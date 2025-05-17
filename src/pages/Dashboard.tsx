@@ -1,11 +1,9 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import QRCodeGenerator from '@/components/qr/QRCodeGenerator';
 import { useAuth } from '@/context/AuthContext';
 import { QRCode } from '@/types';
-import { getUserQRCodes, updateQRCode } from '@/lib/mockData';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
@@ -14,7 +12,9 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/components/ui/use-toast';
-import { QRCodeSVG } from 'qrcode.react';
+import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
+import ReactDOM from 'react-dom/client';
+import { qrCodeApi } from '@/lib/api';
 
 const Dashboard = () => {
   const { user, isTrialExpired, isTrialActive, daysLeftInTrial } = useAuth();
@@ -38,7 +38,7 @@ const Dashboard = () => {
       
       setIsLoading(true);
       try {
-        const codes = await getUserQRCodes(user.id);
+        const codes = await qrCodeApi.getAll();
         setQrCodes(codes);
       } catch (error) {
         console.error('Failed to fetch QR codes', error);
@@ -68,7 +68,7 @@ const Dashboard = () => {
     if (!editingQR) return;
     
     try {
-      const updatedQR = await updateQRCode(editingQR.id, { url: newUrl });
+      const updatedQR = await qrCodeApi.update(editingQR.id, { url: newUrl });
       setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
       setEditingQR(null);
       toast({
@@ -85,12 +85,116 @@ const Dashboard = () => {
     }
   };
 
+  const handleDeleteQR = async (qrId: string) => {
+    try {
+      await qrCodeApi.delete(qrId);
+      setQrCodes(prev => prev.filter(qr => qr.id !== qrId));
+      toast({
+        title: "QR Code Deleted",
+        description: "Your QR code has been deleted successfully.",
+      });
+    } catch (error) {
+      console.error('Failed to delete QR code', error);
+      toast({
+        variant: "destructive",
+        title: "Delete failed",
+        description: "There was a problem deleting your QR code.",
+      });
+    }
+  };
+
   const handleDownload = (qr: QRCode, format: 'png' | 'svg') => {
-    // Mock download function
-    toast({
-      title: `QR Code Downloaded`,
-      description: `Your QR code has been downloaded as ${format.toUpperCase()}`,
-    });
+    try {
+      if (format === 'svg') {
+        // Get the SVG element
+        const svgElement = document.querySelector(`[data-qr-id="${qr.id}"] svg`);
+        if (!svgElement) return;
+
+        // Create a new SVG element with the same content
+        const svgData = new XMLSerializer().serializeToString(svgElement);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const svgUrl = URL.createObjectURL(svgBlob);
+
+        // Create download link
+        const downloadLink = document.createElement('a');
+        downloadLink.href = svgUrl;
+        downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
+        document.body.appendChild(downloadLink);
+        downloadLink.click();
+        document.body.removeChild(downloadLink);
+        URL.revokeObjectURL(svgUrl);
+      } else {
+        // For PNG, we need to create a canvas element
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        // Set canvas size
+        canvas.width = 400;
+        canvas.height = 400;
+
+        // Create QR code on canvas
+        const qrCanvas = document.createElement('div');
+        qrCanvas.style.display = 'none';
+        document.body.appendChild(qrCanvas);
+
+        // Create QR code using QRCodeCanvas component
+        const qrCode = document.createElement('div');
+        qrCanvas.appendChild(qrCode);
+        
+        // Render QR code using React
+        const root = ReactDOM.createRoot(qrCode);
+        root.render(
+          <QRCodeCanvas
+            value={qr.url}
+            size={400}
+            bgColor={qr.backgroundColor}
+            fgColor={qr.foregroundColor}
+            level="H"
+            includeMargin={false}
+            imageSettings={qr.logoUrl ? {
+              src: qr.logoUrl,
+              height: 100,
+              width: 100,
+              excavate: true,
+            } : undefined}
+          />
+        );
+
+        // Wait for QR code to render
+        setTimeout(() => {
+          const canvasElement = qrCanvas.querySelector('canvas');
+          if (!canvasElement) return;
+
+          // Draw QR code on our canvas
+          ctx.fillStyle = qr.backgroundColor;
+          ctx.fillRect(0, 0, canvas.width, canvas.height);
+          ctx.drawImage(canvasElement, 0, 0, canvas.width, canvas.height);
+          
+          // Convert to PNG and download
+          const pngUrl = canvas.toDataURL('image/png');
+          const downloadLink = document.createElement('a');
+          downloadLink.href = pngUrl;
+          downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          document.body.removeChild(qrCanvas);
+        }, 100);
+      }
+
+      toast({
+        title: `QR Code Downloaded`,
+        description: `Your QR code has been downloaded as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      console.error('Download failed:', error);
+      toast({
+        variant: "destructive",
+        title: "Download Failed",
+        description: "There was a problem downloading your QR code.",
+      });
+    }
   };
 
   if (!user) return null;
@@ -174,6 +278,7 @@ const Dashboard = () => {
                       <div 
                         className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md p-2" 
                         style={{ backgroundColor: qr.backgroundColor }}
+                        data-qr-id={qr.id}
                       >
                         <QRCodeSVG
                           value={qr.url}
@@ -195,7 +300,7 @@ const Dashboard = () => {
                         <Label className="text-xs text-gray-500">URL</Label>
                         <p className="text-sm truncate mb-2">{qr.url}</p>
                         <Label className="text-xs text-gray-500">Created</Label>
-                        <p className="text-sm">{qr.createdAt.toLocaleDateString()}</p>
+                        <p className="text-sm">{new Date(qr.createdAt).toLocaleDateString()}</p>
                       </div>
                       
                       <div className="flex flex-col space-y-2">
@@ -249,6 +354,15 @@ const Dashboard = () => {
                             SVG
                           </Button>
                         </div>
+
+                        <Button 
+                          variant="destructive" 
+                          size="sm" 
+                          onClick={() => handleDeleteQR(qr.id)}
+                          className="w-full"
+                        >
+                          Delete
+                        </Button>
                       </div>
                     </CardContent>
                   </Card>

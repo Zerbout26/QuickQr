@@ -1,15 +1,14 @@
-
 import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { createQRCode } from '@/lib/mockData';
 import { QRCode as QRCodeType } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
+import { qrCodeApi } from '@/lib/api';
 
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
@@ -74,19 +73,19 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     
     try {
       // Validate URL format
+      let finalUrl = url;
       try {
         new URL(url);
       } catch {
         // If not a valid URL, try prepending https://
         if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          setUrl(`https://${url}`);
+          finalUrl = `https://${url}`;
         }
       }
       
-      const newQRCode = await createQRCode({
-        userId: user.id,
+      const newQRCode = await qrCodeApi.create({
         name: name || 'My QR Code',
-        url,
+        url: finalUrl,
         foregroundColor,
         backgroundColor,
         logoUrl
@@ -100,6 +99,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       // Reset form
       setName('');
       setUrl('');
+      setLogoUrl(undefined);
       
       // Call onCreated callback
       if (onCreated) {

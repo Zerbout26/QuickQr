@@ -1,9 +1,7 @@
-
 import { useState, useEffect, useMemo } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { useAuth } from '@/context/AuthContext';
-import { getAllUsers, activateUser, deactivateUser } from '@/lib/mockData';
 import { User } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
@@ -12,6 +10,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { toast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { adminApi } from '@/lib/api';
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
@@ -41,7 +40,7 @@ const Admin = () => {
       
       setIsLoading(true);
       try {
-        const allUsers = await getAllUsers();
+        const allUsers = await adminApi.getAllUsers();
         setUsers(allUsers);
       } catch (error) {
         console.error('Failed to fetch users', error);
@@ -60,7 +59,7 @@ const Admin = () => {
 
   const handleActivateUser = async (userId: string) => {
     try {
-      const updatedUser = await activateUser(userId);
+      const updatedUser = await adminApi.updateUserStatus(userId, true);
       setUsers(prevUsers => 
         prevUsers.map(u => u.id === userId ? updatedUser : u)
       );
@@ -79,7 +78,7 @@ const Admin = () => {
 
   const handleDeactivateUser = async (userId: string) => {
     try {
-      const updatedUser = await deactivateUser(userId);
+      const updatedUser = await adminApi.updateUserStatus(userId, false);
       setUsers(prevUsers => 
         prevUsers.map(u => u.id === userId ? updatedUser : u)
       );
