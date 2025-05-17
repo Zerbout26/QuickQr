@@ -1,35 +1,49 @@
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
 import { createQRCode } from '@/lib/mockData';
-import { QRCode } from '@/types';
+import { QRCode as QRCodeType } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { QRCodeSVG } from 'qrcode.react';
 
-// Mock QR code image for preview
-const QRPreview = ({ url, color, bgColor }: { url: string; color: string; bgColor: string }) => {
+// QR Preview component that shows an actual QR code
+const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
+  if (!url) return null;
+  
   return (
     <div className="flex justify-center items-center mb-4">
       <div 
-        className="w-48 h-48 flex items-center justify-center border rounded-md" 
+        className="w-48 h-48 flex items-center justify-center border rounded-md p-2" 
         style={{ backgroundColor: bgColor }}
       >
-        <div className="text-sm text-center text-gray-400">
-          QR Code Preview<br/>
-          (Mock: {url})
-          <div className="w-28 h-28 mt-2 mx-auto border-2" style={{ borderColor: color }}></div>
-        </div>
+        <QRCodeSVG
+          value={url}
+          size={176}
+          bgColor={bgColor}
+          fgColor={color}
+          level="H"
+          includeMargin={false}
+          imageSettings={logoUrl ? {
+            src: logoUrl,
+            x: undefined,
+            y: undefined,
+            height: 40,
+            width: 40,
+            excavate: true,
+          } : undefined}
+        />
       </div>
     </div>
   );
 };
 
 interface QRCodeFormProps {
-  onCreated?: (qrCode: QRCode) => void;
+  onCreated?: (qrCode: QRCodeType) => void;
 }
 
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
@@ -38,6 +52,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [url, setUrl] = useState('');
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
+  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -73,7 +88,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         name: name || 'My QR Code',
         url,
         foregroundColor,
-        backgroundColor
+        backgroundColor,
+        logoUrl
       });
       
       toast({
@@ -100,6 +116,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       setIsLoading(false);
     }
   };
+
+  // Format URL for QR code generation
+  const formattedUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
 
   return (
     <Card className="w-full max-w-lg mx-auto">
@@ -176,10 +195,21 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   />
                 </div>
               </div>
+              
+              <div className="space-y-2">
+                <Label htmlFor="logo">Logo URL (Optional)</Label>
+                <Input 
+                  id="logo"
+                  placeholder="https://example.com/logo.png" 
+                  value={logoUrl || ''}
+                  onChange={(e) => setLogoUrl(e.target.value || undefined)}
+                />
+                <p className="text-xs text-gray-500">Add a logo to the center of your QR code</p>
+              </div>
             </TabsContent>
             
             {/* QR Preview */}
-            {url && <QRPreview url={url} color={foregroundColor} bgColor={backgroundColor} />}
+            {url && <QRPreview url={formattedUrl} color={foregroundColor} bgColor={backgroundColor} logoUrl={logoUrl} />}
             
             <div className="flex justify-end">
               <Button 

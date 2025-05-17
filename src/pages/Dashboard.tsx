@@ -14,6 +14,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { toast } from '@/components/ui/use-toast';
+import { QRCodeSVG } from 'qrcode.react';
 
 const Dashboard = () => {
   const { user, isTrialExpired, isTrialActive, daysLeftInTrial } = useAuth();
@@ -154,7 +155,7 @@ const Dashboard = () => {
               <div className="text-center py-12 border rounded-lg bg-gray-50">
                 <p className="text-gray-500">You haven't created any QR codes yet.</p>
                 <Button 
-                  onClick={() => document.querySelector('[data-value="create"]')?.click()}
+                  onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                   variant="link" 
                   className="text-qr-primary mt-2"
                 >
@@ -171,13 +172,23 @@ const Dashboard = () => {
                     <CardContent>
                       {/* QR Code Display */}
                       <div 
-                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md" 
+                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md p-2" 
                         style={{ backgroundColor: qr.backgroundColor }}
                       >
-                        <div className="text-sm text-center text-gray-400">
-                          QR Code Preview<br/>
-                          <div className="w-28 h-28 mt-2 mx-auto border-2" style={{ borderColor: qr.foregroundColor }}></div>
-                        </div>
+                        <QRCodeSVG
+                          value={qr.url}
+                          size={160}
+                          bgColor={qr.backgroundColor}
+                          fgColor={qr.foregroundColor}
+                          level="H"
+                          includeMargin={false}
+                          imageSettings={qr.logoUrl ? {
+                            src: qr.logoUrl,
+                            height: 40,
+                            width: 40,
+                            excavate: true,
+                          } : undefined}
+                        />
                       </div>
                       
                       <div className="mb-4">
