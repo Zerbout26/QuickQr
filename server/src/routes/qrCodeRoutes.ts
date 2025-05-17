@@ -23,7 +23,6 @@ router.get('/redirect/:id', async (req: Request, res: Response) => {
       return res.status(404).send('QR Code not found');
     }
 
-    // Render a simple HTML page with a button that redirects to the actual URL
     res.send(`
       <!DOCTYPE html>
       <html>
@@ -55,18 +54,13 @@ router.get('/redirect/:id', async (req: Request, res: Response) => {
               border-radius: 4px;
               font-weight: bold;
               margin-top: 1rem;
-              transition: background-color 0.2s;
-            }
-            .button:hover {
-              background-color: #0056b3;
             }
           </style>
         </head>
         <body>
           <div class="container">
-            <h1>You're being redirected</h1>
-            <p>Click the button below to continue to your destination</p>
-            <a href="${qrCode.url}" class="button">Continue to Destination</a>
+            <h1>Click to Continue</h1>
+            <a href="${qrCode.url}" class="button">Go to Destination</a>
           </div>
         </body>
       </html>
