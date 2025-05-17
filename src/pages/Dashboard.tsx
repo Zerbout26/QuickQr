@@ -15,6 +15,7 @@ import { toast } from '@/components/ui/use-toast';
 import { QRCodeSVG, QRCodeCanvas } from 'qrcode.react';
 import ReactDOM from 'react-dom/client';
 import { qrCodeApi } from '@/lib/api';
+import { Lock, Download, Eye } from 'lucide-react';
 
 const Dashboard = () => {
   const { user, isTrialExpired, isTrialActive, daysLeftInTrial } = useAuth();
@@ -22,6 +23,7 @@ const Dashboard = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [editingQR, setEditingQR] = useState<QRCode | null>(null);
   const [newUrl, setNewUrl] = useState('');
+  const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
 
   // Redirect if not logged in
@@ -103,69 +105,86 @@ const Dashboard = () => {
     }
   };
 
+  const handlePreview = (qr: QRCode) => {
+    setPreviewQR(qr);
+  };
+
   const handleDownload = (qr: QRCode, format: 'png' | 'svg') => {
-    // Check if user is activated
     if (!user?.isActive) {
       toast({
         variant: "destructive",
         title: "Account Not Activated",
-        description: "Your account needs to be activated by an administrator before you can download QR codes.",
+        description: "Please activate your account to download QR codes.",
       });
       return;
     }
 
     try {
       if (format === 'svg') {
-        // Get the SVG element
-        const svgElement = document.querySelector(`[data-qr-id="${qr.id}"] svg`);
-        if (!svgElement) return;
-
-        // Create a new SVG element with the same content
-        const svgData = new XMLSerializer().serializeToString(svgElement);
-        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-        const svgUrl = URL.createObjectURL(svgBlob);
-
-        // Create download link
-        const downloadLink = document.createElement('a');
-        downloadLink.href = svgUrl;
-        downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
-        document.body.appendChild(downloadLink);
-        downloadLink.click();
-        document.body.removeChild(downloadLink);
-        URL.revokeObjectURL(svgUrl);
-      } else {
-        // For PNG, we need to create a canvas element
-        const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
-        // Set canvas size
-        canvas.width = 400;
-        canvas.height = 400;
-
-        // Create QR code on canvas
-        const qrCanvas = document.createElement('div');
-        qrCanvas.style.display = 'none';
-        document.body.appendChild(qrCanvas);
-
-        // Create QR code using QRCodeCanvas component
-        const qrCode = document.createElement('div');
-        qrCanvas.appendChild(qrCode);
+        // Create a new SVG element
+        const svgElement = document.createElement('div');
+        document.body.appendChild(svgElement);
         
         // Render QR code using React
-        const root = ReactDOM.createRoot(qrCode);
+        const root = ReactDOM.createRoot(svgElement);
         root.render(
-          <QRCodeCanvas
+          <QRCodeSVG
             value={qr.url}
-            size={400}
+            size={800}
             bgColor={qr.backgroundColor}
             fgColor={qr.foregroundColor}
             level="H"
             includeMargin={false}
             imageSettings={qr.logoUrl ? {
               src: qr.logoUrl,
-              height: 100,
-              width: 100,
+              height: 200,
+              width: 200,
+              excavate: true,
+            } : undefined}
+          />
+        );
+
+        // Wait for SVG to render
+        setTimeout(() => {
+          const svg = svgElement.querySelector('svg');
+          if (!svg) return;
+
+          // Create a new SVG element with the same content
+          const svgData = new XMLSerializer().serializeToString(svg);
+          const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+          const svgUrl = URL.createObjectURL(svgBlob);
+
+          // Create download link
+          const downloadLink = document.createElement('a');
+          downloadLink.href = svgUrl;
+          downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
+          document.body.appendChild(downloadLink);
+          downloadLink.click();
+          document.body.removeChild(downloadLink);
+          URL.revokeObjectURL(svgUrl);
+          document.body.removeChild(svgElement);
+        }, 100);
+      } else {
+        // For PNG, create a temporary container
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        document.body.appendChild(container);
+
+        // Render QR code using React
+        const root = ReactDOM.createRoot(container);
+        root.render(
+          <QRCodeCanvas
+            value={qr.url}
+            size={800}
+            bgColor={qr.backgroundColor}
+            fgColor={qr.foregroundColor}
+            level="H"
+            includeMargin={false}
+            imageSettings={qr.logoUrl ? {
+              src: qr.logoUrl,
+              height: 200,
+              width: 200,
               excavate: true,
             } : undefined}
           />
@@ -173,23 +192,24 @@ const Dashboard = () => {
 
         // Wait for QR code to render
         setTimeout(() => {
-          const canvasElement = qrCanvas.querySelector('canvas');
-          if (!canvasElement) return;
+          const canvas = container.querySelector('canvas');
+          if (!canvas) return;
 
-          // Draw QR code on our canvas
-          ctx.fillStyle = qr.backgroundColor;
-          ctx.fillRect(0, 0, canvas.width, canvas.height);
-          ctx.drawImage(canvasElement, 0, 0, canvas.width, canvas.height);
-          
-          // Convert to PNG and download
-          const pngUrl = canvas.toDataURL('image/png');
-          const downloadLink = document.createElement('a');
-          downloadLink.href = pngUrl;
-          downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-          document.body.removeChild(qrCanvas);
+          // Convert canvas to blob
+          canvas.toBlob((blob) => {
+            if (!blob) return;
+
+            // Create download link
+            const url = URL.createObjectURL(blob);
+            const downloadLink = document.createElement('a');
+            downloadLink.href = url;
+            downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+            document.body.appendChild(downloadLink);
+            downloadLink.click();
+            document.body.removeChild(downloadLink);
+            URL.revokeObjectURL(url);
+            document.body.removeChild(container);
+          }, 'image/png', 1.0);
         }, 100);
       }
 
@@ -316,15 +336,10 @@ const Dashboard = () => {
                         data-qr-id={qr.id}
                       >
                         {!user?.isActive && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-md">
-                            <div className="text-center p-4">
-                              <p className="text-white mb-4">Activate your account to download QR codes</p>
-                              <Button 
-                                onClick={() => navigate('/payment-instructions')} 
-                                className="bg-white hover:bg-gray-50 text-qr-primary border-qr-primary"
-                              >
-                                Activate Account
-                              </Button>
+                          <div className="absolute inset-0 bg-black/10 flex items-center justify-center rounded-md pointer-events-none">
+                            <div className="text-center">
+                              <Lock className="w-6 h-6 text-gray-400 mb-2" />
+                              <p className="text-gray-500 text-sm">Preview Mode</p>
                             </div>
                           </div>
                         )}
@@ -385,24 +400,38 @@ const Dashboard = () => {
                         </Dialog>
                         
                         <div className="flex space-x-2">
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDownload(qr, 'png')}
-                            className="flex-1"
-                            disabled={!user?.isActive}
-                          >
-                            PNG
-                          </Button>
-                          <Button 
-                            variant="outline" 
-                            size="sm" 
-                            onClick={() => handleDownload(qr, 'svg')}
-                            className="flex-1"
-                            disabled={!user?.isActive}
-                          >
-                            SVG
-                          </Button>
+                          {user?.isActive ? (
+                            <>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleDownload(qr, 'png')}
+                                className="flex-1"
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                PNG
+                              </Button>
+                              <Button 
+                                variant="outline" 
+                                size="sm" 
+                                onClick={() => handleDownload(qr, 'svg')}
+                                className="flex-1"
+                              >
+                                <Download className="w-4 h-4 mr-2" />
+                                SVG
+                              </Button>
+                            </>
+                          ) : (
+                            <Button 
+                              variant="outline" 
+                              size="sm" 
+                              onClick={() => handlePreview(qr)}
+                              className="w-full"
+                            >
+                              <Eye className="w-4 h-4 mr-2" />
+                              Preview
+                            </Button>
+                          )}
                         </div>
 
                         <Button 
@@ -422,6 +451,55 @@ const Dashboard = () => {
           </TabsContent>
         </Tabs>
       </div>
+
+      {/* Preview Dialog */}
+      <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
+        <DialogContent className="max-w-2xl">
+          <DialogHeader>
+            <DialogTitle>QR Code Preview</DialogTitle>
+          </DialogHeader>
+          <div className="py-4">
+            {previewQR && (
+              <div className="flex flex-col items-center">
+                <div 
+                  className="w-64 h-64 mb-4 flex items-center justify-center border rounded-md p-2 relative" 
+                  style={{ backgroundColor: previewQR.backgroundColor }}
+                >
+                  <div className="absolute inset-0 bg-black/10 flex items-center justify-center rounded-md">
+                    <div className="text-center">
+                      <Lock className="w-8 h-8 text-gray-400 mb-2" />
+                      <p className="text-gray-500">Preview Mode</p>
+                    </div>
+                  </div>
+                  <QRCodeSVG
+                    value={previewQR.url}
+                    size={240}
+                    bgColor={previewQR.backgroundColor}
+                    fgColor={previewQR.foregroundColor}
+                    level="H"
+                    includeMargin={false}
+                    imageSettings={previewQR.logoUrl ? {
+                      src: previewQR.logoUrl,
+                      height: 60,
+                      width: 60,
+                      excavate: true,
+                    } : undefined}
+                  />
+                </div>
+                <p className="text-sm text-gray-500 mb-4">
+                  Activate your account to download high-resolution QR codes
+                </p>
+                <Button 
+                  onClick={() => navigate('/payment-instructions')}
+                  className="bg-qr-primary hover:bg-qr-primary/90"
+                >
+                  Activate Account
+                </Button>
+              </div>
+            )}
+          </div>
+        </DialogContent>
+      </Dialog>
     </MainLayout>
   );
 };
