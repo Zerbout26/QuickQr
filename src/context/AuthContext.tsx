@@ -8,8 +8,8 @@ import { toast } from '../components/ui/use-toast';
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signIn: async () => {},
-  signUp: async () => {},
+  signIn: async () => null,
+  signUp: async () => null,
   signOut: () => {},
   isAdmin: () => false,
   isTrialActive: () => false,
@@ -17,9 +17,57 @@ const AuthContext = createContext<AuthContextType>({
   daysLeftInTrial: () => null,
 });
 
+// Initialize default admin account on first load
+const initializeDefaultAdmin = () => {
+  // Check if there's already an admin in localStorage to avoid overwriting
+  const savedUser = localStorage.getItem('qr-generator-user');
+  if (savedUser) {
+    try {
+      const parsedUser = JSON.parse(savedUser);
+      if (parsedUser.role === 'admin') {
+        return; // Admin already exists
+      }
+    } catch (error) {
+      console.error('Failed to parse saved user', error);
+    }
+  }
+
+  // Set default admin in localStorage if it doesn't exist
+  const defaultAdmin: User = {
+    id: 'admin-1',
+    email: 'admin@qrcreator.com',
+    name: 'System Admin',
+    role: 'admin',
+    trialStartDate: new Date(),
+    trialEndDate: new Date(),
+    isActive: true,
+    hasActiveSubscription: true
+  };
+
+  // Store default admin in mock data storage
+  if (!mockLogin('admin@qrcreator.com', 'adminpassword')
+      .then(() => {})
+      .catch(() => {
+        // If admin doesn't exist in mock data, add it
+        mockRegister('admin@qrcreator.com', 'adminpassword')
+          .then(user => {
+            // Update the role to admin after registration
+            user.role = 'admin';
+            user.name = 'System Admin';
+            user.hasActiveSubscription = true;
+          })
+          .catch(err => console.error('Failed to create default admin', err));
+      }));
+};
+
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+
+  // Initialize default admin on first load
+  useEffect(() => {
+    initializeDefaultAdmin();
+  }, []);
 
   // Check for saved user on mount
   useEffect(() => {
@@ -48,7 +96,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   }, [user]);
 
-  const signIn = async (email: string, password: string) => {
+  const signIn = async (email: string, password: string): Promise<User> => {
     setLoading(true);
     try {
       const user = await mockLogin(email, password);
@@ -57,6 +105,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Signed in successfully",
         description: `Welcome back${user.name ? `, ${user.name}` : ''}!`,
       });
+      return user;
     } catch (error) {
       toast({
         variant: "destructive",
@@ -69,7 +118,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string) => {
+  const signUp = async (email: string, password: string): Promise<User> => {
     setLoading(true);
     try {
       const user = await mockRegister(email, password);
@@ -78,6 +127,7 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
         title: "Account created",
         description: `Welcome to QR Code Generator! Your 14-day free trial has started.`,
       });
+      return user;
     } catch (error) {
       toast({
         variant: "destructive",

@@ -27,8 +27,8 @@ export interface QRCode {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<void>;
-  signUp: (email: string, password: string) => Promise<void>;
+  signIn: (email: string, password: string) => Promise<User>;
+  signUp: (email: string, password: string) => Promise<User>;
   signOut: () => void;
   isAdmin: () => boolean;
   isTrialActive: () => boolean;

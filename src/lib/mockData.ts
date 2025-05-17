@@ -42,6 +42,16 @@ export const mockUsers: User[] = [
     trialEndDate: new Date(),
     isActive: true,
     hasActiveSubscription: true
+  },
+  {
+    id: 'admin-1',
+    email: 'admin@qrcreator.com',
+    name: 'System Admin',
+    role: 'admin',
+    trialStartDate: new Date(),
+    trialEndDate: new Date(),
+    isActive: true,
+    hasActiveSubscription: true
   }
 ];
 
@@ -106,7 +116,7 @@ export const mockRegister = (email: string, password: string): Promise<User> => 
       const newUser: User = {
         id: `${mockUsers.length + 1}`,
         email,
-        role: 'user',
+        role: 'user', // Default role for new registrations is 'user'
         trialStartDate: new Date(),
         trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         isActive: true,

@@ -21,40 +21,15 @@ const SignInForm = () => {
     setIsLoading(true);
 
     try {
-      await signIn(email, password);
-      navigate('/dashboard');
+      const user = await signIn(email, password);
+      // Redirect based on user role
+      if (user.role === 'admin') {
+        navigate('/admin');
+      } else {
+        navigate('/dashboard');
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleDemoLogin = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      await signIn('user@example.com', 'password');
-      navigate('/dashboard');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with demo account');
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const handleAdminLogin = async (e: React.MouseEvent) => {
-    e.preventDefault();
-    setError('');
-    setIsLoading(true);
-
-    try {
-      await signIn('admin@example.com', 'password');
-      navigate('/admin');
-    } catch (err) {
-      setError(err instanceof Error ? err.message : 'Failed to sign in with admin account');
     } finally {
       setIsLoading(false);
     }
@@ -97,7 +72,7 @@ const SignInForm = () => {
             />
           </div>
         </CardContent>
-        <CardFooter className="flex flex-col space-y-4">
+        <CardFooter className="flex flex-col">
           <Button 
             type="submit" 
             className="w-full qr-btn-primary" 
@@ -105,25 +80,7 @@ const SignInForm = () => {
           >
             {isLoading ? 'Signing in...' : 'Sign In'}
           </Button>
-          <div className="flex justify-between w-full mt-2">
-            <Button 
-              variant="outline" 
-              className="flex-1 mr-2" 
-              onClick={handleDemoLogin}
-              disabled={isLoading}
-            >
-              Demo User
-            </Button>
-            <Button 
-              variant="outline" 
-              className="flex-1" 
-              onClick={handleAdminLogin}
-              disabled={isLoading}
-            >
-              Demo Admin
-            </Button>
-          </div>
-          <div className="text-center text-sm text-gray-500">
+          <div className="text-center mt-4 text-sm text-gray-500">
             Don't have an account?{' '}
             <Link to="/signup" className="text-qr-secondary font-medium hover:underline">
               Sign up
