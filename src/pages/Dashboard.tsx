@@ -104,6 +104,16 @@ const Dashboard = () => {
   };
 
   const handleDownload = (qr: QRCode, format: 'png' | 'svg') => {
+    // Check if user is activated
+    if (!user?.isActive) {
+      toast({
+        variant: "destructive",
+        title: "Account Not Activated",
+        description: "Your account needs to be activated by an administrator before you can download QR codes.",
+      });
+      return;
+    }
+
     try {
       if (format === 'svg') {
         // Get the SVG element
@@ -342,6 +352,7 @@ const Dashboard = () => {
                             size="sm" 
                             onClick={() => handleDownload(qr, 'png')}
                             className="flex-1"
+                            disabled={!user?.isActive}
                           >
                             PNG
                           </Button>
@@ -350,6 +361,7 @@ const Dashboard = () => {
                             size="sm" 
                             onClick={() => handleDownload(qr, 'svg')}
                             className="flex-1"
+                            disabled={!user?.isActive}
                           >
                             SVG
                           </Button>
