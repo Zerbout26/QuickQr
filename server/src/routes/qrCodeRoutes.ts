@@ -13,7 +13,7 @@ import { QRCode } from '../models/QRCode';
 const router = express.Router();
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 
-// Landing page route for QR code redirects
+// Public landing page route for QR code redirects (no auth required)
 router.get('/redirect/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -70,6 +70,7 @@ router.get('/redirect/:id', async (req: Request, res: Response) => {
   }
 });
 
+// Protected routes (require authentication)
 router.post('/', auth, createQRCode);
 router.get('/', auth, getQRCodes);
 router.get('/:id', auth, getQRCode);
