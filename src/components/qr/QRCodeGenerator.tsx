@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -9,6 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
+import { Upload, X } from 'lucide-react';
 
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
@@ -31,8 +32,8 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
             src: logoUrl,
             x: undefined,
             y: undefined,
-            height: 40,
-            width: 40,
+            height: 48,
+            width: 48,
             excavate: true,
           } : undefined}
         />
@@ -51,9 +52,53 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [url, setUrl] = useState('');
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
-  const [logoUrl, setLogoUrl] = useState<string | undefined>(undefined);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: "destructive",
+        title: "Invalid file type",
+        description: "Please upload an image file (PNG, JPG, etc.)",
+      });
+      return;
+    }
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "File too large",
+        description: "Logo image must be less than 2MB",
+      });
+      return;
+    }
+
+    setLogoFile(file);
+
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const removeLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -82,14 +127,47 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           finalUrl = `https://${url}`;
         }
       }
+
+      const formData = new FormData();
+      formData.append('name', name || 'My QR Code');
+      formData.append('url', finalUrl);
+      formData.append('foregroundColor', foregroundColor);
+      formData.append('backgroundColor', backgroundColor);
       
-      const newQRCode = await qrCodeApi.create({
-        name: name || 'My QR Code',
-        url: finalUrl,
-        foregroundColor,
-        backgroundColor,
-        logoUrl
+      // If we have a logo file, append it to the form data
+      if (logoFile) {
+        formData.append('logo', logoFile);
+      }
+
+      // Get token from localStorage
+      const token = localStorage.getItem('qr-generator-token');
+      if (!token) {
+        throw new Error('Please log in to create QR codes');
+      }
+
+      console.log('Sending form data:', {
+        name: formData.get('name'),
+        url: formData.get('url'),
+        foregroundColor: formData.get('foregroundColor'),
+        backgroundColor: formData.get('backgroundColor'),
+        hasLogo: formData.has('logo')
       });
+
+      const response = await fetch('http://localhost:3000/api/qrcodes', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${token}`
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({ error: 'Failed to create QR code' }));
+        throw new Error(errorData.error || 'Failed to create QR code');
+      }
+
+      const newQR = await response.json();
+      console.log('Received QR code response:', newQR);
       
       toast({
         title: "QR Code Created",
@@ -99,13 +177,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       // Reset form
       setName('');
       setUrl('');
-      setLogoUrl(undefined);
+      removeLogo();
       
       // Call onCreated callback
       if (onCreated) {
-        onCreated(newQRCode);
+        onCreated(newQR);
       }
     } catch (err) {
+      console.error('Error creating QR code:', err);
       setError(err instanceof Error ? err.message : 'Failed to create QR code');
       toast({
         variant: "destructive",
@@ -197,19 +276,61 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               </div>
               
               <div className="space-y-2">
-                <Label htmlFor="logo">Logo URL (Optional)</Label>
-                <Input 
-                  id="logo"
-                  placeholder="https://example.com/logo.png" 
-                  value={logoUrl || ''}
-                  onChange={(e) => setLogoUrl(e.target.value || undefined)}
-                />
-                <p className="text-xs text-gray-500">Add a logo to the center of your QR code</p>
+                <Label>Logo (Optional)</Label>
+                <div className="flex flex-col space-y-2">
+                  <div className="flex items-center space-x-2">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleLogoUpload}
+                      ref={fileInputRef}
+                      className="hidden"
+                      id="logo-upload"
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="w-full"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      Upload Logo
+                    </Button>
+                  </div>
+                  
+                  {logoPreview && (
+                    <div className="relative w-24 h-24 border rounded-md overflow-hidden">
+                      <img
+                        src={logoPreview}
+                        alt="Logo preview"
+                        className="w-full h-full object-contain"
+                      />
+                      <button
+                        type="button"
+                        onClick={removeLogo}
+                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
+                  )}
+                  
+                  <p className="text-xs text-gray-500">
+                    Upload a logo to add to the center of your QR code (max 2MB)
+                  </p>
+                </div>
               </div>
             </TabsContent>
             
             {/* QR Preview */}
-            {url && <QRPreview url={formattedUrl} color={foregroundColor} bgColor={backgroundColor} logoUrl={logoUrl} />}
+            {url && (
+              <QRPreview 
+                url={formattedUrl} 
+                color={foregroundColor} 
+                bgColor={backgroundColor} 
+                logoUrl={logoPreview || undefined} 
+              />
+            )}
             
             <div className="flex justify-end">
               <Button 

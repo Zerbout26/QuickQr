@@ -2,8 +2,47 @@ import { Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
+import multer from 'multer';
+import path from 'path';
+import fs from 'fs';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
+
+// Configure multer for file uploads
+const storage = multer.diskStorage({
+  destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    const uploadDir = path.join(__dirname, '../../uploads/logos');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    // Get file extension
+    const ext = path.extname(file.originalname);
+    // Create a unique filename with timestamp and random number
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    // Create filename: originalname-timestamp-random.ext
+    const filename = `${path.basename(file.originalname, ext)}-${uniqueSuffix}${ext}`;
+    console.log('Generated filename:', filename);
+    cb(null, filename);
+  }
+});
+
+const upload = multer({
+  storage,
+  limits: {
+    fileSize: 2 * 1024 * 1024 // 2MB limit
+  },
+  fileFilter: (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
+    }
+  }
+}).single('logo');
 
 export const createQRCode = async (req: AuthRequest, res: Response) => {
   try {
@@ -11,20 +50,52 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { name, url, logoUrl, foregroundColor, backgroundColor } = req.body;
+    upload(req, res, async (err) => {
+      if (err) {
+        console.error('Upload error:', err);
+        return res.status(400).json({ error: err.message });
+      }
 
-    const qrCode = qrCodeRepository.create({
-      name,
-      url,
-      logoUrl,
-      foregroundColor,
-      backgroundColor,
-      user: req.user
+      try {
+        console.log('Request body:', req.body);
+        console.log('Request file:', req.file);
+
+        const { name, url, foregroundColor, backgroundColor } = req.body;
+        
+        if (!url) {
+          return res.status(400).json({ error: 'URL is required' });
+        }
+
+        let logoUrl = undefined;
+        if (req.file) {
+          // Create URL for the uploaded file
+          const baseUrl = process.env.NODE_ENV === 'production' 
+            ? 'https://your-production-domain.com' 
+            : 'http://localhost:3000';
+          logoUrl = `${baseUrl}/uploads/logos/${req.file.filename}`;
+          console.log('Generated logo URL:', logoUrl);
+        }
+
+        const qrCode = qrCodeRepository.create({
+          name: name || 'My QR Code',
+          url,
+          logoUrl,
+          foregroundColor: foregroundColor || '#000000',
+          backgroundColor: backgroundColor || '#FFFFFF',
+          user: req.user
+        });
+
+        const savedQRCode = await qrCodeRepository.save(qrCode);
+        console.log('Saved QR code:', savedQRCode);
+        
+        res.status(201).json(savedQRCode);
+      } catch (error) {
+        console.error('Error creating QR code:', error);
+        res.status(500).json({ error: 'Error creating QR code' });
+      }
     });
-
-    await qrCodeRepository.save(qrCode);
-    res.status(201).json(qrCode);
   } catch (error) {
+    console.error('Error in createQRCode:', error);
     res.status(500).json({ error: 'Error creating QR code' });
   }
 };

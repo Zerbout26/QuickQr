@@ -215,18 +215,43 @@ const Dashboard = () => {
         <h1 className="text-3xl font-bold mb-2">Your Dashboard</h1>
         <p className="text-gray-600 mb-8">Manage your QR codes and subscription</p>
         
+        {/* Account Status */}
+        {!user.isActive && (
+          <Alert variant="destructive" className="mb-8">
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex-1">
+                <AlertTitle className="text-lg mb-2">Account Not Activated</AlertTitle>
+                <AlertDescription className="text-base">
+                  Your account is pending activation. Please complete the payment process to activate your account.
+                </AlertDescription>
+              </div>
+              <Button 
+                onClick={() => navigate('/payment-instructions')} 
+                className="bg-white hover:bg-gray-50 text-qr-primary border-qr-primary min-w-[200px] h-12 text-base font-medium"
+              >
+                View Payment Instructions
+              </Button>
+            </div>
+          </Alert>
+        )}
+        
         {/* Subscription Status */}
         {isTrialExpired() && !user.hasActiveSubscription && (
           <Alert variant="destructive" className="mb-8">
-            <AlertTitle>Your trial has expired</AlertTitle>
-            <AlertDescription>
-              Your 14-day free trial has ended. Please subscribe to continue using our service.
-              <div className="mt-4">
-                <Button variant="outline" className="bg-white">
-                  Contact Support
-                </Button>
+            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+              <div className="flex-1">
+                <AlertTitle className="text-lg mb-2">Your trial has expired</AlertTitle>
+                <AlertDescription className="text-base">
+                  Your 14-day free trial has ended. Please subscribe to continue using our service.
+                </AlertDescription>
               </div>
-            </AlertDescription>
+              <Button 
+                onClick={() => navigate('/payment-instructions')} 
+                className="bg-white hover:bg-gray-50 text-qr-primary border-qr-primary min-w-[200px] h-12 text-base font-medium"
+              >
+                View Payment Instructions
+              </Button>
+            </div>
           </Alert>
         )}
         
@@ -286,10 +311,23 @@ const Dashboard = () => {
                     <CardContent>
                       {/* QR Code Display */}
                       <div 
-                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md p-2" 
+                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md p-2 relative" 
                         style={{ backgroundColor: qr.backgroundColor }}
                         data-qr-id={qr.id}
                       >
+                        {!user?.isActive && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-md">
+                            <div className="text-center p-4">
+                              <p className="text-white mb-4">Activate your account to download QR codes</p>
+                              <Button 
+                                onClick={() => navigate('/payment-instructions')} 
+                                className="bg-white hover:bg-gray-50 text-qr-primary border-qr-primary"
+                              >
+                                Activate Account
+                              </Button>
+                            </div>
+                          </div>
+                        )}
                         <QRCodeSVG
                           value={qr.url}
                           size={160}
