@@ -4,18 +4,14 @@ import {
   getQRCodes,
   getQRCode,
   updateQRCode,
-  deleteQRCode,
-  redirectToUrl
+  deleteQRCode
 } from '../controllers/qrCodeController';
 import { auth } from '../middleware/auth';
 
 const router = Router();
 
-// Public route for QR code redirects
-router.get('/redirect/:id', redirectToUrl);
+router.use(auth); // All QR code routes require authentication
 
-// Protected routes
-router.use(auth);
 router.post('/', createQRCode);
 router.get('/', getQRCodes);
 router.get('/:id', getQRCode);

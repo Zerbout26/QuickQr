@@ -1,4 +1,4 @@
-import { Response, Request } from 'express';
+import { Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
@@ -187,23 +187,5 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error deleting QR code' });
-  }
-};
-
-export const redirectToUrl = async (req: Request, res: Response) => {
-  try {
-    const { id } = req.params;
-    const qrCode = await qrCodeRepository.findOne({
-      where: { id }
-    });
-
-    if (!qrCode) {
-      return res.status(404).json({ error: 'QR code not found' });
-    }
-
-    // Instead of redirecting directly, we'll send the URL to the frontend
-    res.json({ url: qrCode.url });
-  } catch (error) {
-    res.status(500).json({ error: 'Error processing redirect' });
   }
 }; 
