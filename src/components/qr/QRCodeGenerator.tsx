@@ -15,9 +15,8 @@ import { Upload, X } from 'lucide-react';
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
   if (!url) return null;
   
-  // Create the landing page URL for preview using the current origin
-  const origin = window.location.origin;
-  const landingPageUrl = `${origin}/api/qrcodes/redirect/${url}`;
+  // Create the landing page URL for preview using the current domain
+  const landingPageUrl = `${window.location.origin}/api/qrcodes/redirect/${url}`;
   
   return (
     <div className="flex justify-center items-center mb-4">
@@ -157,7 +156,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         hasLogo: formData.has('logo')
       });
 
-      const response = await fetch('http://localhost:3000/api/qrcodes', {
+      const response = await fetch('http://localhost:3001/api/qrcodes', {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`
