@@ -19,10 +19,7 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../uploads')));
 
-// Public QR code landing pages
-app.use('/q', qrCodeRoutes);
-
-// API routes
+// Routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 
@@ -32,7 +29,7 @@ AppDataSource.initialize()
     console.log('Database connection established');
     
     // Start server
-    const PORT = process.env.PORT || 3001;
+    const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server is running on port ${PORT}`);
     });

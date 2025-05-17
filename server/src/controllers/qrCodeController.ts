@@ -66,13 +66,12 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
           return res.status(400).json({ error: 'URL is required' });
         }
 
-        // Get the origin from the request
-        const origin = req.get('origin') || req.get('host');
-        const baseUrl = origin ? `http://${origin}` : 'http://localhost:3000';
-        console.log('Using base URL:', baseUrl);
-
         let logoUrl = undefined;
         if (req.file) {
+          // Create URL for the uploaded file
+          const baseUrl = process.env.NODE_ENV === 'production' 
+            ? 'https://your-production-domain.com' 
+            : 'http://localhost:3000';
           logoUrl = `${baseUrl}/uploads/logos/${req.file.filename}`;
           console.log('Generated logo URL:', logoUrl);
         }
@@ -89,17 +88,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         const savedQRCode = await qrCodeRepository.save(qrCode);
         console.log('Saved QR code:', savedQRCode);
         
-        // Create the landing page URL using the same base URL
-        const landingPageUrl = `${baseUrl}/q/view/${savedQRCode.id}`;
-        console.log('Generated landing page URL:', landingPageUrl);
-        
-        // Return the QR code data with the landing page URL
-        const responseData = {
-          ...savedQRCode,
-          landingPageUrl
-        };
-        
-        res.status(201).json(responseData);
+        res.status(201).json(savedQRCode);
       } catch (error) {
         console.error('Error creating QR code:', error);
         res.status(500).json({ error: 'Error creating QR code' });
