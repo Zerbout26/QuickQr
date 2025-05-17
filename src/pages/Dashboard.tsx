@@ -119,112 +119,188 @@ const Dashboard = () => {
       return;
     }
 
-    try {
-      if (format === 'svg') {
-        // Create a new SVG element
-        const svgElement = document.createElement('div');
-        document.body.appendChild(svgElement);
+    const preloadLogo = (logoUrl: string): Promise<HTMLImageElement> => {
+      return new Promise((resolve, reject) => {
+        const img = new Image();
+        img.crossOrigin = 'anonymous';
         
-        // Render QR code using React
-        const root = ReactDOM.createRoot(svgElement);
-        root.render(
-          <QRCodeSVG
-            value={qr.url}
-            size={800}
-            bgColor={qr.backgroundColor}
-            fgColor={qr.foregroundColor}
-            level="H"
-            includeMargin={false}
-            imageSettings={qr.logoUrl ? {
-              src: qr.logoUrl,
-              height: 200,
-              width: 200,
-              excavate: true,
-            } : undefined}
-          />
-        );
+        // Add timestamp to URL to prevent caching
+        const timestamp = new Date().getTime();
+        const urlWithTimestamp = `${logoUrl}?t=${timestamp}`;
+        
+        img.onload = () => {
+          // Create a canvas to draw the image
+          const canvas = document.createElement('canvas');
+          canvas.width = img.width;
+          canvas.height = img.height;
+          const ctx = canvas.getContext('2d');
+          if (!ctx) {
+            reject(new Error('Could not get canvas context'));
+            return;
+          }
+          
+          // Draw the image on the canvas
+          ctx.drawImage(img, 0, 0);
+          
+          // Create a new image from the canvas
+          const newImg = new Image();
+          newImg.src = canvas.toDataURL('image/png');
+          newImg.onload = () => resolve(newImg);
+          newImg.onerror = reject;
+        };
+        
+        img.onerror = () => {
+          // If CORS fails, try without crossOrigin
+          const fallbackImg = new Image();
+          fallbackImg.onload = () => resolve(fallbackImg);
+          fallbackImg.onerror = reject;
+          fallbackImg.src = urlWithTimestamp;
+        };
+        
+        img.src = urlWithTimestamp;
+      });
+    };
 
-        // Wait for SVG to render
-        setTimeout(() => {
-          const svg = svgElement.querySelector('svg');
-          if (!svg) return;
+    const downloadWithLogo = async () => {
+      try {
+        if (format === 'svg') {
+          // Create a new SVG element
+          const svgElement = document.createElement('div');
+          document.body.appendChild(svgElement);
+          
+          // Preload logo if exists
+          let logoImage: HTMLImageElement | undefined;
+          if (qr.logoUrl) {
+            try {
+              logoImage = await preloadLogo(qr.logoUrl);
+            } catch (error) {
+              console.warn('Failed to preload logo:', error);
+            }
+          }
+          
+          // Render QR code using React
+          const root = ReactDOM.createRoot(svgElement);
+          root.render(
+            <QRCodeSVG
+              value={qr.url}
+              size={800}
+              bgColor={qr.backgroundColor}
+              fgColor={qr.foregroundColor}
+              level="H"
+              includeMargin={false}
+              imageSettings={logoImage ? {
+                src: logoImage.src,
+                height: 200,
+                width: 200,
+                excavate: true,
+              } : undefined}
+            />
+          );
 
-          // Create a new SVG element with the same content
-          const svgData = new XMLSerializer().serializeToString(svg);
-          const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-          const svgUrl = URL.createObjectURL(svgBlob);
+          // Wait for SVG to render
+          setTimeout(() => {
+            const svg = svgElement.querySelector('svg');
+            if (!svg) return;
 
-          // Create download link
-          const downloadLink = document.createElement('a');
-          downloadLink.href = svgUrl;
-          downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
-          document.body.appendChild(downloadLink);
-          downloadLink.click();
-          document.body.removeChild(downloadLink);
-          URL.revokeObjectURL(svgUrl);
-          document.body.removeChild(svgElement);
-        }, 100);
-      } else {
-        // For PNG, create a temporary container
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        document.body.appendChild(container);
-
-        // Render QR code using React
-        const root = ReactDOM.createRoot(container);
-        root.render(
-          <QRCodeCanvas
-            value={qr.url}
-            size={800}
-            bgColor={qr.backgroundColor}
-            fgColor={qr.foregroundColor}
-            level="H"
-            includeMargin={false}
-            imageSettings={qr.logoUrl ? {
-              src: qr.logoUrl,
-              height: 200,
-              width: 200,
-              excavate: true,
-            } : undefined}
-          />
-        );
-
-        // Wait for QR code to render
-        setTimeout(() => {
-          const canvas = container.querySelector('canvas');
-          if (!canvas) return;
-
-          // Convert canvas to blob
-          canvas.toBlob((blob) => {
-            if (!blob) return;
+            // Create a new SVG element with the same content
+            const svgData = new XMLSerializer().serializeToString(svg);
+            const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+            const svgUrl = URL.createObjectURL(svgBlob);
 
             // Create download link
-            const url = URL.createObjectURL(blob);
             const downloadLink = document.createElement('a');
-            downloadLink.href = url;
-            downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+            downloadLink.href = svgUrl;
+            downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
             document.body.appendChild(downloadLink);
             downloadLink.click();
             document.body.removeChild(downloadLink);
-            URL.revokeObjectURL(url);
-            document.body.removeChild(container);
-          }, 'image/png', 1.0);
-        }, 100);
-      }
+            URL.revokeObjectURL(svgUrl);
+            document.body.removeChild(svgElement);
+          }, 100);
+        } else {
+          // For PNG, create a temporary container
+          const container = document.createElement('div');
+          container.style.position = 'absolute';
+          container.style.left = '-9999px';
+          document.body.appendChild(container);
 
-      toast({
-        title: `QR Code Downloaded`,
-        description: `Your QR code has been downloaded as ${format.toUpperCase()}`,
-      });
-    } catch (error) {
-      console.error('Download failed:', error);
-      toast({
-        variant: "destructive",
-        title: "Download Failed",
-        description: "There was a problem downloading your QR code.",
-      });
-    }
+          // Preload logo if exists
+          let logoImage: HTMLImageElement | undefined;
+          if (qr.logoUrl) {
+            try {
+              logoImage = await preloadLogo(qr.logoUrl);
+            } catch (error) {
+              console.warn('Failed to preload logo:', error);
+            }
+          }
+
+          // Create QR code using QRCodeCanvas component
+          const qrContainer = document.createElement('div');
+          container.appendChild(qrContainer);
+          
+          // Render QR code using React
+          const root = ReactDOM.createRoot(qrContainer);
+          root.render(
+            <QRCodeCanvas
+              value={qr.url}
+              size={800}
+              bgColor={qr.backgroundColor}
+              fgColor={qr.foregroundColor}
+              level="H"
+              includeMargin={false}
+              imageSettings={logoImage ? {
+                src: logoImage.src,
+                height: 200,
+                width: 200,
+                excavate: true,
+              } : undefined}
+            />
+          );
+
+          // Wait for QR code to render
+          setTimeout(() => {
+            try {
+              const qrCanvas = qrContainer.querySelector('canvas');
+              if (!qrCanvas) {
+                throw new Error('QR code canvas not found');
+              }
+
+              // Convert to PNG and download
+              const pngUrl = qrCanvas.toDataURL('image/png');
+              const downloadLink = document.createElement('a');
+              downloadLink.href = pngUrl;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.png`;
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+              document.body.removeChild(container);
+            } catch (error) {
+              console.error('Error during PNG generation:', error);
+              toast({
+                variant: "destructive",
+                title: "Download Failed",
+                description: "There was a problem generating the PNG file.",
+              });
+              document.body.removeChild(container);
+            }
+          }, 200);
+        }
+
+        toast({
+          title: `QR Code Downloaded`,
+          description: `Your QR code has been downloaded as ${format.toUpperCase()}`,
+        });
+      } catch (error) {
+        console.error('Download failed:', error);
+        toast({
+          variant: "destructive",
+          title: "Download Failed",
+          description: "There was a problem downloading your QR code.",
+        });
+      }
+    };
+
+    downloadWithLogo();
   };
 
   if (!user) return null;

@@ -11,8 +11,13 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Serve static files from the uploads directory
-app.use('/uploads', express.static(path.join(__dirname, '../uploads')));
+// Serve static files from the uploads directory with CORS headers
+app.use('/uploads', (req, res, next) => {
+  res.setHeader('Access-Control-Allow-Origin', '*');
+  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  next();
+}, express.static(path.join(__dirname, '../uploads')));
 
 // Routes
 app.use('/api/users', userRoutes);
