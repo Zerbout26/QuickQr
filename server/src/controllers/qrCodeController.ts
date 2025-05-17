@@ -201,9 +201,16 @@ export const redirectToUrl = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
-    // Instead of redirecting directly, we'll send the URL to the frontend
-    res.json({ url: qrCode.url });
+    // Send the URL and QR code details to the frontend
+    res.json({
+      url: qrCode.url,
+      name: qrCode.name,
+      backgroundColor: qrCode.backgroundColor,
+      foregroundColor: qrCode.foregroundColor,
+      logoUrl: qrCode.logoUrl
+    });
   } catch (error) {
+    console.error('Error in redirectToUrl:', error);
     res.status(500).json({ error: 'Error processing redirect' });
   }
 }; 

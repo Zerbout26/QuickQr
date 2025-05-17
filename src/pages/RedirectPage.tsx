@@ -2,11 +2,20 @@ import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import { QRCodeSVG } from 'qrcode.react';
+
+interface QRCodeData {
+  url: string;
+  name: string;
+  backgroundColor: string;
+  foregroundColor: string;
+  logoUrl?: string;
+}
 
 export default function RedirectPage() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [url, setUrl] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<QRCodeData | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +29,7 @@ export default function RedirectPage() {
           throw new Error(data.error || 'Failed to fetch URL');
         }
         
-        setUrl(data.url);
+        setQrData(data);
       } catch (err) {
         setError(err instanceof Error ? err.message : 'An error occurred');
       } finally {
@@ -32,8 +41,8 @@ export default function RedirectPage() {
   }, [id]);
 
   const handleRedirect = () => {
-    if (url) {
-      window.location.href = url;
+    if (qrData?.url) {
+      window.location.href = qrData.url;
     }
   };
 
@@ -65,22 +74,49 @@ export default function RedirectPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
       <Card className="w-[350px]">
         <CardHeader>
-          <CardTitle>Redirect Notice</CardTitle>
+          <CardTitle>{qrData?.name || 'Redirect Notice'}</CardTitle>
           <CardDescription>
             You are about to be redirected to an external website.
           </CardDescription>
         </CardHeader>
-        <CardContent>
-          <p className="text-sm text-gray-500 break-all">
-            {url}
-          </p>
+        <CardContent className="space-y-4">
+          {/* Show QR Code */}
+          <div className="flex justify-center">
+            <div 
+              className="w-48 h-48 flex items-center justify-center border rounded-md p-2" 
+              style={{ backgroundColor: qrData?.backgroundColor || '#FFFFFF' }}
+            >
+              <QRCodeSVG
+                value={qrData?.url || ''}
+                size={176}
+                bgColor={qrData?.backgroundColor || '#FFFFFF'}
+                fgColor={qrData?.foregroundColor || '#000000'}
+                level="H"
+                includeMargin={false}
+                imageSettings={qrData?.logoUrl ? {
+                  src: qrData.logoUrl,
+                  height: 48,
+                  width: 48,
+                  excavate: true,
+                } : undefined}
+              />
+            </div>
+          </div>
+          
+          {/* Show URL */}
+          <div>
+            <p className="text-sm font-medium text-gray-500 mb-1">Destination URL:</p>
+            <p className="text-sm text-gray-700 break-all bg-gray-100 p-2 rounded">
+              {qrData?.url}
+            </p>
+          </div>
         </CardContent>
         <CardFooter className="flex justify-between">
           <Button variant="outline" onClick={() => navigate('/')}>
             Cancel
           </Button>
-          <Button onClick={handleRedirect}>
-            Continue
+          <Button onClick={handleRedirect} className="bg-blue-600 hover:bg-blue-700">
+            Continue to Website
           </Button>
         </CardFooter>
       </Card>
