@@ -12,6 +12,7 @@ import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import MainLayout from "./components/layout/MainLayout";
 import PaymentInstructions from "@/pages/PaymentInstructions";
+import RedirectPage from "./pages/RedirectPage";
 
 const queryClient = new QueryClient();
 
@@ -41,6 +42,7 @@ const App = () => (
               </MainLayout>
             } />
             <Route path="/payment-instructions" element={<PaymentInstructions />} />
+            <Route path="/redirect/:id" element={<RedirectPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
