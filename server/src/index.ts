@@ -19,7 +19,10 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../uploads')));
 
-// Routes
+// Public QR code redirect route
+app.use('/qrcodes/redirect', qrCodeRoutes);
+
+// API routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 

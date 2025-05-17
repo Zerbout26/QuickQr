@@ -90,7 +90,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         console.log('Saved QR code:', savedQRCode);
         
         // Create the landing page URL using the same base URL
-        const landingPageUrl = `${baseUrl}/api/qrcodes/redirect/${savedQRCode.id}`;
+        const landingPageUrl = `${baseUrl}/qrcodes/redirect/${savedQRCode.id}`;
         console.log('Generated landing page URL:', landingPageUrl);
         
         // Return the QR code data with the landing page URL
