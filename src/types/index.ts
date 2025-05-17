@@ -1,4 +1,3 @@
-
 export type UserRole = 'user' | 'admin';
 
 export interface User {
@@ -17,6 +16,7 @@ export interface QRCode {
   userId: string;
   name: string;
   url: string;
+  landingPageUrl?: string;
   logoUrl?: string;
   foregroundColor: string;
   backgroundColor: string;

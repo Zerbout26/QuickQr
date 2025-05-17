@@ -182,7 +182,7 @@ const Dashboard = () => {
           const root = ReactDOM.createRoot(svgElement);
           root.render(
             <QRCodeSVG
-              value={qr.url}
+              value={qr.landingPageUrl || qr.url}
               size={800}
               bgColor={qr.backgroundColor}
               fgColor={qr.foregroundColor}
@@ -242,7 +242,7 @@ const Dashboard = () => {
           const root = ReactDOM.createRoot(qrContainer);
           root.render(
             <QRCodeCanvas
-              value={qr.url}
+              value={qr.landingPageUrl || qr.url}
               size={800}
               bgColor={qr.backgroundColor}
               fgColor={qr.foregroundColor}
@@ -420,7 +420,7 @@ const Dashboard = () => {
                           </div>
                         )}
                         <QRCodeSVG
-                          value={qr.url}
+                          value={qr.landingPageUrl || qr.url}
                           size={160}
                           bgColor={qr.backgroundColor}
                           fgColor={qr.foregroundColor}

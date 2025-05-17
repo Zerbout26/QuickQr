@@ -15,6 +15,12 @@ import { Upload, X } from 'lucide-react';
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
   if (!url) return null;
   
+  // Create the landing page URL for preview
+  const baseUrl = process.env.NODE_ENV === 'production' 
+    ? 'https://your-production-domain.com' 
+    : 'http://localhost:3000';
+  const landingPageUrl = `${baseUrl}/api/qrcodes/redirect/${url}`;
+  
   return (
     <div className="flex justify-center items-center mb-4">
       <div 
@@ -22,7 +28,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
         style={{ backgroundColor: bgColor }}
       >
         <QRCodeSVG
-          value={url}
+          value={landingPageUrl}
           size={176}
           bgColor={bgColor}
           fgColor={color}

@@ -1,4 +1,4 @@
-import { Router } from 'express';
+import express, { Request, Response } from 'express';
 import {
   createQRCode,
   getQRCodes,
@@ -7,15 +7,79 @@ import {
   deleteQRCode
 } from '../controllers/qrCodeController';
 import { auth } from '../middleware/auth';
+import { AppDataSource } from '../config/database';
+import { QRCode } from '../models/QRCode';
 
-const router = Router();
+const router = express.Router();
+const qrCodeRepository = AppDataSource.getRepository(QRCode);
 
-router.use(auth); // All QR code routes require authentication
+// Landing page route for QR code redirects
+router.get('/redirect/:id', async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const qrCode = await qrCodeRepository.findOne({ where: { id } });
+    
+    if (!qrCode) {
+      return res.status(404).send('QR Code not found');
+    }
 
-router.post('/', createQRCode);
-router.get('/', getQRCodes);
-router.get('/:id', getQRCode);
-router.patch('/:id', updateQRCode);
-router.delete('/:id', deleteQRCode);
+    // Render a simple HTML page with a button that redirects to the actual URL
+    res.send(`
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>Redirecting...</title>
+          <style>
+            body {
+              font-family: Arial, sans-serif;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+              background-color: #f5f5f5;
+            }
+            .container {
+              text-align: center;
+              padding: 2rem;
+              background: white;
+              border-radius: 8px;
+              box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            }
+            .button {
+              display: inline-block;
+              padding: 12px 24px;
+              background-color: #007bff;
+              color: white;
+              text-decoration: none;
+              border-radius: 4px;
+              font-weight: bold;
+              margin-top: 1rem;
+              transition: background-color 0.2s;
+            }
+            .button:hover {
+              background-color: #0056b3;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            <h1>You're being redirected</h1>
+            <p>Click the button below to continue to your destination</p>
+            <a href="${qrCode.url}" class="button">Continue to Destination</a>
+          </div>
+        </body>
+      </html>
+    `);
+  } catch (error) {
+    res.status(500).send('Error processing redirect');
+  }
+});
+
+router.post('/', auth, createQRCode);
+router.get('/', auth, getQRCodes);
+router.get('/:id', auth, getQRCode);
+router.put('/:id', auth, updateQRCode);
+router.delete('/:id', auth, deleteQRCode);
 
 export default router; 
