@@ -3,6 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { QRCodeSVG } from 'qrcode.react';
+import { ExternalLink } from 'lucide-react';
 
 interface QRCodeData {
   url: string;
@@ -72,14 +73,14 @@ export default function RedirectPage() {
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-50">
-      <Card className="w-[350px]">
+      <Card className="w-[400px]">
         <CardHeader>
-          <CardTitle>{qrData?.name || 'Redirect Notice'}</CardTitle>
-          <CardDescription>
-            You are about to be redirected to an external website.
+          <CardTitle className="text-2xl text-center">{qrData?.name || 'Welcome'}</CardTitle>
+          <CardDescription className="text-center">
+            You're about to visit an external website
           </CardDescription>
         </CardHeader>
-        <CardContent className="space-y-4">
+        <CardContent className="space-y-6">
           {/* Show QR Code */}
           <div className="flex justify-center">
             <div 
@@ -104,19 +105,29 @@ export default function RedirectPage() {
           </div>
           
           {/* Show URL */}
-          <div>
-            <p className="text-sm font-medium text-gray-500 mb-1">Destination URL:</p>
-            <p className="text-sm text-gray-700 break-all bg-gray-100 p-2 rounded">
-              {qrData?.url}
-            </p>
+          <div className="space-y-2">
+            <p className="text-sm font-medium text-gray-500">Destination URL:</p>
+            <div className="bg-gray-100 p-3 rounded-lg">
+              <p className="text-sm text-gray-700 break-all">
+                {qrData?.url}
+              </p>
+            </div>
           </div>
         </CardContent>
-        <CardFooter className="flex justify-between">
-          <Button variant="outline" onClick={() => navigate('/')}>
-            Cancel
+        <CardFooter className="flex flex-col space-y-3">
+          <Button 
+            onClick={handleRedirect} 
+            className="w-full bg-blue-600 hover:bg-blue-700 h-12 text-lg"
+          >
+            <ExternalLink className="w-5 h-5 mr-2" />
+            Visit Website
           </Button>
-          <Button onClick={handleRedirect} className="bg-blue-600 hover:bg-blue-700">
-            Continue to Website
+          <Button 
+            variant="outline" 
+            onClick={() => navigate('/')}
+            className="w-full"
+          >
+            Go Back
           </Button>
         </CardFooter>
       </Card>
