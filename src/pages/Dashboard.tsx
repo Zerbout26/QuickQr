@@ -420,7 +420,7 @@ const Dashboard = () => {
                           </div>
                         )}
                         <QRCodeSVG
-                          value={qr.url}
+                          value={`${window.location.origin}/redirect/${qr.id}`}
                           size={160}
                           bgColor={qr.backgroundColor}
                           fgColor={qr.foregroundColor}

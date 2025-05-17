@@ -15,7 +15,9 @@ import { Upload, X } from 'lucide-react';
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
   if (!url) return null;
   
-  // Use the direct URL for the QR code
+  // Create the redirect URL
+  const redirectUrl = `${window.location.origin}/redirect/${url}`;
+  
   return (
     <div className="flex justify-center items-center mb-4">
       <div 
@@ -23,7 +25,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
         style={{ backgroundColor: bgColor }}
       >
         <QRCodeSVG
-          value={url}
+          value={redirectUrl}
           size={176}
           bgColor={bgColor}
           fgColor={color}
