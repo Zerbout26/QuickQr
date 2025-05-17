@@ -384,7 +384,7 @@ const Dashboard = () => {
             
             {isLoading ? (
               <div className="flex justify-center py-12">
-                <div className="animate-pulse-slow">Loading your QR codes..</div>
+                <div className="animate-pulse-slow">Loading your QR codes...</div>
               </div>
             ) : qrCodes.length === 0 ? (
               <div className="text-center py-12 border rounded-lg bg-gray-50">
