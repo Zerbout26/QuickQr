@@ -19,8 +19,8 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../uploads')));
 
-// Public QR code redirect route
-app.use('/qrcodes/redirect', qrCodeRoutes);
+// Public QR code landing pages
+app.use('/q', qrCodeRoutes);
 
 // API routes
 app.use('/api/users', userRoutes);
