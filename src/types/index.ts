@@ -35,3 +35,10 @@ export interface AuthContextType {
   isTrialExpired: () => boolean;
   daysLeftInTrial: () => number | null;
 }
+
+export interface AdminStats {
+  totalUsers: number;
+  activeTrials: number;
+  subscribers: number;
+  expiredTrials: number;
+}
