@@ -16,7 +16,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
   if (!url) return null;
   
   // Create the landing page URL for preview using the current domain
-  const landingPageUrl = `${window.location.origin}/q/${url}`;
+  const landingPageUrl = `${window.location.origin}/q/view/${url}`;
   
   return (
     <div className="flex justify-center items-center mb-4">

@@ -14,7 +14,7 @@ const router = express.Router();
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 
 // Public landing page route for QR code redirects (no auth required)
-router.get('/:id', async (req: Request, res: Response) => {
+router.get('/view/:id', async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const qrCode = await qrCodeRepository.findOne({ where: { id } });
