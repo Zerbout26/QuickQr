@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -13,7 +12,6 @@ import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import MainLayout from "./components/layout/MainLayout";
 import PaymentInstructions from "@/pages/PaymentInstructions";
-import QRRedirect from "@/pages/QRRedirect";
 
 const queryClient = new QueryClient();
 
@@ -43,7 +41,6 @@ const App = () => (
               </MainLayout>
             } />
             <Route path="/payment-instructions" element={<PaymentInstructions />} />
-            <Route path="/qr/:id" element={<QRRedirect />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

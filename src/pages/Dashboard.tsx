@@ -119,10 +119,6 @@ const Dashboard = () => {
       return;
     }
 
-    // Create the redirect URL for this QR code
-    const baseUrl = window.location.origin;
-    const redirectUrl = `${baseUrl}/qr/${qr.id}`;
-
     const preloadLogo = (logoUrl: string): Promise<HTMLImageElement> => {
       return new Promise((resolve, reject) => {
         const img = new Image();
@@ -182,11 +178,11 @@ const Dashboard = () => {
             }
           }
           
-          // Render QR code using React - use redirectUrl instead of direct URL
+          // Render QR code using React
           const root = ReactDOM.createRoot(svgElement);
           root.render(
             <QRCodeSVG
-              value={redirectUrl}
+              value={qr.url}
               size={800}
               bgColor={qr.backgroundColor}
               fgColor={qr.foregroundColor}
@@ -242,11 +238,11 @@ const Dashboard = () => {
           const qrContainer = document.createElement('div');
           container.appendChild(qrContainer);
           
-          // Render QR code using React - use redirectUrl instead of direct URL
+          // Render QR code using React
           const root = ReactDOM.createRoot(qrContainer);
           root.render(
             <QRCodeCanvas
-              value={redirectUrl}
+              value={qr.url}
               size={800}
               bgColor={qr.backgroundColor}
               fgColor={qr.foregroundColor}
@@ -409,7 +405,7 @@ const Dashboard = () => {
                       <CardTitle className="text-lg">{qr.name}</CardTitle>
                     </CardHeader>
                     <CardContent>
-                      {/* QR Code Display - use the redirect URL */}
+                      {/* QR Code Display */}
                       <div 
                         className="w-full aspect-square mb-4 flex items-center justify-center border rounded-md p-2 relative" 
                         style={{ backgroundColor: qr.backgroundColor }}
@@ -424,7 +420,7 @@ const Dashboard = () => {
                           </div>
                         )}
                         <QRCodeSVG
-                          value={`${window.location.origin}/qr/${qr.id}`}
+                          value={qr.url}
                           size={160}
                           bgColor={qr.backgroundColor}
                           fgColor={qr.foregroundColor}
@@ -440,11 +436,7 @@ const Dashboard = () => {
                       </div>
                       
                       <div className="mb-4">
-                        <Label className="text-xs text-gray-500">QR Code URL</Label>
-                        <p className="text-sm truncate mb-2">
-                          {`${window.location.origin}/qr/${qr.id}`}
-                        </p>
-                        <Label className="text-xs text-gray-500">Target URL</Label>
+                        <Label className="text-xs text-gray-500">URL</Label>
                         <p className="text-sm truncate mb-2">{qr.url}</p>
                         <Label className="text-xs text-gray-500">Created</Label>
                         <p className="text-sm">{new Date(qr.createdAt).toLocaleDateString()}</p>
@@ -556,7 +548,7 @@ const Dashboard = () => {
                     </div>
                   </div>
                   <QRCodeSVG
-                    value={`${window.location.origin}/qr/${previewQR.id}`}
+                    value={previewQR.url}
                     size={240}
                     bgColor={previewQR.backgroundColor}
                     fgColor={previewQR.foregroundColor}

@@ -6,8 +6,6 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { toast } from '@/components/ui/use-toast';
-import axios from 'axios';
 
 const SignInForm = () => {
   const [email, setEmail] = useState('');
@@ -31,25 +29,7 @@ const SignInForm = () => {
         navigate('/dashboard');
       }
     } catch (err) {
-      console.error('Login error:', err);
-      
-      if (axios.isAxiosError(err)) {
-        if (err.code === 'ERR_NETWORK' || err.code === 'ERR_CONNECTION_REFUSED') {
-          setError('Cannot connect to the server. Please make sure the backend server is running.');
-          toast({
-            variant: "destructive",
-            title: "Connection Error",
-            description: "Cannot connect to the server. Please check if the backend is running.",
-          });
-        } else if (err.response) {
-          // Server responded with an error status code
-          setError(err.response.data?.error || 'Invalid credentials');
-        } else {
-          setError('Failed to sign in. Please try again.');
-        }
-      } else {
-        setError(err instanceof Error ? err.message : 'Failed to sign in');
-      }
+      setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {
       setIsLoading(false);
     }
