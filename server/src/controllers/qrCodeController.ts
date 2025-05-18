@@ -190,7 +190,7 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
   }
 };
 
-// New public endpoint for fetching QR codes without authentication
+// Ensure this public endpoint doesn't require authentication
 export const getPublicQRCode = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
@@ -199,14 +199,20 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'QR code ID is required' });
     }
 
+    console.log(`Public access: Fetching QR code with ID: ${id}`);
+
     const qrCode = await qrCodeRepository.findOne({
       where: { id }
     });
 
     if (!qrCode) {
+      console.log(`QR code with ID ${id} not found`);
       return res.status(404).json({ error: 'QR code not found' });
     }
 
+    console.log(`Successfully found QR code: ${qrCode.id}`);
+
+    // Return only necessary data
     res.json({
       id: qrCode.id,
       name: qrCode.name,

@@ -12,12 +12,14 @@ import { auth } from '../middleware/auth';
 
 const router = Router();
 
-// Public route for QR code redirection - This should be BEFORE the auth middleware
-// and outside of any routes that use auth middleware
+// Public routes - NO authentication required
+// Must be defined BEFORE any middleware that would apply to all routes
 router.get('/public/:id', getPublicQRCode);
 
+// All routes below this middleware will require authentication
+router.use(auth);
+
 // Protected routes requiring authentication
-router.use(auth); // All routes below this line will require authentication
 router.post('/', createQRCode);
 router.get('/', getQRCodes);
 router.get('/:id', getQRCode);
