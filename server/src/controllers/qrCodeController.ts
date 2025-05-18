@@ -87,8 +87,19 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
 
         const savedQRCode = await qrCodeRepository.save(qrCode);
         console.log('Saved QR code:', savedQRCode);
+
+        // Generate the landing page URL
+        const landingPageUrl = `${process.env.NODE_ENV === 'production' 
+          ? 'https://your-production-domain.com' 
+          : 'http://localhost:3000'}/landing/${savedQRCode.id}`;
         
-        res.status(201).json(savedQRCode);
+        // Add the landing page URL to the response
+        const response = {
+          ...savedQRCode,
+          landingPageUrl
+        };
+        
+        res.status(201).json(response);
       } catch (error) {
         console.error('Error creating QR code:', error);
         res.status(500).json({ error: 'Error creating QR code' });
