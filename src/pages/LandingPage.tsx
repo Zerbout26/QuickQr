@@ -6,7 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 
 const LandingPage = () => {
-  const { id, url } = useParams();
+  const { id } = useParams();
   const navigate = useNavigate();
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
@@ -28,17 +28,6 @@ const LandingPage = () => {
       fetchQRCode();
     }
   }, [id]);
-
-  useEffect(() => {
-    if (url && qrCode) {
-      // Find the matching link
-      const link = qrCode.links?.find(l => l.url === decodeURIComponent(url));
-      if (link) {
-        // Redirect to the actual URL
-        window.location.href = link.url;
-      }
-    }
-  }, [url, qrCode]);
 
   if (loading) {
     return (
@@ -65,15 +54,16 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen flex items-center justify-center bg-gray-100">
       <Card className="w-full max-w-md mx-4">
-        <CardContent className="pt-6">
+        <CardContent className="p-6">
           <div className="text-center">
             {qrCode.logoUrl && (
-              <img
-                src={qrCode.logoUrl}
-                alt="Logo"
+              <img 
+                src={qrCode.logoUrl} 
+                alt="Logo" 
                 className="w-32 h-32 mx-auto mb-6 object-contain"
               />
             )}
+            <h1 className="text-2xl font-bold mb-6">{qrCode.name}</h1>
             <div className="space-y-4">
               {qrCode.links?.map((link, index) => (
                 <Button

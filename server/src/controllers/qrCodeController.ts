@@ -8,7 +8,7 @@ import fs from 'fs';
 import crypto from 'crypto';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -82,14 +82,9 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      // Get the host from the request
-      const protocol = req.protocol;
-      const host = req.get('host');
-      const baseUrl = `${protocol}://${host}`;
-
       // Generate a temporary ID for the URL
       const tempId = crypto.randomUUID();
-      const tempUrl = `${baseUrl}/l/${tempId}`;
+      const tempUrl = `${FRONTEND_URL}/landing/${tempId}`;
 
       const qrCode = new QRCode();
       qrCode.name = name || 'My QR Code';
@@ -108,7 +103,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Saved QR code:', savedQRCode);
 
       // Update the URL with the actual ID
-      savedQRCode.url = `${baseUrl}/l/${savedQRCode.id}`;
+      savedQRCode.url = `${FRONTEND_URL}/landing/${savedQRCode.id}`;
       savedQRCode.originalUrl = savedQRCode.url;
 
       // Save again with the updated URL

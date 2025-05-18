@@ -4,11 +4,10 @@ import path from 'path';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
-import landingRoutes from './routes/landingRoutes';
 import { auth } from './middleware/auth';
 
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
 // Middleware
 app.use(cors());
@@ -25,17 +24,6 @@ app.use('/uploads', (req, res, next) => {
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', auth, qrCodeRoutes);
-
-// Landing page routes
-app.use('/landing', landingRoutes);
-
-// Short URL redirection
-app.get('/l/:id', (req, res) => {
-  const protocol = req.protocol;
-  const host = req.get('host');
-  const baseUrl = `${protocol}://${host}`;
-  res.redirect(`${baseUrl}/landing/${req.params.id}`);
-});
 
 // Initialize database connection
 AppDataSource.initialize()
