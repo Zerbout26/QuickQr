@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
@@ -188,4 +188,35 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: 'Error deleting QR code' });
   }
-}; 
+};
+
+// New public endpoint for fetching QR codes without authentication
+export const getPublicQRCode = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'QR code ID is required' });
+    }
+
+    const qrCode = await qrCodeRepository.findOne({
+      where: { id }
+    });
+
+    if (!qrCode) {
+      return res.status(404).json({ error: 'QR code not found' });
+    }
+
+    res.json({
+      id: qrCode.id,
+      name: qrCode.name,
+      url: qrCode.url,
+      logoUrl: qrCode.logoUrl,
+      foregroundColor: qrCode.foregroundColor,
+      backgroundColor: qrCode.backgroundColor
+    });
+  } catch (error) {
+    console.error('Error fetching public QR code:', error);
+    res.status(500).json({ error: 'Error fetching QR code' });
+  }
+};

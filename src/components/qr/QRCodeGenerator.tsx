@@ -12,8 +12,17 @@ import { qrCodeApi } from '@/lib/api';
 import { Upload, X } from 'lucide-react';
 
 // QR Preview component that shows an actual QR code
-const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
+const QRPreview = ({ url, color, bgColor, logoUrl, qrRedirectUrl }: { 
+  url: string; 
+  color: string; 
+  bgColor: string; 
+  logoUrl?: string;
+  qrRedirectUrl?: string;
+}) => {
   if (!url) return null;
+  
+  // Use the landing page URL for the QR code if available
+  const qrUrl = qrRedirectUrl || url;
   
   return (
     <div className="flex justify-center items-center mb-4">
@@ -22,7 +31,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
         style={{ backgroundColor: bgColor }}
       >
         <QRCodeSVG
-          value={url}
+          value={qrUrl}
           size={176}
           bgColor={bgColor}
           fgColor={color}
@@ -57,6 +66,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [qrRedirectUrl, setQrRedirectUrl] = useState<string | null>(null);
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -169,6 +179,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       const newQR = await response.json();
       console.log('Received QR code response:', newQR);
       
+      // Set the QR redirect URL for preview
+      const baseUrl = window.location.origin;
+      setQrRedirectUrl(`${baseUrl}/qr/${newQR.id}`);
+      
       toast({
         title: "QR Code Created",
         description: "Your QR code has been created successfully.",
@@ -179,9 +193,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       setUrl('');
       removeLogo();
       
-      // Call onCreated callback
+      // Call onCreated callback with updated QR object that includes the redirect URL
       if (onCreated) {
-        onCreated(newQR);
+        // Add a redirectUrl property to the newQR object
+        const enhancedQR = {
+          ...newQR,
+          redirectUrl: `${baseUrl}/qr/${newQR.id}`
+        };
+        onCreated(enhancedQR);
       }
     } catch (err) {
       console.error('Error creating QR code:', err);
@@ -328,7 +347,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 url={formattedUrl} 
                 color={foregroundColor} 
                 bgColor={backgroundColor} 
-                logoUrl={logoPreview || undefined} 
+                logoUrl={logoPreview || undefined}
+                qrRedirectUrl={qrRedirectUrl || undefined}
               />
             )}
             
