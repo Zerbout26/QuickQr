@@ -4,41 +4,41 @@ import { QRCode } from "./QRCode";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column({ unique: true })
-  email: string;
+  email!: string;
 
   @Column()
-  password: string;
+  password!: string;
 
   @Column({ nullable: true })
-  name: string;
+  name!: string;
 
   @Column({
     type: "varchar",
     default: "user"
   })
-  role: string;
+  role!: string;
 
   @Column({ type: "datetime" })
-  trialStartDate: Date;
+  trialStartDate!: Date;
 
   @Column({ type: "datetime" })
-  trialEndDate: Date;
+  trialEndDate!: Date;
 
   @Column({ default: true })
-  isActive: boolean;
+  isActive!: boolean;
 
   @Column({ default: false })
-  hasActiveSubscription: boolean;
+  hasActiveSubscription!: boolean;
 
   @OneToMany(() => QRCode, qrCode => qrCode.user)
-  qrCodes: QRCode[];
+  qrCodes!: QRCode[];
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 } 

@@ -4,32 +4,32 @@ import { User } from "./User";
 @Entity()
 export class QRCode {
   @PrimaryGeneratedColumn("uuid")
-  id: string;
+  id!: string;
 
   @Column()
-  name: string;
+  name!: string;
 
   @Column()
-  url: string;
+  url!: string;
 
   @Column()
-  originalUrl: string;
+  originalUrl!: string;
 
   @Column({ nullable: true })
-  logoUrl: string;
+  logoUrl!: string;
 
   @Column()
-  foregroundColor: string;
+  foregroundColor!: string;
 
   @Column()
-  backgroundColor: string;
+  backgroundColor!: string;
 
   @ManyToOne(() => User, user => user.qrCodes)
-  user: User;
+  user!: User;
 
   @CreateDateColumn()
-  createdAt: Date;
+  createdAt!: Date;
 
   @UpdateDateColumn()
-  updatedAt: Date;
+  updatedAt!: Date;
 } 
