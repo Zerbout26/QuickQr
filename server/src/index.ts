@@ -4,6 +4,7 @@ import path from 'path';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
+import landingRoutes from './routes/landingRoutes';
 
 const app = express();
 
@@ -22,6 +23,7 @@ app.use('/uploads', (req, res, next) => {
 // Routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
+app.use('/landing', landingRoutes);
 
 // Initialize database connection
 AppDataSource.initialize()

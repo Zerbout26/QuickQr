@@ -12,6 +12,9 @@ export class QRCode {
   @Column()
   url: string;
 
+  @Column()
+  originalUrl: string;
+
   @Column({ nullable: true })
   logoUrl: string;
 

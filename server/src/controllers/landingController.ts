@@ -65,8 +65,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
                 <div class="container">
                     <h1>QuickQR Redirect</h1>
                     <p>You are about to be redirected to:</p>
-                    <div class="url">${qrCode.url}</div>
-                    <a href="${qrCode.url}" class="button">Continue to Website</a>
+                    <div class="url">${qrCode.originalUrl}</div>
+                    <a href="${qrCode.originalUrl}" class="button">Continue to Website</a>
                 </div>
             </body>
             </html>
