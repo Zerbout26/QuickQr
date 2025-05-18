@@ -13,12 +13,35 @@ export interface User {
   updatedAt: Date;
 }
 
+export type QRCodeType = 'url' | 'menu';
+
+export interface MenuItem {
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  imageUrl?: string;
+}
+
+export interface MenuCategory {
+  name: string;
+  items: MenuItem[];
+}
+
+export interface Menu {
+  restaurantName: string;
+  description?: string;
+  categories: MenuCategory[];
+}
+
 export interface QRCode {
   id: string;
   name: string;
+  type: QRCodeType;
   url: string;
   originalUrl: string;
   links: { label: string; url: string }[];
+  menu?: Menu;
   logoUrl?: string;
   foregroundColor: string;
   backgroundColor: string;

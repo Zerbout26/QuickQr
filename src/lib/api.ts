@@ -47,17 +47,38 @@ export const authApi = {
 export const qrCodeApi = {
   create: async (data: {
     name: string;
-    url: string;
+    type: 'url' | 'menu';
+    url?: string;
     logoUrl?: string;
     foregroundColor: string;
     backgroundColor: string;
-    links: { label: string; url: string }[];
+    links?: { label: string; url: string }[];
+    menu?: {
+      restaurantName: string;
+      description?: string;
+      categories: {
+        name: string;
+        items: {
+          name: string;
+          description?: string;
+          price: number;
+          category: string;
+          imageUrl?: string;
+        }[];
+      }[];
+    };
   }) => {
     const formData = new FormData();
     formData.append('name', data.name);
+    formData.append('type', data.type);
     formData.append('foregroundColor', data.foregroundColor);
     formData.append('backgroundColor', data.backgroundColor);
-    formData.append('links', JSON.stringify(data.links));
+    
+    if (data.type === 'url' && data.links) {
+      formData.append('links', JSON.stringify(data.links));
+    } else if (data.type === 'menu' && data.menu) {
+      formData.append('menu', JSON.stringify(data.menu));
+    }
     
     if (data.logoUrl) {
       formData.append('logoUrl', data.logoUrl);

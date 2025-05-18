@@ -4,6 +4,7 @@ import { QRCode } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -52,33 +53,76 @@ const LandingPage = () => {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-100">
-      <Card className="w-full max-w-md mx-4">
-        <CardContent className="p-6">
-          <div className="text-center">
-            {qrCode.logoUrl && (
-              <img 
-                src={qrCode.logoUrl} 
-                alt="Logo" 
-                className="w-32 h-32 mx-auto mb-6 object-contain"
-              />
+    <div className="min-h-screen bg-gray-100 py-12">
+      <div className="container mx-auto px-4">
+        <Card className="max-w-4xl mx-auto">
+          <CardContent className="pt-6">
+            <h1 className="text-3xl font-bold text-center mb-8">{qrCode.name}</h1>
+            
+            {qrCode.type === 'url' ? (
+              <div className="space-y-6">
+                {qrCode.links.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="block w-full"
+                  >
+                    <Button className="w-full" variant="outline">
+                      {link.label}
+                    </Button>
+                  </a>
+                ))}
+              </div>
+            ) : (
+              <div className="space-y-8">
+                <div className="text-center">
+                  <h2 className="text-2xl font-semibold mb-2">{qrCode.menu?.restaurantName}</h2>
+                  {qrCode.menu?.description && (
+                    <p className="text-gray-600">{qrCode.menu.description}</p>
+                  )}
+                </div>
+                
+                <Tabs defaultValue={qrCode.menu?.categories[0]?.name} className="w-full">
+                  <TabsList className="w-full justify-start overflow-x-auto">
+                    {qrCode.menu?.categories.map((category) => (
+                      <TabsTrigger key={category.name} value={category.name}>
+                        {category.name}
+                      </TabsTrigger>
+                    ))}
+                  </TabsList>
+                  
+                  {qrCode.menu?.categories.map((category) => (
+                    <TabsContent key={category.name} value={category.name} className="space-y-4">
+                      {category.items.map((item, index) => (
+                        <div key={index} className="border rounded-lg p-4">
+                          <div className="flex justify-between items-start">
+                            <div>
+                              <h3 className="text-lg font-semibold">{item.name}</h3>
+                              {item.description && (
+                                <p className="text-gray-600 mt-1">{item.description}</p>
+                              )}
+                            </div>
+                            <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
+                          </div>
+                          {item.imageUrl && (
+                            <img
+                              src={item.imageUrl}
+                              alt={item.name}
+                              className="mt-4 rounded-lg w-full h-48 object-cover"
+                            />
+                          )}
+                        </div>
+                      ))}
+                    </TabsContent>
+                  ))}
+                </Tabs>
+              </div>
             )}
-            <h1 className="text-2xl font-bold mb-6">{qrCode.name}</h1>
-            <div className="space-y-4">
-              {qrCode.links?.map((link, index) => (
-                <Button
-                  key={index}
-                  className="w-full"
-                  style={{ backgroundColor: qrCode.foregroundColor || '#6366F1' }}
-                  onClick={() => window.location.href = link.url}
-                >
-                  {link.label}
-                </Button>
-              ))}
-            </div>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   );
 };

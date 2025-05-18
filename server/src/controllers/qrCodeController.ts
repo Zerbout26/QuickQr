@@ -1,6 +1,6 @@
 import { Response } from 'express';
 import { AppDataSource } from '../config/database';
-import { QRCode } from '../models/QRCode';
+import { QRCode, QRCodeType } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
 import multer from 'multer';
 import path from 'path';
@@ -62,7 +62,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Request body:', req.body);
       console.log('Request file:', req.file);
 
-      const { name, foregroundColor, backgroundColor, links } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu } = req.body;
       let logoUrl = '';
 
       // Handle logo upload if present
@@ -82,13 +82,27 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
+      // Parse menu if provided
+      let parsedMenu = null;
+      if (type === 'menu' && menu) {
+        try {
+          parsedMenu = JSON.parse(menu);
+          console.log('Parsed menu:', parsedMenu);
+        } catch (e) {
+          console.error('Error parsing menu:', e);
+          return res.status(400).json({ error: 'Invalid menu format' });
+        }
+      }
+
       // Generate a temporary ID for the URL
       const tempId = crypto.randomUUID();
       const tempUrl = `${FRONTEND_URL}/landing/${tempId}`;
 
       const qrCode = new QRCode();
       qrCode.name = name || 'My QR Code';
+      qrCode.type = type || 'url';
       qrCode.links = parsedLinks;
+      qrCode.menu = parsedMenu;
       qrCode.logoUrl = logoUrl;
       qrCode.foregroundColor = foregroundColor || '#6366F1';
       qrCode.backgroundColor = backgroundColor || '#FFFFFF';
@@ -167,7 +181,7 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
     }
 
     const { id } = req.params;
-    const { name, url, logoUrl, foregroundColor, backgroundColor, links } = req.body;
+    const { name, url, logoUrl, foregroundColor, backgroundColor, links, type, menu } = req.body;
 
     const qrCode = await qrCodeRepository.findOne({
       where: { id, user: { id: req.user.id } }
@@ -182,11 +196,21 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
     if (logoUrl !== undefined) qrCode.logoUrl = logoUrl;
     if (foregroundColor) qrCode.foregroundColor = foregroundColor;
     if (backgroundColor) qrCode.backgroundColor = backgroundColor;
+    if (type) qrCode.type = type as QRCodeType;
+    
     if (links !== undefined) {
       try {
         qrCode.links = links ? JSON.parse(links) : [];
       } catch (e) {
         return res.status(400).json({ error: 'Invalid links format' });
+      }
+    }
+
+    if (menu !== undefined) {
+      try {
+        qrCode.menu = menu ? JSON.parse(menu) : null;
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid menu format' });
       }
     }
 

@@ -10,6 +10,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
 import { Upload, X, Plus, Trash2 } from 'lucide-react';
+import { Textarea } from '@/components/ui/textarea';
 
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
@@ -47,6 +48,19 @@ interface Link {
   url: string;
 }
 
+interface MenuItem {
+  name: string;
+  description?: string;
+  price: number;
+  category: string;
+  imageUrl?: string;
+}
+
+interface MenuCategory {
+  name: string;
+  items: MenuItem[];
+}
+
 interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
 }
@@ -54,7 +68,9 @@ interface QRCodeFormProps {
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
+  const [type, setType] = useState<'url' | 'menu'>('url');
   const [links, setLinks] = useState<Link[]>([]);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -119,6 +135,46 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     setLinks(newLinks);
   };
 
+  const addCategory = () => {
+    setMenuCategories([...menuCategories, { name: '', items: [] }]);
+  };
+
+  const removeCategory = (index: number) => {
+    setMenuCategories(menuCategories.filter((_, i) => i !== index));
+  };
+
+  const updateCategory = (index: number, name: string) => {
+    const newCategories = [...menuCategories];
+    newCategories[index] = { ...newCategories[index], name };
+    setMenuCategories(newCategories);
+  };
+
+  const addMenuItem = (categoryIndex: number) => {
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items.push({
+      name: '',
+      description: '',
+      price: 0,
+      category: newCategories[categoryIndex].name,
+    });
+    setMenuCategories(newCategories);
+  };
+
+  const removeMenuItem = (categoryIndex: number, itemIndex: number) => {
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items = newCategories[categoryIndex].items.filter((_, i) => i !== itemIndex);
+    setMenuCategories(newCategories);
+  };
+
+  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number) => {
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items[itemIndex] = {
+      ...newCategories[categoryIndex].items[itemIndex],
+      [field]: value,
+    };
+    setMenuCategories(newCategories);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -127,8 +183,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       return;
     }
     
-    if (links.length === 0) {
-      setError('At least one link is required');
+    if (type === 'url' && links.length === 0) {
+      setError('At least one link is required for URL type');
+      return;
+    }
+
+    if (type === 'menu' && menuCategories.length === 0) {
+      setError('At least one category is required for menu type');
       return;
     }
     
@@ -138,9 +199,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     try {
       const formData = new FormData();
       formData.append('name', name || 'My QR Code');
+      formData.append('type', type);
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
-      formData.append('links', JSON.stringify(links));
+      
+      if (type === 'url') {
+        formData.append('links', JSON.stringify(links));
+      } else {
+        formData.append('menu', JSON.stringify({
+          restaurantName: name,
+          categories: menuCategories,
+        }));
+      }
       
       if (logoFile) {
         formData.append('logo', logoFile);
@@ -171,7 +241,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
       // Reset form
       setName('');
+      setType('url');
       setLinks([]);
+      setMenuCategories([]);
       setForegroundColor('#6366F1');
       setBackgroundColor('#FFFFFF');
       setLogoFile(null);
@@ -218,42 +290,136 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Links</Label>
+                  <Label>Type</Label>
+                  <div className="flex gap-2">
+                    <Button
+                      type="button"
+                      variant={type === 'url' ? 'default' : 'outline'}
+                      onClick={() => setType('url')}
+                      className="flex-1"
+                    >
+                      URL
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'menu' ? 'default' : 'outline'}
+                      onClick={() => setType('menu')}
+                      className="flex-1"
+                    >
+                      Menu
+                    </Button>
+                  </div>
+                </div>
+                {type === 'url' ? (
                   <div className="space-y-2">
-                    {links.map((link, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Input
-                          placeholder="Button Label"
-                          value={link.label}
-                          onChange={(e) => updateLink(index, 'label', e.target.value)}
-                        />
-                        <Input
-                          placeholder="URL"
-                          type="url"
-                          value={link.url}
-                          onChange={(e) => updateLink(index, 'url', e.target.value)}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeLink(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
+                    <Label>Links</Label>
+                    <div className="space-y-2">
+                      {links.map((link, index) => (
+                        <div key={index} className="flex gap-2">
+                          <Input
+                            placeholder="Button Label"
+                            value={link.label}
+                            onChange={(e) => updateLink(index, 'label', e.target.value)}
+                          />
+                          <Input
+                            placeholder="URL"
+                            type="url"
+                            value={link.url}
+                            onChange={(e) => updateLink(index, 'url', e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeLink(index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        className="w-full"
+                        onClick={addLink}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Link
+                      </Button>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {menuCategories.map((category, categoryIndex) => (
+                      <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
+                        <div className="flex gap-2 items-center">
+                          <Input
+                            placeholder="Category Name"
+                            value={category.name}
+                            onChange={(e) => updateCategory(categoryIndex, e.target.value)}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeCategory(categoryIndex)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="space-y-2 mt-4">
+                          {category.items.map((item, itemIndex) => (
+                            <div key={itemIndex} className="space-y-2 border p-2 rounded">
+                              <Input
+                                placeholder="Item Name"
+                                value={item.name}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                              />
+                              <Textarea
+                                placeholder="Description"
+                                value={item.description}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                              />
+                              <Input
+                                type="number"
+                                placeholder="Price"
+                                value={item.price}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Remove Item
+                              </Button>
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full"
+                            onClick={() => addMenuItem(categoryIndex)}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Menu Item
+                          </Button>
+                        </div>
                       </div>
                     ))}
                     <Button
                       type="button"
                       variant="outline"
                       className="w-full"
-                      onClick={addLink}
+                      onClick={addCategory}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Link
+                      Add Category
                     </Button>
                   </div>
-                </div>
+                )}
               </div>
             </TabsContent>
             <TabsContent value="advanced" className="space-y-4">
@@ -299,6 +465,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     type="file"
                     accept="image/*"
                     onChange={handleLogoUpload}
+                    ref={fileInputRef}
                   />
                 </div>
               </div>
