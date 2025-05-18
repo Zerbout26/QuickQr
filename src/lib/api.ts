@@ -51,19 +51,56 @@ export const qrCodeApi = {
     logoUrl?: string;
     foregroundColor: string;
     backgroundColor: string;
+    links: { label: string; url: string }[];
   }) => {
-    const response = await api.post('/qrcodes', data);
-    return response.data;
+    const formData = new FormData();
+    formData.append('name', data.name);
+    formData.append('foregroundColor', data.foregroundColor);
+    formData.append('backgroundColor', data.backgroundColor);
+    formData.append('links', JSON.stringify(data.links));
+    
+    if (data.logoUrl) {
+      formData.append('logoUrl', data.logoUrl);
+    }
+
+    const response = await fetch(`${API_BASE_URL}/qrcodes`, {
+      method: 'POST',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+      },
+      body: formData
+    });
+    if (!response.ok) throw new Error('Failed to create QR code');
+    return response.json();
   },
 
   getAll: async () => {
-    const response = await api.get('/qrcodes');
-    return response.data;
+    const response = await fetch(`${API_BASE_URL}/qrcodes`, {
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to fetch QR codes');
+    return response.json();
   },
 
-  getOne: async (id: string) => {
-    const response = await api.get(`/qrcodes/${id}`);
-    return response.data;
+  getQRCode: async (id: string, requireAuth: boolean = true) => {
+    const headers: Record<string, string> = {
+      'Content-Type': 'application/json',
+    };
+
+    if (requireAuth) {
+      const token = localStorage.getItem('qr-generator-token');
+      if (token) {
+        headers['Authorization'] = `Bearer ${token}`;
+      }
+    }
+
+    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
+      headers,
+    });
+    if (!response.ok) throw new Error('Failed to fetch QR code');
+    return response.json();
   },
 
   update: async (id: string, data: {
@@ -72,14 +109,29 @@ export const qrCodeApi = {
     logoUrl?: string;
     foregroundColor?: string;
     backgroundColor?: string;
+    links?: { label: string; url: string }[];
   }) => {
-    const response = await api.patch(`/qrcodes/${id}`, data);
-    return response.data;
+    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data),
+    });
+    if (!response.ok) throw new Error('Failed to update QR code');
+    return response.json();
   },
 
   delete: async (id: string) => {
-    await api.delete(`/qrcodes/${id}`);
-  }
+    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+      },
+    });
+    if (!response.ok) throw new Error('Failed to delete QR code');
+  },
 };
 
 // Helper function to get auth headers

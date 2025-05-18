@@ -5,8 +5,10 @@ import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
+import { auth } from './middleware/auth';
 
 const app = express();
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Middleware
 app.use(cors());
@@ -20,20 +22,30 @@ app.use('/uploads', (req, res, next) => {
   next();
 }, express.static(path.join(__dirname, '../uploads')));
 
-// Routes
+// API routes
 app.use('/api/users', userRoutes);
-app.use('/api/qrcodes', qrCodeRoutes);
+app.use('/api/qrcodes', auth, qrCodeRoutes);
+
+// Landing page routes
 app.use('/landing', landingRoutes);
+
+// Short URL redirection
+app.get('/l/:id', (req, res) => {
+  const protocol = req.protocol;
+  const host = req.get('host');
+  const baseUrl = `${protocol}://${host}`;
+  res.redirect(`${baseUrl}/landing/${req.params.id}`);
+});
 
 // Initialize database connection
 AppDataSource.initialize()
   .then(() => {
-    console.log('Database connection established');
+    console.log('Database connected');
     
     // Start server
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
-      console.log(`Server is running on port ${PORT}`);
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch((error) => {

@@ -12,6 +12,8 @@ import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import MainLayout from "./components/layout/MainLayout";
 import PaymentInstructions from "@/pages/PaymentInstructions";
+import LandingPage from '@/pages/LandingPage';
+import PrivateRoute from '@/components/PrivateRoute';
 
 const queryClient = new QueryClient();
 
@@ -24,8 +26,16 @@ const App = () => (
         <BrowserRouter>
           <Routes>
             <Route path="/" element={<Index />} />
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/admin" element={<Admin />} />
+            <Route path="/dashboard" element={
+              <PrivateRoute>
+                <Dashboard />
+              </PrivateRoute>
+            } />
+            <Route path="/admin" element={
+              <PrivateRoute>
+                <Admin />
+              </PrivateRoute>
+            } />
             <Route path="/signin" element={
               <MainLayout>
                 <div className="container mx-auto px-4 py-12">
@@ -41,6 +51,8 @@ const App = () => (
               </MainLayout>
             } />
             <Route path="/payment-instructions" element={<PaymentInstructions />} />
+            <Route path="/landing/:id" element={<LandingPage />} />
+            <Route path="/landing/:id/:url" element={<LandingPage />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

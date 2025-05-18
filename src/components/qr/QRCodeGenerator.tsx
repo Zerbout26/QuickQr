@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
-import { Upload, X } from 'lucide-react';
+import { Upload, X, Plus, Trash2 } from 'lucide-react';
 
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
@@ -42,6 +42,11 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
   );
 };
 
+interface Link {
+  label: string;
+  url: string;
+}
+
 interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
 }
@@ -49,7 +54,7 @@ interface QRCodeFormProps {
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
-  const [url, setUrl] = useState('');
+  const [links, setLinks] = useState<Link[]>([]);
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -100,6 +105,20 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     }
   };
 
+  const addLink = () => {
+    setLinks([...links, { label: '', url: '' }]);
+  };
+
+  const removeLink = (index: number) => {
+    setLinks(links.filter((_, i) => i !== index));
+  };
+
+  const updateLink = (index: number, field: keyof Link, value: string) => {
+    const newLinks = [...links];
+    newLinks[index] = { ...newLinks[index], [field]: value };
+    setLinks(newLinks);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
@@ -108,8 +127,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       return;
     }
     
-    if (!url) {
-      setError('URL is required');
+    if (links.length === 0) {
+      setError('At least one link is required');
       return;
     }
     
@@ -117,41 +136,20 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     setIsLoading(true);
     
     try {
-      // Validate URL format
-      let finalUrl = url;
-      try {
-        new URL(url);
-      } catch {
-        // If not a valid URL, try prepending https://
-        if (!url.startsWith('http://') && !url.startsWith('https://')) {
-          finalUrl = `https://${url}`;
-        }
-      }
-
       const formData = new FormData();
       formData.append('name', name || 'My QR Code');
-      formData.append('url', finalUrl);
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
+      formData.append('links', JSON.stringify(links));
       
-      // If we have a logo file, append it to the form data
       if (logoFile) {
         formData.append('logo', logoFile);
       }
 
-      // Get token from localStorage
       const token = localStorage.getItem('qr-generator-token');
       if (!token) {
         throw new Error('Please log in to create QR codes');
       }
-
-      console.log('Sending form data:', {
-        name: formData.get('name'),
-        url: formData.get('url'),
-        foregroundColor: formData.get('foregroundColor'),
-        backgroundColor: formData.get('backgroundColor'),
-        hasLogo: formData.has('logo')
-      });
 
       const response = await fetch('http://localhost:3000/api/qrcodes', {
         method: 'POST',
@@ -167,182 +165,151 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       }
 
       const newQR = await response.json();
-      console.log('Received QR code response:', newQR);
-      
+      if (onCreated) {
+        onCreated(newQR);
+      }
+
+      // Reset form
+      setName('');
+      setLinks([]);
+      setForegroundColor('#6366F1');
+      setBackgroundColor('#FFFFFF');
+      setLogoFile(null);
+      setLogoPreview(null);
+      if (fileInputRef.current) {
+        fileInputRef.current.value = '';
+      }
+
       toast({
         title: "QR Code Created",
         description: "Your QR code has been created successfully.",
       });
-      
-      // Reset form
-      setName('');
-      setUrl('');
-      removeLogo();
-      
-      // Call onCreated callback
-      if (onCreated) {
-        onCreated(newQR);
-      }
-    } catch (err) {
-      console.error('Error creating QR code:', err);
-      setError(err instanceof Error ? err.message : 'Failed to create QR code');
+    } catch (error) {
+      console.error('Error creating QR code:', error);
+      setError(error instanceof Error ? error.message : 'Failed to create QR code');
       toast({
         variant: "destructive",
-        title: "Failed to create QR code",
-        description: err instanceof Error ? err.message : 'An error occurred',
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to create QR code',
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Format URL for QR code generation
-  const formattedUrl = url.startsWith('http://') || url.startsWith('https://') ? url : `https://${url}`;
-
   return (
-    <Card className="w-full max-w-lg mx-auto">
+    <Card>
       <CardContent className="pt-6">
-        <Tabs defaultValue="basic">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="basic">Basic</TabsTrigger>
-            <TabsTrigger value="customize">Customize</TabsTrigger>
-          </TabsList>
-          
-          <form onSubmit={handleSubmit} className="space-y-4 mt-4">
-            {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
-                {error}
-              </div>
-            )}
-            
+        <form onSubmit={handleSubmit}>
+          <Tabs defaultValue="basic" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">Basic</TabsTrigger>
+              <TabsTrigger value="advanced">Advanced</TabsTrigger>
+            </TabsList>
             <TabsContent value="basic" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="name">QR Code Name (Optional)</Label>
-                <Input 
-                  id="name"
-                  placeholder="My Website" 
-                  value={name} 
-                  onChange={(e) => setName(e.target.value)}
-                />
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="url">URL</Label>
-                <Input 
-                  id="url"
-                  placeholder="https://example.com" 
-                  value={url} 
-                  onChange={(e) => setUrl(e.target.value)}
-                  required
-                />
-              </div>
-            </TabsContent>
-            
-            <TabsContent value="customize" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="foreground">Foreground Color</Label>
-                <div className="flex space-x-2 items-center">
-                  <input
-                    id="foreground"
-                    type="color"
-                    value={foregroundColor}
-                    onChange={(e) => setForegroundColor(e.target.value)}
-                    className="w-10 h-10 rounded-md overflow-hidden"
-                  />
-                  <Input 
-                    value={foregroundColor}
-                    onChange={(e) => setForegroundColor(e.target.value)}
-                    className="flex-1"
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="name">Name</Label>
+                  <Input
+                    id="name"
+                    value={name}
+                    onChange={(e) => setName(e.target.value)}
+                    placeholder="My QR Code"
                   />
                 </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label htmlFor="background">Background Color</Label>
-                <div className="flex space-x-2 items-center">
-                  <input
-                    id="background"
-                    type="color"
-                    value={backgroundColor}
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="w-10 h-10 rounded-md overflow-hidden"
-                  />
-                  <Input 
-                    value={backgroundColor}
-                    onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="flex-1"
-                  />
-                </div>
-              </div>
-              
-              <div className="space-y-2">
-                <Label>Logo (Optional)</Label>
-                <div className="flex flex-col space-y-2">
-                  <div className="flex items-center space-x-2">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={handleLogoUpload}
-                      ref={fileInputRef}
-                      className="hidden"
-                      id="logo-upload"
-                    />
+                <div className="space-y-2">
+                  <Label>Links</Label>
+                  <div className="space-y-2">
+                    {links.map((link, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Input
+                          placeholder="Button Label"
+                          value={link.label}
+                          onChange={(e) => updateLink(index, 'label', e.target.value)}
+                        />
+                        <Input
+                          placeholder="URL"
+                          type="url"
+                          value={link.url}
+                          onChange={(e) => updateLink(index, 'url', e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeLink(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                     <Button
                       type="button"
                       variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
                       className="w-full"
+                      onClick={addLink}
                     >
-                      <Upload className="w-4 h-4 mr-2" />
-                      Upload Logo
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Link
                     </Button>
                   </div>
-                  
-                  {logoPreview && (
-                    <div className="relative w-24 h-24 border rounded-md overflow-hidden">
-                      <img
-                        src={logoPreview}
-                        alt="Logo preview"
-                        className="w-full h-full object-contain"
-                      />
-                      <button
-                        type="button"
-                        onClick={removeLogo}
-                        className="absolute top-1 right-1 p-1 bg-red-500 text-white rounded-full hover:bg-red-600"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    </div>
-                  )}
-                  
-                  <p className="text-xs text-gray-500">
-                    Upload a logo to add to the center of your QR code (max 2MB)
-                  </p>
                 </div>
               </div>
             </TabsContent>
-            
-            {/* QR Preview */}
-            {url && (
-              <QRPreview 
-                url={formattedUrl} 
-                color={foregroundColor} 
-                bgColor={backgroundColor} 
-                logoUrl={logoPreview || undefined} 
-              />
-            )}
-            
-            <div className="flex justify-end">
-              <Button 
-                type="submit" 
-                className="qr-btn-primary" 
-                disabled={isLoading}
-              >
-                {isLoading ? 'Creating...' : 'Create QR Code'}
-              </Button>
-            </div>
-          </form>
-        </Tabs>
+            <TabsContent value="advanced" className="space-y-4">
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="foregroundColor">Foreground Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="foregroundColor"
+                      type="color"
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="backgroundColor">Background Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="backgroundColor"
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="logo">Logo</Label>
+                  <Input
+                    id="logo"
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoUpload}
+                  />
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+          <div className="mt-4 flex justify-end">
+            <Button type="submit" disabled={isLoading}>
+              {isLoading ? 'Creating...' : 'Create QR Code'}
+            </Button>
+          </div>
+        </form>
       </CardContent>
     </Card>
   );

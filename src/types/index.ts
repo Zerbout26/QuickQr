@@ -1,4 +1,3 @@
-
 export type UserRole = 'user' | 'admin';
 
 export interface User {
@@ -10,16 +9,20 @@ export interface User {
   trialEndDate: Date;
   isActive: boolean;
   hasActiveSubscription: boolean;
+  createdAt: Date;
+  updatedAt: Date;
 }
 
 export interface QRCode {
   id: string;
-  userId: string;
   name: string;
   url: string;
+  originalUrl: string;
+  links: { label: string; url: string }[];
   logoUrl?: string;
   foregroundColor: string;
   backgroundColor: string;
+  user: User;
   createdAt: Date;
   updatedAt: Date;
 }
@@ -27,6 +30,9 @@ export interface QRCode {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
+  login: (email: string, password: string) => Promise<void>;
+  register: (email: string, password: string, name?: string) => Promise<void>;
+  logout: () => void;
   signIn: (email: string, password: string) => Promise<User>;
   signUp: (email: string, password: string) => Promise<User>;
   signOut: () => void;

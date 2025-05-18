@@ -2,77 +2,121 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
 
+const qrCodeRepository = AppDataSource.getRepository(QRCode);
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
+
 export const getLandingPage = async (req: Request, res: Response) => {
-    try {
-        const { shortId } = req.params;
-        
-        // Find the QR code in the database
-        const qrCodeRepository = AppDataSource.getRepository(QRCode);
-        const qrCode = await qrCodeRepository.findOne({ where: { id: shortId } });
+  try {
+    const { id } = req.params;
+    const qrCode = await qrCodeRepository.findOne({
+      where: { id }
+    });
 
-        if (!qrCode) {
-            return res.status(404).send('QR Code not found');
-        }
-
-        // Render the landing page with the URL information
-        res.send(`
-            <!DOCTYPE html>
-            <html lang="en">
-            <head>
-                <meta charset="UTF-8">
-                <meta name="viewport" content="width=device-width, initial-scale=1.0">
-                <title>QuickQR - Redirect</title>
-                <style>
-                    body {
-                        font-family: Arial, sans-serif;
-                        display: flex;
-                        justify-content: center;
-                        align-items: center;
-                        min-height: 100vh;
-                        margin: 0;
-                        background-color: #f5f5f5;
-                    }
-                    .container {
-                        text-align: center;
-                        padding: 2rem;
-                        background: white;
-                        border-radius: 10px;
-                        box-shadow: 0 2px 10px rgba(0,0,0,0.1);
-                        max-width: 500px;
-                        width: 90%;
-                    }
-                    .button {
-                        display: inline-block;
-                        padding: 12px 24px;
-                        background-color: #007bff;
-                        color: white;
-                        text-decoration: none;
-                        border-radius: 5px;
-                        margin-top: 1rem;
-                        transition: background-color 0.3s;
-                    }
-                    .button:hover {
-                        background-color: #0056b3;
-                    }
-                    .url {
-                        word-break: break-all;
-                        margin: 1rem 0;
-                        color: #666;
-                    }
-                </style>
-            </head>
-            <body>
-                <div class="container">
-                    <h1>QuickQR Redirect</h1>
-                    <p>You are about to be redirected to:</p>
-                    <div class="url">${qrCode.originalUrl}</div>
-                    <a href="${qrCode.originalUrl}" class="button">Continue to Website</a>
-                </div>
-            </body>
-            </html>
-        `);
-    } catch (error) {
-        console.error('Error in landing page:', error);
-        res.status(500).send('Internal server error');
+    if (!qrCode) {
+      return res.status(404).send(`
+        <html>
+          <head>
+            <title>QR Code Not Found</title>
+            <style>
+              body {
+                font-family: system-ui, -apple-system, sans-serif;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                min-height: 100vh;
+                margin: 0;
+                background-color: #f3f4f6;
+              }
+              .container {
+                text-align: center;
+                padding: 2rem;
+                background: white;
+                border-radius: 0.5rem;
+                box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+              }
+              h1 { color: #1f2937; margin-bottom: 1rem; }
+              p { color: #6b7280; }
+            </style>
+          </head>
+          <body>
+            <div class="container">
+              <h1>QR Code Not Found</h1>
+              <p>The requested QR code does not exist or has been removed.</p>
+            </div>
+          </body>
+        </html>
+      `);
     }
+
+    // Generate HTML for the landing page
+    const html = `
+      <!DOCTYPE html>
+      <html>
+        <head>
+          <title>${qrCode.name}</title>
+          <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <style>
+            body {
+              font-family: system-ui, -apple-system, sans-serif;
+              margin: 0;
+              padding: 0;
+              min-height: 100vh;
+              display: flex;
+              flex-direction: column;
+              align-items: center;
+              justify-content: center;
+              background-color: #f3f4f6;
+            }
+            .container {
+              width: 100%;
+              max-width: 600px;
+              padding: 2rem;
+              text-align: center;
+            }
+            .logo {
+              max-width: 200px;
+              height: auto;
+              margin-bottom: 2rem;
+            }
+            .buttons {
+              display: flex;
+              flex-direction: column;
+              gap: 1rem;
+              width: 100%;
+            }
+            .button {
+              display: inline-block;
+              padding: 1rem 2rem;
+              background-color: ${qrCode.foregroundColor || '#6366F1'};
+              color: white;
+              text-decoration: none;
+              border-radius: 0.5rem;
+              font-weight: 500;
+              transition: opacity 0.2s;
+            }
+            .button:hover {
+              opacity: 0.9;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="container">
+            ${qrCode.logoUrl ? `<img src="${qrCode.logoUrl}" alt="Logo" class="logo">` : ''}
+            <div class="buttons">
+              ${qrCode.links?.map(link => `
+                <a href="${link.url}" class="button" target="_blank" rel="noopener noreferrer">
+                  ${link.label}
+                </a>
+              `).join('') || ''}
+            </div>
+          </div>
+        </body>
+      </html>
+    `;
+
+    res.send(html);
+  } catch (error) {
+    console.error('Error generating landing page:', error);
+    res.status(500).send('Error generating landing page');
+  }
 }; 

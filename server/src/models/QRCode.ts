@@ -15,6 +15,9 @@ export class QRCode {
   @Column()
   originalUrl!: string;
 
+  @Column("simple-json", { nullable: true, default: "[]" })
+  links!: { label: string; url: string }[];
+
   @Column({ nullable: true })
   logoUrl!: string;
 

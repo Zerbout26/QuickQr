@@ -5,8 +5,10 @@ import { AuthRequest } from '../middleware/auth';
 import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
+import crypto from 'crypto';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
+const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Configure multer for file uploads
 const storage = multer.diskStorage({
@@ -45,69 +47,84 @@ const upload = multer({
 }).single('logo');
 
 export const createQRCode = async (req: AuthRequest, res: Response) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+  upload(req, res, async (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: err.message });
     }
 
-    upload(req, res, async (err) => {
-      if (err) {
-        console.error('Upload error:', err);
-        return res.status(400).json({ error: err.message });
+    try {
+      if (!req.user) {
+        console.error('No user found in request');
+        return res.status(401).json({ error: 'Not authenticated' });
       }
 
-      try {
-        console.log('Request body:', req.body);
-        console.log('Request file:', req.file);
+      console.log('Request body:', req.body);
+      console.log('Request file:', req.file);
 
-        const { name, url, foregroundColor, backgroundColor } = req.body;
-        
-        if (!url) {
-          return res.status(400).json({ error: 'URL is required' });
-        }
+      const { name, foregroundColor, backgroundColor, links } = req.body;
+      let logoUrl = '';
 
-        let logoUrl = undefined;
-        if (req.file) {
-          // Create URL for the uploaded file
-          const baseUrl = process.env.NODE_ENV === 'production' 
-            ? 'https://your-production-domain.com' 
-            : 'http://localhost:3000';
-          logoUrl = `${baseUrl}/uploads/logos/${req.file.filename}`;
-          console.log('Generated logo URL:', logoUrl);
-        }
-
-        const qrCode = qrCodeRepository.create({
-          name: name || 'My QR Code',
-          url: url, // Store the original URL in url field
-          originalUrl: url, // Store the original URL in originalUrl field
-          logoUrl,
-          foregroundColor: foregroundColor || '#000000',
-          backgroundColor: backgroundColor || '#FFFFFF',
-          user: req.user
-        });
-
-        const savedQRCode = await qrCodeRepository.save(qrCode);
-        console.log('Saved QR code:', savedQRCode);
-
-        // Generate the landing page URL using the QR code's UUID
-        const landingPageUrl = `${process.env.NODE_ENV === 'production' 
-          ? 'https://your-production-domain.com' 
-          : 'http://localhost:3000'}/landing/${savedQRCode.id}`;
-        
-        // Update the QR code with the landing page URL
-        savedQRCode.url = landingPageUrl;
-        await qrCodeRepository.save(savedQRCode);
-        
-        res.status(201).json(savedQRCode);
-      } catch (error) {
-        console.error('Error creating QR code:', error);
-        res.status(500).json({ error: 'Error creating QR code' });
+      // Handle logo upload if present
+      if (req.file) {
+        logoUrl = `/uploads/logos/${req.file.filename}`;
       }
-    });
-  } catch (error) {
-    console.error('Error in createQRCode:', error);
-    res.status(500).json({ error: 'Error creating QR code' });
-  }
+
+      // Parse links if provided
+      let parsedLinks = [];
+      if (links) {
+        try {
+          parsedLinks = JSON.parse(links);
+          console.log('Parsed links:', parsedLinks);
+        } catch (e) {
+          console.error('Error parsing links:', e);
+          return res.status(400).json({ error: 'Invalid links format' });
+        }
+      }
+
+      // Get the host from the request
+      const protocol = req.protocol;
+      const host = req.get('host');
+      const baseUrl = `${protocol}://${host}`;
+
+      // Generate a temporary ID for the URL
+      const tempId = crypto.randomUUID();
+      const tempUrl = `${baseUrl}/l/${tempId}`;
+
+      const qrCode = new QRCode();
+      qrCode.name = name || 'My QR Code';
+      qrCode.links = parsedLinks;
+      qrCode.logoUrl = logoUrl;
+      qrCode.foregroundColor = foregroundColor || '#6366F1';
+      qrCode.backgroundColor = backgroundColor || '#FFFFFF';
+      qrCode.user = req.user;
+      qrCode.url = tempUrl;
+      qrCode.originalUrl = tempUrl;
+
+      console.log('Creating QR code:', qrCode);
+
+      // Save the QR code
+      const savedQRCode = await qrCodeRepository.save(qrCode);
+      console.log('Saved QR code:', savedQRCode);
+
+      // Update the URL with the actual ID
+      savedQRCode.url = `${baseUrl}/l/${savedQRCode.id}`;
+      savedQRCode.originalUrl = savedQRCode.url;
+
+      // Save again with the updated URL
+      const finalQRCode = await qrCodeRepository.save(savedQRCode);
+      console.log('Final QR code:', finalQRCode);
+
+      res.status(201).json(finalQRCode);
+    } catch (error) {
+      console.error('Error creating QR code:', error);
+      if (error instanceof Error) {
+        console.error('Error details:', error.message);
+        console.error('Error stack:', error.stack);
+      }
+      res.status(500).json({ error: 'Error creating QR code' });
+    }
+  });
 };
 
 export const getQRCodes = async (req: AuthRequest, res: Response) => {
@@ -155,7 +172,7 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
     }
 
     const { id } = req.params;
-    const { name, url, logoUrl, foregroundColor, backgroundColor } = req.body;
+    const { name, url, logoUrl, foregroundColor, backgroundColor, links } = req.body;
 
     const qrCode = await qrCodeRepository.findOne({
       where: { id, user: { id: req.user.id } }
@@ -170,6 +187,13 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
     if (logoUrl !== undefined) qrCode.logoUrl = logoUrl;
     if (foregroundColor) qrCode.foregroundColor = foregroundColor;
     if (backgroundColor) qrCode.backgroundColor = backgroundColor;
+    if (links !== undefined) {
+      try {
+        qrCode.links = links ? JSON.parse(links) : [];
+      } catch (e) {
+        return res.status(400).json({ error: 'Invalid links format' });
+      }
+    }
 
     await qrCodeRepository.save(qrCode);
     res.json(qrCode);
