@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -29,7 +28,16 @@ const QRRedirect = () => {
       try {
         setLoading(true);
         console.log(`Fetching QR code data for ID: ${id}`);
-        const response = await axios.get(`http://localhost:3000/api/qrcodes/public/${id}`);
+        
+        // Create an axios instance without auth headers for public endpoints
+        const publicAxios = axios.create({
+          baseURL: 'http://localhost:3000/api',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        });
+        
+        const response = await publicAxios.get(`/qrcodes/public/${id}`);
         console.log('QR code data received:', response.data);
         setQrData(response.data);
       } catch (err) {
@@ -37,6 +45,7 @@ const QRRedirect = () => {
         if (axios.isAxiosError(err)) {
           const statusCode = err.response?.status;
           const errorMessage = err.response?.data?.error || err.message;
+          console.error(`Error (${statusCode}): ${errorMessage}`);
           setError(`Error (${statusCode}): ${errorMessage}`);
         } else {
           setError('The QR code you scanned could not be found or has been deleted.');
