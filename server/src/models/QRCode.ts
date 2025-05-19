@@ -16,6 +16,12 @@ export interface MenuCategory {
   items: MenuItem[];
 }
 
+export interface Link {
+  label: string;
+  url: string;
+  type?: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' | 'whatsapp' | 'telegram' | 'website' | 'other';
+}
+
 @Entity()
 export class QRCode {
   @PrimaryGeneratedColumn("uuid")

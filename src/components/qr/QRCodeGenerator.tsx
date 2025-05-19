@@ -9,8 +9,9 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
-import { Upload, X, Plus, Trash2 } from 'lucide-react';
+import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -48,6 +49,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
 interface Link {
   label: string;
   url: string;
+  type?: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' | 'whatsapp' | 'telegram' | 'website' | 'other';
 }
 
 interface MenuItem {
@@ -124,7 +126,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   };
 
   const addLink = () => {
-    setLinks([...links, { label: '', url: '' }]);
+    setLinks([...links, { label: '', url: '', type: 'website' }]);
   };
 
   const removeLink = (index: number) => {
@@ -133,8 +135,39 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
   const updateLink = (index: number, field: keyof Link, value: string) => {
     const newLinks = [...links];
-    newLinks[index] = { ...newLinks[index], [field]: value };
+    if (field === 'type') {
+      // Automatically set the label based on the selected type
+      const label = getPlatformLabel(value as Link['type']);
+      newLinks[index] = { ...newLinks[index], [field]: value as Link['type'], label };
+    } else {
+      newLinks[index] = { ...newLinks[index], [field]: value };
+    }
     setLinks(newLinks);
+  };
+
+  const getPlatformLabel = (type: string): string => {
+    switch (type) {
+      case 'facebook':
+        return 'Follow us on Facebook';
+      case 'instagram':
+        return 'Follow us on Instagram';
+      case 'twitter':
+        return 'Follow us on Twitter';
+      case 'linkedin':
+        return 'Connect on LinkedIn';
+      case 'youtube':
+        return 'Subscribe on YouTube';
+      case 'tiktok':
+        return 'Follow us on TikTok';
+      case 'whatsapp':
+        return 'Chat on WhatsApp';
+      case 'telegram':
+        return 'Join our Telegram';
+      case 'website':
+        return 'Visit our Website';
+      default:
+        return 'Visit Link';
+    }
   };
 
   const addCategory = () => {
@@ -238,6 +271,27 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
   const removeItemImage = (categoryIndex: number, itemIndex: number) => {
     updateMenuItem(categoryIndex, itemIndex, 'imageUrl', '');
+  };
+
+  const getLinkIcon = (type?: string) => {
+    switch (type) {
+      case 'facebook':
+        return <Facebook className="h-4 w-4 mr-2" />;
+      case 'instagram':
+        return <Instagram className="h-4 w-4 mr-2" />;
+      case 'twitter':
+        return <Twitter className="h-4 w-4 mr-2" />;
+      case 'linkedin':
+        return <Linkedin className="h-4 w-4 mr-2" />;
+      case 'youtube':
+        return <Youtube className="h-4 w-4 mr-2" />;
+      case 'whatsapp':
+        return <MessageCircle className="h-4 w-4 mr-2" />;
+      case 'telegram':
+        return <Send className="h-4 w-4 mr-2" />;
+      default:
+        return <Globe className="h-4 w-4 mr-2" />;
+    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -391,11 +445,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     <div className="space-y-2">
                       {links.map((link, index) => (
                         <div key={index} className="flex gap-2">
-                          <Input
-                            placeholder="Button Label"
-                            value={link.label}
-                            onChange={(e) => updateLink(index, 'label', e.target.value)}
-                          />
+                          <Select
+                            value={link.type || 'website'}
+                            onValueChange={(value) => updateLink(index, 'type', value)}
+                          >
+                            <SelectTrigger className="w-[180px]">
+                              <SelectValue placeholder="Select platform" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="website">Website</SelectItem>
+                              <SelectItem value="facebook">Facebook</SelectItem>
+                              <SelectItem value="instagram">Instagram</SelectItem>
+                              <SelectItem value="twitter">Twitter</SelectItem>
+                              <SelectItem value="linkedin">LinkedIn</SelectItem>
+                              <SelectItem value="youtube">YouTube</SelectItem>
+                              <SelectItem value="tiktok">TikTok</SelectItem>
+                              <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                              <SelectItem value="telegram">Telegram</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
                           <Input
                             placeholder="URL"
                             type="url"
