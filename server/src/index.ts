@@ -9,11 +9,14 @@ import { auth } from './middleware/auth';
 
 const app = express();
 
-// Get the domain from environment variable or use a default
-const getDomain = (req: express.Request) => {
-  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
-  const host = req.get('host') || 'localhost:8080';
-  return `${protocol}://${host}`;
+// Get the frontend domain from the request origin
+const getFrontendDomain = (req: express.Request) => {
+  const origin = req.get('origin');
+  if (origin) {
+    return origin;
+  }
+  // Fallback to environment variable or default
+  return process.env.FRONTEND_URL || 'http://localhost:8080';
 };
 
 // Create uploads directories if they don't exist
@@ -31,9 +34,9 @@ const itemsDir = path.join(uploadsDir, 'items');
 app.use(cors());
 app.use(express.json());
 
-// Add domain to request object
+// Add frontend domain to request object
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
-  (req as any).domain = getDomain(req);
+  (req as any).frontendDomain = getFrontendDomain(req);
   next();
 });
 
