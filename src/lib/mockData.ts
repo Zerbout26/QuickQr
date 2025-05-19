@@ -1,187 +1,227 @@
 
-import { User, QRCode } from "@/types";
+import { User, QRCode } from '../types';
 
-// Mock Users
+// Mock users with different statuses
 export const mockUsers: User[] = [
   {
-    id: "usr-123",
-    email: "user@example.com",
-    name: "Regular User",
-    role: "user",
-    trialStartDate: new Date('2023-01-01'),
-    trialEndDate: new Date('2023-01-15'),
+    id: '1',
+    email: 'user@example.com',
+    name: 'Demo User',
+    role: 'user',
+    trialStartDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+    trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days in future
     isActive: true,
-    hasActiveSubscription: false,
-    createdAt: new Date('2022-12-15'),
-    updatedAt: new Date('2022-12-15')
+    hasActiveSubscription: false
   },
   {
-    id: "usr-456",
-    email: "expired@example.com",
-    name: "Expired User",
-    role: "user",
-    trialStartDate: new Date('2022-01-01'),
-    trialEndDate: new Date('2022-01-15'),
+    id: '2',
+    email: 'expired@example.com',
+    name: 'Expired Trial',
+    role: 'user',
+    trialStartDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+    trialEndDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
     isActive: false,
-    hasActiveSubscription: false,
-    createdAt: new Date('2021-12-15'),
-    updatedAt: new Date('2022-01-16')
+    hasActiveSubscription: false
   },
   {
-    id: "usr-789",
-    email: "subscriber@example.com",
-    name: "Subscriber",
-    role: "user",
-    trialStartDate: new Date('2023-01-01'),
-    trialEndDate: new Date('2023-01-15'),
+    id: '3',
+    email: 'paid@example.com',
+    name: 'Paid User',
+    role: 'user',
+    trialStartDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+    trialEndDate: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000), // 16 days ago
     isActive: true,
-    hasActiveSubscription: true,
-    createdAt: new Date('2022-12-15'),
-    updatedAt: new Date('2023-01-15')
+    hasActiveSubscription: true
   },
   {
-    id: "adm-123",
-    email: "admin@example.com",
-    name: "Admin User",
-    role: "admin",
-    trialStartDate: new Date('2023-01-01'),
-    trialEndDate: new Date('2023-01-15'),
+    id: '4',
+    email: 'admin@example.com',
+    name: 'Admin User',
+    role: 'admin',
+    trialStartDate: new Date(),
+    trialEndDate: new Date(),
     isActive: true,
-    hasActiveSubscription: true,
-    createdAt: new Date('2022-12-01'),
-    updatedAt: new Date('2022-12-01')
+    hasActiveSubscription: true
   },
   {
-    id: "adm-456",
-    email: "superadmin@example.com",
-    name: "Super Admin",
-    role: "admin",
-    trialStartDate: new Date('2022-01-01'),
-    trialEndDate: new Date('2022-01-15'),
+    id: 'admin-1',
+    email: 'admin@qrcreator.com',
+    name: 'System Admin',
+    role: 'admin',
+    trialStartDate: new Date(),
+    trialEndDate: new Date(),
     isActive: true,
-    hasActiveSubscription: true,
-    createdAt: new Date('2021-12-01'),
-    updatedAt: new Date('2021-12-01')
-  },
+    hasActiveSubscription: true
+  }
 ];
 
-// Mock QR Codes
+// Mock QR codes
 export const mockQRCodes: QRCode[] = [
   {
-    id: "qr-123",
-    name: "Restaurant Menu",
-    type: "menu",
-    url: "https://example.com/menu",
-    originalUrl: "https://example.com/menu",
-    links: [],
-    menu: {
-      restaurantName: "Delicious Bites",
-      description: "Home of the best burgers in town!",
-      categories: [
-        {
-          name: "Appetizers",
-          items: [
-            {
-              name: "Mozzarella Sticks",
-              description: "Crispy on the outside, gooey on the inside. Served with marinara.",
-              price: 8.99,
-              category: "Appetizers",
-              imageUrl: "/uploads/items/item-1747613328646-965541719.png"
-            }
-          ],
-        },
-        {
-          name: "Main Dishes",
-          items: [
-            {
-              name: "Classic Burger",
-              description: "Juicy beef patty with lettuce, tomato, onion, and our special sauce.",
-              price: 12.99,
-              category: "Main Dishes",
-              imageUrl: "/uploads/items/item-1747613383629-430941781.jpeg"
-            }
-          ],
-        },
-      ],
-    },
-    logoUrl: "/uploads/logos/logo-1747487613512-874229422.png",
-    foregroundColor: "#5D5FEF",
-    backgroundColor: "#F9FAFB",
-    user: mockUsers[0],
-    createdAt: new Date('2023-02-15'),
-    updatedAt: new Date('2023-02-15')
+    id: '1',
+    userId: '1',
+    name: 'Website QR',
+    url: 'https://example.com',
+    foregroundColor: '#6366F1',
+    backgroundColor: '#FFFFFF',
+    createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
   },
   {
-    id: "qr-456",
-    name: "Business Card",
-    type: "url",
-    url: "https://example.com/contact",
-    originalUrl: "https://example.com/contact",
-    links: [
-      { label: "Website", url: "https://example.com" },
-      { label: "Facebook", url: "https://facebook.com/example" },
-      { label: "Contact Me", url: "mailto:contact@example.com" },
-    ],
-    logoUrl: "/uploads/logos/logo-1747487702205-220060420.png",
-    foregroundColor: "#8B5CF6",
-    backgroundColor: "#F3F4F6",
-    user: mockUsers[2],
-    createdAt: new Date('2023-03-01'),
-    updatedAt: new Date('2023-03-01')
+    id: '2',
+    userId: '1',
+    name: 'Contact Card',
+    url: 'https://example.com/contact',
+    logoUrl: 'https://placeholder.com/150',
+    foregroundColor: '#8B5CF6',
+    backgroundColor: '#F9FAFB',
+    createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
   },
   {
-    id: "qr-789",
-    name: "Both Types",
-    type: "both",
-    url: "https://example.com/restaurant",
-    originalUrl: "https://example.com/restaurant",
-    links: [
-      { label: "Reserve a Table", url: "https://example.com/reservations" },
-      { label: "Directions", url: "https://maps.google.com" },
-      { label: "Instagram", url: "https://instagram.com/restaurant" },
-      { label: "Twitter", url: "https://twitter.com/restaurant" },
-      { label: "LinkedIn", url: "https://linkedin.com/company/restaurant" },
-    ],
-    menu: {
-      restaurantName: "Fancy Dining",
-      description: "Fine dining experience with the best ingredients",
-      categories: [
-        {
-          name: "Starters",
-          items: [
-            {
-              name: "Truffle Fries",
-              description: "Hand-cut fries with truffle oil and parmesan",
-              price: 14.99,
-              category: "Starters",
-              imageUrl: "/uploads/items/item-1747614049285-273052679.png"
-            }
-          ],
-        }
-      ],
-    },
-    logoUrl: "/uploads/logos/logo-1747488412434-849390581.png",
-    foregroundColor: "#10B981",
-    backgroundColor: "#ECFDF5",
-    user: mockUsers[0],
-    createdAt: new Date('2023-04-10'),
-    updatedAt: new Date('2023-04-10')
-  },
+    id: '3',
+    userId: '3',
+    name: 'Product Page',
+    url: 'https://example.com/product',
+    foregroundColor: '#1F2937',
+    backgroundColor: '#FFFFFF',
+    createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
+    updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
+  }
 ];
 
-export const mockUserWithoutQRCodes: User = {
-  id: "usr-999",
-  email: "new@example.com",
-  role: "user",
-  trialStartDate: new Date('2023-05-01'),
-  trialEndDate: new Date('2023-05-15'),
-  isActive: true,
-  hasActiveSubscription: false,
-  createdAt: new Date('2023-05-01'),
-  updatedAt: new Date('2023-05-01')
+// Login function that simulates authentication
+export const mockLogin = (email: string, password: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const user = mockUsers.find(u => u.email === email);
+      if (user) {
+        resolve(user);
+      } else {
+        reject(new Error('Invalid email or password'));
+      }
+    }, 500);
+  });
 };
 
-// Function to find QR codes by user id
-export const getQRCodesByUser = (userId: string) => {
-  return mockQRCodes.filter(qr => qr.user.id === userId);
+// Register function that simulates user creation
+export const mockRegister = (email: string, password: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      if (mockUsers.some(u => u.email === email)) {
+        reject(new Error('User already exists'));
+        return;
+      }
+      
+      const newUser: User = {
+        id: `${mockUsers.length + 1}`,
+        email,
+        role: 'user', // Default role for new registrations is 'user'
+        trialStartDate: new Date(),
+        trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
+        isActive: true,
+        hasActiveSubscription: false
+      };
+      
+      mockUsers.push(newUser);
+      resolve(newUser);
+    }, 500);
+  });
+};
+
+// Function to get QR codes for a specific user
+export const getUserQRCodes = (userId: string): Promise<QRCode[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const userCodes = mockQRCodes.filter(code => code.userId === userId);
+      resolve(userCodes);
+    }, 300);
+  });
+};
+
+// Function to create a new QR code
+export const createQRCode = (qrCode: Omit<QRCode, 'id' | 'createdAt' | 'updatedAt'>): Promise<QRCode> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const newQR: QRCode = {
+        ...qrCode,
+        id: `${mockQRCodes.length + 1}`,
+        createdAt: new Date(),
+        updatedAt: new Date()
+      };
+      
+      mockQRCodes.push(newQR);
+      resolve(newQR);
+    }, 300);
+  });
+};
+
+// Function to update a QR code
+export const updateQRCode = (id: string, updates: Partial<QRCode>): Promise<QRCode> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const index = mockQRCodes.findIndex(qr => qr.id === id);
+      if (index === -1) {
+        reject(new Error('QR code not found'));
+        return;
+      }
+      
+      const updatedQR = {
+        ...mockQRCodes[index],
+        ...updates,
+        updatedAt: new Date()
+      };
+      
+      mockQRCodes[index] = updatedQR;
+      resolve(updatedQR);
+    }, 300);
+  });
+};
+
+// Admin functions for managing users
+export const activateUser = (userId: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const index = mockUsers.findIndex(u => u.id === userId);
+      if (index === -1) {
+        reject(new Error('User not found'));
+        return;
+      }
+      
+      mockUsers[index] = {
+        ...mockUsers[index],
+        isActive: true,
+        hasActiveSubscription: true
+      };
+      
+      resolve(mockUsers[index]);
+    }, 300);
+  });
+};
+
+export const deactivateUser = (userId: string): Promise<User> => {
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      const index = mockUsers.findIndex(u => u.id === userId);
+      if (index === -1) {
+        reject(new Error('User not found'));
+        return;
+      }
+      
+      mockUsers[index] = {
+        ...mockUsers[index],
+        isActive: false
+      };
+      
+      resolve(mockUsers[index]);
+    }, 300);
+  });
+};
+
+export const getAllUsers = (): Promise<User[]> => {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      resolve([...mockUsers]);
+    }, 300);
+  });
 };
