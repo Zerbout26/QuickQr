@@ -1,10 +1,11 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Separator } from '@/components/ui/separator';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -20,6 +21,7 @@ const LandingPage = () => {
         setQRCode(data);
         setLoading(false);
       } catch (err) {
+        console.error('Error fetching QR code:', err);
         setError('Failed to load QR code');
         setLoading(false);
       }
@@ -32,8 +34,9 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
+          <div className="w-16 h-16 border-4 border-qr-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-xl text-gray-600">Loading...</p>
         </div>
       </div>
@@ -42,9 +45,9 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4">Error</h1>
+          <h1 className="text-4xl font-bold mb-4 text-gray-800">Error</h1>
           <p className="text-xl text-gray-600 mb-4">{error || 'QR code not found'}</p>
           <Button onClick={() => navigate('/')}>Return to Home</Button>
         </div>
@@ -56,48 +59,110 @@ const LandingPage = () => {
   const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
 
   return (
-    <div className="min-h-screen bg-gray-100 py-12">
-      <div className="container mx-auto px-4">
-        <Card className="max-w-4xl mx-auto">
-          <CardContent className="pt-6">
-            <h1 className="text-3xl font-bold text-center mb-8">{qrCode.name}</h1>
-            
-            {hasUrls && hasMenu ? (
-              <Tabs defaultValue="menu" className="w-full">
-                <TabsList className="w-full grid grid-cols-2">
-                  <TabsTrigger value="menu">Menu</TabsTrigger>
-                  <TabsTrigger value="links">Links</TabsTrigger>
-                </TabsList>
+    <div 
+      className="min-h-screen py-8 px-4"
+      style={{
+        background: `linear-gradient(135deg, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -20) : '#e5e7eb'} 100%)`,
+      }}
+    >
+      <div className="container mx-auto max-w-4xl">
+        <Card className="overflow-hidden shadow-xl">
+          {qrCode.logoUrl && (
+            <div className="flex justify-center pt-8">
+              <img 
+                src={qrCode.logoUrl} 
+                alt="Logo" 
+                className="h-24 w-auto object-contain"
+              />
+            </div>
+          )}
+          
+          <CardContent className="p-6 md:p-8">
+            <h1 
+              className="text-3xl md:text-4xl font-bold text-center mb-6"
+              style={{ color: qrCode.foregroundColor || '#1f2937' }}
+            >
+              {qrCode.name}
+            </h1>
+
+            {/* Links Section */}
+            {hasUrls && (
+              <div className="mb-8">
+                <div className="grid gap-3">
+                  {qrCode.links.map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full"
+                    >
+                      <Button 
+                        className="w-full text-lg py-6" 
+                        style={{ 
+                          backgroundColor: qrCode.foregroundColor || '#6366F1',
+                          color: '#ffffff'
+                        }}
+                      >
+                        {link.label}
+                      </Button>
+                    </a>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Display both links and menu */}
+            {hasUrls && hasMenu && (
+              <Separator className="my-8" />
+            )}
+
+            {/* Menu Section */}
+            {hasMenu && (
+              <div className="space-y-8">
+                <div className="text-center mb-6">
+                  <h2 
+                    className="text-2xl font-semibold"
+                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                  >
+                    {qrCode.menu?.restaurantName}
+                  </h2>
+                  {qrCode.menu?.description && (
+                    <p className="text-gray-600 mt-2">{qrCode.menu.description}</p>
+                  )}
+                </div>
                 
-                <TabsContent value="menu" className="space-y-8">
-                  <div className="text-center">
-                    <h2 className="text-2xl font-semibold mb-2">{qrCode.menu?.restaurantName}</h2>
-                    {qrCode.menu?.description && (
-                      <p className="text-gray-600">{qrCode.menu.description}</p>
-                    )}
-                  </div>
-                  
-                  <Tabs defaultValue={qrCode.menu?.categories[0]?.name} className="w-full">
-                    <TabsList className="w-full justify-start overflow-x-auto">
-                      {qrCode.menu?.categories.map((category) => (
-                        <TabsTrigger key={category.name} value={category.name}>
-                          {category.name}
-                        </TabsTrigger>
-                      ))}
-                    </TabsList>
-                    
-                    {qrCode.menu?.categories.map((category) => (
-                      <TabsContent key={category.name} value={category.name} className="space-y-4">
+                <div className="space-y-10">
+                  {qrCode.menu?.categories.map((category) => (
+                    <div key={category.name} className="space-y-6">
+                      <h3 
+                        className="text-xl font-bold text-center pb-2 border-b-2"
+                        style={{ borderColor: qrCode.foregroundColor || '#6366F1' }}
+                      >
+                        {category.name}
+                      </h3>
+                      
+                      <div className="space-y-5">
                         {category.items.map((item, index) => (
-                          <div key={index} className="border rounded-lg p-4">
+                          <div key={index} className="bg-white rounded-lg p-4 shadow-md">
                             <div className="flex justify-between items-start">
                               <div>
-                                <h3 className="text-lg font-semibold">{item.name}</h3>
+                                <h3 
+                                  className="text-lg font-semibold"
+                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                >
+                                  {item.name}
+                                </h3>
                                 {item.description && (
-                                  <p className="text-gray-600 mt-1">{item.description}</p>
+                                  <p className="text-gray-600 mt-1 text-sm">{item.description}</p>
                                 )}
                               </div>
-                              <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
+                              <p 
+                                className="text-lg font-semibold"
+                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                              >
+                                ${item.price.toFixed(2)}
+                              </p>
                             </div>
                             {item.imageUrl && (
                               <img
@@ -108,88 +173,12 @@ const LandingPage = () => {
                             )}
                           </div>
                         ))}
-                      </TabsContent>
-                    ))}
-                  </Tabs>
-                </TabsContent>
-
-                <TabsContent value="links" className="space-y-6">
-                  {qrCode.links.map((link, index) => (
-                    <a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full"
-                    >
-                      <Button className="w-full" variant="outline">
-                        {link.label}
-                      </Button>
-                    </a>
+                      </div>
+                    </div>
                   ))}
-                </TabsContent>
-              </Tabs>
-            ) : hasUrls ? (
-              <div className="space-y-6">
-                {qrCode.links.map((link, index) => (
-                  <a
-                    key={index}
-                    href={link.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="block w-full"
-                  >
-                    <Button className="w-full" variant="outline">
-                      {link.label}
-                    </Button>
-                  </a>
-                ))}
-              </div>
-            ) : hasMenu ? (
-              <div className="space-y-8">
-                <div className="text-center">
-                  <h2 className="text-2xl font-semibold mb-2">{qrCode.menu?.restaurantName}</h2>
-                  {qrCode.menu?.description && (
-                    <p className="text-gray-600">{qrCode.menu.description}</p>
-                  )}
                 </div>
-                
-                <Tabs defaultValue={qrCode.menu?.categories[0]?.name} className="w-full">
-                  <TabsList className="w-full justify-start overflow-x-auto">
-                    {qrCode.menu?.categories.map((category) => (
-                      <TabsTrigger key={category.name} value={category.name}>
-                        {category.name}
-                      </TabsTrigger>
-                    ))}
-                  </TabsList>
-                  
-                  {qrCode.menu?.categories.map((category) => (
-                    <TabsContent key={category.name} value={category.name} className="space-y-4">
-                      {category.items.map((item, index) => (
-                        <div key={index} className="border rounded-lg p-4">
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <h3 className="text-lg font-semibold">{item.name}</h3>
-                              {item.description && (
-                                <p className="text-gray-600 mt-1">{item.description}</p>
-                              )}
-                            </div>
-                            <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
-                          </div>
-                          {item.imageUrl && (
-                            <img
-                              src={item.imageUrl}
-                              alt={item.name}
-                              className="mt-4 rounded-lg w-full h-48 object-cover"
-                            />
-                          )}
-                        </div>
-                      ))}
-                    </TabsContent>
-                  ))}
-                </Tabs>
               </div>
-            ) : null}
+            )}
           </CardContent>
         </Card>
       </div>
@@ -197,4 +186,23 @@ const LandingPage = () => {
   );
 };
 
-export default LandingPage; 
+// Helper function to adjust color brightness
+function adjustColor(color: string, amount: number): string {
+  // Remove the # if present
+  color = color.replace(/^#/, '');
+  
+  // Parse the color
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+  
+  // Adjust each channel
+  r = Math.max(0, Math.min(255, r + amount));
+  g = Math.max(0, Math.min(255, g + amount));
+  b = Math.max(0, Math.min(255, b + amount));
+  
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+}
+
+export default LandingPage;
