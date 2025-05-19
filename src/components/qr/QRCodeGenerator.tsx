@@ -12,6 +12,8 @@ import { qrCodeApi } from '@/lib/api';
 import { Upload, X, Plus, Trash2 } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 
+const API_BASE_URL = 'http://localhost:3000/api';
+
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
   if (!url) return null;
@@ -173,6 +175,70 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       [field]: value,
     };
     setMenuCategories(newCategories);
+  };
+
+  const handleItemImageUpload = async (categoryIndex: number, itemIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+
+    // Check file type
+    if (!file.type.startsWith('image/')) {
+      toast({
+        variant: "destructive",
+        title: "Invalid file type",
+        description: "Please upload an image file (PNG, JPG, etc.)",
+      });
+      return;
+    }
+
+    // Check file size (max 2MB)
+    if (file.size > 2 * 1024 * 1024) {
+      toast({
+        variant: "destructive",
+        title: "File too large",
+        description: "Item image must be less than 2MB",
+      });
+      return;
+    }
+
+    try {
+      const formData = new FormData();
+      formData.append('image', file);
+
+      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        },
+        body: formData
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to upload image');
+      }
+
+      const { imageUrl } = await response.json();
+      // Construct absolute URL for the image
+      const absoluteImageUrl = `${API_BASE_URL.replace('/api', '')}${imageUrl}`;
+      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', absoluteImageUrl);
+
+      toast({
+        title: "Image Uploaded",
+        description: "Item image has been uploaded successfully.",
+      });
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error instanceof Error ? error.message : 'Failed to upload item image',
+      });
+    }
+  };
+
+  const removeItemImage = (categoryIndex: number, itemIndex: number) => {
+    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', '');
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -397,6 +463,36 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 value={item.price}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
                               />
+                              <div className="space-y-2">
+                                <Label>Item Image</Label>
+                                {item.imageUrl ? (
+                                  <div className="relative">
+                                    <img
+                                      src={item.imageUrl}
+                                      alt={item.name}
+                                      className="w-32 h-32 object-cover rounded-lg"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      className="absolute top-2 right-2"
+                                      onClick={() => removeItemImage(categoryIndex, itemIndex)}
+                                    >
+                                      <X className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ) : (
+                                  <div className="flex items-center gap-2">
+                                    <Input
+                                      type="file"
+                                      accept="image/*"
+                                      onChange={(e) => handleItemImageUpload(categoryIndex, itemIndex, e)}
+                                      className="flex-1"
+                                    />
+                                  </div>
+                                )}
+                              </div>
                               <Button
                                 type="button"
                                 variant="outline"

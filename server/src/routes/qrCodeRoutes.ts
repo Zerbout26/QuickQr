@@ -4,7 +4,8 @@ import {
   getQRCodes,
   getQRCode,
   updateQRCode,
-  deleteQRCode
+  deleteQRCode,
+  uploadItemImageHandler
 } from '../controllers/qrCodeController';
 import { auth } from '../middleware/auth';
 
@@ -15,7 +16,8 @@ router.use(auth); // All QR code routes require authentication
 router.post('/', createQRCode);
 router.get('/', getQRCodes);
 router.get('/:id', getQRCode);
-router.patch('/:id', updateQRCode);
+router.put('/:id', updateQRCode);
 router.delete('/:id', deleteQRCode);
+router.post('/upload/item-image', uploadItemImageHandler);
 
 export default router; 

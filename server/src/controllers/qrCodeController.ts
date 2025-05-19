@@ -31,6 +31,23 @@ const storage = multer.diskStorage({
   }
 });
 
+// Configure multer for item image uploads
+const itemImageStorage = multer.diskStorage({
+  destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+    const uploadDir = path.join(__dirname, '../../uploads/items');
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+    cb(null, uploadDir);
+  },
+  filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+    const ext = path.extname(file.originalname);
+    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+    const filename = `item-${uniqueSuffix}${ext}`;
+    cb(null, filename);
+  }
+});
+
 const upload = multer({
   storage,
   limits: {
@@ -45,6 +62,46 @@ const upload = multer({
     }
   }
 }).single('logo');
+
+const uploadItemImage = multer({
+  storage: itemImageStorage,
+  limits: {
+    fileSize: 2 * 1024 * 1024 // 2MB limit
+  },
+  fileFilter: (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
+    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+    if (allowedTypes.includes(file.mimetype)) {
+      cb(null, true);
+    } else {
+      cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
+    }
+  }
+}).single('image');
+
+export const uploadItemImageHandler = async (req: AuthRequest, res: Response) => {
+  uploadItemImage(req, res, async (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: err.message });
+    }
+
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
+      }
+
+      if (!req.file) {
+        return res.status(400).json({ error: 'No image file provided' });
+      }
+
+      const imageUrl = `/uploads/items/${req.file.filename}`;
+      res.json({ imageUrl });
+    } catch (error) {
+      console.error('Error uploading item image:', error);
+      res.status(500).json({ error: 'Error uploading item image' });
+    }
+  });
+};
 
 export const createQRCode = async (req: AuthRequest, res: Response) => {
   upload(req, res, async (err) => {

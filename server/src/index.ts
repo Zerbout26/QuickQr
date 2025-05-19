@@ -1,6 +1,7 @@
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
+import fs from 'fs';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
@@ -8,6 +9,17 @@ import { auth } from './middleware/auth';
 
 const app = express();
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
+
+// Create uploads directories if they don't exist
+const uploadsDir = path.join(__dirname, '../uploads');
+const logosDir = path.join(uploadsDir, 'logos');
+const itemsDir = path.join(uploadsDir, 'items');
+
+[uploadsDir, logosDir, itemsDir].forEach(dir => {
+  if (!fs.existsSync(dir)) {
+    fs.mkdirSync(dir, { recursive: true });
+  }
+});
 
 // Middleware
 app.use(cors());
