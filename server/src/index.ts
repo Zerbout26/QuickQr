@@ -8,7 +8,13 @@ import qrCodeRoutes from './routes/qrCodeRoutes';
 import { auth } from './middleware/auth';
 
 const app = express();
-const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
+
+// Get the domain from environment variable or use a default
+const getDomain = (req: express.Request) => {
+  const protocol = process.env.NODE_ENV === 'production' ? 'https' : 'http';
+  const host = req.get('host') || 'localhost:8080';
+  return `${protocol}://${host}`;
+};
 
 // Create uploads directories if they don't exist
 const uploadsDir = path.join(__dirname, '../uploads');
@@ -24,6 +30,12 @@ const itemsDir = path.join(uploadsDir, 'items');
 // Middleware
 app.use(cors());
 app.use(express.json());
+
+// Add domain to request object
+app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
+  (req as any).domain = getDomain(req);
+  next();
+});
 
 // Serve static files from the uploads directory with CORS headers
 app.use('/uploads', (req, res, next) => {

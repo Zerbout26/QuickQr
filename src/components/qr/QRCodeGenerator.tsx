@@ -219,9 +219,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       }
 
       const { imageUrl } = await response.json();
-      // Construct absolute URL for the image
-      const absoluteImageUrl = `${API_BASE_URL.replace('/api', '')}${imageUrl}`;
-      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', absoluteImageUrl);
+      // Use the full URL returned from the server
+      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', imageUrl);
 
       toast({
         title: "Image Uploaded",

@@ -1,4 +1,4 @@
-import { Response } from 'express';
+import { Response, Request } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode, QRCodeType } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
@@ -94,7 +94,8 @@ export const uploadItemImageHandler = async (req: AuthRequest, res: Response) =>
         return res.status(400).json({ error: 'No image file provided' });
       }
 
-      const imageUrl = `/uploads/items/${req.file.filename}`;
+      const domain = (req as any).domain;
+      const imageUrl = `${domain}/uploads/items/${req.file.filename}`;
       res.json({ imageUrl });
     } catch (error) {
       console.error('Error uploading item image:', error);
@@ -120,11 +121,12 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Request file:', req.file);
 
       const { name, foregroundColor, backgroundColor, links, type, menu } = req.body;
+      const domain = (req as any).domain;
       let logoUrl = '';
 
       // Handle logo upload if present
       if (req.file) {
-        logoUrl = `/uploads/logos/${req.file.filename}`;
+        logoUrl = `${domain}/uploads/logos/${req.file.filename}`;
       }
 
       // Parse links if provided
@@ -153,7 +155,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
 
       // Generate a temporary ID for the URL
       const tempId = crypto.randomUUID();
-      const tempUrl = `${FRONTEND_URL}/landing/${tempId}`;
+      const tempUrl = `${domain}/landing/${tempId}`;
 
       const qrCode = new QRCode();
       qrCode.name = name || 'My QR Code';
@@ -174,7 +176,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Saved QR code:', savedQRCode);
 
       // Update the URL with the actual ID
-      savedQRCode.url = `${FRONTEND_URL}/landing/${savedQRCode.id}`;
+      savedQRCode.url = `${domain}/landing/${savedQRCode.id}`;
       savedQRCode.originalUrl = savedQRCode.url;
 
       // Save again with the updated URL
@@ -297,5 +299,23 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
     res.status(204).send();
   } catch (error) {
     res.status(500).json({ error: 'Error deleting QR code' });
+  }
+};
+
+export const getPublicQRCode = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const qrCode = await qrCodeRepository.findOne({
+      where: { id }
+    });
+
+    if (!qrCode) {
+      return res.status(404).json({ error: 'QR code not found' });
+    }
+
+    res.json(qrCode);
+  } catch (error) {
+    console.error('Error fetching public QR code:', error);
+    res.status(500).json({ error: 'Error fetching QR code' });
   }
 }; 
