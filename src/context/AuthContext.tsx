@@ -1,8 +1,16 @@
 
 import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
-import { api } from '@/lib/api';
+import axios from 'axios';
 import { User, AuthContextType } from '@/types';
 import { useNavigate } from 'react-router-dom';
+
+// Create a new api instance specifically for AuthContext
+const api = axios.create({
+  baseURL: 'http://localhost:3000/api',
+  headers: {
+    'Content-Type': 'application/json',
+  },
+});
 
 const AuthContext = createContext<AuthContextType>({
   user: null,
