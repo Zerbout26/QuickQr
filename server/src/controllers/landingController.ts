@@ -55,6 +55,28 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Define primary color with fallback
     const primaryColor = qrCode.foregroundColor || '#5D5FEF';
     
+    // Helper function to get social media icon
+    const getSocialIcon = (url) => {
+      const urlLower = url.toLowerCase();
+      if (urlLower.includes('facebook') || urlLower.includes('fb.com')) {
+        return `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"></path></svg>
+        `;
+      } else if (urlLower.includes('instagram') || urlLower.includes('ig.com')) {
+        return `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><rect width="20" height="20" x="2" y="2" rx="5" ry="5"></rect><path d="M16 11.37A4 4 0 1 1 12.63 8 4 4 0 0 1 16 11.37z"></path><line x1="17.5" x2="17.51" y1="6.5" y2="6.5"></line></svg>
+        `;
+      } else if (urlLower.includes('twitter') || urlLower.includes('x.com')) {
+        return `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+        `;
+      } else {
+        return `
+          <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="icon"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></svg>
+        `;
+      }
+    };
+    
     // Generate HTML for the landing page with improved styling
     const html = `
       <!DOCTYPE html>
@@ -105,7 +127,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
               width: 100%;
             }
             .button {
-              display: inline-block;
+              display: flex;
+              align-items: center;
+              justify-content: center;
+              gap: 0.5rem;
               padding: 0.75rem 1.5rem;
               background-color: ${primaryColor};
               color: white;
@@ -117,6 +142,9 @@ export const getLandingPage = async (req: Request, res: Response) => {
             .button:hover {
               opacity: 0.9;
               transform: translateY(-1px);
+            }
+            .icon {
+              margin-right: 0.5rem;
             }
             .menu-section {
               margin-top: 2rem;
@@ -145,26 +173,25 @@ export const getLandingPage = async (req: Request, res: Response) => {
               padding: 0.5rem;
               font-size: 1rem;
               font-weight: 500;
+              text-align: center;
             }
             .category-items {
-              display: grid;
-              grid-template-columns: 1fr;
-              gap: 0.5rem;
-              padding: 0.5rem;
-            }
-            @media (min-width: 480px) {
-              .category-items {
-                grid-template-columns: repeat(2, 1fr);
-              }
-            }
-            .item {
-              background: white;
-              padding: 0.5rem;
-              border-radius: 0.375rem;
-              box-shadow: 0 1px 2px rgba(0,0,0,0.05);
               display: flex;
               flex-direction: column;
-              height: 100%;
+            }
+            .item {
+              padding: 1rem;
+              border-bottom: 1px solid #e5e7eb;
+              display: flex;
+              justify-content: space-between;
+              align-items: center;
+            }
+            .item:last-child {
+              border-bottom: none;
+            }
+            .item-content {
+              flex: 1;
+              text-align: left;
             }
             .item-header {
               display: flex;
@@ -189,11 +216,11 @@ export const getLandingPage = async (req: Request, res: Response) => {
               -webkit-box-orient: vertical;
             }
             .item-image {
-              width: 100%;
-              height: 100px;
+              width: 60px;
+              height: 60px;
               object-fit: cover;
               border-radius: 0.25rem;
-              margin-top: 0.5rem;
+              margin-left: 1rem;
             }
           </style>
         </head>
@@ -206,6 +233,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
               <div class="buttons">
                 ${qrCode.links.map(link => `
                   <a href="${link.url}" class="button" target="_blank" rel="noopener noreferrer">
+                    ${getSocialIcon(link.url)}
                     ${link.label}
                   </a>
                 `).join('')}
@@ -224,11 +252,13 @@ export const getLandingPage = async (req: Request, res: Response) => {
                       <div class="category-items">
                         ${category.items.map(item => `
                           <div class="item">
-                            <div class="item-header">
-                              <div class="item-name">${item.name}</div>
-                              <div class="item-price">$${item.price.toFixed(2)}</div>
+                            <div class="item-content">
+                              <div class="item-header">
+                                <div class="item-name">${item.name}</div>
+                                <div class="item-price">$${item.price.toFixed(2)}</div>
+                              </div>
+                              ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
                             </div>
-                            ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
                             ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="item-image">` : ''}
                           </div>
                         `).join('')}
