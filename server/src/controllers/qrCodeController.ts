@@ -84,7 +84,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
 
       // Parse menu if provided
       let parsedMenu = null;
-      if (type === 'menu' && menu) {
+      if ((type === 'menu' || type === 'both') && menu) {
         try {
           parsedMenu = JSON.parse(menu);
           console.log('Parsed menu:', parsedMenu);
@@ -206,7 +206,7 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       }
     }
 
-    if (menu !== undefined) {
+    if (menu !== undefined && (type === 'menu' || type === 'both')) {
       try {
         qrCode.menu = menu ? JSON.parse(menu) : null;
       } catch (e) {

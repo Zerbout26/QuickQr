@@ -68,7 +68,7 @@ interface QRCodeFormProps {
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
-  const [type, setType] = useState<'url' | 'menu'>('url');
+  const [type, setType] = useState<'url' | 'menu' | 'both'>('url');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
@@ -183,12 +183,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       return;
     }
     
-    if (type === 'url' && links.length === 0) {
+    if ((type === 'url' || type === 'both') && links.length === 0) {
       setError('At least one link is required for URL type');
       return;
     }
 
-    if (type === 'menu' && menuCategories.length === 0) {
+    if ((type === 'menu' || type === 'both') && menuCategories.length === 0) {
       setError('At least one category is required for menu type');
       return;
     }
@@ -203,9 +203,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
       
-      if (type === 'url') {
+      if (type === 'url' || type === 'both') {
         formData.append('links', JSON.stringify(links));
-      } else {
+      }
+      
+      if (type === 'menu' || type === 'both') {
         formData.append('menu', JSON.stringify({
           restaurantName: name,
           categories: menuCategories,
@@ -308,9 +310,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     >
                       Menu
                     </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'both' ? 'default' : 'outline'}
+                      onClick={() => setType('both')}
+                      className="flex-1"
+                    >
+                      Both
+                    </Button>
                   </div>
                 </div>
-                {type === 'url' ? (
+                {(type === 'url' || type === 'both') && (
                   <div className="space-y-2">
                     <Label>Links</Label>
                     <div className="space-y-2">
@@ -348,7 +358,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       </Button>
                     </div>
                   </div>
-                ) : (
+                )}
+                {(type === 'menu' || type === 'both') && (
                   <div className="space-y-4">
                     {menuCategories.map((category, categoryIndex) => (
                       <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">

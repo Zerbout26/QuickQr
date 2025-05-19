@@ -47,7 +47,7 @@ export const authApi = {
 export const qrCodeApi = {
   create: async (data: {
     name: string;
-    type: 'url' | 'menu';
+    type: 'url' | 'menu' | 'both';
     url?: string;
     logoUrl?: string;
     foregroundColor: string;
@@ -74,9 +74,11 @@ export const qrCodeApi = {
     formData.append('foregroundColor', data.foregroundColor);
     formData.append('backgroundColor', data.backgroundColor);
     
-    if (data.type === 'url' && data.links) {
+    if ((data.type === 'url' || data.type === 'both') && data.links) {
       formData.append('links', JSON.stringify(data.links));
-    } else if (data.type === 'menu' && data.menu) {
+    }
+    
+    if ((data.type === 'menu' || data.type === 'both') && data.menu) {
       formData.append('menu', JSON.stringify(data.menu));
     }
     

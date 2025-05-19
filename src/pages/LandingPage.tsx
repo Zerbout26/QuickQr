@@ -52,6 +52,9 @@ const LandingPage = () => {
     );
   }
 
+  const hasUrls = qrCode.links && qrCode.links.length > 0;
+  const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
+
   return (
     <div className="min-h-screen bg-gray-100 py-12">
       <div className="container mx-auto px-4">
@@ -59,7 +62,74 @@ const LandingPage = () => {
           <CardContent className="pt-6">
             <h1 className="text-3xl font-bold text-center mb-8">{qrCode.name}</h1>
             
-            {qrCode.type === 'url' ? (
+            {hasUrls && hasMenu ? (
+              <Tabs defaultValue="menu" className="w-full">
+                <TabsList className="w-full grid grid-cols-2">
+                  <TabsTrigger value="menu">Menu</TabsTrigger>
+                  <TabsTrigger value="links">Links</TabsTrigger>
+                </TabsList>
+                
+                <TabsContent value="menu" className="space-y-8">
+                  <div className="text-center">
+                    <h2 className="text-2xl font-semibold mb-2">{qrCode.menu?.restaurantName}</h2>
+                    {qrCode.menu?.description && (
+                      <p className="text-gray-600">{qrCode.menu.description}</p>
+                    )}
+                  </div>
+                  
+                  <Tabs defaultValue={qrCode.menu?.categories[0]?.name} className="w-full">
+                    <TabsList className="w-full justify-start overflow-x-auto">
+                      {qrCode.menu?.categories.map((category) => (
+                        <TabsTrigger key={category.name} value={category.name}>
+                          {category.name}
+                        </TabsTrigger>
+                      ))}
+                    </TabsList>
+                    
+                    {qrCode.menu?.categories.map((category) => (
+                      <TabsContent key={category.name} value={category.name} className="space-y-4">
+                        {category.items.map((item, index) => (
+                          <div key={index} className="border rounded-lg p-4">
+                            <div className="flex justify-between items-start">
+                              <div>
+                                <h3 className="text-lg font-semibold">{item.name}</h3>
+                                {item.description && (
+                                  <p className="text-gray-600 mt-1">{item.description}</p>
+                                )}
+                              </div>
+                              <p className="text-lg font-semibold">${item.price.toFixed(2)}</p>
+                            </div>
+                            {item.imageUrl && (
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="mt-4 rounded-lg w-full h-48 object-cover"
+                              />
+                            )}
+                          </div>
+                        ))}
+                      </TabsContent>
+                    ))}
+                  </Tabs>
+                </TabsContent>
+
+                <TabsContent value="links" className="space-y-6">
+                  {qrCode.links.map((link, index) => (
+                    <a
+                      key={index}
+                      href={link.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="block w-full"
+                    >
+                      <Button className="w-full" variant="outline">
+                        {link.label}
+                      </Button>
+                    </a>
+                  ))}
+                </TabsContent>
+              </Tabs>
+            ) : hasUrls ? (
               <div className="space-y-6">
                 {qrCode.links.map((link, index) => (
                   <a
@@ -75,7 +145,7 @@ const LandingPage = () => {
                   </a>
                 ))}
               </div>
-            ) : (
+            ) : hasMenu ? (
               <div className="space-y-8">
                 <div className="text-center">
                   <h2 className="text-2xl font-semibold mb-2">{qrCode.menu?.restaurantName}</h2>
@@ -119,7 +189,7 @@ const LandingPage = () => {
                   ))}
                 </Tabs>
               </div>
-            )}
+            ) : null}
           </CardContent>
         </Card>
       </div>

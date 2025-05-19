@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
-export type QRCodeType = 'url' | 'menu';
+export type QRCodeType = 'url' | 'menu' | 'both';
 
 export interface MenuItem {
   name: string;
