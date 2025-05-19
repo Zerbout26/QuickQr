@@ -103,17 +103,35 @@
   @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium;
 }
 
-/* Compact menu styles */
+/* Menu category styles */
+.menu-category {
+  @apply mb-4 overflow-hidden rounded-md;
+}
+
+/* Horizontal menu layout */
+.menu-items-horizontal {
+  @apply bg-white p-2 rounded-b-md space-y-3;
+}
+
+.menu-item-row {
+  @apply flex justify-between items-center bg-gray-50 p-3 rounded-md;
+}
+
+.menu-item-info {
+  @apply flex-1 pr-3;
+}
+
+.menu-item-image {
+  @apply flex-shrink-0;
+}
+
+/* Legacy styles kept for compatibility */
 .menu-item-compact {
   @apply mb-2 overflow-hidden rounded-md;
 }
 
-.menu-item-compact h3 {
-  @apply py-2 px-3 text-base;
-}
-
 .menu-item-content {
-  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3;
+  @apply grid grid-cols-1 sm:grid-cols-2 gap-3;
 }
 
 .menu-item-card {
@@ -122,4 +140,9 @@
 
 .menu-item-card-image {
   @apply h-24 w-full object-cover rounded-md mb-2;
+}
+
+/* Social media icons */
+.social-icon {
+  @apply inline-flex items-center justify-center w-10 h-10 rounded-full transition-colors;
 }

@@ -1,97 +1,104 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
-import { User, AuthContextType } from '../types';
-import { toast } from '../components/ui/use-toast';
-import { authApi } from '../lib/api';
 
-// Create auth context with default values
+import { createContext, useState, useContext, useEffect, ReactNode } from 'react';
+import { api } from '@/lib/api';
+import { User, AuthContextType } from '@/types';
+import { useNavigate } from 'react-router-dom';
+
 const AuthContext = createContext<AuthContextType>({
   user: null,
   loading: true,
-  signIn: async () => null,
-  signUp: async () => null,
+  signIn: () => Promise.resolve({}),
+  signUp: () => Promise.resolve({}),
   signOut: () => {},
   isAdmin: () => false,
   isTrialActive: () => false,
   isTrialExpired: () => false,
-  daysLeftInTrial: () => null,
+  daysLeftInTrial: () => 0,
+  // Adding aliases for compatibility
+  login: () => Promise.resolve({}),
+  register: () => Promise.resolve({}),
+  logout: () => {},
 });
 
-export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+interface AuthProviderProps {
+  children: ReactNode;
+}
+
+export const AuthProvider = ({ children }: AuthProviderProps) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const navigate = useNavigate();
 
-  // Check for saved token and fetch user profile on mount
   useEffect(() => {
-    const token = localStorage.getItem('qr-generator-token');
-    if (token) {
-      authApi.getProfile()
-        .then(userData => {
-          setUser(userData);
-        })
-        .catch(() => {
-          localStorage.removeItem('qr-generator-token');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
+    // Check if user is already logged in
+    const checkAuth = async () => {
+      try {
+        const token = localStorage.getItem('qrToken');
+        
+        if (token) {
+          api.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+          const { data } = await api.get('/users/me');
+          setUser(data);
+        }
+      } catch (error) {
+        console.error('Authentication error:', error);
+        localStorage.removeItem('qrToken');
+        delete api.defaults.headers.common['Authorization'];
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    checkAuth();
   }, []);
 
-  const signIn = async (email: string, password: string): Promise<User> => {
-    setLoading(true);
+  const signIn = async (email: string, password: string) => {
     try {
-      const { user, token } = await authApi.login({ email, password });
-      localStorage.setItem('qr-generator-token', token);
-      setUser(user);
-      toast({
-        title: "Signed in successfully",
-        description: `Welcome back${user.name ? `, ${user.name}` : ''}!`,
+      const { data } = await api.post('/users/login', {
+        email,
+        password
       });
-      return user;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Sign in failed",
-        description: error?.response?.data?.error || "Unknown error occurred",
-      });
+
+      localStorage.setItem('qrToken', data.token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+      // Fetch user data
+      const { data: userData } = await api.get('/users/me');
+      setUser(userData);
+
+      return userData;
+    } catch (error) {
+      console.error('Login error:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
-  const signUp = async (email: string, password: string): Promise<User> => {
-    setLoading(true);
+  const signUp = async (email: string, password: string) => {
     try {
-      const { user, token } = await authApi.register({ email, password });
-      localStorage.setItem('qr-generator-token', token);
-      setUser(user);
-      toast({
-        title: "Account created",
-        description: `Welcome to QR Code Generator! Your 14-day free trial has started.`,
+      const { data } = await api.post('/users/register', {
+        email,
+        password
       });
-      return user;
-    } catch (error: any) {
-      toast({
-        variant: "destructive",
-        title: "Sign up failed",
-        description: error?.response?.data?.error || "Unknown error occurred",
-      });
+
+      localStorage.setItem('qrToken', data.token);
+      api.defaults.headers.common['Authorization'] = `Bearer ${data.token}`;
+
+      // Fetch user data
+      const { data: userData } = await api.get('/users/me');
+      setUser(userData);
+
+      return userData;
+    } catch (error) {
+      console.error('Registration error:', error);
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
   const signOut = () => {
+    localStorage.removeItem('qrToken');
+    delete api.defaults.headers.common['Authorization'];
     setUser(null);
-    localStorage.removeItem('qr-generator-token');
-    toast({
-      title: "Signed out",
-      description: "You have been signed out successfully.",
-    });
+    navigate('/');
   };
 
   const isAdmin = () => {
@@ -101,37 +108,36 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
   const isTrialActive = () => {
     if (!user) return false;
     
-    // If user has active subscription, they're not in trial
-    if (user.hasActiveSubscription) return false;
+    const today = new Date();
+    const trialEndDate = new Date(user.trialEndDate);
     
-    const now = new Date();
-    return now <= user.trialEndDate && user.isActive;
+    return !user.hasActiveSubscription && user.isActive && today <= trialEndDate;
   };
 
   const isTrialExpired = () => {
     if (!user) return false;
     
-    // If user has active subscription, trial expiration doesn't matter
-    if (user.hasActiveSubscription) return false;
+    const today = new Date();
+    const trialEndDate = new Date(user.trialEndDate);
     
-    const now = new Date();
-    return now > user.trialEndDate;
+    return !user.hasActiveSubscription && today > trialEndDate;
   };
 
   const daysLeftInTrial = () => {
-    if (!user || user.hasActiveSubscription) return null;
+    if (!user) return 0;
     
-    const now = new Date();
-    const endDate = new Date(user.trialEndDate);
+    const today = new Date();
+    const trialEndDate = new Date(user.trialEndDate);
+    const timeDiff = trialEndDate.getTime() - today.getTime();
+    const daysLeft = Math.ceil(timeDiff / (1000 * 3600 * 24));
     
-    // If trial has expired, return 0
-    if (now > endDate) return 0;
-    
-    // Calculate days left
-    const diffTime = endDate.getTime() - now.getTime();
-    const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
-    return diffDays;
+    return Math.max(0, daysLeft);
   };
+
+  // Create alias functions for backward compatibility
+  const login = signIn;
+  const register = signUp;
+  const logout = signOut;
 
   const value = {
     user,
@@ -142,14 +148,13 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     isAdmin,
     isTrialActive,
     isTrialExpired,
-    daysLeftInTrial
+    daysLeftInTrial,
+    login,
+    register,
+    logout
   };
 
-  return (
-    <AuthContext.Provider value={value}>
-      {children}
-    </AuthContext.Provider>
-  );
+  return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 };
 
 export const useAuth = () => useContext(AuthContext);

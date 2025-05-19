@@ -1,3 +1,4 @@
+
 export type UserRole = 'user' | 'admin';
 
 export interface User {
@@ -13,7 +14,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export type QRCodeType = 'url' | 'menu';
+export type QRCodeType = 'url' | 'menu' | 'both';
 
 export interface MenuItem {
   name: string;
