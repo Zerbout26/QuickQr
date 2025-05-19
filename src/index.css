@@ -103,7 +103,20 @@
   @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium;
 }
 
-/* Compact menu styles */
+/* Updated menu styles */
+.menu-category {
+  @apply mb-4 overflow-hidden rounded-md;
+}
+
+.menu-item-line {
+  @apply flex justify-between items-center border-b border-gray-100 py-2 last:border-b-0;
+}
+
+.menu-item-image {
+  @apply h-16 w-16 object-cover rounded-md ml-4;
+}
+
+/* We keep the old menu styles for backwards compatibility */
 .menu-item-compact {
   @apply mb-2 overflow-hidden rounded-md;
 }

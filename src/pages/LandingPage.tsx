@@ -117,7 +117,7 @@ const LandingPage = () => {
               <Separator className="my-8" />
             )}
 
-            {/* Menu Section - Redesigned for compact display */}
+            {/* Menu Section - Redesigned for single line items with image on right */}
             {hasMenu && (
               <div className="space-y-6">
                 <div className="text-center mb-4">
@@ -134,9 +134,9 @@ const LandingPage = () => {
                 
                 <div className="space-y-6">
                   {qrCode.menu?.categories.map((category) => (
-                    <div key={category.name} className="menu-item-compact">
+                    <div key={category.name} className="menu-category">
                       <h3 
-                        className="text-lg font-bold text-center rounded-t-md"
+                        className="text-lg font-bold text-center py-2 rounded-t-md"
                         style={{ 
                           backgroundColor: qrCode.foregroundColor || '#5D5FEF',
                           color: '#ffffff'
@@ -145,32 +145,40 @@ const LandingPage = () => {
                         {category.name}
                       </h3>
                       
-                      <div className="menu-item-content p-3 bg-gray-50 rounded-b-md">
+                      <div className="bg-gray-50 rounded-b-md p-2 space-y-2">
                         {category.items.map((item, index) => (
-                          <div key={index} className="menu-item-card">
-                            <div className="flex justify-between items-start mb-1">
-                              <h4 
-                                className="text-base font-medium truncate"
-                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                              >
-                                {item.name}
-                              </h4>
-                              <p 
-                                className="text-base font-medium whitespace-nowrap ml-2"
-                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                              >
-                                ${item.price.toFixed(2)}
-                              </p>
+                          <div 
+                            key={index} 
+                            className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm"
+                          >
+                            <div className="flex-1 pr-4">
+                              <div className="flex justify-between items-start mb-1">
+                                <h4 
+                                  className="text-base font-medium"
+                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                >
+                                  {item.name}
+                                </h4>
+                                <p 
+                                  className="text-base font-medium whitespace-nowrap ml-2"
+                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                >
+                                  ${item.price.toFixed(2)}
+                                </p>
+                              </div>
+                              {item.description && (
+                                <p className="text-gray-600 text-sm line-clamp-2">{item.description}</p>
+                              )}
                             </div>
-                            {item.description && (
-                              <p className="text-gray-600 text-xs mb-2 line-clamp-2">{item.description}</p>
-                            )}
+                            
                             {item.imageUrl && (
-                              <img
-                                src={item.imageUrl}
-                                alt={item.name}
-                                className="menu-item-card-image mt-auto"
-                              />
+                              <div className="flex-shrink-0">
+                                <img
+                                  src={item.imageUrl}
+                                  alt={item.name}
+                                  className="h-16 w-16 object-cover rounded-md"
+                                />
+                              </div>
                             )}
                           </div>
                         ))}
