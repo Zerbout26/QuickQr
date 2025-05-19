@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -33,7 +32,10 @@ const itemsDir = path.join(uploadsDir, 'items');
 });
 
 // Middleware
-app.use(cors());
+app.use(cors({
+  origin: true, // Allow all origins
+  credentials: true
+}));
 app.use(express.json());
 
 // Add frontend domain to request object
@@ -44,9 +46,17 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
 
 // Serve static files from the uploads directory with CORS headers
 app.use('/uploads', (req, res, next) => {
+  // Set CORS headers for static files
   res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET');
+  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
+  
+  // Handle OPTIONS request
+  if (req.method === 'OPTIONS') {
+    return res.status(200).end();
+  }
+  
   next();
 }, express.static(path.join(__dirname, '../uploads')));
 

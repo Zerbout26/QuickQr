@@ -94,8 +94,9 @@ export const uploadItemImageHandler = async (req: AuthRequest, res: Response) =>
         return res.status(400).json({ error: 'No image file provided' });
       }
 
-      const frontendDomain = (req as any).frontendDomain;
-      const imageUrl = `${frontendDomain}/uploads/items/${req.file.filename}`;
+      // Use the server's domain for image URLs
+      const serverUrl = `${req.protocol}://${req.get('host')}`;
+      const imageUrl = `${serverUrl}/uploads/items/${req.file.filename}`;
       res.json({ imageUrl });
     } catch (error) {
       console.error('Error uploading item image:', error);
