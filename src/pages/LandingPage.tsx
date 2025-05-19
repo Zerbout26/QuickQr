@@ -6,21 +6,6 @@ import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import { Facebook, Instagram, Twitter, ExternalLink } from 'lucide-react';
-
-// Helper function to determine the icon for a link
-const getLinkIcon = (url: string) => {
-  const urlLower = url.toLowerCase();
-  if (urlLower.includes('facebook') || urlLower.includes('fb.com')) {
-    return <Facebook className="mr-2" />;
-  } else if (urlLower.includes('instagram') || urlLower.includes('ig.com')) {
-    return <Instagram className="mr-2" />;
-  } else if (urlLower.includes('twitter') || urlLower.includes('x.com')) {
-    return <Twitter className="mr-2" />;
-  } else {
-    return <ExternalLink className="mr-2" />;
-  }
-};
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -100,7 +85,7 @@ const LandingPage = () => {
               {qrCode.name}
             </h1>
 
-            {/* Enhanced Links Section with Icons */}
+            {/* Links Section */}
             {hasUrls && (
               <div className="mb-8">
                 <div className="grid gap-3">
@@ -113,14 +98,13 @@ const LandingPage = () => {
                       className="block w-full"
                     >
                       <Button 
-                        className="w-full text-lg py-6 flex items-center justify-center" 
+                        className="w-full text-lg py-6" 
                         style={{ 
                           backgroundColor: qrCode.foregroundColor || '#5D5FEF',
                           color: '#ffffff'
                         }}
                       >
-                        {getLinkIcon(link.url)}
-                        <span>{link.label}</span>
+                        {link.label}
                       </Button>
                     </a>
                   ))}
@@ -133,7 +117,7 @@ const LandingPage = () => {
               <Separator className="my-8" />
             )}
 
-            {/* Enhanced Menu Section with inline items and images on the right */}
+            {/* Menu Section - Redesigned for compact display */}
             {hasMenu && (
               <div className="space-y-6">
                 <div className="text-center mb-4">
@@ -148,11 +132,11 @@ const LandingPage = () => {
                   )}
                 </div>
                 
-                <div className="space-y-4">
+                <div className="space-y-6">
                   {qrCode.menu?.categories.map((category) => (
-                    <div key={category.name} className="bg-white shadow-sm rounded-md overflow-hidden">
+                    <div key={category.name} className="menu-item-compact">
                       <h3 
-                        className="text-lg font-bold py-2 px-4 text-center rounded-t-md"
+                        className="text-lg font-bold text-center rounded-t-md"
                         style={{ 
                           backgroundColor: qrCode.foregroundColor || '#5D5FEF',
                           color: '#ffffff'
@@ -161,36 +145,32 @@ const LandingPage = () => {
                         {category.name}
                       </h3>
                       
-                      <div className="divide-y divide-gray-100">
+                      <div className="menu-item-content p-3 bg-gray-50 rounded-b-md">
                         {category.items.map((item, index) => (
-                          <div key={index} className="p-4 flex justify-between items-center">
-                            <div className="flex-grow pr-4">
-                              <div className="flex justify-between">
-                                <h4 
-                                  className="font-medium"
-                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                                >
-                                  {item.name}
-                                </h4>
-                                <p 
-                                  className="font-medium"
-                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                                >
-                                  ${item.price.toFixed(2)}
-                                </p>
-                              </div>
-                              {item.description && (
-                                <p className="text-gray-500 text-sm mt-1 line-clamp-2">{item.description}</p>
-                              )}
+                          <div key={index} className="menu-item-card">
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 
+                                className="text-base font-medium truncate"
+                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                              >
+                                {item.name}
+                              </h4>
+                              <p 
+                                className="text-base font-medium whitespace-nowrap ml-2"
+                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                              >
+                                ${item.price.toFixed(2)}
+                              </p>
                             </div>
+                            {item.description && (
+                              <p className="text-gray-600 text-xs mb-2 line-clamp-2">{item.description}</p>
+                            )}
                             {item.imageUrl && (
-                              <div className="flex-shrink-0">
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.name}
-                                  className="w-16 h-16 object-cover rounded-md"
-                                />
-                              </div>
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="menu-item-card-image mt-auto"
+                              />
                             )}
                           </div>
                         ))}

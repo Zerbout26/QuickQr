@@ -103,36 +103,23 @@
   @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium;
 }
 
-/* Enhanced Social Media Button Styles */
-.social-btn {
-  @apply flex items-center justify-center gap-2 transition-transform hover:scale-105;
+/* Compact menu styles */
+.menu-item-compact {
+  @apply mb-2 overflow-hidden rounded-md;
 }
 
-.social-btn-facebook {
-  @apply bg-[#1877F2] text-white;
+.menu-item-compact h3 {
+  @apply py-2 px-3 text-base;
 }
 
-.social-btn-instagram {
-  @apply bg-gradient-to-r from-[#833AB4] via-[#FD1D1D] to-[#FCAF45] text-white;
+.menu-item-content {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3;
 }
 
-.social-btn-twitter {
-  @apply bg-[#1DA1F2] text-white;
+.menu-item-card {
+  @apply bg-white rounded-md shadow-sm p-3 flex flex-col h-full;
 }
 
-.social-btn-url {
-  @apply bg-gray-700 text-white;
-}
-
-/* Enhanced Menu Styles */
-.menu-item {
-  @apply flex justify-between items-center hover:bg-gray-50 transition-colors p-4 rounded-md;
-}
-
-.menu-item-image {
-  @apply rounded-md shadow-sm border border-gray-100;
-}
-
-.menu-category-header {
-  @apply font-bold text-white py-2 px-3 rounded-t-md text-center;
+.menu-item-card-image {
+  @apply h-24 w-full object-cover rounded-md mb-2;
 }
