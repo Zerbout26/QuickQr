@@ -97,6 +97,28 @@ export const qrCodeApi = {
     return response.json();
   },
 
+  update: async (id: string, data: {
+    name: string;
+    type: 'url' | 'menu' | 'both';
+    url?: string;
+    logoUrl?: string;
+    foregroundColor: string;
+    backgroundColor: string;
+    links: string;
+    menu: string;
+  }) => {
+    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify(data)
+    });
+    if (!response.ok) throw new Error('Failed to update QR code');
+    return response.json();
+  },
+
   getAll: async () => {
     const response = await fetch(`${API_BASE_URL}/qrcodes`, {
       headers: {
@@ -107,42 +129,13 @@ export const qrCodeApi = {
     return response.json();
   },
 
-  getQRCode: async (id: string, requireAuth: boolean = true) => {
-    const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
-    };
-
-    if (requireAuth) {
-      const token = localStorage.getItem('qr-generator-token');
-      if (token) {
-        headers['Authorization'] = `Bearer ${token}`;
-      }
-    }
-
+  getQRCode: async (id: string) => {
     const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
-      headers,
-    });
-    if (!response.ok) throw new Error('Failed to fetch QR code');
-    return response.json();
-  },
-
-  update: async (id: string, data: {
-    name?: string;
-    url?: string;
-    logoUrl?: string;
-    foregroundColor?: string;
-    backgroundColor?: string;
-    links?: { label: string; url: string }[];
-  }) => {
-    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
-      method: 'PUT',
       headers: {
         'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        'Content-Type': 'application/json',
       },
-      body: JSON.stringify(data),
     });
-    if (!response.ok) throw new Error('Failed to update QR code');
+    if (!response.ok) throw new Error('Failed to fetch QR code');
     return response.json();
   },
 

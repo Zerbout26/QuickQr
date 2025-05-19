@@ -443,6 +443,14 @@ const Dashboard = () => {
                       </div>
                       
                       <div className="flex flex-col space-y-2">
+                        <Button 
+                          variant="outline" 
+                          size="sm" 
+                          onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
+                          className="w-full"
+                        >
+                          Edit Content
+                        </Button>
                         <Dialog>
                           <DialogTrigger asChild>
                             <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full">

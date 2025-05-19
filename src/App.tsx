@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -14,6 +13,7 @@ import SignUpForm from "./components/auth/SignUpForm";
 import MainLayout from "./components/layout/MainLayout";
 import PaymentInstructions from "@/pages/PaymentInstructions";
 import LandingPage from '@/pages/LandingPage';
+import EditQRCodePage from '@/pages/EditQRCodePage';
 import PrivateRoute from '@/components/PrivateRoute';
 
 const queryClient = new QueryClient();
@@ -54,6 +54,11 @@ const App = () => (
             <Route path="/payment-instructions" element={<PaymentInstructions />} />
             <Route path="/landing/:id" element={<LandingPage />} />
             <Route path="/landing/:id/:url" element={<LandingPage />} />
+            <Route path="/qrcodes/:id/edit" element={
+              <PrivateRoute>
+                <EditQRCodePage />
+              </PrivateRoute>
+            } />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>

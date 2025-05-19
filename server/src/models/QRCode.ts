@@ -43,7 +43,7 @@ export class QRCode {
   originalUrl!: string;
 
   @Column("simple-json", { nullable: true, default: "[]" })
-  links!: { label: string; url: string }[];
+  links!: { label: string; url: string; type: string }[];
 
   @Column("simple-json", { nullable: true })
   menu!: {

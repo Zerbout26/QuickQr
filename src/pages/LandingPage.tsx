@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode } from '@/types';
@@ -6,6 +5,7 @@ import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
+import * as LucideIcons from 'lucide-react';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -13,6 +13,32 @@ const LandingPage = () => {
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+
+  // Function to map platform type to label, icon, and colors
+  const getPlatformInfo = (type: string): { label: string; icon: string; bgColor: string; hoverBgColor: string } => {
+    switch (type) {
+      case 'facebook':
+        return { label: 'Follow us on Facebook', icon: 'Facebook', bgColor: '#1877F2', hoverBgColor: '#166FE5' };
+      case 'instagram':
+        return { label: 'Follow us on Instagram', icon: 'Instagram', bgColor: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', hoverBgColor: 'linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%)' };
+      case 'twitter':
+        return { label: 'Follow us on Twitter', icon: 'Twitter', bgColor: '#1DA1F2', hoverBgColor: '#1A91DA' };
+      case 'linkedin':
+        return { label: 'Connect on LinkedIn', icon: 'Linkedin', bgColor: '#0A66C2', hoverBgColor: '#095BB5' };
+      case 'youtube':
+        return { label: 'Subscribe on YouTube', icon: 'Youtube', bgColor: '#FF0000', hoverBgColor: '#E60000' };
+      case 'tiktok':
+        return { label: 'Follow us on TikTok', icon: 'Music', bgColor: '#000000', hoverBgColor: '#1A1A1A' };
+      case 'whatsapp':
+        return { label: 'Chat on WhatsApp', icon: 'MessageCircle', bgColor: '#25D366', hoverBgColor: '#20BA56' };
+      case 'telegram':
+        return { label: 'Join our Telegram', icon: 'Send', bgColor: '#0088CC', hoverBgColor: '#0077B5' };
+      case 'website':
+        return { label: 'Visit our Website', icon: 'Globe', bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+      default:
+        return { label: 'Visit Link', icon: 'ExternalLink', bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+    }
+  };
 
   useEffect(() => {
     const fetchQRCode = async () => {
@@ -34,10 +60,10 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-qr-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-600">Loading...</p>
+          <p className="text-xl text-gray-700 font-medium tracking-tight">Loading...</p>
         </div>
       </div>
     );
@@ -45,11 +71,16 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gray-100">
         <div className="text-center">
-          <h1 className="text-4xl font-bold mb-4 text-gray-800">Error</h1>
-          <p className="text-xl text-gray-600 mb-4">{error || 'QR code not found'}</p>
-          <Button onClick={() => navigate('/')}>Return to Home</Button>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Error</h1>
+          <p className="text-xl text-gray-600 mb-6">{error || 'QR code not found'}</p>
+          <Button
+            className="px-6 py-3 text-lg font-medium rounded-full bg-qr-primary text-white hover:bg-opacity-90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-qr-primary"
+            onClick={() => navigate('/')}
+          >
+            Return to Home
+          </Button>
         </div>
       </div>
     );
@@ -59,27 +90,27 @@ const LandingPage = () => {
   const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
 
   return (
-    <div 
-      className="min-h-screen py-8 px-4"
+    <div
+      className="min-h-screen py-12 px-4 font-sans"
       style={{
-        background: `linear-gradient(135deg, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -20) : '#e5e7eb'} 100%)`,
+        background: `radial-gradient(circle at top, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -30) : '#e5e7eb'} 100%)`,
       }}
     >
-      <div className="container mx-auto max-w-4xl">
-        <Card className="overflow-hidden shadow-xl">
+      <div className="container mx-auto max-w-5xl">
+        <Card className="overflow-hidden rounded-2xl shadow-2xl border-none bg-white/95 backdrop-blur-sm">
           {qrCode.logoUrl && (
-            <div className="flex justify-center pt-8">
-              <img 
-                src={qrCode.logoUrl} 
-                alt="Logo" 
-                className="h-24 w-auto object-contain"
+            <div className="flex justify-center pt-10">
+              <img
+                src={qrCode.logoUrl}
+                alt="Logo"
+                className="h-28 w-auto object-contain transition-transform duration-200 hover:scale-105"
               />
             </div>
           )}
-          
-          <CardContent className="p-6 md:p-8">
-            <h1 
-              className="text-3xl md:text-4xl font-bold text-center mb-6"
+
+          <CardContent className="p-6 md:p-10">
+            <h1
+              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight"
               style={{ color: qrCode.foregroundColor || '#1f2937' }}
             >
               {qrCode.name}
@@ -87,96 +118,109 @@ const LandingPage = () => {
 
             {/* Links Section */}
             {hasUrls && (
-              <div className="mb-8">
-                <div className="grid gap-3">
-                  {qrCode.links.map((link, index) => (
-                    <a
-                      key={index}
-                      href={link.url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="block w-full"
-                    >
-                      <Button 
-                        className="w-full text-lg py-6" 
-                        style={{ 
-                          backgroundColor: qrCode.foregroundColor || '#5D5FEF',
-                          color: '#ffffff'
-                        }}
+              <div className="mb-10">
+                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                  {qrCode.links.map((link, index) => {
+                    const { label, icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
+                    const IconComponent = icon && LucideIcons[icon as keyof typeof LucideIcons];
+                    return (
+                      <a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="block"
                       >
-                        {link.label}
-                      </Button>
-                    </a>
-                  ))}
+                        <Button
+                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-[color] flex items-center justify-center gap-3" // Enhanced hover and focus
+                          style={{
+                            background: bgColor, // Platform-specific background
+                            color: '#ffffff',
+                            '--hover-bg': hoverBgColor, // Custom property for hover
+                          } as React.CSSProperties}
+                          onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)} // Dynamic hover background
+                          onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)} // Reset to original
+                        >
+                          {IconComponent && <IconComponent size={24} aria-hidden="true" />} {/* Larger icon */}
+                          <span>{label}</span>
+                        </Button>
+                      </a>
+                    );
+                  })}
                 </div>
               </div>
             )}
 
-            {/* Display both links and menu */}
+            {/* Separator for sections */}
             {hasUrls && hasMenu && (
-              <Separator className="my-8" />
+              <Separator className="my-10 bg-gray-200/50" />
             )}
 
-            {/* Menu Section - Redesigned for single line items with image on right */}
+            {/* Menu Section */}
             {hasMenu && (
-              <div className="space-y-6">
-                <div className="text-center mb-4">
-                  <h2 
-                    className="text-2xl font-semibold"
+              <div className="space-y-8">
+                <div className="text-center mb-6">
+                  <h2
+                    className="text-3xl font-semibold tracking-tight"
                     style={{ color: qrCode.foregroundColor || '#1f2937' }}
                   >
                     {qrCode.menu?.restaurantName}
                   </h2>
                   {qrCode.menu?.description && (
-                    <p className="text-gray-600 mt-2 text-sm">{qrCode.menu.description}</p>
+                    <p className="text-gray-500 mt-3 text-base max-w-2xl mx-auto">
+                      {qrCode.menu.description}
+                    </p>
                   )}
                 </div>
-                
-                <div className="space-y-6">
+
+                <div className="space-y-8">
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
-                      <h3 
-                        className="text-lg font-bold text-center py-2 rounded-t-md"
-                        style={{ 
-                          backgroundColor: qrCode.foregroundColor || '#5D5FEF',
-                          color: '#ffffff'
+                      <h3
+                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200"
+                        style={{
+                          color: qrCode.foregroundColor || '#1f2937',
+                          borderColor: qrCode.foregroundColor || '#5D5FEF',
                         }}
                       >
                         {category.name}
                       </h3>
-                      
-                      <div className="bg-gray-50 rounded-b-md p-2 space-y-2">
+
+                      <div className="space-y-3 p-4 rounded-b-lg bg-gray-50/50">
                         {category.items.map((item, index) => (
-                          <div 
-                            key={index} 
-                            className="flex items-center justify-between bg-white p-3 rounded-md shadow-sm"
+                          <div
+                            key={index}
+                            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
                           >
-                            <div className="flex-1 pr-4">
-                              <div className="flex justify-between items-start mb-1">
-                                <h4 
-                                  className="text-base font-medium"
+                            <div className="flex-1 pr-6">
+                              <div className="flex justify-between items-start mb-2">
+                                <h4
+                                  className="text-lg font-semibold"
                                   style={{ color: qrCode.foregroundColor || '#1f2937' }}
                                 >
                                   {item.name}
                                 </h4>
-                                <p 
-                                  className="text-base font-medium whitespace-nowrap ml-2"
+                                <p
+                                  className="text-lg font-semibold whitespace-nowrap ml-4"
                                   style={{ color: qrCode.foregroundColor || '#1f2937' }}
                                 >
                                   ${item.price.toFixed(2)}
                                 </p>
                               </div>
                               {item.description && (
-                                <p className="text-gray-600 text-sm line-clamp-2">{item.description}</p>
+                                <p className="text-gray-600 text-sm line-clamp-3">
+                                  {item.description}
+                                </p>
                               )}
                             </div>
-                            
+
                             {item.imageUrl && (
                               <div className="flex-shrink-0">
                                 <img
                                   src={item.imageUrl}
                                   alt={item.name}
-                                  className="h-16 w-16 object-cover rounded-md"
+                                  className="h-20 w-20 object-cover rounded-lg transition-transform duration-200 hover:scale-110"
+                                  loading="lazy"
                                 />
                               </div>
                             )}
@@ -197,20 +241,13 @@ const LandingPage = () => {
 
 // Helper function to adjust color brightness
 function adjustColor(color: string, amount: number): string {
-  // Remove the # if present
   color = color.replace(/^#/, '');
-  
-  // Parse the color
   let r = parseInt(color.substring(0, 2), 16);
   let g = parseInt(color.substring(2, 4), 16);
   let b = parseInt(color.substring(4, 6), 16);
-  
-  // Adjust each channel
   r = Math.max(0, Math.min(255, r + amount));
   g = Math.max(0, Math.min(255, g + amount));
   b = Math.max(0, Math.min(255, b + amount));
-  
-  // Convert back to hex
   return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
 }
 

@@ -40,7 +40,7 @@ export interface QRCode {
   type: QRCodeType;
   url: string;
   originalUrl: string;
-  links: { label: string; url: string }[];
+  links: { label: string; url: string; type: string }[];
   menu?: Menu;
   logoUrl?: string;
   foregroundColor: string;
