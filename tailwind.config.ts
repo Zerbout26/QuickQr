@@ -64,9 +64,9 @@ export default {
 					ring: 'hsl(var(--sidebar-ring))'
 				},
 				qr: {
-					primary: '#6366F1', // Indigo
+					primary: '#5D5FEF', // Refined indigo
 					secondary: '#8B5CF6', // Purple
-					accent: '#4ADE80', // Green
+					accent: '#10B981', // Emerald green
 					light: '#F9FAFB',
 					dark: '#1F2937',
 				}

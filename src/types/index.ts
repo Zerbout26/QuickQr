@@ -53,16 +53,16 @@ export interface QRCode {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  login: (email: string, password: string) => Promise<void>;
-  register: (email: string, password: string, name?: string) => Promise<void>;
-  logout: () => void;
-  signIn: (email: string, password: string) => Promise<User>;
-  signUp: (email: string, password: string) => Promise<User>;
+  signIn: (email: string, password: string) => Promise<any>;
+  signUp: (email: string, password: string) => Promise<any>;
   signOut: () => void;
   isAdmin: () => boolean;
   isTrialActive: () => boolean;
   isTrialExpired: () => boolean;
-  daysLeftInTrial: () => number | null;
+  daysLeftInTrial: () => number;
+  login: (email: string, password: string) => Promise<any>;
+  register: (email: string, password: string) => Promise<any>;
+  logout: () => void;
 }
 
 export interface AdminStats {

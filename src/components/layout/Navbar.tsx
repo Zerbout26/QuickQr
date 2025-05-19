@@ -7,7 +7,7 @@ const Navbar = () => {
   const { user, signOut, isAdmin, daysLeftInTrial, isTrialActive, isTrialExpired } = useAuth();
 
   return (
-    <nav className="border-b">
+    <nav className="border-b shadow-sm">
       <div className="container mx-auto flex justify-between items-center h-16 px-4 sm:px-6 lg:px-8">
         <div className="flex items-center">
           <Link to="/" className="flex items-center">
@@ -19,7 +19,7 @@ const Navbar = () => {
           {user ? (
             <>
               <Link to="/dashboard">
-                <Button variant="ghost">Dashboard</Button>
+                <Button variant="ghost" className="font-medium hover:bg-gray-100">Dashboard</Button>
               </Link>
               
               {/* Trial status indicator */}
@@ -49,12 +49,12 @@ const Navbar = () => {
                 </Link>
               )}
               
-              <Button variant="ghost" onClick={signOut}>Sign Out</Button>
+              <Button variant="ghost" onClick={signOut} className="hover:bg-red-50 hover:text-red-600">Sign Out</Button>
             </>
           ) : (
             <>
               <Link to="/signin">
-                <Button variant="ghost">Sign In</Button>
+                <Button variant="ghost" className="font-medium hover:bg-gray-100">Sign In</Button>
               </Link>
               <Link to="/signup">
                 <Button className="qr-btn-primary">Sign Up</Button>

@@ -14,7 +14,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222.2 84% 4.9%;
 
-    --primary: 240 81% 67%;
+    --primary: 240 81% 65%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 262 83% 66%;
@@ -23,7 +23,7 @@
     --muted: 210 40% 96.1%;
     --muted-foreground: 215.4 16.3% 46.9%;
 
-    --accent: 142 70% 59%;
+    --accent: 160 84% 39%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 84.2% 60.2%;
@@ -31,9 +31,9 @@
 
     --border: 214.3 31.8% 91.4%;
     --input: 214.3 31.8% 91.4%;
-    --ring: 240 81% 67%;
+    --ring: 240 81% 65%;
 
-    --radius: 0.5rem;
+    --radius: 0.6rem;
 
     --sidebar-background: 0 0% 98%;
     --sidebar-foreground: 240 5.3% 26.1%;
@@ -55,7 +55,7 @@
     --popover: 222.2 84% 4.9%;
     --popover-foreground: 210 40% 98%;
 
-    --primary: 240 81% 67%;
+    --primary: 240 81% 65%;
     --primary-foreground: 0 0% 100%;
 
     --secondary: 262 83% 66%;
@@ -64,7 +64,7 @@
     --muted: 217.2 32.6% 17.5%;
     --muted-foreground: 215 20.2% 65.1%;
 
-    --accent: 142 70% 59%;
+    --accent: 160 84% 39%;
     --accent-foreground: 0 0% 100%;
 
     --destructive: 0 62.8% 30.6%;
@@ -72,7 +72,7 @@
 
     --border: 217.2 32.6% 17.5%;
     --input: 217.2 32.6% 17.5%;
-    --ring: 240 81% 67%;
+    --ring: 240 81% 65%;
   }
 }
 
@@ -88,7 +88,7 @@
 
 /* Custom styles for QR Code Generator */
 .qr-gradient-bg {
-  background: linear-gradient(135deg, rgba(99, 102, 241, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(93, 95, 239, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
 }
 
 .qr-card {
@@ -101,4 +101,25 @@
 
 .qr-btn-secondary {
   @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium;
+}
+
+/* Compact menu styles */
+.menu-item-compact {
+  @apply mb-2 overflow-hidden rounded-md;
+}
+
+.menu-item-compact h3 {
+  @apply py-2 px-3 text-base;
+}
+
+.menu-item-content {
+  @apply grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3;
+}
+
+.menu-item-card {
+  @apply bg-white rounded-md shadow-sm p-3 flex flex-col h-full;
+}
+
+.menu-item-card-image {
+  @apply h-24 w-full object-cover rounded-md mb-2;
 }

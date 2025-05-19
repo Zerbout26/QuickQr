@@ -1,3 +1,4 @@
+
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -5,6 +6,7 @@ import fs from 'fs';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
+import landingRoutes from './routes/landingRoutes';
 import { auth } from './middleware/auth';
 
 const app = express();
@@ -51,6 +53,7 @@ app.use('/uploads', (req, res, next) => {
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', auth, qrCodeRoutes);
+app.use('/landing', landingRoutes);
 
 // Initialize database connection
 AppDataSource.initialize()
@@ -65,4 +68,4 @@ AppDataSource.initialize()
   })
   .catch((error) => {
     console.error('Error connecting to database:', error);
-  }); 
+  });

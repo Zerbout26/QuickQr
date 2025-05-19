@@ -100,7 +100,7 @@ const LandingPage = () => {
                       <Button 
                         className="w-full text-lg py-6" 
                         style={{ 
-                          backgroundColor: qrCode.foregroundColor || '#6366F1',
+                          backgroundColor: qrCode.foregroundColor || '#5D5FEF',
                           color: '#ffffff'
                         }}
                       >
@@ -117,10 +117,10 @@ const LandingPage = () => {
               <Separator className="my-8" />
             )}
 
-            {/* Menu Section */}
+            {/* Menu Section - Redesigned for compact display */}
             {hasMenu && (
-              <div className="space-y-8">
-                <div className="text-center mb-6">
+              <div className="space-y-6">
+                <div className="text-center mb-4">
                   <h2 
                     className="text-2xl font-semibold"
                     style={{ color: qrCode.foregroundColor || '#1f2937' }}
@@ -128,47 +128,48 @@ const LandingPage = () => {
                     {qrCode.menu?.restaurantName}
                   </h2>
                   {qrCode.menu?.description && (
-                    <p className="text-gray-600 mt-2">{qrCode.menu.description}</p>
+                    <p className="text-gray-600 mt-2 text-sm">{qrCode.menu.description}</p>
                   )}
                 </div>
                 
-                <div className="space-y-10">
+                <div className="space-y-6">
                   {qrCode.menu?.categories.map((category) => (
-                    <div key={category.name} className="space-y-6">
+                    <div key={category.name} className="menu-item-compact">
                       <h3 
-                        className="text-xl font-bold text-center pb-2 border-b-2"
-                        style={{ borderColor: qrCode.foregroundColor || '#6366F1' }}
+                        className="text-lg font-bold text-center rounded-t-md"
+                        style={{ 
+                          backgroundColor: qrCode.foregroundColor || '#5D5FEF',
+                          color: '#ffffff'
+                        }}
                       >
                         {category.name}
                       </h3>
                       
-                      <div className="space-y-5">
+                      <div className="menu-item-content p-3 bg-gray-50 rounded-b-md">
                         {category.items.map((item, index) => (
-                          <div key={index} className="bg-white rounded-lg p-4 shadow-md">
-                            <div className="flex justify-between items-start">
-                              <div>
-                                <h3 
-                                  className="text-lg font-semibold"
-                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                                >
-                                  {item.name}
-                                </h3>
-                                {item.description && (
-                                  <p className="text-gray-600 mt-1 text-sm">{item.description}</p>
-                                )}
-                              </div>
+                          <div key={index} className="menu-item-card">
+                            <div className="flex justify-between items-start mb-1">
+                              <h4 
+                                className="text-base font-medium truncate"
+                                style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                              >
+                                {item.name}
+                              </h4>
                               <p 
-                                className="text-lg font-semibold"
+                                className="text-base font-medium whitespace-nowrap ml-2"
                                 style={{ color: qrCode.foregroundColor || '#1f2937' }}
                               >
                                 ${item.price.toFixed(2)}
                               </p>
                             </div>
+                            {item.description && (
+                              <p className="text-gray-600 text-xs mb-2 line-clamp-2">{item.description}</p>
+                            )}
                             {item.imageUrl && (
                               <img
                                 src={item.imageUrl}
                                 alt={item.name}
-                                className="mt-4 rounded-lg w-full h-48 object-cover"
+                                className="menu-item-card-image mt-auto"
                               />
                             )}
                           </div>
