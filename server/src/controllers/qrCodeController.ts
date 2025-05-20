@@ -121,7 +121,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Request body:', req.body);
       console.log('Request file:', req.file);
 
-      const { name, foregroundColor, backgroundColor, links, type, menu } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
 
@@ -166,6 +166,8 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.logoUrl = logoUrl;
       qrCode.foregroundColor = foregroundColor || '#6366F1';
       qrCode.backgroundColor = backgroundColor || '#FFFFFF';
+      qrCode.textAbove = textAbove || 'Scan me';
+      qrCode.textBelow = textBelow || '';
       qrCode.user = req.user;
       qrCode.url = tempUrl;
       qrCode.originalUrl = tempUrl;

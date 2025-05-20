@@ -9,19 +9,190 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
-import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send } from 'lucide-react';
+import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
 // QR Preview component that shows an actual QR code
-const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: string; bgColor: string; logoUrl?: string }) => {
+const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: { 
+  url: string; 
+  color: string; 
+  bgColor: string; 
+  logoUrl?: string;
+  textAbove?: string;
+  textBelow?: string;
+}) => {
+  const qrRef = useRef<HTMLDivElement>(null);
+
+  const handleDownload = async (format: 'png' | 'svg') => {
+    if (!qrRef.current) return;
+
+    try {
+      if (format === 'svg') {
+        // Create SVG with text
+        const svgNS = "http://www.w3.org/2000/svg";
+        const svg = document.createElementNS(svgNS, "svg");
+        svg.setAttribute("width", "400");
+        svg.setAttribute("height", "500");
+        svg.setAttribute("viewBox", "0 0 400 500");
+
+        // Add background
+        const rect = document.createElementNS(svgNS, "rect");
+        rect.setAttribute("width", "400");
+        rect.setAttribute("height", "500");
+        rect.setAttribute("fill", "#FFFFFF");
+        svg.appendChild(rect);
+
+        // Add text above
+        if (textAbove) {
+          const textAboveElement = document.createElementNS(svgNS, "text");
+          textAboveElement.setAttribute("x", "200");
+          textAboveElement.setAttribute("y", "40");
+          textAboveElement.setAttribute("text-anchor", "middle");
+          textAboveElement.setAttribute("font-family", "Arial");
+          textAboveElement.setAttribute("font-size", "24");
+          textAboveElement.setAttribute("font-weight", "bold");
+          textAboveElement.setAttribute("fill", "#374151");
+          textAboveElement.textContent = textAbove;
+          svg.appendChild(textAboveElement);
+        }
+
+        // Add QR code
+        const qrElement = qrRef.current.querySelector('svg');
+        if (qrElement) {
+          const qrClone = qrElement.cloneNode(true) as SVGElement;
+          qrClone.setAttribute("x", "50");
+          qrClone.setAttribute("y", textAbove ? "80" : "100");
+          qrClone.setAttribute("width", "300");
+          qrClone.setAttribute("height", "300");
+          svg.appendChild(qrClone);
+        }
+
+        // Add text below
+        if (textBelow) {
+          const textBelowElement = document.createElementNS(svgNS, "text");
+          textBelowElement.setAttribute("x", "200");
+          textBelowElement.setAttribute("y", textAbove ? "420" : "440");
+          textBelowElement.setAttribute("text-anchor", "middle");
+          textBelowElement.setAttribute("font-family", "Arial");
+          textBelowElement.setAttribute("font-size", "24");
+          textBelowElement.setAttribute("font-weight", "bold");
+          textBelowElement.setAttribute("fill", "#374151");
+          textBelowElement.textContent = textBelow;
+          svg.appendChild(textBelowElement);
+        }
+
+        // Add border
+        const border = document.createElementNS(svgNS, "rect");
+        border.setAttribute("width", "400");
+        border.setAttribute("height", "500");
+        border.setAttribute("fill", "none");
+        border.setAttribute("stroke", "#E5E7EB");
+        border.setAttribute("stroke-width", "2");
+        svg.appendChild(border);
+
+        // Convert to string and download
+        const svgString = new XMLSerializer().serializeToString(svg);
+        const blob = new Blob([svgString], { type: 'image/svg+xml' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `${name || 'qr-code'}.svg`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      } else {
+        // PNG download
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+
+        canvas.width = 400;
+        canvas.height = 500;
+
+        // Fill background
+        ctx.fillStyle = '#FFFFFF';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Draw text above
+        if (textAbove) {
+          ctx.fillStyle = '#374151';
+          ctx.font = 'bold 24px Arial';
+          ctx.textAlign = 'center';
+          ctx.fillText(textAbove, canvas.width / 2, 40);
+        }
+
+        // Draw QR code
+        const qrElement = qrRef.current.querySelector('svg');
+        if (qrElement) {
+          const svgData = new XMLSerializer().serializeToString(qrElement);
+          const img = new Image();
+          await new Promise<void>((resolve) => {
+            img.onload = () => resolve();
+            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
+          });
+          const qrSize = 300;
+          const qrX = (canvas.width - qrSize) / 2;
+          const qrY = textAbove ? 80 : 100;
+          ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
+        }
+
+        // Draw text below
+        if (textBelow) {
+          ctx.fillStyle = '#374151';
+          ctx.font = 'bold 24px Arial';
+          ctx.textAlign = 'center';
+          const textY = textAbove ? 420 : 440;
+          ctx.fillText(textBelow, canvas.width / 2, textY);
+        }
+
+        // Add border
+        ctx.strokeStyle = '#E5E7EB';
+        ctx.lineWidth = 2;
+        ctx.strokeRect(0, 0, canvas.width, canvas.height);
+
+        // Convert to blob and download
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = `${name || 'qr-code'}.png`;
+          document.body.appendChild(a);
+          a.click();
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 'image/png', 1.0);
+      }
+
+      toast({
+        title: "Success",
+        description: `QR code downloaded as ${format.toUpperCase()}`,
+      });
+    } catch (error) {
+      console.error('Error downloading QR code:', error);
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: "Failed to download QR code",
+      });
+    }
+  };
+
   if (!url) return null;
   
   return (
-    <div className="flex justify-center items-center mb-4">
+    <div className="flex flex-col items-center mb-4">
+      {textAbove && (
+        <div className="text-center mb-2 font-medium text-gray-700">
+          {textAbove}
+        </div>
+      )}
       <div 
+        ref={qrRef}
         className="w-48 h-48 flex items-center justify-center border rounded-md p-2" 
         style={{ backgroundColor: bgColor }}
       >
@@ -41,6 +212,29 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: { url: string; color: strin
             excavate: true,
           } : undefined}
         />
+      </div>
+      {textBelow && (
+        <div className="text-center mt-2 font-medium text-gray-700">
+          {textBelow}
+        </div>
+      )}
+      <div className="flex gap-2 mt-4">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleDownload('png')}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Download PNG
+        </Button>
+        <Button
+          type="button"
+          variant="outline"
+          onClick={() => handleDownload('svg')}
+        >
+          <Download className="h-4 w-4 mr-2" />
+          Download SVG
+        </Button>
       </div>
     </div>
   );
@@ -82,6 +276,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [textAbove, setTextAbove] = useState('Scan me');
+  const [textBelow, setTextBelow] = useState('');
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -333,6 +529,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         }));
       }
       
+      formData.append('textAbove', textAbove);
+      formData.append('textBelow', textBelow);
+      
       if (logoFile) {
         formData.append('logo', logoFile);
       }
@@ -408,6 +607,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="My QR Code"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="textAbove">Text Above QR Code</Label>
+                  <Input
+                    id="textAbove"
+                    value={textAbove}
+                    onChange={(e) => setTextAbove(e.target.value)}
+                    placeholder="Enter text to display above QR code"
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="textBelow">Text Below QR Code</Label>
+                  <Input
+                    id="textBelow"
+                    value={textBelow}
+                    onChange={(e) => setTextBelow(e.target.value)}
+                    placeholder="Enter text to display below QR code"
                   />
                 </div>
                 <div className="space-y-2">
@@ -595,6 +812,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     </Button>
                   </div>
                 )}
+                <div className="mt-4">
+                  <QRPreview 
+                    url={name ? `http://localhost:3000/api/qrcodes/preview/${name}` : ''}
+                    color={foregroundColor}
+                    bgColor={backgroundColor}
+                    logoUrl={logoPreview || undefined}
+                    textAbove={textAbove}
+                    textBelow={textBelow}
+                  />
+                </div>
               </div>
             </TabsContent>
             <TabsContent value="advanced" className="space-y-4">

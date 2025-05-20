@@ -148,6 +148,8 @@ export const qrCodeApi = {
     logoUrl?: string;
     foregroundColor: string;
     backgroundColor: string;
+    textAbove?: string;
+    textBelow?: string;
     links?: { label: string; url: string }[];
     menu?: {
       restaurantName: string;

@@ -51,6 +51,8 @@ export interface QRCode {
   logoUrl?: string;
   foregroundColor: string;
   backgroundColor: string;
+  textAbove?: string;
+  textBelow?: string;
   user: User;
   createdAt: Date;
   updatedAt: Date;

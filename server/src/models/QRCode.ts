@@ -61,6 +61,12 @@ export class QRCode {
   @Column()
   backgroundColor!: string;
 
+  @Column({ nullable: true })
+  textAbove!: string;
+
+  @Column({ nullable: true })
+  textBelow!: string;
+
   @ManyToOne(() => User, user => user.qrCodes)
   user!: User;
 
