@@ -6,7 +6,8 @@ import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
-import { auth } from './middleware/auth';
+import { auth, generateAuthToken } from './middleware/auth';
+import { AuthRequest } from './middleware/auth';
 
 const app = express();
 
@@ -59,6 +60,22 @@ app.use('/uploads', (req, res, next) => {
   
   next();
 }, express.static(path.join(__dirname, '../uploads')));
+
+// Add token refresh endpoint
+app.post('/api/users/refresh-token', auth, (req: AuthRequest, res: express.Response) => {
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Authentication required' });
+    }
+    
+    // Generate a new token
+    const token = generateAuthToken(req.user.id);
+    
+    res.json({ token });
+  } catch (error) {
+    res.status(500).json({ error: 'Failed to refresh token' });
+  }
+});
 
 // API routes
 app.use('/api/users', userRoutes);

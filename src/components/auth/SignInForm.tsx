@@ -1,11 +1,15 @@
 
 import { useState } from 'react';
-import { useNavigate, Link } from 'react-router-dom';
+import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+
+interface LocationState {
+  from?: string;
+}
 
 const SignInForm = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +18,10 @@ const SignInForm = () => {
   const [error, setError] = useState('');
   const { signIn } = useAuth();
   const navigate = useNavigate();
+  const location = useLocation();
+  
+  // Get the page the user was trying to visit
+  const from = (location.state as LocationState)?.from || '/dashboard';
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,11 +30,11 @@ const SignInForm = () => {
 
     try {
       const user = await signIn(email, password);
-      // Redirect based on user role
-      if (user.role === 'admin') {
+      // Redirect based on original location or user role
+      if (user.role === 'admin' && from === '/dashboard') {
         navigate('/admin');
       } else {
-        navigate('/dashboard');
+        navigate(from);
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');

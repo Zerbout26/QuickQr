@@ -1,11 +1,9 @@
 import { Request, Response } from 'express';
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../config/database';
 import { User } from '../models/User';
-import { AuthRequest } from '../middleware/auth';
+import { AuthRequest, generateAuthToken } from '../middleware/auth';
 
-const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 const userRepository = AppDataSource.getRepository(User);
 
 export const register = async (req: Request, res: Response) => {
@@ -40,8 +38,8 @@ export const register = async (req: Request, res: Response) => {
 
     await userRepository.save(user);
 
-    // Generate token
-    const token = jwt.sign({ id: user.id }, JWT_SECRET);
+    // Generate token using our new function
+    const token = generateAuthToken(user.id);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
@@ -68,8 +66,13 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Generate token
-    const token = jwt.sign({ id: user.id }, JWT_SECRET);
+    // Check if account is active
+    if (!user.isActive) {
+      return res.status(403).json({ error: 'Account is inactive. Please contact support.' });
+    }
+
+    // Generate token using our new function
+    const token = generateAuthToken(user.id);
 
     // Remove password from response
     const { password: _, ...userWithoutPassword } = user;
@@ -163,4 +166,4 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
   } catch (error) {
     res.status(500).json({ error: 'Error updating user status' });
   }
-}; 
+};

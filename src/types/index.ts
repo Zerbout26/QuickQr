@@ -1,11 +1,10 @@
-
 export type UserRole = 'user' | 'admin';
 
 export interface User {
   id: string;
   email: string;
   name?: string;
-  role: UserRole;
+  role: 'user' | 'admin';
   trialStartDate: Date;
   trialEndDate: Date;
   isActive: boolean;
@@ -60,16 +59,17 @@ export interface QRCode {
 export interface AuthContextType {
   user: User | null;
   loading: boolean;
-  signIn: (email: string, password: string) => Promise<any>;
-  signUp: (email: string, password: string) => Promise<any>;
+  signIn: (email: string, password: string) => Promise<User>;
+  signUp: (email: string, password: string) => Promise<User>;
   signOut: () => void;
-  login: (email: string, password: string) => Promise<any>;
-  register: (email: string, password: string) => Promise<any>;
+  login: (email: string, password: string) => Promise<User>;
+  register: (email: string, password: string) => Promise<User>;
   logout: () => void;
   isAdmin: () => boolean;
   isTrialActive: () => boolean;
   isTrialExpired: () => boolean;
   daysLeftInTrial: () => number | null;
+  refreshUserProfile?: () => Promise<void>;
 }
 
 export interface AdminStats {

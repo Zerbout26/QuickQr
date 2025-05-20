@@ -1,5 +1,7 @@
-import { Navigate } from 'react-router-dom';
+
+import { Navigate, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { Loader2 } from "lucide-react";
 
 interface PrivateRouteProps {
   children: React.ReactNode;
@@ -7,20 +9,23 @@ interface PrivateRouteProps {
 
 const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
   const { user, loading } = useAuth();
+  const location = useLocation();
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center min-h-screen">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      <div className="flex flex-col items-center justify-center min-h-screen">
+        <Loader2 className="h-12 w-12 animate-spin text-qr-primary mb-4" />
+        <p className="text-gray-600 font-medium">Loading your session...</p>
       </div>
     );
   }
 
   if (!user) {
-    return <Navigate to="/signin" />;
+    // Save the current location the user was trying to navigate to
+    return <Navigate to="/signin" state={{ from: location.pathname }} />;
   }
 
   return <>{children}</>;
 };
 
-export default PrivateRoute; 
+export default PrivateRoute;

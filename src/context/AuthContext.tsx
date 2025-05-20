@@ -1,5 +1,5 @@
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { User, AuthContextType } from '../types';
 import { toast } from '../components/ui/use-toast';
 import { authApi } from '../lib/api';
@@ -11,9 +11,9 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => null,
   signUp: async () => null,
   signOut: () => {},
-  login: async () => null,  // Added missing method
-  register: async () => null, // Added missing method  
-  logout: () => {}, // Added missing method
+  login: async () => null,
+  register: async () => null,
+  logout: () => {},
   isAdmin: () => false,
   isTrialActive: () => false,
   isTrialExpired: () => false,
@@ -23,25 +23,61 @@ const AuthContext = createContext<AuthContextType>({
 export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState(true);
+  const [sessionChecked, setSessionChecked] = useState(false);
+
+  // Function to refresh user profile data
+  const refreshUserProfile = useCallback(async () => {
+    const token = localStorage.getItem('qr-generator-token');
+    if (!token) {
+      setUser(null);
+      setLoading(false);
+      setSessionChecked(true);
+      return;
+    }
+
+    try {
+      const userData = await authApi.getProfile();
+      setUser(userData);
+    } catch (error) {
+      console.error('Error refreshing user profile:', error);
+      localStorage.removeItem('qr-generator-token');
+      setUser(null);
+    } finally {
+      setLoading(false);
+      setSessionChecked(true);
+    }
+  }, []);
 
   // Check for saved token and fetch user profile on mount
   useEffect(() => {
-    const token = localStorage.getItem('qr-generator-token');
-    if (token) {
-      authApi.getProfile()
-        .then(userData => {
-          setUser(userData);
-        })
-        .catch(() => {
-          localStorage.removeItem('qr-generator-token');
-        })
-        .finally(() => {
-          setLoading(false);
-        });
-    } else {
-      setLoading(false);
-    }
-  }, []);
+    refreshUserProfile();
+  }, [refreshUserProfile]);
+
+  // Set up refresh interval and visibility change handling
+  useEffect(() => {
+    if (!sessionChecked) return;
+
+    // Refresh user data when tab becomes visible again
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === 'visible' && localStorage.getItem('qr-generator-token')) {
+        refreshUserProfile();
+      }
+    };
+
+    // Set up periodic refresh (every 15 minutes)
+    const intervalId = setInterval(() => {
+      if (localStorage.getItem('qr-generator-token')) {
+        refreshUserProfile();
+      }
+    }, 15 * 60 * 1000); // 15 minutes
+
+    document.addEventListener('visibilitychange', handleVisibilityChange);
+    
+    return () => {
+      clearInterval(intervalId);
+      document.removeEventListener('visibilitychange', handleVisibilityChange);
+    };
+  }, [sessionChecked, refreshUserProfile]);
 
   const signIn = async (email: string, password: string): Promise<User> => {
     setLoading(true);
@@ -148,13 +184,14 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
-    login,     // Added missing method
-    register,  // Added missing method
-    logout,    // Added missing method
+    login,
+    register,
+    logout,
     isAdmin,
     isTrialActive,
     isTrialExpired,
-    daysLeftInTrial
+    daysLeftInTrial,
+    refreshUserProfile,
   };
 
   return (

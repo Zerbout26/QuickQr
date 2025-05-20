@@ -1,4 +1,4 @@
-import axios from 'axios';
+import axios, { AxiosError, AxiosResponse } from 'axios';
 import { User } from '@/types';
 
 const API_BASE_URL = 'http://localhost:3000/api';
@@ -11,6 +11,21 @@ const api = axios.create({
   },
 });
 
+// Keep track of if we are refreshing the token
+let isRefreshingToken = false;
+let refreshSubscribers: Array<(token: string) => void> = [];
+
+// Function to subscribe to token refresh
+function subscribeTokenRefresh(callback: (token: string) => void) {
+  refreshSubscribers.push(callback);
+}
+
+// Function to notify subscribers about a new token
+function onTokenRefreshed(token: string) {
+  refreshSubscribers.forEach(callback => callback(token));
+  refreshSubscribers = [];
+}
+
 // Add request interceptor to add auth token
 api.interceptors.request.use((config) => {
   const token = localStorage.getItem('qr-generator-token');
@@ -19,6 +34,80 @@ api.interceptors.request.use((config) => {
   }
   return config;
 });
+
+// Add response interceptor to handle token refresh
+api.interceptors.response.use(
+  (response) => {
+    // Check if response contains a new token
+    const newToken = response.headers['x-auth-token'];
+    if (newToken) {
+      localStorage.setItem('qr-generator-token', newToken);
+    }
+    return response;
+  },
+  async (error: AxiosError) => {
+    const originalRequest: any = error.config;
+    
+    // If the error is not 401 or we've already tried to refresh, reject
+    if (!error.response || error.response.status !== 401 || originalRequest._retry) {
+      return Promise.reject(error);
+    }
+    
+    const errorData = error.response.data as any;
+    
+    // Only handle token expired errors
+    if (errorData.code !== 'TOKEN_EXPIRED') {
+      return Promise.reject(error);
+    }
+    
+    // Mark this request as retried
+    originalRequest._retry = true;
+    
+    // If already refreshing, wait for new token
+    if (isRefreshingToken) {
+      try {
+        const token = await new Promise<string>((resolve) => {
+          subscribeTokenRefresh((token: string) => {
+            resolve(token);
+          });
+        });
+        
+        originalRequest.headers.Authorization = `Bearer ${token}`;
+        return api(originalRequest);
+      } catch (err) {
+        return Promise.reject(err);
+      }
+    }
+    
+    // Set refreshing flag
+    isRefreshingToken = true;
+    
+    try {
+      // Try to get a new token using current user credentials
+      // This is a simplified approach - in production, you might use a refresh token
+      const response = await authApi.silentRefresh();
+      const { token } = response;
+      
+      // Save the new token
+      localStorage.setItem('qr-generator-token', token);
+      
+      // Update authorization header
+      originalRequest.headers.Authorization = `Bearer ${token}`;
+      
+      // Notify all subscribers about new token
+      onTokenRefreshed(token);
+      
+      return api(originalRequest);
+    } catch (refreshError) {
+      // If refresh fails, clear token and reject
+      localStorage.removeItem('qr-generator-token');
+      window.location.href = '/signin'; // Redirect to login
+      return Promise.reject(refreshError);
+    } finally {
+      isRefreshingToken = false;
+    }
+  }
+);
 
 // Auth API calls
 export const authApi = {
@@ -41,6 +130,13 @@ export const authApi = {
     const response = await api.patch('/users/profile', data);
     return response.data;
   },
+  
+  silentRefresh: async () => {
+    // In a real implementation, this would use a refresh token
+    // For now, we'll simulate it with the current token
+    const response = await api.post('/users/refresh-token');
+    return response.data;
+  }
 };
 
 // QR Code API calls
@@ -170,4 +266,4 @@ export const adminApi = {
     const response = await api.patch(`/users/admin/users/${userId}/status`, { isActive });
     return response.data;
   }
-}; 
+};
