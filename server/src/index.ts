@@ -34,7 +34,9 @@ const itemsDir = path.join(uploadsDir, 'items');
 
 // Middleware
 app.use(cors({
-  origin: true, // Allow all origins
+  origin: '*', // Allow all origins
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
 }));
 app.use(express.json());
