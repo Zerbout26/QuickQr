@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import * as LucideIcons from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -16,28 +17,28 @@ const LandingPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Function to map platform type to label, icon, and colors
-  const getPlatformInfo = (type: string): { label: string; icon: keyof typeof LucideIcons; bgColor: string; hoverBgColor: string } => {
+  const getPlatformInfo = (type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
     switch (type) {
       case 'facebook':
-        return { label: 'Follow us on Facebook', icon: 'Facebook', bgColor: '#1877F2', hoverBgColor: '#166FE5' };
+        return { label: 'Follow us on Facebook', icon: Facebook, bgColor: '#1877F2', hoverBgColor: '#166FE5' };
       case 'instagram':
-        return { label: 'Follow us on Instagram', icon: 'Instagram', bgColor: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', hoverBgColor: 'linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%)' };
+        return { label: 'Follow us on Instagram', icon: Instagram, bgColor: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', hoverBgColor: 'linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%)' };
       case 'twitter':
-        return { label: 'Follow us on Twitter', icon: 'Twitter', bgColor: '#1DA1F2', hoverBgColor: '#1A91DA' };
+        return { label: 'Follow us on Twitter', icon: Twitter, bgColor: '#1DA1F2', hoverBgColor: '#1A91DA' };
       case 'linkedin':
-        return { label: 'Connect on LinkedIn', icon: 'Linkedin', bgColor: '#0A66C2', hoverBgColor: '#095BB5' };
+        return { label: 'Connect on LinkedIn', icon: Linkedin, bgColor: '#0A66C2', hoverBgColor: '#095BB5' };
       case 'youtube':
-        return { label: 'Subscribe on YouTube', icon: 'Youtube', bgColor: '#FF0000', hoverBgColor: '#E60000' };
+        return { label: 'Subscribe on YouTube', icon: Youtube, bgColor: '#FF0000', hoverBgColor: '#E60000' };
       case 'tiktok':
-        return { label: 'Follow us on TikTok', icon: 'Music', bgColor: '#000000', hoverBgColor: '#1A1A1A' };
+        return { label: 'Follow us on TikTok', icon: Music, bgColor: '#000000', hoverBgColor: '#1A1A1A' };
       case 'whatsapp':
-        return { label: 'Chat on WhatsApp', icon: 'MessageCircle', bgColor: '#25D366', hoverBgColor: '#20BA56' };
+        return { label: 'Chat on WhatsApp', icon: MessageCircle, bgColor: '#25D366', hoverBgColor: '#20BA56' };
       case 'telegram':
-        return { label: 'Join our Telegram', icon: 'Send', bgColor: '#0088CC', hoverBgColor: '#0077B5' };
+        return { label: 'Join our Telegram', icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
-        return { label: 'Visit our Website', icon: 'Globe', bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+        return { label: 'Visit our Website', icon: Globe, bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
       default:
-        return { label: 'Visit Link', icon: 'ExternalLink', bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+        return { label: 'Visit Link', icon: ExternalLink, bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
     }
   };
 
@@ -122,8 +123,7 @@ const LandingPage = () => {
               <div className="mb-10">
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {qrCode.links.map((link, index) => {
-                    const { label, icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
-                    const IconComponent = LucideIcons[icon];
+                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
                     return (
                       <a
                         key={index}
@@ -133,16 +133,16 @@ const LandingPage = () => {
                         className="block"
                       >
                         <Button
-                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-[color] flex items-center justify-center gap-3" // Enhanced hover and focus
+                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-[color] flex items-center justify-center gap-3"
                           style={{
-                            background: bgColor, // Platform-specific background
+                            background: bgColor,
                             color: '#ffffff',
-                            '--hover-bg': hoverBgColor, // Custom property for hover
+                            '--hover-bg': hoverBgColor,
                           } as React.CSSProperties}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)} // Dynamic hover background
-                          onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)} // Reset to original
+                          onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)}
+                          onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)}
                         >
-                          {IconComponent && <IconComponent size={24} />} {/* Proper rendering of the icon */}
+                          <Icon size={24} /> {/* Now using the icon component directly */}
                           <span>{label}</span>
                         </Button>
                       </a>
@@ -253,3 +253,4 @@ function adjustColor(color: string, amount: number): string {
 }
 
 export default LandingPage;
+
