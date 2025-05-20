@@ -86,6 +86,36 @@
   }
 }
 
+/* Custom animations */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes scaleUp {
+  from { transform: scale(0.95); opacity: 0; }
+  to { transform: scale(1); opacity: 1; }
+}
+
+/* Custom utility classes */
+@layer utilities {
+  .animate-fade-in {
+    animation: fadeIn 0.4s ease-out forwards;
+  }
+  
+  .animate-scale-up {
+    animation: scaleUp 0.3s ease-out forwards;
+  }
+  
+  .transition-all {
+    transition: all 0.3s ease;
+  }
+  
+  .hover-scale {
+    @apply transition-transform duration-300 hover:scale-105;
+  }
+}
+
 /* Custom styles for QR Code Generator */
 .qr-gradient-bg {
   background: linear-gradient(135deg, rgba(93, 95, 239, 0.1) 0%, rgba(139, 92, 246, 0.1) 100%);
@@ -96,29 +126,29 @@
 }
 
 .qr-btn-primary {
-  @apply bg-qr-primary hover:bg-qr-primary/90 text-white font-medium;
+  @apply bg-qr-primary hover:bg-qr-primary/90 text-white font-medium transition-colors duration-300;
 }
 
 .qr-btn-secondary {
-  @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium;
+  @apply bg-qr-secondary hover:bg-qr-secondary/90 text-white font-medium transition-colors duration-300;
 }
 
 /* Updated menu styles */
 .menu-category {
-  @apply mb-4 overflow-hidden rounded-md;
+  @apply mb-4 overflow-hidden rounded-md shadow-sm transition-all duration-300 hover:shadow-md;
 }
 
 .menu-item-line {
-  @apply flex justify-between items-center border-b border-gray-100 py-2 last:border-b-0;
+  @apply flex justify-between items-center border-b border-gray-100 py-2 last:border-b-0 hover:bg-gray-50 transition-colors duration-200;
 }
 
 .menu-item-image {
-  @apply h-16 w-16 object-cover rounded-md ml-4;
+  @apply h-16 w-16 object-cover rounded-md ml-4 shadow-sm hover:scale-105 transition-transform duration-300;
 }
 
 /* We keep the old menu styles for backwards compatibility */
 .menu-item-compact {
-  @apply mb-2 overflow-hidden rounded-md;
+  @apply mb-2 overflow-hidden rounded-md shadow-sm hover:shadow-md transition-all duration-300;
 }
 
 .menu-item-compact h3 {
@@ -130,9 +160,9 @@
 }
 
 .menu-item-card {
-  @apply bg-white rounded-md shadow-sm p-3 flex flex-col h-full;
+  @apply bg-white rounded-md shadow-sm p-3 flex flex-col h-full hover:shadow-md transition-all duration-300;
 }
 
 .menu-item-card-image {
-  @apply h-24 w-full object-cover rounded-md mb-2;
+  @apply h-24 w-full object-cover rounded-md mb-2 hover:scale-105 transition-transform duration-300;
 }
