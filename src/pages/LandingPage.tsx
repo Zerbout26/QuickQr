@@ -1,3 +1,4 @@
+
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode } from '@/types';
@@ -15,7 +16,7 @@ const LandingPage = () => {
   const [error, setError] = useState<string | null>(null);
 
   // Function to map platform type to label, icon, and colors
-  const getPlatformInfo = (type: string): { label: string; icon: string; bgColor: string; hoverBgColor: string } => {
+  const getPlatformInfo = (type: string): { label: string; icon: keyof typeof LucideIcons; bgColor: string; hoverBgColor: string } => {
     switch (type) {
       case 'facebook':
         return { label: 'Follow us on Facebook', icon: 'Facebook', bgColor: '#1877F2', hoverBgColor: '#166FE5' };
@@ -87,7 +88,7 @@ const LandingPage = () => {
   }
 
   const hasUrls = qrCode.links && qrCode.links.length > 0;
-  const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
+  const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
 
   return (
     <div
@@ -122,7 +123,7 @@ const LandingPage = () => {
                 <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                   {qrCode.links.map((link, index) => {
                     const { label, icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
-                    const IconComponent = icon && LucideIcons[icon as keyof typeof LucideIcons];
+                    const IconComponent = LucideIcons[icon];
                     return (
                       <a
                         key={index}
@@ -141,7 +142,7 @@ const LandingPage = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)} // Dynamic hover background
                           onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)} // Reset to original
                         >
-                          {IconComponent && <IconComponent size={24} aria-hidden="true" />} {/* Larger icon */}
+                          {IconComponent && <IconComponent size={24} />} {/* Proper rendering of the icon */}
                           <span>{label}</span>
                         </Button>
                       </a>

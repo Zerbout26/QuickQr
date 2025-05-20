@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -79,7 +78,17 @@ const Dashboard = () => {
     if (!editingQR) return;
     
     try {
-      const updatedQR = await qrCodeApi.update(editingQR.id, { url: newUrl });
+      // Updated to include all required fields
+      const updatedQR = await qrCodeApi.update(editingQR.id, { 
+        name: editingQR.name,
+        type: editingQR.type,
+        url: newUrl,
+        foregroundColor: editingQR.foregroundColor,
+        backgroundColor: editingQR.backgroundColor,
+        links: JSON.stringify(editingQR.links),
+        menu: JSON.stringify(editingQR.menu || {})
+      });
+      
       setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
       setEditingQR(null);
       toast({

@@ -1,3 +1,4 @@
+
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { User, AuthContextType } from '../types';
 import { toast } from '../components/ui/use-toast';
@@ -10,6 +11,9 @@ const AuthContext = createContext<AuthContextType>({
   signIn: async () => null,
   signUp: async () => null,
   signOut: () => {},
+  login: async () => null,  // Added missing method
+  register: async () => null, // Added missing method  
+  logout: () => {}, // Added missing method
   isAdmin: () => false,
   isTrialActive: () => false,
   isTrialExpired: () => false,
@@ -94,6 +98,11 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     });
   };
 
+  // Add aliases for backward compatibility
+  const login = signIn;
+  const register = signUp;
+  const logout = signOut;
+
   const isAdmin = () => {
     return user?.role === 'admin';
   };
@@ -139,6 +148,9 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     signIn,
     signUp,
     signOut,
+    login,     // Added missing method
+    register,  // Added missing method
+    logout,    // Added missing method
     isAdmin,
     isTrialActive,
     isTrialExpired,

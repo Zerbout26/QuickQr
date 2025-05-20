@@ -11,7 +11,9 @@ export const mockUsers: User[] = [
     trialStartDate: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
     trialEndDate: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000), // 7 days in future
     isActive: true,
-    hasActiveSubscription: false
+    hasActiveSubscription: false,
+    createdAt: new Date(Date.now() - 14 * 24 * 60 * 60 * 1000), // 14 days ago
+    updatedAt: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000) // 7 days ago
   },
   {
     id: '2',
@@ -21,7 +23,9 @@ export const mockUsers: User[] = [
     trialStartDate: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
     trialEndDate: new Date(Date.now() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
     isActive: false,
-    hasActiveSubscription: false
+    hasActiveSubscription: false,
+    createdAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000), // 20 days ago
+    updatedAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000) // 10 days ago
   },
   {
     id: '3',
@@ -31,7 +35,9 @@ export const mockUsers: User[] = [
     trialStartDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
     trialEndDate: new Date(Date.now() - 16 * 24 * 60 * 60 * 1000), // 16 days ago
     isActive: true,
-    hasActiveSubscription: true
+    hasActiveSubscription: true,
+    createdAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000), // 30 days ago
+    updatedAt: new Date(Date.now() - 15 * 24 * 60 * 60 * 1000) // 15 days ago
   },
   {
     id: '4',
@@ -41,7 +47,9 @@ export const mockUsers: User[] = [
     trialStartDate: new Date(),
     trialEndDate: new Date(),
     isActive: true,
-    hasActiveSubscription: true
+    hasActiveSubscription: true,
+    createdAt: new Date(Date.now() - 60 * 24 * 60 * 60 * 1000), // 60 days ago
+    updatedAt: new Date(Date.now() - 20 * 24 * 60 * 60 * 1000) // 20 days ago
   },
   {
     id: 'admin-1',
@@ -51,7 +59,9 @@ export const mockUsers: User[] = [
     trialStartDate: new Date(),
     trialEndDate: new Date(),
     isActive: true,
-    hasActiveSubscription: true
+    hasActiveSubscription: true,
+    createdAt: new Date(Date.now() - 90 * 24 * 60 * 60 * 1000), // 90 days ago
+    updatedAt: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000) // 30 days ago
   }
 ];
 
@@ -59,32 +69,41 @@ export const mockUsers: User[] = [
 export const mockQRCodes: QRCode[] = [
   {
     id: '1',
-    userId: '1',
     name: 'Website QR',
+    type: 'url',
     url: 'https://example.com',
+    originalUrl: 'https://example.com',
+    links: [{ label: 'Website', url: 'https://example.com', type: 'website' }],
     foregroundColor: '#6366F1',
     backgroundColor: '#FFFFFF',
+    user: mockUsers[0],
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
   },
   {
     id: '2',
-    userId: '1',
     name: 'Contact Card',
+    type: 'url',
     url: 'https://example.com/contact',
+    originalUrl: 'https://example.com/contact',
+    links: [{ label: 'Contact', url: 'https://example.com/contact', type: 'website' }],
     logoUrl: 'https://placeholder.com/150',
     foregroundColor: '#8B5CF6',
     backgroundColor: '#F9FAFB',
+    user: mockUsers[0],
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
   },
   {
     id: '3',
-    userId: '3',
     name: 'Product Page',
+    type: 'url',
     url: 'https://example.com/product',
+    originalUrl: 'https://example.com/product',
+    links: [{ label: 'Product', url: 'https://example.com/product', type: 'website' }],
     foregroundColor: '#1F2937',
     backgroundColor: '#FFFFFF',
+    user: mockUsers[2],
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
   }
@@ -120,7 +139,9 @@ export const mockRegister = (email: string, password: string): Promise<User> => 
         trialStartDate: new Date(),
         trialEndDate: new Date(Date.now() + 14 * 24 * 60 * 60 * 1000), // 14 days from now
         isActive: true,
-        hasActiveSubscription: false
+        hasActiveSubscription: false,
+        createdAt: new Date(),
+        updatedAt: new Date()
       };
       
       mockUsers.push(newUser);
@@ -133,7 +154,7 @@ export const mockRegister = (email: string, password: string): Promise<User> => 
 export const getUserQRCodes = (userId: string): Promise<QRCode[]> => {
   return new Promise((resolve) => {
     setTimeout(() => {
-      const userCodes = mockQRCodes.filter(code => code.userId === userId);
+      const userCodes = mockQRCodes.filter(code => code.user.id === userId);
       resolve(userCodes);
     }, 300);
   });

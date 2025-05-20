@@ -1,3 +1,4 @@
+
 export type UserRole = 'user' | 'admin';
 
 export interface User {
@@ -13,7 +14,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export type QRCodeType = 'url' | 'menu';
+export type QRCodeType = 'url' | 'menu' | 'both';
 
 export interface MenuItem {
   name: string;
@@ -34,13 +35,19 @@ export interface Menu {
   categories: MenuCategory[];
 }
 
+export interface QRCodeLink {
+  label: string;
+  url: string;
+  type: string;
+}
+
 export interface QRCode {
   id: string;
   name: string;
   type: QRCodeType;
   url: string;
   originalUrl: string;
-  links: { label: string; url: string; type: string }[];
+  links: QRCodeLink[];
   menu?: Menu;
   logoUrl?: string;
   foregroundColor: string;
@@ -56,13 +63,13 @@ export interface AuthContextType {
   signIn: (email: string, password: string) => Promise<any>;
   signUp: (email: string, password: string) => Promise<any>;
   signOut: () => void;
-  isAdmin: () => boolean;
-  isTrialActive: () => boolean;
-  isTrialExpired: () => boolean;
-  daysLeftInTrial: () => number;
   login: (email: string, password: string) => Promise<any>;
   register: (email: string, password: string) => Promise<any>;
   logout: () => void;
+  isAdmin: () => boolean;
+  isTrialActive: () => boolean;
+  isTrialExpired: () => boolean;
+  daysLeftInTrial: () => number | null;
 }
 
 export interface AdminStats {
