@@ -13,9 +13,12 @@ const PrivateRoute: React.FC<PrivateRouteProps> = ({ children }) => {
 
   if (loading) {
     return (
-      <div className="flex flex-col items-center justify-center min-h-screen">
-        <Loader2 className="h-12 w-12 animate-spin text-qr-primary mb-4" />
-        <p className="text-gray-600 font-medium">Loading your session...</p>
+      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-white to-qr-neutral/30">
+        <div className="p-8 rounded-2xl shadow-soft bg-white">
+          <Loader2 className="h-12 w-12 animate-spin text-qr-primary mb-4" />
+          <p className="text-gray-600 font-medium">Loading your session...</p>
+          <p className="text-xs text-gray-400 mt-2 animate-pulse">Preparing your dashboard</p>
+        </div>
       </div>
     );
   }
