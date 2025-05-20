@@ -1,4 +1,3 @@
-
 import { Router } from 'express';
 import {
   createQRCode,
@@ -7,7 +6,8 @@ import {
   updateQRCode,
   deleteQRCode,
   uploadItemImageHandler,
-  getPublicQRCode
+  getPublicQRCode,
+  redirectToUrl
 } from '../controllers/qrCodeController';
 import { auth } from '../middleware/auth';
 
@@ -15,6 +15,7 @@ const router = Router();
 
 // Public routes (no authentication required)
 router.get('/public/:id', getPublicQRCode);
+router.get('/redirect/:url', redirectToUrl);
 
 // Protected routes (authentication required)
 router.use(auth); 

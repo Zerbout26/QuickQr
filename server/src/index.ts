@@ -97,7 +97,7 @@ app.post('/api/users/refresh-token', auth, (req: AuthRequest, res: express.Respo
 
 // API routes
 app.use('/api/users', userRoutes);
-app.use('/api/qrcodes', auth, qrCodeRoutes);
+app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
 // Initialize database connection

@@ -121,7 +121,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       console.log('Request body:', req.body);
       console.log('Request file:', req.file);
 
-      const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
 
@@ -154,10 +154,6 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      // Generate a temporary ID for the URL
-      const tempId = crypto.randomUUID();
-      const tempUrl = `${frontendDomain}/landing/${tempId}`;
-
       const qrCode = new QRCode();
       qrCode.name = name || 'My QR Code';
       qrCode.type = type || 'url';
@@ -169,24 +165,38 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.textAbove = textAbove || 'Scan me';
       qrCode.textBelow = textBelow || '';
       qrCode.user = req.user;
-      qrCode.url = tempUrl;
-      qrCode.originalUrl = tempUrl;
 
-      console.log('Creating QR code:', qrCode);
+      if (type === 'direct' && url) {
+        // For direct type, use the server's redirect endpoint
+        const serverUrl = `${req.protocol}://${req.get('host')}`;
+        qrCode.url = `${serverUrl}/api/qrcodes/redirect/${encodeURIComponent(url)}`;
+        qrCode.originalUrl = url;
+      } else {
+        // For other types, use the landing page
+        const tempId = crypto.randomUUID();
+        const tempUrl = `${frontendDomain}/landing/${tempId}`;
+        qrCode.url = tempUrl;
+        qrCode.originalUrl = tempUrl;
 
-      // Save the QR code
+        // Save the QR code
+        const savedQRCode = await qrCodeRepository.save(qrCode);
+        console.log('Saved QR code:', savedQRCode);
+
+        // Update the URL with the actual ID
+        savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
+        savedQRCode.originalUrl = savedQRCode.url;
+
+        // Save again with the updated URL
+        const finalQRCode = await qrCodeRepository.save(savedQRCode);
+        console.log('Final QR code:', finalQRCode);
+        return res.status(201).json(finalQRCode);
+      }
+
+      // Save the direct URL QR code
       const savedQRCode = await qrCodeRepository.save(qrCode);
       console.log('Saved QR code:', savedQRCode);
+      res.status(201).json(savedQRCode);
 
-      // Update the URL with the actual ID
-      savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
-      savedQRCode.originalUrl = savedQRCode.url;
-
-      // Save again with the updated URL
-      const finalQRCode = await qrCodeRepository.save(savedQRCode);
-      console.log('Final QR code:', finalQRCode);
-
-      res.status(201).json(finalQRCode);
     } catch (error) {
       console.error('Error creating QR code:', error);
       if (error instanceof Error) {
@@ -320,5 +330,25 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
   } catch (error) {
     console.error('Error fetching public QR code:', error);
     res.status(500).json({ error: 'Error fetching QR code' });
+  }
+};
+
+export const redirectToUrl = async (req: Request, res: Response) => {
+  try {
+    const { url } = req.params;
+    const decodedUrl = decodeURIComponent(url);
+    
+    // Validate URL
+    try {
+      new URL(decodedUrl);
+    } catch (e) {
+      return res.status(400).json({ error: 'Invalid URL' });
+    }
+
+    // Redirect to the URL
+    res.redirect(decodedUrl);
+  } catch (error) {
+    console.error('Error redirecting:', error);
+    res.status(500).json({ error: 'Error redirecting to URL' });
   }
 }; 

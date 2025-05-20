@@ -99,7 +99,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
         const url = URL.createObjectURL(blob);
         const a = document.createElement('a');
         a.href = url;
-        a.download = `${name || 'qr-code'}.svg`;
+        a.download = `qr-code.${format}`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
@@ -160,7 +160,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
           const url = URL.createObjectURL(blob);
           const a = document.createElement('a');
           a.href = url;
-          a.download = `${name || 'qr-code'}.png`;
+          a.download = `qr-code.${format}`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
@@ -266,7 +266,8 @@ interface QRCodeFormProps {
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
-  const [type, setType] = useState<'url' | 'menu' | 'both'>('url');
+  const [type, setType] = useState<'url' | 'menu' | 'both' | 'direct'>('url');
+  const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
@@ -498,6 +499,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       return;
     }
     
+    if (type === 'direct' && !directUrl) {
+      setError('URL is required for direct URL type');
+      return;
+    }
+
     if ((type === 'url' || type === 'both') && links.length === 0) {
       setError('At least one link is required for URL type');
       return;
@@ -518,7 +524,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
       
-      if (type === 'url' || type === 'both') {
+      if (type === 'direct') {
+        formData.append('url', directUrl);
+      } else if (type === 'url' || type === 'both') {
         formData.append('links', JSON.stringify(links));
       }
       
@@ -654,8 +662,28 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     >
                       Both
                     </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'direct' ? 'default' : 'outline'}
+                      onClick={() => setType('direct')}
+                      className="flex-1"
+                    >
+                      Direct Link
+                    </Button>
                   </div>
                 </div>
+                {type === 'direct' && (
+                  <div className="space-y-2">
+                    <Label htmlFor="directUrl">URL</Label>
+                    <Input
+                      id="directUrl"
+                      type="url"
+                      value={directUrl}
+                      onChange={(e) => setDirectUrl(e.target.value)}
+                      placeholder="Enter URL"
+                    />
+                  </div>
+                )}
                 {(type === 'url' || type === 'both') && (
                   <div className="space-y-2">
                     <Label>Links</Label>
@@ -814,7 +842,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 <div className="mt-4">
                   <QRPreview 
-                    url={name ? `http://localhost:3000/api/qrcodes/preview/${name}` : ''}
+                    url={type === 'direct' ? `http://localhost:3000/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `http://localhost:3000/api/qrcodes/preview/${name}` : ''}
                     color={foregroundColor}
                     bgColor={backgroundColor}
                     logoUrl={logoPreview || undefined}

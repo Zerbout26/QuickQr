@@ -13,7 +13,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export type QRCodeType = 'url' | 'menu' | 'both';
+export type QRCodeType = 'url' | 'menu' | 'both' | 'direct';
 
 export interface MenuItem {
   name: string;
