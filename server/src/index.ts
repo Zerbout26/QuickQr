@@ -1,4 +1,3 @@
-
 import express from 'express';
 import cors from 'cors';
 import path from 'path';
@@ -19,7 +18,7 @@ const getFrontendDomain = (req: express.Request) => {
     return origin;
   }
   // Fallback to environment variable or default
-  return process.env.FRONTEND_URL || 'http://localhost:5173';
+  return process.env.FRONTEND_URL || 'http://localhost:8080';
 };
 
 // Create uploads directories if they don't exist
@@ -35,7 +34,23 @@ const itemsDir = path.join(uploadsDir, 'items');
 
 // Middleware
 app.use(cors({
-  origin: '*',  // Allow all origins in development
+  origin: function(origin, callback) {
+    const allowedOrigins = [
+      process.env.FRONTEND_URL, // Production frontend URL
+      'http://localhost:8080',  // Development frontend URL
+      'http://localhost:5173'   // Vite default development URL
+    ];
+    
+    // Allow requests with no origin (like mobile apps or curl requests)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.indexOf(origin) !== -1 || process.env.NODE_ENV === 'development') {
+      callback(null, true);
+    } else {
+      console.log('Blocked by CORS:', origin);
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
@@ -85,11 +100,6 @@ app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
-// Test endpoint to check if the server is running
-app.get('/api/health', (req, res) => {
-  res.json({ status: 'ok', message: 'Server is running' });
-});
-
 // Initialize database connection
 AppDataSource.initialize()
   .then(() => {
@@ -99,7 +109,6 @@ AppDataSource.initialize()
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
     });
   })
   .catch((error) => {
