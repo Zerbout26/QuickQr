@@ -345,7 +345,24 @@ export const redirectToUrl = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid URL' });
     }
 
-    // Redirect to the URL
+    // Find the QR code that contains this URL
+    const qrCode = await qrCodeRepository.findOne({
+      where: { originalUrl: decodedUrl },
+      relations: ['user']
+    });
+
+    if (!qrCode) {
+      return res.status(404).json({ error: 'QR code not found' });
+    }
+
+    // Check if user is active
+    if (!qrCode.user.isActive) {
+      // Redirect to payment instructions page
+      const frontendDomain = process.env.FRONTEND_URL || 'http://localhost:8080';
+      return res.redirect(`${frontendDomain}/payment-instructions`);
+    }
+
+    // If user is active, redirect to the original URL
     res.redirect(decodedUrl);
   } catch (error) {
     console.error('Error redirecting:', error);

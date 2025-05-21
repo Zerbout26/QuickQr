@@ -66,11 +66,6 @@ export const login = async (req: Request, res: Response) => {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // Check if account is active
-    if (!user.isActive) {
-      return res.status(403).json({ error: 'Account is inactive. Please contact support.' });
-    }
-
     // Generate token using our new function
     const token = generateAuthToken(user.id);
 

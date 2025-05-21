@@ -1,4 +1,3 @@
-
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import { AppDataSource } from '../config/database';
@@ -39,10 +38,7 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
         throw new Error('User not found');
       }
 
-      if (!user.isActive) {
-        throw new Error('User account is inactive');
-      }
-
+      // Remove the isActive check to allow dashboard access
       req.user = user;
       
       // If token is about to expire, include a refresh token in the response
@@ -52,7 +48,7 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
       }
       
       next();
-    } catch (error) {
+    } catch (error: any) {
       if (error.name === 'TokenExpiredError') {
         return res.status(401).json({ 
           error: 'Token expired', 
@@ -61,7 +57,7 @@ export const auth = async (req: AuthRequest, res: Response, next: NextFunction) 
       }
       throw error;
     }
-  } catch (error) {
+  } catch (error: any) {
     res.status(401).json({ 
       error: error.message || 'Please authenticate.',
       code: 'AUTH_REQUIRED' 
