@@ -77,6 +77,8 @@ export const mockQRCodes: QRCode[] = [
     foregroundColor: '#6366F1',
     backgroundColor: '#FFFFFF',
     user: mockUsers[0],
+    scanCount: 0,
+    scanHistory: [],
     createdAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 3 * 24 * 60 * 60 * 1000)
   },
@@ -91,6 +93,8 @@ export const mockQRCodes: QRCode[] = [
     foregroundColor: '#8B5CF6',
     backgroundColor: '#F9FAFB',
     user: mockUsers[0],
+    scanCount: 0,
+    scanHistory: [],
     createdAt: new Date(Date.now() - 2 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 1 * 24 * 60 * 60 * 1000)
   },
@@ -104,6 +108,8 @@ export const mockQRCodes: QRCode[] = [
     foregroundColor: '#1F2937',
     backgroundColor: '#FFFFFF',
     user: mockUsers[2],
+    scanCount: 0,
+    scanHistory: [],
     createdAt: new Date(Date.now() - 10 * 24 * 60 * 60 * 1000),
     updatedAt: new Date(Date.now() - 5 * 24 * 60 * 60 * 1000)
   }

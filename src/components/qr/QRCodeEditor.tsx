@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Globe, Upload } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { QRCode } from '@/types';
+import { QRCode, QRCodeType } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import {
   Select,
@@ -55,7 +55,10 @@ const defaultAvailability = {
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [name, setName] = useState(qrCode.name);
-  const [type, setType] = useState<'url' | 'menu' | 'both'>(qrCode.type);
+  // Fix: Cast to a compatible type, ignoring 'direct' which isn't handled in the UI
+  const [type, setType] = useState<'url' | 'menu' | 'both'>(
+    qrCode.type === 'direct' ? 'url' : qrCode.type as 'url' | 'menu' | 'both'
+  );
   const [links, setLinks] = useState<Link[]>(qrCode.links.map(link => ({ 
     ...link, 
     type: (link.type || 'website') as Link['type']
@@ -316,18 +319,19 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setIsLoading(true);
 
     try {
+      // Fix: Convert links array to proper format rather than stringifying
       const updatedQRCode = await qrCodeApi.update(qrCode.id, {
         name,
         type,
         foregroundColor,
         backgroundColor,
         logoUrl,
-        links: JSON.stringify(links.map(link => ({
+        links: links.map(link => ({
           label: link.label,
           url: link.url,
           type: link.type
-        }))),
-        menu: JSON.stringify({
+        })),
+        menu: {
           restaurantName: qrCode.menu?.restaurantName || '',
           description: qrCode.menu?.description || '',
           categories: menuCategories.map(category => ({
@@ -341,7 +345,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
               availability: item.availability || defaultAvailability
             }))
           }))
-        }),
+        },
       });
 
       onUpdated(updatedQRCode);
@@ -686,4 +690,4 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   );
 };
 
-export default QRCodeEditor; 
+export default QRCodeEditor;

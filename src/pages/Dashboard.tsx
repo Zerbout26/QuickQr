@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -86,15 +87,16 @@ const Dashboard = () => {
     if (!editingQR) return;
     
     try {
-      // Updated to include all required fields
+      // Fix: Pass properly structured data instead of JSON strings
       const updatedQR = await qrCodeApi.update(editingQR.id, { 
         name: editingQR.name,
         type: editingQR.type,
         url: newUrl,
         foregroundColor: editingQR.foregroundColor,
         backgroundColor: editingQR.backgroundColor,
-        links: JSON.stringify(editingQR.links),
-        menu: JSON.stringify(editingQR.menu || {})
+        // Pass proper objects instead of strings
+        links: editingQR.links,
+        menu: editingQR.menu || { restaurantName: '', description: '', categories: [] }
       });
       
       setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
