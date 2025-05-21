@@ -293,6 +293,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [textBelow, setTextBelow] = useState('');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
 
+  const resetForm = () => {
+    setName('');
+    setType('url');
+    setDirectUrl('');
+    setLinks([]);
+    setMenuCategories([]);
+    setForegroundColor('#6366F1');
+    setBackgroundColor('#FFFFFF');
+    setLogoFile(null);
+    setLogoPreview(null);
+    setTextAbove('Scan me');
+    setTextBelow('');
+    setTempImages({});
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
+    }
+  };
+
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
     if (!file) return;
@@ -564,6 +582,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         title: "Success",
         description: "QR code created successfully",
       });
+      resetForm(); // Reset form after successful creation
     } catch (error) {
       console.error('Error creating QR code:', error);
       toast({
