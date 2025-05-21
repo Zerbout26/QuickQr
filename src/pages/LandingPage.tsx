@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { QRCode } from '@/types';
+import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
@@ -39,6 +39,13 @@ const LandingPage = () => {
       default:
         return { label: 'Visit Link', icon: ExternalLink, bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
     }
+  };
+
+  // Update the isItemAvailableToday function
+  const isItemAvailableToday = (item: MenuItem): boolean => {
+    const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+    const today = days[new Date().getDay()];
+    return item.availability?.[today] ?? true;
   };
 
   useEffect(() => {
@@ -190,45 +197,47 @@ const LandingPage = () => {
                       </h3>
 
                       <div className="space-y-3 p-4 rounded-b-lg bg-gray-50/50">
-                        {category.items.map((item, index) => (
-                          <div
-                            key={index}
-                            className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
-                          >
-                            <div className="flex-1 pr-6">
-                              <div className="flex justify-between items-start mb-2">
-                                <h4
-                                  className="text-lg font-semibold"
-                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                                >
-                                  {item.name}
-                                </h4>
-                                <p
-                                  className="text-lg font-semibold whitespace-nowrap ml-4"
-                                  style={{ color: qrCode.foregroundColor || '#1f2937' }}
-                                >
-                                  ${item.price.toFixed(2)}
-                                </p>
+                        {category.items
+                          .filter(item => isItemAvailableToday(item))
+                          .map((item, index) => (
+                            <div
+                              key={index}
+                              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+                            >
+                              <div className="flex-1 pr-6">
+                                <div className="flex justify-between items-start mb-2">
+                                  <h4
+                                    className="text-lg font-semibold"
+                                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                  >
+                                    {item.name}
+                                  </h4>
+                                  <p
+                                    className="text-lg font-semibold whitespace-nowrap ml-4"
+                                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                  >
+                                    ${item.price.toFixed(2)}
+                                  </p>
+                                </div>
+                                {item.description && (
+                                  <p className="text-gray-600 text-sm line-clamp-3">
+                                    {item.description}
+                                  </p>
+                                )}
                               </div>
-                              {item.description && (
-                                <p className="text-gray-600 text-sm line-clamp-3">
-                                  {item.description}
-                                </p>
+
+                              {item.imageUrl && (
+                                <div className="flex-shrink-0">
+                                  <img
+                                    src={item.imageUrl}
+                                    alt={item.name}
+                                    className="h-20 w-20 object-cover rounded-lg transition-transform duration-200 hover:scale-110"
+                                    loading="lazy"
+                                  />
+                                </div>
                               )}
                             </div>
-
-                            {item.imageUrl && (
-                              <div className="flex-shrink-0">
-                                <img
-                                  src={item.imageUrl}
-                                  alt={item.name}
-                                  className="h-20 w-20 object-cover rounded-lg transition-transform duration-200 hover:scale-110"
-                                  loading="lazy"
-                                />
-                              </div>
-                            )}
-                          </div>
-                        ))}
+                          ))}
                       </div>
                     </div>
                   ))}

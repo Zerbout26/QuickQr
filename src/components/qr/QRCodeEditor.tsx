@@ -14,6 +14,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Checkbox } from '@/components/ui/checkbox';
 
 const API_BASE_URL = 'http://localhost:3000/api';
 
@@ -28,6 +29,7 @@ interface MenuItem {
   price: number;
   category: string;
   imageUrl?: string;
+  availability: Record<string, boolean>;
 }
 
 interface MenuCategory {
@@ -40,6 +42,16 @@ interface Link {
   url: string;
   type: 'website' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'whatsapp' | 'telegram';
 }
+
+const defaultAvailability = {
+  sunday: true,
+  monday: true,
+  tuesday: true,
+  wednesday: true,
+  thursday: true,
+  friday: true,
+  saturday: true,
+};
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [name, setName] = useState(qrCode.name);
@@ -215,6 +227,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       description: '',
       price: 0,
       category: newCategories[categoryIndex].name,
+      imageUrl: '',
+      availability: { ...defaultAvailability },
     });
     setMenuCategories(newCategories);
   };
@@ -291,6 +305,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     }
   };
 
+  const handleItemAvailabilityChange = (categoryIndex: number, itemIndex: number, day: string, checked: boolean) => {
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items[itemIndex].availability[day] = checked;
+    setMenuCategories(newCategories);
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -317,7 +337,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
               description: item.description || '',
               price: Number(item.price) || 0,
               category: category.name,
-              imageUrl: item.imageUrl
+              imageUrl: item.imageUrl,
+              availability: item.availability || defaultAvailability
             }))
           }))
         }),
@@ -577,6 +598,28 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             value={item.price}
                             onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
                           />
+                          <div className="space-y-2">
+                            <Label>Availability</Label>
+                            <div className="grid grid-cols-4 gap-2">
+                              {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                <div key={day} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`edit-${categoryIndex}-${itemIndex}-${day}`}
+                                    checked={isAvailable}
+                                    onCheckedChange={(checked) => 
+                                      handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`edit-${categoryIndex}-${itemIndex}-${day}`}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    {day.charAt(0).toUpperCase() + day.slice(1)}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
                           <Button
                             type="button"
                             variant="outline"

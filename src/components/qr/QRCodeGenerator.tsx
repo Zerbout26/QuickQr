@@ -12,8 +12,19 @@ import { qrCodeApi } from '@/lib/api';
 import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Checkbox } from '@/components/ui/checkbox';
 
 const API_BASE_URL = 'http://localhost:3000/api';
+
+const defaultAvailability = {
+  sunday: true,
+  monday: true,
+  tuesday: true,
+  wednesday: true,
+  thursday: true,
+  friday: true,
+  saturday: true,
+};
 
 // QR Preview component that shows an actual QR code
 const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: { 
@@ -252,6 +263,7 @@ interface MenuItem {
   price: number;
   category: string;
   imageUrl?: string;
+  availability: Record<string, boolean>;
 }
 
 interface MenuCategory {
@@ -279,6 +291,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [textAbove, setTextAbove] = useState('Scan me');
   const [textBelow, setTextBelow] = useState('');
+  const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -388,6 +401,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       description: '',
       price: 0,
       category: newCategories[categoryIndex].name,
+      imageUrl: '',
+      availability: { ...defaultAvailability },
     });
     setMenuCategories(newCategories);
   };
@@ -407,8 +422,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     setMenuCategories(newCategories);
   };
 
-  const handleItemImageUpload = async (categoryIndex: number, itemIndex: number, event: React.ChangeEvent<HTMLInputElement>) => {
-    const file = event.target.files?.[0];
+  const handleMenuItemImageUpload = async (categoryIndex: number, itemIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
     if (!file) return;
 
     // Check file type
@@ -426,48 +441,38 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       toast({
         variant: "destructive",
         title: "File too large",
-        description: "Item image must be less than 2MB",
+        description: "Image must be less than 2MB",
       });
       return;
     }
 
-    try {
-      const formData = new FormData();
-      formData.append('image', file);
+    // Store the file temporarily
+    const key = `menu-${categoryIndex}-${itemIndex}`;
+    setTempImages(prev => ({ ...prev, [key]: file }));
 
-      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to upload image');
-      }
-
-      const { imageUrl } = await response.json();
-      // Use the full URL returned from the server
-      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', imageUrl);
-
-      toast({
-        title: "Image Uploaded",
-        description: "Item image has been uploaded successfully.",
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to upload item image',
-      });
-    }
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(file);
+    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
   };
 
   const removeItemImage = (categoryIndex: number, itemIndex: number) => {
-    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', '');
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items[itemIndex].imageUrl = '';
+    setMenuCategories(newCategories);
+    
+    // Remove from temp images if exists
+    const key = `menu-${categoryIndex}-${itemIndex}`;
+    setTempImages(prev => {
+      const newTempImages = { ...prev };
+      delete newTempImages[key];
+      return newTempImages;
+    });
+  };
+
+  const handleItemAvailabilityChange = (categoryIndex: number, itemIndex: number, day: string, checked: boolean) => {
+    const updatedMenu = { ...menuCategories[categoryIndex] };
+    updatedMenu.items[itemIndex].availability[day] = checked;
+    setMenuCategories(prev => prev.map((category, index) => index === categoryIndex ? updatedMenu : category));
   };
 
   const getLinkIcon = (type?: string) => {
@@ -493,30 +498,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!user) {
-      setError('You must be logged in to create QR codes');
-      return;
-    }
-    
-    if (type === 'direct' && !directUrl) {
-      setError('URL is required for direct URL type');
-      return;
-    }
-
-    if ((type === 'url' || type === 'both') && links.length === 0) {
-      setError('At least one link is required for URL type');
-      return;
-    }
-
-    if ((type === 'menu' || type === 'both') && menuCategories.length === 0) {
-      setError('At least one category is required for menu type');
-      return;
-    }
-    
-    setError('');
     setIsLoading(true);
-    
+
     try {
       const formData = new FormData();
       formData.append('name', name || 'My QR Code');
@@ -531,10 +514,28 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       }
       
       if (type === 'menu' || type === 'both') {
-        formData.append('menu', JSON.stringify({
+        // First, create the menu data without image URLs
+        const menuData = {
           restaurantName: name,
-          categories: menuCategories,
-        }));
+          categories: menuCategories.map(category => ({
+            name: category.name,
+            items: category.items.map(item => ({
+              name: item.name,
+              description: item.description || '',
+              price: Number(item.price),
+              category: category.name,
+              imageUrl: '', // We'll update this after uploading images
+              availability: item.availability || defaultAvailability
+            }))
+          }))
+        };
+        formData.append('menu', JSON.stringify(menuData));
+
+        // Then, upload each menu item image
+        for (const [key, file] of Object.entries(tempImages)) {
+          const [_, categoryIndex, itemIndex] = key.split('-');
+          formData.append(`menuItemImages`, file, `${categoryIndex}-${itemIndex}-${file.name}`);
+        }
       }
       
       formData.append('textAbove', textAbove);
@@ -544,49 +545,27 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         formData.append('logo', logoFile);
       }
 
-      const token = localStorage.getItem('qr-generator-token');
-      if (!token) {
-        throw new Error('Please log in to create QR codes');
-      }
-
-      const response = await fetch('http://localhost:3000/api/qrcodes', {
+      const response = await fetch(`${API_BASE_URL}/qrcodes`, {
         method: 'POST',
         headers: {
-          'Authorization': `Bearer ${token}`
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
         },
-        body: formData
+        body: formData,
       });
 
       if (!response.ok) {
-        const errorData = await response.json().catch(() => ({ error: 'Failed to create QR code' }));
+        const errorData = await response.json();
         throw new Error(errorData.error || 'Failed to create QR code');
       }
 
-      const newQR = await response.json();
-      if (onCreated) {
-        onCreated(newQR);
-      }
-
-      // Reset form
-      setName('');
-      setType('url');
-      setLinks([]);
-      setMenuCategories([]);
-      setForegroundColor('#6366F1');
-      setBackgroundColor('#FFFFFF');
-      setLogoFile(null);
-      setLogoPreview(null);
-      if (fileInputRef.current) {
-        fileInputRef.current.value = '';
-      }
-
+      const data = await response.json();
+      onCreated(data);
       toast({
-        title: "QR Code Created",
-        description: "Your QR code has been created successfully.",
+        title: "Success",
+        description: "QR code created successfully",
       });
     } catch (error) {
       console.error('Error creating QR code:', error);
-      setError(error instanceof Error ? error.message : 'Failed to create QR code');
       toast({
         variant: "destructive",
         title: "Error",
@@ -778,33 +757,48 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               />
                               <div className="space-y-2">
                                 <Label>Item Image</Label>
-                                {item.imageUrl ? (
-                                  <div className="relative">
-                                    <img
-                                      src={item.imageUrl}
-                                      alt={item.name}
-                                      className="w-32 h-32 object-cover rounded-lg"
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="destructive"
-                                      size="icon"
-                                      className="absolute top-2 right-2"
-                                      onClick={() => removeItemImage(categoryIndex, itemIndex)}
-                                    >
-                                      <X className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ) : (
-                                  <div className="flex items-center gap-2">
-                                    <Input
-                                      type="file"
-                                      accept="image/*"
-                                      onChange={(e) => handleItemImageUpload(categoryIndex, itemIndex, e)}
-                                      className="flex-1"
-                                    />
-                                  </div>
-                                )}
+                                <div className="flex items-center gap-4 mb-2">
+                                  {item.imageUrl && (
+                                    <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                  )}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
+                                      input.click();
+                                    }}
+                                  >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    {item.imageUrl ? 'Change Image' : 'Add Image'}
+                                  </Button>
+                                </div>
+                              </div>
+                              <div className="space-y-2">
+                                <Label>Availability</Label>
+                                <div className="grid grid-cols-4 gap-2">
+                                  {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                    <div key={day} className="flex items-center space-x-2">
+                                      <Checkbox
+                                        id={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                        checked={isAvailable}
+                                        onCheckedChange={(checked) => 
+                                          handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
+                                        }
+                                      />
+                                      <label
+                                        htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                      >
+                                        {day.charAt(0).toUpperCase() + day.slice(1)}
+                                      </label>
+                                    </div>
+                                  ))}
+                                </div>
                               </div>
                               <Button
                                 type="button"

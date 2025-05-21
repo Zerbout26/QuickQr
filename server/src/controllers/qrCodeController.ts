@@ -1,6 +1,6 @@
 import { Response, Request } from 'express';
 import { AppDataSource } from '../config/database';
-import { QRCode, QRCodeType } from '../models/QRCode';
+import { QRCode, QRCodeType, MenuItem, MenuCategory } from '../models/QRCode';
 import { AuthRequest } from '../middleware/auth';
 import multer from 'multer';
 import path from 'path';
@@ -11,60 +11,61 @@ const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
 // Configure multer for file uploads
-const storage = multer.diskStorage({
-  destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-    const uploadDir = path.join(__dirname, '../../uploads/logos');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    // Get file extension
-    const ext = path.extname(file.originalname);
-    // Create a unique filename with timestamp and random number
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    // Create filename: originalname-timestamp-random.ext
-    const filename = `${path.basename(file.originalname, ext)}-${uniqueSuffix}${ext}`;
-    console.log('Generated filename:', filename);
-    cb(null, filename);
-  }
-});
-
-// Configure multer for item image uploads
-const itemImageStorage = multer.diskStorage({
-  destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-    const uploadDir = path.join(__dirname, '../../uploads/items');
-    if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
-    }
-    cb(null, uploadDir);
-  },
-  filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-    const ext = path.extname(file.originalname);
-    const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-    const filename = `item-${uniqueSuffix}${ext}`;
-    cb(null, filename);
-  }
-});
-
 const upload = multer({
-  storage,
+  storage: multer.diskStorage({
+    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+      let uploadDir = path.join(__dirname, '../../uploads/logos'); // Default to logos directory
+      if (file.fieldname === 'menuItemImages') {
+        uploadDir = path.join(__dirname, '../../uploads/items');
+      }
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+      const ext = path.extname(file.originalname);
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+      if (file.fieldname === 'logo') {
+        const filename = `${path.basename(file.originalname, ext)}-${uniqueSuffix}${ext}`;
+        cb(null, filename);
+      } else if (file.fieldname === 'menuItemImages') {
+        const filename = `item-${uniqueSuffix}${ext}`;
+        cb(null, filename);
+      }
+    }
+  }),
   limits: {
-    fileSize: 2 * 1024 * 1024 // 2MB limit
+    fileSize: 2 * 1024 * 1024, // 2MB limit
   },
-  fileFilter: (req: Express.Request, file: Express.Multer.File, cb: multer.FileFilterCallback) => {
-    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
-    if (allowedTypes.includes(file.mimetype)) {
+  fileFilter: (req, file, cb) => {
+    if (file.mimetype.startsWith('image/')) {
       cb(null, true);
     } else {
-      cb(new Error('Invalid file type. Only JPEG, PNG and GIF are allowed.'));
+      cb(new Error('Only image files are allowed'));
     }
   }
-}).single('logo');
+}).fields([
+  { name: 'logo', maxCount: 1 },
+  { name: 'menuItemImages', maxCount: 20 } // Allow up to 20 menu item images
+]);
 
 const uploadItemImage = multer({
-  storage: itemImageStorage,
+  storage: multer.diskStorage({
+    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
+      const uploadDir = path.join(__dirname, '../../uploads/items');
+      if (!fs.existsSync(uploadDir)) {
+        fs.mkdirSync(uploadDir, { recursive: true });
+      }
+      cb(null, uploadDir);
+    },
+    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
+      const ext = path.extname(file.originalname);
+      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
+      const filename = `item-${uniqueSuffix}${ext}`;
+      cb(null, filename);
+    }
+  }),
   limits: {
     fileSize: 2 * 1024 * 1024 // 2MB limit
   },
@@ -119,15 +120,16 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       console.log('Request body:', req.body);
-      console.log('Request file:', req.file);
+      console.log('Request files:', req.files);
 
       const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
 
       // Handle logo upload if present
-      if (req.file) {
-        logoUrl = `${frontendDomain}/uploads/logos/${req.file.filename}`;
+      if (req.files && (req.files as any)['logo']) {
+        const logoFile = (req.files as any)['logo'][0];
+        logoUrl = `${frontendDomain}/uploads/logos/${logoFile.filename}`;
       }
 
       // Parse links if provided
@@ -135,7 +137,6 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       if (links) {
         try {
           parsedLinks = JSON.parse(links);
-          console.log('Parsed links:', parsedLinks);
         } catch (e) {
           console.error('Error parsing links:', e);
           return res.status(400).json({ error: 'Invalid links format' });
@@ -143,11 +144,31 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       // Parse menu if provided
-      let parsedMenu = null;
+      let parsedMenu: { restaurantName: string; description?: string; categories: MenuCategory[] } | null = null;
       if ((type === 'menu' || type === 'both') && menu) {
         try {
-          parsedMenu = JSON.parse(menu);
-          console.log('Parsed menu:', parsedMenu);
+          parsedMenu = JSON.parse(menu) as { restaurantName: string; description?: string; categories: MenuCategory[] };
+          
+          // Handle menu item images
+          if (req.files && (req.files as any)['menuItemImages']) {
+            const menuItemImages = (req.files as any)['menuItemImages'];
+            menuItemImages.forEach((file: Express.Multer.File) => {
+              // Extract category and item indices from filename
+              const [categoryIndex, itemIndex] = file.originalname.split('-').map(Number);
+              if (parsedMenu && 
+                  parsedMenu.categories[categoryIndex] && 
+                  parsedMenu.categories[categoryIndex].items[itemIndex]) {
+                // Use the server's domain for image URLs
+                const serverUrl = `${req.protocol}://${req.get('host')}`;
+                // Preserve all existing item data and only update the imageUrl
+                const item = parsedMenu.categories[categoryIndex].items[itemIndex];
+                parsedMenu.categories[categoryIndex].items[itemIndex] = {
+                  ...item,
+                  imageUrl: `${serverUrl}/uploads/items/${file.filename}`
+                };
+              }
+            });
+          }
         } catch (e) {
           console.error('Error parsing menu:', e);
           return res.status(400).json({ error: 'Invalid menu format' });
@@ -158,7 +179,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.name = name || 'My QR Code';
       qrCode.type = type || 'url';
       qrCode.links = parsedLinks;
-      qrCode.menu = parsedMenu;
+      qrCode.menu = parsedMenu || { restaurantName: '', categories: [] };
       qrCode.logoUrl = logoUrl;
       qrCode.foregroundColor = foregroundColor || '#6366F1';
       qrCode.backgroundColor = backgroundColor || '#FFFFFF';
@@ -167,34 +188,23 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.user = req.user;
 
       if (type === 'direct' && url) {
-        // For direct type, use the server's redirect endpoint
         const serverUrl = `${req.protocol}://${req.get('host')}`;
         qrCode.url = `${serverUrl}/api/qrcodes/redirect/${encodeURIComponent(url)}`;
         qrCode.originalUrl = url;
       } else {
-        // For other types, use the landing page
         const tempId = crypto.randomUUID();
         const tempUrl = `${frontendDomain}/landing/${tempId}`;
         qrCode.url = tempUrl;
         qrCode.originalUrl = tempUrl;
 
-        // Save the QR code
         const savedQRCode = await qrCodeRepository.save(qrCode);
-        console.log('Saved QR code:', savedQRCode);
-
-        // Update the URL with the actual ID
         savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
         savedQRCode.originalUrl = savedQRCode.url;
-
-        // Save again with the updated URL
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
-        console.log('Final QR code:', finalQRCode);
         return res.status(201).json(finalQRCode);
       }
 
-      // Save the direct URL QR code
       const savedQRCode = await qrCodeRepository.save(qrCode);
-      console.log('Saved QR code:', savedQRCode);
       res.status(201).json(savedQRCode);
 
     } catch (error) {
