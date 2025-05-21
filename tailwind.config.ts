@@ -19,6 +19,9 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				cairo: ['Cairo', 'sans-serif'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -63,10 +66,15 @@ export default {
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
 				},
+				algeria: {
+					red: '#cc2828',
+					green: '#147828',
+					gold: '#e6a80c',
+				},
 				qr: {
-					primary: '#5D5FEF', // Refined indigo
-					secondary: '#8B5CF6', // Purple
-					accent: '#10B981', // Emerald green
+					primary: '#cc2828', // Updated to Algerian red
+					secondary: '#147828', // Updated to Algerian green
+					accent: '#e6a80c', // Gold accent color
 					light: '#F9FAFB',
 					dark: '#1F2937',
 				}

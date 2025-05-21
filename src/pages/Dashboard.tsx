@@ -63,13 +63,6 @@ const Dashboard = () => {
     fetchQRCodes();
   }, [user]);
 
-  // Set up periodic refresh every 30 seconds
-  // useEffect(() => {
-  //   const refreshInterval = setInterval(fetchQRCodes, 30000); // Refresh every 30 seconds
-  //   
-  //   return () => clearInterval(refreshInterval); // Cleanup on unmount
-  // }, [user]);
-
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
     toast({
@@ -424,19 +417,37 @@ const Dashboard = () => {
       <div className="container mx-auto px-4 py-8">
         {/* Header with welcome message */}
         <div className="mb-8">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Welcome, {user.name || user.email.split('@')[0]}</h1>
-          <p className="text-gray-600 mb-4">Manage your QR codes and subscription from your personalized dashboard</p>
+          <div className="flex flex-wrap items-center justify-between">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900 mb-1 font-cairo">
+                <span className="text-primary">مرحبا</span> {/* Hello in Arabic */}
+                <span>, {user.name || user.email.split('@')[0]}</span>
+              </h1>
+              <p className="text-gray-600 mb-4">Manage your QR codes and subscription from your personalized dashboard</p>
+            </div>
+            <div className="flex items-center">
+              <img 
+                src="/algeria-flag-icon.png" 
+                alt="Algeria"
+                className="w-8 h-8 mr-2 rounded shadow-sm"
+                onError={(e) => {
+                  // Fallback if image doesn't exist
+                  e.currentTarget.style.display = 'none';
+                }}
+              />
+            </div>
+          </div>
           
           {/* Subscription status badges */}
           <div className="flex flex-wrap gap-3 mt-2">
             {user.hasActiveSubscription && (
-              <span className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+              <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                 <CheckCircle className="w-4 h-4" /> Active Subscription
               </span>
             )}
             
             {isTrialActive() && (
-              <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                 <Calendar className="w-4 h-4" /> Trial: {daysLeftInTrial()} days left
               </span>
             )}
@@ -451,10 +462,10 @@ const Dashboard = () => {
         
         {/* Account Status Alerts */}
         {!user.isActive && (
-          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-red-200">
+          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <AlertTitle className="text-lg mb-2 flex items-center gap-2">
+                <AlertTitle className="text-lg mb-2 flex items-center gap-2 font-cairo">
                   <AlertCircle className="w-5 h-5" /> Account Not Activated
                 </AlertTitle>
                 <AlertDescription className="text-base">
@@ -463,7 +474,7 @@ const Dashboard = () => {
               </div>
               <Button 
                 onClick={() => navigate('/payment-instructions')} 
-                className="bg-white hover:bg-gray-50 text-red-600 border-red-200 hover:border-red-300 min-w-[200px] h-12 text-base font-medium"
+                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 min-w-[200px] h-12 text-base font-medium"
               >
                 View Payment Instructions
               </Button>
@@ -472,10 +483,10 @@ const Dashboard = () => {
         )}
         
         {isTrialExpired() && !user.hasActiveSubscription && (
-          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-red-200">
+          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <AlertTitle className="text-lg mb-2 flex items-center gap-2">
+                <AlertTitle className="text-lg mb-2 flex items-center gap-2 font-cairo">
                   <AlertCircle className="w-5 h-5" /> Your trial has expired
                 </AlertTitle>
                 <AlertDescription className="text-base">
@@ -484,7 +495,7 @@ const Dashboard = () => {
               </div>
               <Button 
                 onClick={() => navigate('/payment-instructions')} 
-                className="bg-white hover:bg-gray-50 text-red-600 border-red-200 hover:border-red-300 min-w-[200px] h-12 text-base font-medium"
+                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 min-w-[200px] h-12 text-base font-medium"
               >
                 View Payment Instructions
               </Button>
@@ -493,9 +504,9 @@ const Dashboard = () => {
         )}
         
         {isTrialActive() && (
-          <Alert className="mb-8 border-qr-primary/30 bg-qr-primary/5 shadow-sm animate-fade-in">
-            <AlertTitle className="flex items-center gap-2">
-              <Calendar className="w-5 h-5 text-qr-primary" /> Free Trial Active
+          <Alert className="mb-8 border-primary/30 bg-primary/5 shadow-sm animate-fade-in">
+            <AlertTitle className="flex items-center gap-2 font-cairo">
+              <Calendar className="w-5 h-5 text-primary" /> Free Trial Active
             </AlertTitle>
             <AlertDescription>
               You have {daysLeftInTrial()} days left in your free trial. Enjoy full access to all features!
@@ -504,9 +515,9 @@ const Dashboard = () => {
         )}
         
         {user.hasActiveSubscription && (
-          <Alert className="mb-8 border-qr-accent/30 bg-qr-accent/5 shadow-sm animate-fade-in">
-            <AlertTitle className="flex items-center gap-2">
-              <CheckCircle className="w-5 h-5 text-qr-accent" /> Active Subscription
+          <Alert className="mb-8 border-secondary/30 bg-secondary/5 shadow-sm animate-fade-in">
+            <AlertTitle className="flex items-center gap-2 font-cairo">
+              <CheckCircle className="w-5 h-5 text-secondary" /> Active Subscription
             </AlertTitle>
             <AlertDescription>
               Thank you for your subscription! You have full access to all QRCreator features.
@@ -517,12 +528,12 @@ const Dashboard = () => {
         {/* Main tabs navigation */}
         <Tabs defaultValue="create" className="mb-8">
           <TabsList className="grid w-full max-w-md grid-cols-2 p-1 rounded-xl bg-gray-100">
-            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Create QR Code
               </div>
             </TabsTrigger>
-            <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:shadow-sm">
+            <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
                 <Edit className="w-4 h-4" /> Manage QR Codes
               </div>
@@ -531,7 +542,7 @@ const Dashboard = () => {
           
           {/* QR Code Creation Tab */}
           <TabsContent value="create" className="py-8 px-1">
-            <div className="bg-white rounded-xl shadow-sm border p-6 animate-fade-in">
+            <div className="algerian-card p-6 animate-fade-in">
               <QRCodeGenerator onCreated={handleQRCreated} />
             </div>
           </TabsContent>
@@ -539,10 +550,10 @@ const Dashboard = () => {
           {/* QR Code Management Tab */}
           <TabsContent value="manage" className="py-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold">Your QR Codes</h2>
+              <h2 className="text-2xl font-semibold font-cairo">Your QR Codes</h2>
               <Button 
                 onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
-                className="qr-btn-primary flex items-center gap-2"
+                className="dz-button flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> Create New
               </Button>
@@ -551,7 +562,7 @@ const Dashboard = () => {
             {isLoading ? (
               <div className="flex justify-center py-16">
                 <div className="flex flex-col items-center gap-3">
-                  <div className="w-10 h-10 border-4 border-qr-primary border-t-transparent rounded-full animate-spin"></div>
+                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
                   <p className="text-gray-500">Loading your QR codes...</p>
                 </div>
               </div>
@@ -561,12 +572,12 @@ const Dashboard = () => {
                   <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                     <Plus className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-medium text-gray-700">No QR codes yet</h3>
+                  <h3 className="text-xl font-medium text-gray-700 font-cairo">No QR codes yet</h3>
                   <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. Create your first QR code to get started.</p>
                   <Button 
                     onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                     variant="outline" 
-                    className="mt-3 border-qr-primary text-qr-primary hover:bg-qr-primary/5"
+                    className="mt-3 border-primary text-primary hover:bg-primary/5"
                   >
                     Create your first QR code
                   </Button>
@@ -575,16 +586,16 @@ const Dashboard = () => {
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
                 {qrCodes.map((qr) => (
-                  <Card key={qr.id} className="qr-card border-0 shadow-lg hover:shadow-xl transition-all duration-300">
-                    <CardHeader className="pb-2 border-b bg-gray-50 rounded-t-xl">
-                      <CardTitle className="text-lg flex items-center justify-between">
+                  <Card key={qr.id} className="algerian-card shadow-lg hover:shadow-xl transition-all duration-300">
+                    <CardHeader className="pb-2 dz-card-header rounded-t-xl">
+                      <CardTitle className="text-lg flex items-center justify-between font-cairo">
                         <span className="truncate">{qr.name}</span>
                         <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-1 bg-gray-200 rounded-full flex items-center gap-1">
+                          <span className="text-xs px-2 py-1 bg-white/50 rounded-full flex items-center gap-1">
                             <Eye className="w-3 h-3" />
                             {qr.scanCount || 0}
                           </span>
-                          <span className="text-xs px-2 py-1 bg-gray-200 rounded-full">{qr.type}</span>
+                          <span className="text-xs px-2 py-1 bg-white/50 rounded-full">{qr.type}</span>
                         </div>
                       </CardTitle>
                     </CardHeader>
@@ -640,7 +651,7 @@ const Dashboard = () => {
                               href={qr.url} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="text-qr-primary hover:text-qr-primary/80"
+                              className="text-primary hover:text-primary/80"
                             >
                               <ExternalLink className="w-3.5 h-3.5" />
                             </a>
@@ -662,19 +673,19 @@ const Dashboard = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
-                            className="w-full hover:bg-gray-50"
+                            className="w-full hover:bg-gray-50 font-cairo"
                           >
                             <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit Content
                           </Button>
                           <Dialog>
                             <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full hover:bg-gray-50">
+                              <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full hover:bg-gray-50 font-cairo">
                                 <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Edit URL
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>Edit QR Code URL</DialogTitle>
+                                <DialogTitle className="font-cairo">Edit QR Code URL</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
@@ -684,13 +695,14 @@ const Dashboard = () => {
                                     value={newUrl}
                                     onChange={(e) => setNewUrl(e.target.value)}
                                     placeholder="Enter new URL"
+                                    className="border-primary/20 focus:border-primary"
                                   />
                                 </div>
                                 <div className="flex justify-end gap-2">
                                   <Button variant="outline" onClick={() => setEditingQR(null)}>
                                     Cancel
                                   </Button>
-                                  <Button onClick={handleUpdateQR}>
+                                  <Button onClick={handleUpdateQR} className="dz-button">
                                     Update URL
                                   </Button>
                                 </div>
@@ -703,7 +715,7 @@ const Dashboard = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDownload(qr, 'png')}
-                            className="w-full hover:bg-gray-50"
+                            className="w-full hover:bg-gray-50 font-cairo"
                           >
                             <Download className="w-3.5 h-3.5 mr-1.5" /> Download PNG
                           </Button>
@@ -711,7 +723,7 @@ const Dashboard = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDownload(qr, 'svg')}
-                            className="w-full hover:bg-gray-50"
+                            className="w-full hover:bg-gray-50 font-cairo"
                           >
                             <Download className="w-3.5 h-3.5 mr-1.5" /> Download SVG
                           </Button>
@@ -722,7 +734,7 @@ const Dashboard = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="w-full border-red-200 text-red-600 hover:bg-red-50 hover:text-red-700"
+                              className="w-full border-red-200 text-primary hover:bg-primary/5 hover:text-primary/80 font-cairo"
                               onClick={() => setDeleteConfirmQR(qr)}
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-1.5" />
@@ -732,7 +744,7 @@ const Dashboard = () => {
                           {deleteConfirmQR && (
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle>Confirm Deletion</DialogTitle>
+                                <DialogTitle className="font-cairo">Confirm Deletion</DialogTitle>
                               </DialogHeader>
                               <div className="py-4">
                                 <p>Are you sure you want to delete "{deleteConfirmQR.name}"? This action cannot be undone.</p>
@@ -765,7 +777,7 @@ const Dashboard = () => {
       <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle>QR Code Preview</DialogTitle>
+            <DialogTitle className="font-cairo">QR Code Preview</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             {previewQR && (
@@ -800,7 +812,7 @@ const Dashboard = () => {
                 </p>
                 <Button 
                   onClick={() => navigate('/payment-instructions')}
-                  className="bg-qr-primary hover:bg-qr-primary/90 flex items-center gap-2"
+                  className="dz-button flex items-center gap-2"
                 >
                   <CheckCircle className="w-4 h-4" /> Activate Account
                 </Button>
