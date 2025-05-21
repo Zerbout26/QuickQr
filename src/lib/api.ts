@@ -143,14 +143,14 @@ export const authApi = {
 export const qrCodeApi = {
   create: async (data: {
     name: string;
-    type: 'url' | 'menu' | 'both';
+    type: 'url' | 'menu' | 'both' | 'direct';
     url?: string;
     logoUrl?: string;
     foregroundColor: string;
     backgroundColor: string;
     textAbove?: string;
     textBelow?: string;
-    links?: { label: string; url: string }[];
+    links?: { label: string; url: string; type: string }[];
     menu?: {
       restaurantName: string;
       description?: string;
@@ -160,92 +160,62 @@ export const qrCodeApi = {
           name: string;
           description?: string;
           price: number;
-          category: string;
           imageUrl?: string;
         }[];
       }[];
     };
   }) => {
-    const formData = new FormData();
-    formData.append('name', data.name);
-    formData.append('type', data.type);
-    formData.append('foregroundColor', data.foregroundColor);
-    formData.append('backgroundColor', data.backgroundColor);
-    
-    if ((data.type === 'url' || data.type === 'both') && data.links) {
-      formData.append('links', JSON.stringify(data.links));
-    }
-    
-    if ((data.type === 'menu' || data.type === 'both') && data.menu) {
-      formData.append('menu', JSON.stringify(data.menu));
-    }
-    
-    if (data.logoUrl) {
-      formData.append('logoUrl', data.logoUrl);
-    }
-
-    const response = await fetch(`${API_BASE_URL}/qrcodes`, {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-      },
-      body: formData
-    });
-    if (!response.ok) throw new Error('Failed to create QR code');
-    return response.json();
+    const response = await api.post('/qrcodes', data);
+    return response.data;
   },
 
   update: async (id: string, data: {
-    name: string;
-    type: 'url' | 'menu' | 'both';
+    name?: string;
+    type?: 'url' | 'menu' | 'both' | 'direct';
     url?: string;
     logoUrl?: string;
-    foregroundColor: string;
-    backgroundColor: string;
-    links: string;
-    menu: string;
+    foregroundColor?: string;
+    backgroundColor?: string;
+    textAbove?: string;
+    textBelow?: string;
+    links?: { label: string; url: string; type: string }[];
+    menu?: {
+      restaurantName: string;
+      description?: string;
+      categories: {
+        name: string;
+        items: {
+          name: string;
+          description?: string;
+          price: number;
+          imageUrl?: string;
+        }[];
+      }[];
+    };
   }) => {
-    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
-      method: 'PUT',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data)
-    });
-    if (!response.ok) throw new Error('Failed to update QR code');
-    return response.json();
+    const response = await api.put(`/qrcodes/${id}`, data);
+    return response.data;
   },
 
   getAll: async () => {
-    const response = await fetch(`${API_BASE_URL}/qrcodes`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-      },
-    });
-    if (!response.ok) throw new Error('Failed to fetch QR codes');
-    return response.json();
+    const response = await api.get('/qrcodes');
+    return response.data;
   },
 
   getQRCode: async (id: string) => {
-    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-      },
-    });
-    if (!response.ok) throw new Error('Failed to fetch QR code');
-    return response.json();
+    const response = await api.get(`/qrcodes/${id}`);
+    return response.data;
   },
 
   delete: async (id: string) => {
-    const response = await fetch(`${API_BASE_URL}/qrcodes/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-      },
-    });
-    if (!response.ok) throw new Error('Failed to delete QR code');
+    const response = await api.delete(`/qrcodes/${id}`);
+    return response.data;
   },
+
+  incrementScanCount: async (id: string) => {
+    const response = await api.post(`/qrcodes/${id}/scan`);
+    return response.data;
+  }
 };
 
 // Helper function to get auth headers

@@ -67,6 +67,16 @@ export class QRCode {
   @Column({ nullable: true })
   textBelow!: string;
 
+  @Column({ type: "int", default: 0 })
+  scanCount!: number;
+
+  @Column("simple-json", { nullable: true, default: "[]" })
+  scanHistory!: {
+    timestamp: Date;
+    userAgent: string;
+    ipAddress: string;
+  }[];
+
   @ManyToOne(() => User, user => user.qrCodes)
   user!: User;
 

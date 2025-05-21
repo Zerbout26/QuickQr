@@ -30,6 +30,26 @@ const Dashboard = () => {
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
 
+  // Function to fetch QR codes
+  const fetchQRCodes = async () => {
+    if (!user) return;
+    
+    setIsLoading(true);
+    try {
+      const codes = await qrCodeApi.getAll();
+      setQrCodes(codes);
+    } catch (error) {
+      console.error('Failed to fetch QR codes', error);
+      toast({
+        variant: "destructive",
+        title: "Error loading QR codes",
+        description: "There was a problem loading your QR codes.",
+      });
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
   // Redirect if not logged in
   useEffect(() => {
     if (!user) {
@@ -37,29 +57,17 @@ const Dashboard = () => {
     }
   }, [user, navigate]);
 
-  // Fetch user QR codes
+  // Initial fetch
   useEffect(() => {
-    const fetchQRCodes = async () => {
-      if (!user) return;
-      
-      setIsLoading(true);
-      try {
-        const codes = await qrCodeApi.getAll();
-        setQrCodes(codes);
-      } catch (error) {
-        console.error('Failed to fetch QR codes', error);
-        toast({
-          variant: "destructive",
-          title: "Error loading QR codes",
-          description: "There was a problem loading your QR codes.",
-        });
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
     fetchQRCodes();
   }, [user]);
+
+  // Set up periodic refresh every 30 seconds
+  // useEffect(() => {
+  //   const refreshInterval = setInterval(fetchQRCodes, 30000); // Refresh every 30 seconds
+  //   
+  //   return () => clearInterval(refreshInterval); // Cleanup on unmount
+  // }, [user]);
 
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
@@ -569,7 +577,13 @@ const Dashboard = () => {
                     <CardHeader className="pb-2 border-b bg-gray-50 rounded-t-xl">
                       <CardTitle className="text-lg flex items-center justify-between">
                         <span className="truncate">{qr.name}</span>
-                        <span className="text-xs px-2 py-1 bg-gray-200 rounded-full">{qr.type}</span>
+                        <div className="flex items-center gap-2">
+                          <span className="text-xs px-2 py-1 bg-gray-200 rounded-full flex items-center gap-1">
+                            <Eye className="w-3 h-3" />
+                            {qr.scanCount || 0}
+                          </span>
+                          <span className="text-xs px-2 py-1 bg-gray-200 rounded-full">{qr.type}</span>
+                        </div>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">

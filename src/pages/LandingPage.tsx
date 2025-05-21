@@ -1,4 +1,3 @@
-
 import { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode } from '@/types';
@@ -45,6 +44,9 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
+        // First, increment the scan count
+        await qrCodeApi.incrementScanCount(id!);
+        // Then fetch the updated QR code
         const data = await qrCodeApi.getQRCode(id!);
         setQRCode(data);
         setLoading(false);

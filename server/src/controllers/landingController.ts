@@ -9,7 +9,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const qrCode = await qrCodeRepository.findOne({
-      where: { id }
+      where: { id },
+      relations: ['user']
     });
 
     if (!qrCode) {
@@ -50,6 +51,32 @@ export const getLandingPage = async (req: Request, res: Response) => {
         </html>
       `);
     }
+
+    // Check if user is active
+    if (!qrCode.user.isActive) {
+      // Redirect to payment instructions page
+      const frontendDomain = process.env.FRONTEND_URL || 'http://localhost:8080';
+      return res.redirect(`${frontendDomain}/payment-instructions`);
+    }
+
+    // Initialize scan count and history if they don't exist
+    if (typeof qrCode.scanCount !== 'number') {
+      qrCode.scanCount = 0;
+    }
+    if (!Array.isArray(qrCode.scanHistory)) {
+      qrCode.scanHistory = [];
+    }
+
+    // Increment scan count and log scan history
+    qrCode.scanCount += 1;
+    qrCode.scanHistory.push({
+      timestamp: new Date(),
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      ipAddress: req.ip || 'Unknown'
+    });
+    
+    // Save the updated QR code and wait for it to complete
+    await qrCodeRepository.save(qrCode);
 
     // Define primary color with fallback
     const primaryColor = qrCode.foregroundColor || '#5D5FEF';
@@ -211,7 +238,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
               </div>
             ` : ''}
             
-            ${qrCode.menu && qrCode.menu.categories.length > 0 ? `
+            ${qrCode.menu ? `
               <div class="menu-section">
                 <h2 class="menu-header">${qrCode.menu.restaurantName || 'Menu'}</h2>
                 ${qrCode.menu.description ? `<p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.875rem;">${qrCode.menu.description}</p>` : ''}

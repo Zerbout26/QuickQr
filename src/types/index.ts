@@ -53,6 +53,12 @@ export interface QRCode {
   backgroundColor: string;
   textAbove?: string;
   textBelow?: string;
+  scanCount: number;
+  scanHistory: {
+    timestamp: Date;
+    userAgent: string;
+    ipAddress: string;
+  }[];
   user: User;
   createdAt: Date;
   updatedAt: Date;

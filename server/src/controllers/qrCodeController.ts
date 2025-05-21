@@ -347,7 +347,10 @@ export const redirectToUrl = async (req: Request, res: Response) => {
 
     // Find the QR code that contains this URL
     const qrCode = await qrCodeRepository.findOne({
-      where: { originalUrl: decodedUrl },
+      where: [
+        { originalUrl: decodedUrl },
+        { url: decodedUrl }
+      ],
       relations: ['user']
     });
 
@@ -362,10 +365,60 @@ export const redirectToUrl = async (req: Request, res: Response) => {
       return res.redirect(`${frontendDomain}/payment-instructions`);
     }
 
+    // Increment scan count and log scan history
+    qrCode.scanCount = (qrCode.scanCount || 0) + 1;
+    qrCode.scanHistory = qrCode.scanHistory || [];
+    qrCode.scanHistory.push({
+      timestamp: new Date(),
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      ipAddress: req.ip || 'Unknown'
+    });
+    
+    // Save the updated QR code
+    await qrCodeRepository.save(qrCode);
+
     // If user is active, redirect to the original URL
     res.redirect(decodedUrl);
   } catch (error) {
     console.error('Error redirecting:', error);
     res.status(500).json({ error: 'Error redirecting to URL' });
+  }
+};
+
+export const incrementScanCount = async (req: Request, res: Response) => {
+  try {
+    const { id } = req.params;
+    const qrCode = await qrCodeRepository.findOne({
+      where: { id },
+      relations: ['user']
+    });
+
+    if (!qrCode) {
+      return res.status(404).json({ message: 'QR code not found' });
+    }
+
+    // Initialize scan count and history if they don't exist
+    if (typeof qrCode.scanCount !== 'number') {
+      qrCode.scanCount = 0;
+    }
+    if (!Array.isArray(qrCode.scanHistory)) {
+      qrCode.scanHistory = [];
+    }
+
+    // Increment scan count and log scan history
+    qrCode.scanCount += 1;
+    qrCode.scanHistory.push({
+      timestamp: new Date(),
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      ipAddress: req.ip || 'Unknown'
+    });
+    
+    // Save the updated QR code
+    await qrCodeRepository.save(qrCode);
+
+    res.json({ success: true, scanCount: qrCode.scanCount });
+  } catch (error) {
+    console.error('Error incrementing scan count:', error);
+    res.status(500).json({ message: 'Error incrementing scan count' });
   }
 }; 
