@@ -53,8 +53,8 @@ const LandingPage = () => {
       try {
         // First, increment the scan count
         await qrCodeApi.incrementScanCount(id!);
-        // Then fetch the updated QR code
-        const data = await qrCodeApi.getQRCode(id!);
+        // Then fetch the updated QR code using the public endpoint
+        const data = await qrCodeApi.getPublicQRCode(id!);
         setQRCode(data);
         setLoading(false);
       } catch (err) {

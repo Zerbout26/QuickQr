@@ -207,6 +207,11 @@ export const qrCodeApi = {
     return response.data;
   },
 
+  getPublicQRCode: async (id: string) => {
+    const response = await api.get(`/qrcodes/public/${id}`);
+    return response.data;
+  },
+
   delete: async (id: string) => {
     const response = await api.delete(`/qrcodes/${id}`);
     return response.data;

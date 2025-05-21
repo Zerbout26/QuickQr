@@ -329,11 +329,17 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
     const qrCode = await qrCodeRepository.findOne({
-      where: { id }
+      where: { id },
+      relations: ['user']
     });
 
     if (!qrCode) {
       return res.status(404).json({ error: 'QR code not found' });
+    }
+
+    // Check if user is active
+    if (!qrCode.user.isActive) {
+      return res.status(403).json({ error: 'QR code is not accessible. User account is not active.' });
     }
 
     res.json(qrCode);
@@ -370,9 +376,7 @@ export const redirectToUrl = async (req: Request, res: Response) => {
 
     // Check if user is active
     if (!qrCode.user.isActive) {
-      // Redirect to payment instructions page
-      const frontendDomain = process.env.FRONTEND_URL || 'http://localhost:8080';
-      return res.redirect(`${frontendDomain}/payment-instructions`);
+      return res.status(403).json({ error: 'QR code is not accessible. User account is not active.' });
     }
 
     // Increment scan count and log scan history
@@ -387,7 +391,7 @@ export const redirectToUrl = async (req: Request, res: Response) => {
     // Save the updated QR code
     await qrCodeRepository.save(qrCode);
 
-    // If user is active, redirect to the original URL
+    // Redirect to the original URL
     res.redirect(decodedUrl);
   } catch (error) {
     console.error('Error redirecting:', error);
