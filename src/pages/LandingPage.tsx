@@ -35,9 +35,9 @@ const LandingPage = () => {
       case 'telegram':
         return { label: 'Join our Telegram', icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
-        return { label: 'Visit our Website', icon: Globe, bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+        return { label: 'Visit our Website', icon: Globe, bgColor: 'var(--algeria-red)', hoverBgColor: 'var(--algeria-red-dark)' };
       default:
-        return { label: 'Visit Link', icon: ExternalLink, bgColor: qrCode?.foregroundColor || '#5D5FEF', hoverBgColor: qrCode?.foregroundColor ? adjustColor(qrCode.foregroundColor, -20) : '#4B4CC6' };
+        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--algeria-red)', hoverBgColor: 'var(--algeria-red-dark)' };
     }
   };
 
@@ -71,9 +71,9 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-qr-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-algeria-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-xl text-gray-700 font-medium tracking-tight">Loading...</p>
         </div>
       </div>
@@ -82,12 +82,12 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-100">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
         <div className="text-center">
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Error</h1>
           <p className="text-xl text-gray-600 mb-6">{error || 'QR code not found'}</p>
           <Button
-            className="px-6 py-3 text-lg font-medium rounded-full bg-qr-primary text-white hover:bg-opacity-90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-qr-primary"
+            className="px-6 py-3 text-lg font-medium rounded-full bg-algeria-red text-white hover:bg-algeria-red/90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-algeria-red"
             onClick={() => navigate('/')}
           >
             Return to Home
@@ -121,8 +121,7 @@ const LandingPage = () => {
 
           <CardContent className="p-6 md:p-10">
             <h1
-              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight"
-              style={{ color: qrCode.foregroundColor || '#1f2937' }}
+              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight text-algeria-red"
             >
               {qrCode.name}
             </h1>
@@ -151,7 +150,7 @@ const LandingPage = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)}
                           onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)}
                         >
-                          <Icon size={24} /> {/* Now using the icon component directly */}
+                          <Icon size={24} />
                           <span>{label}</span>
                         </Button>
                       </a>
@@ -171,8 +170,7 @@ const LandingPage = () => {
               <div className="space-y-8">
                 <div className="text-center mb-6">
                   <h2
-                    className="text-3xl font-semibold tracking-tight"
-                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                    className="text-3xl font-semibold tracking-tight text-algeria-red"
                   >
                     {qrCode.menu?.restaurantName}
                   </h2>
@@ -187,11 +185,7 @@ const LandingPage = () => {
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
                       <h3
-                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200"
-                        style={{
-                          color: qrCode.foregroundColor || '#1f2937',
-                          borderColor: qrCode.foregroundColor || '#5D5FEF',
-                        }}
+                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200 text-algeria-red border-algeria-red"
                       >
                         {category.name}
                       </h3>
@@ -207,14 +201,12 @@ const LandingPage = () => {
                               <div className="flex-1 pr-6">
                                 <div className="flex justify-between items-start mb-2">
                                   <h4
-                                    className="text-lg font-semibold"
-                                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                    className="text-lg font-semibold text-algeria-red"
                                   >
                                     {item.name}
                                   </h4>
                                   <p
-                                    className="text-lg font-semibold whitespace-nowrap ml-4"
-                                    style={{ color: qrCode.foregroundColor || '#1f2937' }}
+                                    className="text-lg font-semibold whitespace-nowrap ml-4 text-algeria-green"
                                   >
                                     ${item.price.toFixed(2)}
                                   </p>
@@ -244,6 +236,13 @@ const LandingPage = () => {
                 </div>
               </div>
             )}
+
+            {/* Footer */}
+            <div className="mt-12 text-center">
+              <p className="text-sm text-gray-500">
+                Powered by <span className="text-algeria-red font-medium">QuickQR</span> - Digital Solutions for Business
+              </p>
+            </div>
           </CardContent>
         </Card>
       </div>
