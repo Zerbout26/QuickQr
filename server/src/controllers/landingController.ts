@@ -1,3 +1,4 @@
+
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
@@ -19,9 +20,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
           <head>
             <title>QR Code Not Found</title>
             <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap">
             <style>
               body {
-                font-family: system-ui, -apple-system, sans-serif;
+                font-family: 'Cairo', system-ui, -apple-system, sans-serif;
                 display: flex;
                 align-items: center;
                 justify-content: center;
@@ -37,6 +39,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
                 max-width: 90%;
                 width: 400px;
+                border-left: 4px solid #cc2828;
               }
               h1 { color: #1f2937; margin-bottom: 1rem; font-size: 1.5rem; }
               p { color: #6b7280; }
@@ -79,7 +82,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
     await qrCodeRepository.save(qrCode);
 
     // Define primary color with fallback
-    const primaryColor = qrCode.foregroundColor || '#5D5FEF';
+    const primaryColor = qrCode.foregroundColor || '#cc2828';
     
     // Generate HTML for the landing page with improved styling
     const html = `
@@ -88,9 +91,21 @@ export const getLandingPage = async (req: Request, res: Response) => {
         <head>
           <title>${qrCode.name}</title>
           <meta name="viewport" content="width=device-width, initial-scale=1.0">
+          <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap">
           <style>
+            :root {
+              --primary-color: ${primaryColor};
+              --secondary-color: ${qrCode.backgroundColor || '#147828'};
+              --accent-color: #e6a80c;
+              --background-color: ${qrCode.backgroundColor || '#f9fafb'};
+              --text-color: #1f2937;
+              --text-light: #6b7280;
+              --border-color: #e5e7eb;
+              --border-radius: 0.75rem;
+            }
+            
             body {
-              font-family: system-ui, -apple-system, sans-serif;
+              font-family: 'Cairo', system-ui, -apple-system, sans-serif;
               margin: 0;
               padding: 0;
               min-height: 100vh;
@@ -98,19 +113,23 @@ export const getLandingPage = async (req: Request, res: Response) => {
               flex-direction: column;
               align-items: center;
               justify-content: center;
-              background: linear-gradient(135deg, ${qrCode.backgroundColor || '#f9fafb'} 0%, 
+              background: linear-gradient(135deg, var(--background-color) 0%, 
                 ${darkenColor(qrCode.backgroundColor || '#f9fafb', 0.1)} 100%);
+              color: var(--text-color);
+              line-height: 1.5;
             }
+            
             .container {
               width: 100%;
               max-width: 600px;
               padding: 2rem;
-              text-align: center;
               background: white;
-              border-radius: 0.75rem;
-              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+              border-radius: var(--border-radius);
+              box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
               margin: 1rem;
+              border-left: 4px solid var(--primary-color);
             }
+            
             .logo {
               max-width: 150px;
               max-height: 80px;
@@ -118,108 +137,172 @@ export const getLandingPage = async (req: Request, res: Response) => {
               margin-bottom: 1.5rem;
               object-fit: contain;
             }
+            
             .title {
               font-size: 1.5rem;
-              font-weight: 600;
-              color: ${primaryColor};
+              font-weight: 700;
+              color: var(--primary-color);
               margin-bottom: 1.5rem;
             }
+            
             .buttons {
               display: flex;
               flex-direction: column;
               gap: 0.75rem;
               width: 100%;
             }
+            
             .button {
               display: inline-block;
               padding: 0.75rem 1.5rem;
-              background-color: ${primaryColor};
+              background-color: var(--primary-color);
               color: white;
               text-decoration: none;
               border-radius: 0.5rem;
               font-weight: 500;
-              transition: all 0.2s;
+              transition: all 0.3s;
+              text-align: center;
             }
+            
             .button:hover {
               opacity: 0.9;
-              transform: translateY(-1px);
+              transform: translateY(-2px);
+              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
             }
+            
             .menu-section {
               margin-top: 2rem;
-              border-top: 1px solid #e5e7eb;
+              border-top: 1px solid var(--border-color);
               padding-top: 1.5rem;
               width: 100%;
             }
+            
             .menu-header {
-              color: ${primaryColor};
+              color: var(--primary-color);
               font-size: 1.25rem;
               margin-bottom: 1rem;
+              font-weight: 600;
             }
+            
             .menu-categories {
               display: flex;
               flex-direction: column;
               gap: 1.5rem;
             }
+            
             .category {
               background: #f9fafb;
               border-radius: 0.5rem;
               overflow: hidden;
+              border-left: 3px solid var(--primary-color);
+              transition: all 0.3s;
             }
+            
+            .category:hover {
+              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+              transform: translateY(-2px);
+            }
+            
             .category-name {
-              background-color: ${primaryColor};
+              background-color: var(--primary-color);
               color: white;
-              padding: 0.5rem;
-              font-size: 1rem;
-              font-weight: 500;
+              padding: 0.75rem;
+              font-size: 1.1rem;
+              font-weight: 600;
             }
+            
             .category-items {
               display: grid;
               grid-template-columns: 1fr;
-              gap: 0.5rem;
-              padding: 0.5rem;
+              gap: 0.75rem;
+              padding: 0.75rem;
             }
+            
             @media (min-width: 480px) {
               .category-items {
                 grid-template-columns: repeat(2, 1fr);
               }
             }
+            
             .item {
               background: white;
-              padding: 0.5rem;
-              border-radius: 0.375rem;
-              box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+              padding: 0.75rem;
+              border-radius: 0.5rem;
+              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
               display: flex;
               flex-direction: column;
               height: 100%;
+              transition: all 0.3s;
+              border: 1px solid var(--border-color);
             }
+            
+            .item:hover {
+              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+              border-color: var(--primary-color);
+            }
+            
             .item-header {
               display: flex;
               justify-content: space-between;
-              margin-bottom: 0.25rem;
-            }
-            .item-name {
-              font-weight: 500;
-              color: ${primaryColor};
-            }
-            .item-price {
-              font-weight: 500;
-            }
-            .item-description {
-              font-size: 0.75rem;
-              color: #6b7280;
               margin-bottom: 0.5rem;
+              align-items: center;
+            }
+            
+            .item-name {
+              font-weight: 600;
+              color: var(--primary-color);
+            }
+            
+            .item-price {
+              font-weight: 600;
+              color: var(--secondary-color);
+            }
+            
+            .item-description {
+              font-size: 0.85rem;
+              color: var(--text-light);
+              margin-bottom: 0.75rem;
               overflow: hidden;
               text-overflow: ellipsis;
               display: -webkit-box;
               -webkit-line-clamp: 2;
               -webkit-box-orient: vertical;
             }
+            
             .item-image {
               width: 100%;
-              height: 100px;
+              height: 120px;
               object-fit: cover;
               border-radius: 0.25rem;
               margin-top: 0.5rem;
+              transition: transform 0.3s;
+            }
+            
+            .item-image:hover {
+              transform: scale(1.05);
+            }
+            
+            .footer {
+              margin-top: 2rem;
+              text-align: center;
+              font-size: 0.75rem;
+              color: var(--text-light);
+            }
+            
+            .pulse {
+              animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+              0% {
+                transform: scale(1);
+              }
+              50% {
+                transform: scale(1.05);
+              }
+              100% {
+                transform: scale(1);
+              }
             }
           </style>
         </head>
@@ -230,8 +313,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
             
             ${qrCode.links && qrCode.links.length > 0 ? `
               <div class="buttons">
-                ${qrCode.links.map(link => `
-                  <a href="${link.url}" class="button" target="_blank" rel="noopener noreferrer">
+                ${qrCode.links.map((link, index) => `
+                  <a href="${link.url}" class="button${index === 0 ? ' pulse' : ''}" target="_blank" rel="noopener noreferrer">
                     ${link.label}
                   </a>
                 `).join('')}
@@ -241,7 +324,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
             ${qrCode.menu ? `
               <div class="menu-section">
                 <h2 class="menu-header">${qrCode.menu.restaurantName || 'Menu'}</h2>
-                ${qrCode.menu.description ? `<p style="color: #6b7280; margin-bottom: 1rem; font-size: 0.875rem;">${qrCode.menu.description}</p>` : ''}
+                ${qrCode.menu.description ? `<p style="color: var(--text-light); margin-bottom: 1.5rem; font-size: 0.95rem;">${qrCode.menu.description}</p>` : ''}
                 
                 <div class="menu-categories">
                   ${qrCode.menu.categories.map(category => `
@@ -255,7 +338,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
                               <div class="item-price">$${item.price.toFixed(2)}</div>
                             </div>
                             ${item.description ? `<div class="item-description">${item.description}</div>` : ''}
-                            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="item-image">` : ''}
+                            ${item.imageUrl ? `<img src="${item.imageUrl}" alt="${item.name}" class="item-image" loading="lazy">` : ''}
                           </div>
                         `).join('')}
                       </div>
@@ -264,6 +347,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
                 </div>
               </div>
             ` : ''}
+            
+            <div class="footer">
+              Powered by QuickQR - Digital Solutions for Business
+            </div>
           </div>
         </body>
       </html>

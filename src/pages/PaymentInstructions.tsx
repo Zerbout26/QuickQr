@@ -1,148 +1,115 @@
-import { useNavigate } from 'react-router-dom';
-import MainLayout from '@/components/layout/MainLayout';
+
+import React from 'react';
+import { Link } from 'react-router-dom';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { Mail, ArrowLeft, CheckCircle2 } from 'lucide-react';
+import MainLayout from '@/components/layout/MainLayout';
+import { motion } from 'framer-motion';
+import { ArrowRight, AlertCircle, CreditCard, Phone, Mail } from 'lucide-react';
 
 const PaymentInstructions = () => {
-  const navigate = useNavigate();
-
-  const handleBack = () => {
-    navigate('/dashboard');
-  };
-
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
-        <Button
-          variant="ghost"
-          onClick={handleBack}
-          className="mb-6"
-        >
-          <ArrowLeft className="w-4 h-4 mr-2" />
-          Back to Dashboard
-        </Button>
-
+      <div className="container mx-auto px-4 py-12">
         <div className="max-w-3xl mx-auto">
-          <h1 className="text-3xl font-bold mb-2">Payment Instructions</h1>
-          <p className="text-gray-600 mb-8">Follow these steps to complete your payment and activate your account</p>
+          <motion.div
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="bg-white rounded-xl shadow-lg overflow-hidden border border-algeria-red/10"
+          >
+            <div className="p-6 bg-gradient-to-r from-algeria-red/10 to-algeria-green/10 border-b border-gray-200">
+              <div className="flex items-center justify-center mb-4">
+                <AlertCircle className="h-10 w-10 text-algeria-red mr-3" />
+                <h1 className="text-2xl font-bold text-gray-900">Subscription Required</h1>
+              </div>
+              <p className="text-center text-gray-600">
+                Your trial period has ended. Please subscribe to continue using our services.
+              </p>
+            </div>
 
-          <div className="space-y-6">
-            {/* Payment Details Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Details</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="bg-gray-50 p-4 rounded-lg">
-                  <h3 className="font-semibold mb-2">Subscription Plan</h3>
-                  <p className="text-2xl font-bold text-qr-primary">$9.99/month</p>
-                  <p className="text-sm text-gray-600 mt-1">Billed monthly, cancel anytime</p>
-                </div>
-
-                <div className="space-y-2">
-                  <h3 className="font-semibold">Payment Methods</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    <li>Bank Transfer</li>
-                    <li>PayPal</li>
-                    <li>Credit Card</li>
-                  </ul>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Instructions Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Payment Instructions</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-4">
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-qr-primary/10 p-2 rounded-full">
-                      <span className="text-qr-primary font-bold">1</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Choose Your Payment Method</h3>
-                      <p className="text-gray-600">Select your preferred payment method from the options above.</p>
-                    </div>
+            <div className="p-8">
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <CreditCard className="mr-2 h-5 w-5 text-algeria-green" />
+                  Payment Instructions
+                </h2>
+                
+                <div className="bg-gray-50 rounded-lg p-4 mb-6 border border-gray-100">
+                  <p className="mb-3">To activate your subscription, please make a payment using one of the following methods:</p>
+                  
+                  <div className="mb-4">
+                    <h3 className="font-medium mb-2 text-algeria-green">Bank Transfer</h3>
+                    <ul className="list-disc list-inside text-sm pl-2 space-y-1 text-gray-700">
+                      <li>Bank Name: Algeria National Bank</li>
+                      <li>Account Holder: QuickQR Solutions</li>
+                      <li>Account Number: 0123456789</li>
+                      <li>Reference: Your email address</li>
+                    </ul>
                   </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-qr-primary/10 p-2 rounded-full">
-                      <span className="text-qr-primary font-bold">2</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Complete the Payment</h3>
-                      <p className="text-gray-600">Make the payment using your chosen method.</p>
-                    </div>
+                  
+                  <div className="mb-4">
+                    <h3 className="font-medium mb-2 text-algeria-green">Mobile Payment</h3>
+                    <ul className="list-disc list-inside text-sm pl-2 space-y-1 text-gray-700">
+                      <li>Send payment to: 05XX-XX-XX-XX</li>
+                      <li>Include your email in the message</li>
+                      <li>Service supported: CCP Mobile, Baridimob</li>
+                    </ul>
                   </div>
-
-                  <div className="flex items-start space-x-3">
-                    <div className="bg-qr-primary/10 p-2 rounded-full">
-                      <span className="text-qr-primary font-bold">3</span>
-                    </div>
-                    <div>
-                      <h3 className="font-semibold">Send Your Receipt</h3>
-                      <p className="text-gray-600">Email your payment receipt to our support team.</p>
-                    </div>
+                  
+                  <div className="mb-2">
+                    <h3 className="font-medium mb-2 text-algeria-green">In-Person Payment</h3>
+                    <p className="text-sm text-gray-700">
+                      Visit our office at: 123 Digital Plaza, Algeria Technology Park, Algiers
+                    </p>
                   </div>
                 </div>
-              </CardContent>
-            </Card>
-
-            {/* Receipt Submission Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Receipt Submission</CardTitle>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <Alert>
-                  <Mail className="h-4 w-4" />
-                  <AlertTitle>Email Your Receipt</AlertTitle>
-                  <AlertDescription>
-                    Send your payment receipt to: <span className="font-semibold">support@qrcodecreator.com</span>
-                  </AlertDescription>
-                </Alert>
-
-                <div className="bg-gray-50 p-4 rounded-lg space-y-2">
-                  <h3 className="font-semibold">What to Include in Your Email:</h3>
-                  <ul className="list-disc list-inside space-y-1 text-gray-600">
-                    <li>Your account email address</li>
-                    <li>Payment receipt or transaction ID</li>
-                    <li>Payment method used</li>
-                    <li>Date of payment</li>
-                  </ul>
+                
+                <div className="bg-algeria-red/5 p-4 rounded-lg border-l-4 border-algeria-red">
+                  <p className="text-sm">
+                    <span className="font-semibold block mb-1">Important:</span>
+                    After making your payment, please contact our support team with your payment details, and we'll activate your subscription within 24 hours.
+                  </p>
                 </div>
-
-                <div className="flex items-center space-x-2 text-sm text-gray-600">
-                  <CheckCircle2 className="h-4 w-4 text-green-500" />
-                  <span>We typically activate accounts within 24 hours of receipt confirmation</span>
-                </div>
-              </CardContent>
-            </Card>
-
-            {/* Support Card */}
-            <Card>
-              <CardHeader>
-                <CardTitle>Need Help?</CardTitle>
-              </CardHeader>
-              <CardContent>
-                <p className="text-gray-600 mb-4">
-                  If you have any questions about the payment process or need assistance,
-                  please don't hesitate to contact our support team.
-                </p>
-                <Button
-                  variant="outline"
-                  onClick={() => window.location.href = 'mailto:support@qrcodecreator.com'}
-                  className="w-full"
-                >
-                  <Mail className="w-4 h-4 mr-2" />
+              </div>
+              
+              <div className="mb-8">
+                <h2 className="text-xl font-semibold mb-4 flex items-center">
+                  <Phone className="mr-2 h-5 w-5 text-algeria-green" />
                   Contact Support
-                </Button>
-              </CardContent>
-            </Card>
+                </h2>
+                
+                <div className="space-y-3 mb-4">
+                  <div className="flex items-center">
+                    <Mail className="h-5 w-5 text-algeria-red mr-2" />
+                    <span>support@quickqr.dz</span>
+                  </div>
+                  <div className="flex items-center">
+                    <Phone className="h-5 w-5 text-algeria-red mr-2" />
+                    <span>+213 XX XX XX XX</span>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex flex-col sm:flex-row gap-4 sm:justify-between pt-4 border-t border-gray-100">
+                <Link to="/">
+                  <Button variant="outline" className="w-full sm:w-auto">
+                    Return to Homepage
+                  </Button>
+                </Link>
+                <a href="mailto:support@quickqr.dz">
+                  <Button className="w-full sm:w-auto bg-algeria-green hover:bg-algeria-green/90 text-white flex items-center gap-2">
+                    Contact Support
+                    <ArrowRight className="h-4 w-4" />
+                  </Button>
+                </a>
+              </div>
+            </div>
+          </motion.div>
+          
+          <div className="text-center mt-8 text-sm text-gray-500">
+            <p>
+              For any questions about your subscription, please contact our customer service team.
+            </p>
           </div>
         </div>
       </div>
@@ -150,4 +117,4 @@ const PaymentInstructions = () => {
   );
 };
 
-export default PaymentInstructions; 
+export default PaymentInstructions;
