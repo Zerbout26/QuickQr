@@ -19,7 +19,7 @@ const getFrontendDomain = (req: express.Request) => {
     return origin;
   }
   // Fallback to environment variable or default
-  return process.env.FRONTEND_URL || 'http://localhost:8080';
+  return process.env.FRONTEND_URL || 'http://localhost:5173';
 };
 
 // Create uploads directories if they don't exist
@@ -85,6 +85,11 @@ app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
+// Test endpoint to check if the server is running
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'ok', message: 'Server is running' });
+});
+
 // Initialize database connection
 AppDataSource.initialize()
   .then(() => {
@@ -94,9 +99,9 @@ AppDataSource.initialize()
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      console.log(`Frontend URL: ${process.env.FRONTEND_URL || 'http://localhost:5173'}`);
     });
   })
   .catch((error) => {
     console.error('Error connecting to database:', error);
   });
-
