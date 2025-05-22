@@ -1,4 +1,3 @@
-
 import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -139,28 +138,28 @@ const Index = () => {
                   <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-xl">
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="https://images.unsplash.com/photo-1581091226825-a6a2a5aee158"
+                        src="public/ChatGPT Image May 23, 2025, 12_04_53 AM.png"
                         alt="QR Code in use" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="https://images.unsplash.com/photo-1623039405147-547794f92e9e"
+                        src="public/Design sans titre.png"
                         alt="Restaurant QR menu" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="https://images.unsplash.com/photo-1472851294608-062f824d29cc"
+                        src="public/ChatGPT Image May 23, 2025, 12_08_02 AM.png"
                         alt="Retail store" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="https://images.unsplash.com/photo-1556741533-6e6a62bd8b49"
+                        src="public/ChatGPT Image May 23, 2025, 12_09_50 AM.png"
                         alt="Digital menu scanning" 
                         className="w-full h-full object-cover"
                       />
@@ -450,7 +449,7 @@ const Index = () => {
                 <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
                 <div className="absolute bottom-0 left-0 transform -translate-x-1/4 translate-y-1/4 w-40 h-40 bg-white/10 rounded-full"></div>
                 <h3 className="text-2xl font-bold relative z-10">Business Plan</h3>
-                <div className="text-4xl font-bold mt-2 relative z-10">$19.99<span className="text-lg font-normal">/month</span></div>
+                <div className="text-4xl font-bold mt-2 relative z-10">500<span className="text-lg font-normal"> DZD/month</span></div>
                 <p className="mt-2 opacity-90 relative z-10">Everything you need for your business</p>
               </div>
               <div className="p-8">
