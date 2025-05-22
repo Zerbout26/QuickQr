@@ -130,6 +130,21 @@ export const authApi = {
     const response = await api.patch('/users/profile', data);
     return response.data;
   },
+
+  resetPassword: async (data: { email: string; newPassword: string; confirmPassword: string }) => {
+    const response = await api.patch('/users/reset-password', data);
+    return response.data;
+  },
+
+  requestPasswordReset: async (email: string) => {
+    const response = await api.post('/users/forgot-password', { email });
+    return response.data;
+  },
+  
+  verifyEmail: async (email: string) => {
+    const response = await api.post('/users/verify-email', { email });
+    return response.data;
+  },
   
   silentRefresh: async () => {
     // In a real implementation, this would use a refresh token

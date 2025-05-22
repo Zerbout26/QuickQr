@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
@@ -27,6 +26,7 @@ import {
   Calendar,
   CheckCircle,
   AlertCircle,
+  Lock,
 } from "lucide-react";
 
 const Navbar = () => {
@@ -103,6 +103,11 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/payment-instructions" className="flex items-center cursor-pointer">
                       <Settings className="w-4 h-4 mr-2" /> Subscription
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/reset-password" className="flex items-center cursor-pointer">
+                      <Lock className="w-4 h-4 mr-2" /> Reset Password
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuSeparator />

@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -78,6 +77,11 @@ const SignInForm = () => {
               onChange={(e) => setPassword(e.target.value)}
               required
             />
+            <div className="text-right">
+              <Link to="/forgot-password" className="text-sm text-qr-secondary hover:underline">
+                Forgot Password?
+              </Link>
+            </div>
           </div>
         </CardContent>
         <CardFooter className="flex flex-col">

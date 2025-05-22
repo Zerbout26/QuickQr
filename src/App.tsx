@@ -1,4 +1,3 @@
-
 import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
@@ -16,6 +15,8 @@ import PaymentInstructions from "@/pages/PaymentInstructions";
 import LandingPage from '@/pages/LandingPage';
 import EditQRCodePage from '@/pages/EditQRCodePage';
 import PrivateRoute from '@/components/PrivateRoute';
+import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
+import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 
 const queryClient = new QueryClient();
 
@@ -52,12 +53,24 @@ const App = () => (
                 </div>
               </MainLayout>
             } />
+            <Route path="/forgot-password" element={
+              <MainLayout>
+                <div className="container mx-auto px-4 py-12">
+                  <ForgotPasswordForm />
+                </div>
+              </MainLayout>
+            } />
             <Route path="/payment-instructions" element={<PaymentInstructions />} />
             <Route path="/landing/:id" element={<LandingPage />} />
             <Route path="/landing/:id/:url" element={<LandingPage />} />
             <Route path="/qrcodes/:id/edit" element={
               <PrivateRoute>
                 <EditQRCodePage />
+              </PrivateRoute>
+            } />
+            <Route path="/reset-password" element={
+              <PrivateRoute>
+                <ResetPasswordForm />
               </PrivateRoute>
             } />
             <Route path="*" element={<NotFound />} />

@@ -162,3 +162,82 @@ export const updateUserStatus = async (req: AuthRequest, res: Response) => {
     res.status(500).json({ error: 'Error updating user status' });
   }
 };
+
+export const verifyEmail = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find user by email
+    const user = await userRepository.findOne({ where: { email } });
+    
+    // Return whether the email exists
+    res.json({ exists: !!user });
+  } catch (error) {
+    res.status(500).json({ error: 'Error verifying email' });
+  }
+};
+
+export const resetPassword = async (req: Request, res: Response) => {
+  try {
+    const { email, newPassword, confirmPassword } = req.body;
+
+    // Simple validation
+    if (!email || !newPassword || !confirmPassword) {
+      return res.status(400).json({ error: 'All fields are required' });
+    }
+
+    if (newPassword !== confirmPassword) {
+      return res.status(400).json({ error: 'Passwords do not match' });
+    }
+
+    // Find user by email
+    const user = await userRepository.findOne({ where: { email } });
+    if (!user) {
+      return res.status(404).json({ error: 'User not found' });
+    }
+
+    // Hash the new password
+    const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+    // Update user's password
+    user.password = hashedPassword;
+    await userRepository.save(user);
+
+    // Remove password from response
+    const { password: _, ...userWithoutPassword } = user;
+
+    res.json({ message: 'Password updated successfully', user: userWithoutPassword });
+  } catch (error) {
+    res.status(500).json({ error: 'Error updating password' });
+  }
+};
+
+export const requestPasswordReset = async (req: Request, res: Response) => {
+  try {
+    const { email } = req.body;
+
+    if (!email) {
+      return res.status(400).json({ error: 'Email is required' });
+    }
+
+    // Find user by email
+    const user = await userRepository.findOne({ where: { email } });
+    if (!user) {
+      // Don't reveal if the email exists or not for security
+      return res.json({ message: 'If an account exists with this email, you will receive password reset instructions.' });
+    }
+
+    // In a real application, you would:
+    // 1. Generate a secure reset token
+    // 2. Save the token with an expiration time
+    // 3. Send an email with a reset link
+    // For now, we'll just return a success message
+    res.json({ message: 'If an account exists with this email, you will receive password reset instructions.' });
+  } catch (error) {
+    res.status(500).json({ error: 'Error processing password reset request' });
+  }
+};
