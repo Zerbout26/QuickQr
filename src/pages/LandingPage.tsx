@@ -57,7 +57,11 @@ const LandingPage = () => {
         const data = await qrCodeApi.getPublicQRCode(id!);
         setQRCode(data);
         setLoading(false);
-      } catch (err) {
+      } catch (err: any) {
+        if (err.response && err.response.status === 403) {
+          navigate('/payment-instructions');
+          return;
+        }
         console.error('Error fetching QR code:', err);
         setError('Failed to load QR code');
         setLoading(false);
@@ -67,7 +71,7 @@ const LandingPage = () => {
     if (id) {
       fetchQRCode();
     }
-  }, [id]);
+  }, [id, navigate]);
 
   if (loading) {
     return (
