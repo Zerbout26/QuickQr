@@ -57,26 +57,38 @@ const LandingPage = () => {
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
+        if (!id) {
+          setError('No QR code ID provided');
+          setLoading(false);
+          return;
+        }
+
         // First, increment the scan count
-        await qrCodeApi.incrementScanCount(id!);
+        await qrCodeApi.incrementScanCount(id);
         // Then fetch the updated QR code using the public endpoint
-        const data = await qrCodeApi.getPublicQRCode(id!);
+        const data = await qrCodeApi.getPublicQRCode(id);
         setQRCode(data);
         setLoading(false);
       } catch (err: any) {
-        if (err.response && err.response.status === 403) {
-          navigate('/payment-instructions');
-          return;
-        }
         console.error('Error fetching QR code:', err);
-        setError('Failed to load QR code');
+        if (err.response) {
+          if (err.response.status === 403) {
+            navigate('/payment-instructions');
+            return;
+          }
+          if (err.response.status === 404) {
+            setError('QR code not found');
+          } else {
+            setError(err.response.data?.error || 'Failed to load QR code');
+          }
+        } else {
+          setError('Failed to load QR code');
+        }
         setLoading(false);
       }
     };
 
-    if (id) {
-      fetchQRCode();
-    }
+    fetchQRCode();
   }, [id, navigate]);
 
   if (loading) {
