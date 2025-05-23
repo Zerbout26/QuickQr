@@ -278,6 +278,7 @@ interface QRCodeFormProps {
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
+  const [id, setId] = useState('');
   const [type, setType] = useState<'url' | 'menu' | 'both' | 'direct'>('url');
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
@@ -577,6 +578,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       }
 
       const data = await response.json();
+      setId(data.id);
       onCreated(data);
       toast({
         title: "Success",
@@ -855,7 +857,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 <div className="mt-4">
                   <QRPreview 
-                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://warm-pithivier-90ecdb.netlify.app/landing/${name}` : ''}
+                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://warm-pithivier-90ecdb.netlify.app/landing/${id}` : ''}
                     color={foregroundColor}
                     bgColor={backgroundColor}
                     logoUrl={logoPreview || undefined}
