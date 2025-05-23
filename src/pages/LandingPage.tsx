@@ -247,6 +247,11 @@ const LandingPage = () => {
                                     alt={item.name}
                                     className="h-20 w-20 object-cover rounded-lg transition-transform duration-200 hover:scale-110"
                                     loading="lazy"
+                                    onError={(e) => {
+                                      const target = e.target as HTMLImageElement;
+                                      target.onerror = null;
+                                      target.src = 'https://via.placeholder.com/80?text=No+Image';
+                                    }}
                                   />
                                 </div>
                               )}
