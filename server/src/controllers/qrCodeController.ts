@@ -169,8 +169,14 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
                   if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
                       parsedMenu.categories[categoryIndex] && 
                       parsedMenu.categories[categoryIndex].items[itemIndex]) {
+                    // Update the imageUrl in the menu item
                     parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
+                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${imageUrl}`);
+                  } else {
+                    console.warn(`Invalid indices in filename: ${filename}`);
                   }
+                } else {
+                  console.warn(`Invalid filename format: ${filename}`);
                 }
               } catch (uploadError) {
                 console.error('Error uploading image to Cloudinary:', uploadError);

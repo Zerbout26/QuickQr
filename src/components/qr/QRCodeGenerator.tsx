@@ -544,7 +544,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               description: item.description || '',
               price: Number(item.price) || 0,
               category: category.name || 'Unnamed Category',
-              imageUrl: '', // We'll update this after uploading images
+              imageUrl: item.imageUrl || '', // Keep the existing imageUrl if it exists
               availability: {
                 sunday: item.availability?.sunday ?? true,
                 monday: item.availability?.monday ?? true,
