@@ -1,4 +1,3 @@
-
 import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
@@ -39,7 +38,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
                 box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
                 max-width: 90%;
                 width: 400px;
-                border-left: 4px solid #cc2828;
+                border-left: 4px solid #4A90E2;
               }
               h1 { color: #1f2937; margin-bottom: 1rem; font-size: 1.5rem; }
               p { color: #6b7280; }
@@ -82,7 +81,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
     await qrCodeRepository.save(qrCode);
 
     // Define primary color with fallback
-    const primaryColor = qrCode.foregroundColor || '#cc2828';
+    const primaryColor = qrCode.foregroundColor || '#4A90E2';
     
     // Generate HTML for the landing page with improved styling
     const html = `
@@ -95,10 +94,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
           <style>
             :root {
               --primary-color: ${primaryColor};
-              --secondary-color: ${qrCode.backgroundColor || '#147828'};
-              --accent-color: #e6a80c;
-              --background-color: ${qrCode.backgroundColor || '#f9fafb'};
-              --text-color: #1f2937;
+              --secondary-color: ${qrCode.backgroundColor || '#F4D03F'};
+              --accent-color: #00BCD4;
+              --background-color: ${qrCode.backgroundColor || '#FAFAFA'};
+              --text-color: ${qrCode.foregroundColor || '#2C3E50'};
               --text-light: #6b7280;
               --border-color: #e5e7eb;
               --border-radius: 0.75rem;

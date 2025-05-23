@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -23,18 +22,18 @@ export default {
 				cairo: ['Cairo', 'sans-serif'],
 			},
 			colors: {
-				border: 'hsl(var(--border))',
+				border: '#E0E0E0',
 				input: 'hsl(var(--input))',
-				ring: 'hsl(var(--ring))',
-				background: 'hsl(var(--background))',
-				foreground: 'hsl(var(--foreground))',
+				ring: '#4A90E2',
+				background: '#FAFAFA',
+				foreground: '#2C3E50',
 				primary: {
-					DEFAULT: 'hsl(var(--primary))',
-					foreground: 'hsl(var(--primary-foreground))'
+					DEFAULT: '#4A90E2',
+					foreground: '#FFFFFF'
 				},
 				secondary: {
-					DEFAULT: 'hsl(var(--secondary))',
-					foreground: 'hsl(var(--secondary-foreground))'
+					DEFAULT: '#F4D03F',
+					foreground: '#2C3E50'
 				},
 				destructive: {
 					DEFAULT: 'hsl(var(--destructive))',
@@ -42,29 +41,29 @@ export default {
 				},
 				muted: {
 					DEFAULT: 'hsl(var(--muted))',
-					foreground: 'hsl(var(--muted-foreground))'
+					foreground: '#7F8C8D'
 				},
 				accent: {
-					DEFAULT: 'hsl(var(--accent))',
-					foreground: 'hsl(var(--accent-foreground))'
+					DEFAULT: '#00BCD4',
+					foreground: '#2C3E50'
 				},
 				popover: {
 					DEFAULT: 'hsl(var(--popover))',
 					foreground: 'hsl(var(--popover-foreground))'
 				},
 				card: {
-					DEFAULT: 'hsl(var(--card))',
-					foreground: 'hsl(var(--card-foreground))'
+					DEFAULT: '#FFFFFF',
+					foreground: '#2C3E50'
 				},
 				sidebar: {
-					DEFAULT: 'hsl(var(--sidebar-background))',
-					foreground: 'hsl(var(--sidebar-foreground))',
-					primary: 'hsl(var(--sidebar-primary))',
-					'primary-foreground': 'hsl(var(--sidebar-primary-foreground))',
-					accent: 'hsl(var(--sidebar-accent))',
-					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
-					border: 'hsl(var(--sidebar-border))',
-					ring: 'hsl(var(--sidebar-ring))'
+					DEFAULT: '#FAFAFA',
+					foreground: '#2C3E50',
+					primary: '#4A90E2',
+					'primary-foreground': '#FFFFFF',
+					accent: '#00BCD4',
+					'accent-foreground': '#2C3E50',
+					border: '#E0E0E0',
+					ring: '#4A90E2'
 				},
 				algeria: {
 					red: '#cc2828',
@@ -72,11 +71,11 @@ export default {
 					gold: '#e6a80c',
 				},
 				qr: {
-					primary: '#cc2828', // Updated to Algerian red
-					secondary: '#147828', // Updated to Algerian green
-					accent: '#e6a80c', // Gold accent color
-					light: '#F9FAFB',
-					dark: '#1F2937',
+					primary: '#4A90E2',
+					secondary: '#F4D03F',
+					accent: '#00BCD4',
+					light: '#FAFAFA',
+					dark: '#2C3E50',
 				}
 			},
 			borderRadius: {

@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
@@ -453,7 +452,7 @@ const Dashboard = () => {
             )}
             
             {isTrialExpired() && !user.hasActiveSubscription && (
-              <span className="bg-red-100 text-red-800 px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
+              <span className="bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
                 <AlertCircle className="w-4 h-4" /> Trial expired
               </span>
             )}
@@ -734,7 +733,7 @@ const Dashboard = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="w-full border-red-200 text-primary hover:bg-primary/5 hover:text-primary/80 font-cairo"
+                              className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive font-cairo"
                               onClick={() => setDeleteConfirmQR(qr)}
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-1.5" />

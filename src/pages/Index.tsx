@@ -10,22 +10,22 @@ const features = [
   {
     title: 'Dynamic QR Landing Pages',
     description: 'Create beautiful landing pages with links and menus that update in real-time.',
-    icon: <Globe className="w-10 h-10 text-qr-primary" />,
+    icon: <Globe className="w-10 h-10 text-primary" />,
   },
   {
     title: 'Custom Branding',
     description: 'Add your logo and brand colors to make your QR codes stand out.',
-    icon: <Star className="w-10 h-10 text-qr-primary" />,
+    icon: <Star className="w-10 h-10 text-primary" />,
   },
   {
     title: 'Restaurant Menus',
     description: 'Create digital menus with categories, descriptions, and images.',
-    icon: <ChartBar className="w-10 h-10 text-qr-primary" />,
+    icon: <ChartBar className="w-10 h-10 text-primary" />,
   },
   {
     title: 'Multi-Link Support',
     description: 'Add multiple links to your QR landing page for versatile customer interactions.',
-    icon: <Settings className="w-10 h-10 text-qr-primary" />,
+    icon: <Settings className="w-10 h-10 text-primary" />,
   },
 ];
 
@@ -33,32 +33,32 @@ const businessTypes = [
   {
     name: 'Restaurants',
     description: 'Digital menus, specials, and online ordering',
-    icon: <ChartBar className="w-10 h-10 text-qr-primary" />,
+    icon: <ChartBar className="w-10 h-10 text-primary" />,
   },
   {
     name: 'Retail Stores',
     description: 'Product catalogs, promotions, and loyalty programs',
-    icon: <Users className="w-10 h-10 text-qr-secondary" />,
+    icon: <Users className="w-10 h-10 text-secondary" />,
   },
   {
     name: 'Professional Services',
     description: 'Appointment booking, testimonials, and service lists',
-    icon: <Award className="w-10 h-10 text-algeria-gold" />,
+    icon: <Award className="w-10 h-10 text-accent" />,
   },
   {
     name: 'Tourism & Hospitality',
     description: 'Virtual tours, booking links, and local attractions',
-    icon: <Globe className="w-10 h-10 text-qr-secondary" />,
+    icon: <Globe className="w-10 h-10 text-secondary" />,
   },
   {
     name: 'Event Planners',
     description: 'Event schedules, maps, and registration links',
-    icon: <ExternalLink className="w-10 h-10 text-algeria-gold" />,
+    icon: <ExternalLink className="w-10 h-10 text-accent" />,
   },
   {
     name: 'Education',
     description: 'Course materials, schedules, and campus information',
-    icon: <Smartphone className="w-10 h-10 text-qr-primary" />,
+    icon: <Smartphone className="w-10 h-10 text-primary" />,
   },
 ];
 
@@ -77,9 +77,9 @@ const Index = () => {
     <MainLayout>
       {/* Hero Section - Modern design with gradient overlay and animation */}
       <section className="relative overflow-hidden py-24 bg-gradient-to-br from-white to-gray-50">
-        <div className="absolute inset-0 bg-gradient-to-br from-algeria-red/5 to-algeria-green/5 -z-10"></div>
-        <div className="absolute -right-20 top-0 w-72 h-72 rounded-full bg-algeria-gold/10 blur-3xl -z-10"></div>
-        <div className="absolute -left-20 bottom-0 w-72 h-72 rounded-full bg-algeria-red/10 blur-3xl -z-10"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 -z-10"></div>
+        <div className="absolute -right-20 top-0 w-72 h-72 rounded-full bg-accent/10 blur-3xl -z-10"></div>
+        <div className="absolute -left-20 bottom-0 w-72 h-72 rounded-full bg-primary/10 blur-3xl -z-10"></div>
         
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col lg:flex-row items-center gap-12">
@@ -90,11 +90,11 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
                 className="mb-6"
               >
-                <span className="inline-block py-1 px-4 rounded-full bg-algeria-red/10 text-algeria-red font-medium text-sm mb-4">
+                <span className="inline-block py-1 px-4 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
                   <span className="arabic mx-1">مرحبا</span> | Digital Solutions for Your Business
                 </span>
                 <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                  Create <span className="text-algeria-red">Engaging</span> QR Landing Pages For Your <span className="text-algeria-green">Business</span>
+                  Create <span className="text-primary">Engaging</span> QR Landing Pages For Your <span className="text-secondary">Business</span>
                 </h1>
                 <p className="text-xl text-gray-600 mb-8 leading-relaxed">
                   Generate beautiful QR codes that lead to custom landing pages with your links, menus, and business information - perfect for any type of business in Algeria and beyond.
@@ -133,7 +133,7 @@ const Index = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute -inset-4 rounded-xl bg-gradient-to-r from-algeria-red to-algeria-green opacity-20 blur-lg"></div>
+                <div className="absolute -inset-4 rounded-xl bg-gradient-to-r from-primary to-secondary opacity-20 blur-lg"></div>
                 <div className="relative rounded-xl shadow-xl transform hover:rotate-0 transition-all duration-300">
                   <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-xl">
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
@@ -168,7 +168,7 @@ const Index = () => {
                 </div>
                 <div className="absolute -top-6 -right-6 w-24 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center p-4">
                   <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
-                    <path fill={`${getComputedStyle(document.documentElement).getPropertyValue('--algeria-red').trim()}`} d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
+                    <path fill={`${getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()}`} d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
                   </svg>
                 </div>
               </motion.div>
@@ -181,7 +181,7 @@ const Index = () => {
       <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-algeria-gold/10 text-algeria-gold font-medium text-sm mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
               Solutions For All Industries
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -212,7 +212,7 @@ const Index = () => {
           </div>
           
           <div className="text-center mt-12">
-            <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-algeria-green hover:bg-algeria-green/90 text-white py-2 px-4 rounded-lg">
+            <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-lg">
               Find Your Solution
               <ArrowRight className="w-4 h-4" />
             </Button>
@@ -224,7 +224,7 @@ const Index = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-algeria-red/10 text-algeria-red font-medium text-sm mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
               Features That Deliver Results
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -243,9 +243,9 @@ const Index = () => {
                 whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
                 viewport={{ once: true }}
-                className="bg-white rounded-xl p-8 shadow-sm hover:shadow-xl transition-all border-l-4 border-l-algeria-red/80 flex flex-col h-full hover:translate-y-[-5px] duration-300"
+                className="bg-white rounded-xl p-8 shadow-sm hover:shadow-xl transition-all border-l-4 border-l-primary/80 flex flex-col h-full hover:translate-y-[-5px] duration-300"
               >
-                <div className="bg-algeria-red/5 p-3 rounded-xl inline-flex mb-6">{feature.icon}</div>
+                <div className="bg-primary/5 p-3 rounded-xl inline-flex mb-6">{feature.icon}</div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
                 <p className="text-gray-600 flex-grow">{feature.description}</p>
               </motion.div>
@@ -258,7 +258,7 @@ const Index = () => {
       <section className="py-24 bg-gradient-to-br from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-algeria-green/10 text-algeria-green font-medium text-sm mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
               Simple Process
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -271,7 +271,7 @@ const Index = () => {
           
           <div className="grid md:grid-cols-3 gap-12 relative">
             {/* Timeline connector */}
-            <div className="absolute top-24 left-0 right-0 h-1 bg-algeria-gold hidden md:block"></div>
+            <div className="absolute top-24 left-0 right-0 h-1 bg-accent hidden md:block"></div>
             
             {/* Step 1 */}
             <motion.div 
@@ -281,7 +281,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="text-center relative z-10"
             >
-              <div className="bg-algeria-red w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">1</div>
+              <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">1</div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Create Your QR Code</h3>
               <p className="text-gray-600">Design your QR code with your brand colors and logo to match your business identity</p>
             </motion.div>
@@ -294,7 +294,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="text-center relative z-10"
             >
-              <div className="bg-algeria-green w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">2</div>
+              <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">2</div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Add Links & Menus</h3>
               <p className="text-gray-600">Customize your landing page with links, restaurant menus and promotional content</p>
             </motion.div>
@@ -307,7 +307,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="text-center relative z-10"
             >
-              <div className="bg-algeria-gold w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">3</div>
+              <div className="bg-accent w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">3</div>
               <h3 className="text-xl font-semibold mb-3 text-gray-900">Share & Update</h3>
               <p className="text-gray-600">Download your QR code and update your landing page anytime without creating new codes</p>
             </motion.div>
@@ -320,7 +320,7 @@ const Index = () => {
             viewport={{ once: true }}
             className="text-center mt-16"
           >
-            <Button onClick={() => navigate('/signup')} className="bg-gradient-to-r from-algeria-red to-algeria-green text-lg py-6 px-8 flex items-center gap-2 group text-white rounded-lg shadow-lg hover:shadow-xl transition-all mx-auto">
+            <Button onClick={() => navigate('/signup')} className="bg-gradient-to-r from-primary to-secondary text-lg py-6 px-8 flex items-center gap-2 group text-white rounded-lg shadow-lg hover:shadow-xl transition-all mx-auto">
               Start Creating Now
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
@@ -332,7 +332,7 @@ const Index = () => {
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-algeria-red/10 text-algeria-red font-medium text-sm mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
               Trusted by Businesses
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -362,9 +362,9 @@ const Index = () => {
               <p className="testimonial-quote mb-4">
                 Since implementing QR code menus, we've seen a 30% increase in special order items. Customers love being able to see photos of our dishes!
               </p>
-              <div className="flex text-algeria-gold">
+              <div className="flex text-accent">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-algeria-gold" />
+                  <Star key={star} className="w-5 h-5 fill-accent" />
                 ))}
               </div>
             </motion.div>
@@ -387,9 +387,9 @@ const Index = () => {
               <p className="testimonial-quote mb-4">
                 The QR codes have become an essential part of our marketing strategy. They connect our physical store to our online presence seamlessly.
               </p>
-              <div className="flex text-algeria-gold">
+              <div className="flex text-accent">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-algeria-gold" />
+                  <Star key={star} className="w-5 h-5 fill-accent" />
                 ))}
               </div>
             </motion.div>
@@ -412,9 +412,9 @@ const Index = () => {
               <p className="testimonial-quote mb-4">
                 Our guests appreciate having easy access to hotel information, local attractions, and services through the QR landing pages we've created.
               </p>
-              <div className="flex text-algeria-gold">
+              <div className="flex text-accent">
                 {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-algeria-gold" />
+                  <Star key={star} className="w-5 h-5 fill-accent" />
                 ))}
               </div>
             </motion.div>
@@ -426,7 +426,7 @@ const Index = () => {
       <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-algeria-green/10 text-algeria-green font-medium text-sm mb-4">
+            <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
               Pricing
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
@@ -445,7 +445,7 @@ const Index = () => {
               viewport={{ once: true }}
               className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 transform transition-all hover:-translate-y-1 hover:shadow-2xl"
             >
-              <div className="bg-gradient-to-r from-algeria-red to-algeria-green p-6 text-white text-center relative overflow-hidden">
+              <div className="bg-gradient-to-r from-primary to-secondary p-6 text-white text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
                 <div className="absolute bottom-0 left-0 transform -translate-x-1/4 translate-y-1/4 w-40 h-40 bg-white/10 rounded-full"></div>
                 <h3 className="text-2xl font-bold relative z-10">Business Plan</h3>
@@ -466,13 +466,13 @@ const Index = () => {
                   ].map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <div className="flex-shrink-0 mt-1">
-                        <Check className="h-5 w-5 text-algeria-green" />
+                        <Check className="h-5 w-5 text-secondary" />
                       </div>
                       <span className="ml-3 text-gray-700">{feature}</span>
                     </li>
                   ))}
                 </ul>
-                <Button onClick={() => navigate('/signup')} className="w-full mt-8 py-6 bg-algeria-green hover:bg-algeria-green/90 text-white">
+                <Button onClick={() => navigate('/signup')} className="w-full mt-8 py-6 bg-accent hover:bg-accent/90 text-white">
                   Start 14-Day Free Trial
                 </Button>
                 <p className="text-sm text-center text-gray-500 mt-4 flex items-center justify-center gap-1">
@@ -486,7 +486,7 @@ const Index = () => {
       </section>
 
       {/* CTA Section - New bottom CTA */}
-      <section className="py-20 bg-gradient-to-r from-algeria-red/10 to-algeria-green/10">
+      <section className="py-20 bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
             <motion.div
@@ -502,10 +502,10 @@ const Index = () => {
                 Join businesses across Algeria that are elevating their customer experience with our easy-to-use QR landing page platform.
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
-                <Button onClick={() => navigate('/signup')} className="bg-algeria-red hover:bg-algeria-red/90 text-white py-6 px-8 rounded-lg shadow-lg">
+                <Button onClick={() => navigate('/signup')} className="bg-primary hover:bg-primary/90 text-white py-6 px-8 rounded-lg shadow-lg">
                   Start Free Trial
                 </Button>
-                <Button onClick={() => navigate('/signin')} variant="outline" className="bg-white border-2 border-algeria-green text-algeria-green hover:bg-algeria-green/5 py-6 px-8 rounded-lg">
+                <Button onClick={() => navigate('/signin')} variant="outline" className="bg-white border-2 border-secondary text-secondary hover:bg-secondary/5 py-6 px-8 rounded-lg">
                   Sign In
                 </Button>
               </div>

@@ -1,4 +1,3 @@
-
 @import url('https://fonts.googleapis.com/css2?family=Cairo:wght@200;300;400;500;600;700;800;900&display=swap');
 
 @tailwind base;
@@ -145,7 +144,7 @@
   }
   
   .text-gradient {
-    @apply bg-clip-text text-transparent bg-gradient-to-r from-algeria-red to-algeria-green;
+    @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-secondary;
   }
   
   .font-cairo {
@@ -157,25 +156,25 @@
   }
   
   .algerian-border {
-    @apply border-2 border-algeria-red/20 hover:border-algeria-red/40 transition-colors;
+    @apply border-2 border-primary/20 hover:border-primary/40 transition-colors;
   }
   
   .algerian-card {
-    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-algeria-red hover:shadow-lg;
+    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-primary hover:shadow-lg;
   }
   
   .algerian-card-green {
-    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-algeria-green hover:shadow-lg;
+    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-secondary hover:shadow-lg;
   }
   
   .algerian-card-gold {
-    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-algeria-gold hover:shadow-lg;
+    @apply bg-white rounded-xl shadow-md overflow-hidden transition-all border-l-4 border-l-accent hover:shadow-lg;
   }
 }
 
 /* Custom styles for QR Code Generator */
 .qr-gradient-bg {
-  background: linear-gradient(135deg, rgba(204, 40, 40, 0.1) 0%, rgba(20, 120, 40, 0.1) 100%);
+  background: linear-gradient(135deg, rgba(74, 144, 226, 0.1) 0%, rgba(244, 208, 63, 0.1) 100%);
 }
 
 .qr-card {
@@ -183,16 +182,16 @@
 }
 
 .qr-btn-primary {
-  @apply bg-algeria-red hover:bg-algeria-red/90 text-white font-medium transition-colors duration-300;
+  @apply bg-primary hover:bg-primary/90 text-primary-foreground font-medium transition-colors duration-300;
 }
 
 .qr-btn-secondary {
-  @apply bg-algeria-green hover:bg-algeria-green/90 text-white font-medium transition-colors duration-300;
+  @apply bg-secondary hover:bg-secondary/90 text-secondary-foreground font-medium transition-colors duration-300;
 }
 
 /* Business-focused styles */
 .business-cta-btn {
-  @apply bg-gradient-to-r from-algeria-red to-algeria-green hover:from-algeria-red/90 hover:to-algeria-green/90 text-white shadow-lg shadow-algeria-red/20 hover:shadow-algeria-red/30 transition-all duration-300;
+  @apply bg-gradient-to-r from-primary to-secondary hover:from-primary/90 hover:to-secondary/90 text-primary-foreground shadow-lg shadow-primary/20 hover:shadow-primary/30 transition-all duration-300;
 }
 
 /* Updated menu styles */
@@ -235,22 +234,26 @@
 }
 
 .testimonial-avatar {
-  @apply w-14 h-14 rounded-full object-cover border-2 border-algeria-red/20;
+  @apply w-14 h-14 rounded-full object-cover border-2 border-primary/20;
 }
 
 .testimonial-quote {
-  @apply text-gray-600 italic relative pl-6 before:content-['"'] before:absolute before:left-0 before:top-0 before:text-3xl before:text-algeria-red/40 before:font-serif;
+  @apply text-gray-600 italic relative pl-6 before:content-['"'] before:absolute before:left-0 before:top-0 before:text-3xl before:text-primary/40 before:font-serif;
 }
 
 /* Algerian specific styles */
 .dz-card-header {
-  @apply bg-gradient-to-r from-algeria-red/10 to-algeria-green/10 text-gray-800 border-b border-gray-100;
+  @apply bg-gradient-to-r from-primary/10 to-secondary/10 text-foreground border-b border-gray-100;
 }
 
 .dz-button {
-  @apply bg-algeria-red text-white hover:bg-algeria-red/80 transition-colors;
+  @apply text-primary-foreground bg-primary hover:bg-primary/90 font-medium transition-colors duration-300;
 }
 
 .dz-button-secondary {
-  @apply bg-algeria-green text-white hover:bg-algeria-green/80 transition-colors;
+  @apply text-secondary-foreground bg-secondary hover:bg-secondary/90 font-medium transition-colors duration-300;
+}
+
+.text-qr-secondary {
+  @apply text-secondary;
 }

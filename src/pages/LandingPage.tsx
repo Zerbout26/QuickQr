@@ -7,6 +7,8 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import * as LucideIcons from 'lucide-react';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { Utensils } from 'lucide-react';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -35,9 +37,13 @@ const LandingPage = () => {
       case 'telegram':
         return { label: 'Join our Telegram', icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
-        return { label: 'Visit our Website', icon: Globe, bgColor: 'var(--algeria-red)', hoverBgColor: 'var(--algeria-red-dark)' };
+        return { label: 'Visit our Website', icon: Globe, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+      case 'link':
+        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+      case 'menu':
+        return { label: 'View Menu', icon: Utensils, bgColor: 'var(--secondary)', hoverBgColor: 'var(--secondary-dark)' };
       default:
-        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--algeria-red)', hoverBgColor: 'var(--algeria-red-dark)' };
+        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
     }
   };
 
@@ -77,7 +83,7 @@ const LandingPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
         <div className="text-center">
-          <div className="w-16 h-16 border-4 border-algeria-red border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
           <p className="text-xl text-gray-700 font-medium tracking-tight">Loading...</p>
         </div>
       </div>
@@ -91,7 +97,7 @@ const LandingPage = () => {
           <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Error</h1>
           <p className="text-xl text-gray-600 mb-6">{error || 'QR code not found'}</p>
           <Button
-            className="px-6 py-3 text-lg font-medium rounded-full bg-algeria-red text-white hover:bg-algeria-red/90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-algeria-red"
+            className="px-6 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             onClick={() => navigate('/')}
           >
             Return to Home
@@ -125,7 +131,7 @@ const LandingPage = () => {
 
           <CardContent className="p-6 md:p-10">
             <h1
-              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight text-algeria-red"
+              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight text-primary"
             >
               {qrCode.name}
             </h1>
@@ -145,7 +151,7 @@ const LandingPage = () => {
                         className="block"
                       >
                         <Button
-                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-[color] flex items-center justify-center gap-3"
+                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-3"
                           style={{
                             background: bgColor,
                             color: '#ffffff',
@@ -174,7 +180,7 @@ const LandingPage = () => {
               <div className="space-y-8">
                 <div className="text-center mb-6">
                   <h2
-                    className="text-3xl font-semibold tracking-tight text-algeria-red"
+                    className="text-3xl font-semibold tracking-tight text-primary"
                   >
                     {qrCode.menu?.restaurantName}
                   </h2>
@@ -189,7 +195,7 @@ const LandingPage = () => {
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
                       <h3
-                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200 text-algeria-red border-algeria-red"
+                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200 text-primary border-primary"
                       >
                         {category.name}
                       </h3>
@@ -205,12 +211,12 @@ const LandingPage = () => {
                               <div className="flex-1 pr-6">
                                 <div className="flex justify-between items-start mb-2">
                                   <h4
-                                    className="text-lg font-semibold text-algeria-red"
+                                    className="text-lg font-semibold text-primary"
                                   >
                                     {item.name}
                                   </h4>
                                   <p
-                                    className="text-lg font-semibold whitespace-nowrap ml-4 text-algeria-green"
+                                    className="text-lg font-semibold whitespace-nowrap ml-4 text-primary"
                                   >
                                     ${item.price.toFixed(2)}
                                   </p>
@@ -244,7 +250,7 @@ const LandingPage = () => {
             {/* Footer */}
             <div className="mt-12 text-center">
               <p className="text-sm text-gray-500">
-                Powered by <span className="text-algeria-red font-medium">QuickQR</span> - Digital Solutions for Business
+                Powered by <span className="text-primary font-medium">QuickQR</span> - Digital Solutions for Business
               </p>
             </div>
           </CardContent>
