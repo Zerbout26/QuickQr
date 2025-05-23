@@ -6,7 +6,7 @@ import { useAuth } from '@/context/AuthContext';
 import { QRCode } from '@/types';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
@@ -79,30 +79,36 @@ const Dashboard = () => {
     if (!editingQR) return;
     
     try {
-      // Fix: Pass properly structured data instead of JSON strings
-      const updatedQR = await qrCodeApi.update(editingQR.id, { 
+      // Prepare the update data
+      const updateData = {
         name: editingQR.name,
         type: editingQR.type,
         url: newUrl,
         foregroundColor: editingQR.foregroundColor,
         backgroundColor: editingQR.backgroundColor,
-        // Pass proper objects instead of strings
-        links: editingQR.links,
+        links: editingQR.links || [],
         menu: editingQR.menu || { restaurantName: '', description: '', categories: [] }
-      });
+      };
+
+      console.log('Updating QR code with data:', updateData); // Debug log
+      
+      const updatedQR = await qrCodeApi.update(editingQR.id, updateData);
+      console.log('Update response:', updatedQR); // Debug log
       
       setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
       setEditingQR(null);
+      setNewUrl('');
+      
       toast({
         title: "QR Code Updated",
-        description: "Your QR code URL has been updated successfully.",
+        description: "Your QR code has been updated successfully.",
       });
     } catch (error) {
-      console.error('Failed to update QR code', error);
+      console.error('Failed to update QR code:', error);
       toast({
         variant: "destructive",
         title: "Update failed",
-        description: "There was a problem updating your QR code.",
+        description: "There was a problem updating your QR code. Please try again.",
       });
     }
   };
@@ -741,12 +747,15 @@ const Dashboard = () => {
                             </Button>
                           </DialogTrigger>
                           {deleteConfirmQR && (
-                            <DialogContent>
+                            <DialogContent aria-describedby="delete-dialog-description">
                               <DialogHeader>
                                 <DialogTitle className="font-cairo">Confirm Deletion</DialogTitle>
+                                <DialogDescription id="delete-dialog-description">
+                                  This action cannot be undone. This will permanently delete your QR code and all associated data.
+                                </DialogDescription>
                               </DialogHeader>
                               <div className="py-4">
-                                <p>Are you sure you want to delete "{deleteConfirmQR.name}"? This action cannot be undone.</p>
+                                <p>Are you sure you want to delete "{deleteConfirmQR.name}"?</p>
                               </div>
                               <div className="flex justify-end space-x-2">
                                 <Button variant="outline" onClick={() => setDeleteConfirmQR(null)}>

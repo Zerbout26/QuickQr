@@ -281,6 +281,8 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
     const { name, url, logoUrl, foregroundColor, backgroundColor, links, type, menu } = req.body;
 
+    console.log('Update request body:', req.body); // Debug log
+
     const qrCode = await qrCodeRepository.findOne({
       where: { id, user: { id: req.user.id } }
     });
@@ -289,32 +291,43 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
-    if (name) qrCode.name = name;
-    if (url) qrCode.url = url;
+    // Update basic fields
+    if (name !== undefined) qrCode.name = name;
+    if (url !== undefined) qrCode.url = url;
     if (logoUrl !== undefined) qrCode.logoUrl = logoUrl;
-    if (foregroundColor) qrCode.foregroundColor = foregroundColor;
-    if (backgroundColor) qrCode.backgroundColor = backgroundColor;
-    if (type) qrCode.type = type as QRCodeType;
+    if (foregroundColor !== undefined) qrCode.foregroundColor = foregroundColor;
+    if (backgroundColor !== undefined) qrCode.backgroundColor = backgroundColor;
+    if (type !== undefined) qrCode.type = type as QRCodeType;
     
+    // Handle links
     if (links !== undefined) {
       try {
-        qrCode.links = links ? JSON.parse(links) : [];
+        // If links is already an array, use it directly
+        qrCode.links = Array.isArray(links) ? links : JSON.parse(links);
       } catch (e) {
+        console.error('Error parsing links:', e);
         return res.status(400).json({ error: 'Invalid links format' });
       }
     }
 
+    // Handle menu
     if (menu !== undefined && (type === 'menu' || type === 'both')) {
       try {
-        qrCode.menu = menu ? JSON.parse(menu) : null;
+        // If menu is already an object, use it directly
+        qrCode.menu = typeof menu === 'object' ? menu : JSON.parse(menu);
       } catch (e) {
+        console.error('Error parsing menu:', e);
         return res.status(400).json({ error: 'Invalid menu format' });
       }
     }
 
-    await qrCodeRepository.save(qrCode);
-    res.json(qrCode);
+    // Save the updated QR code
+    const updatedQRCode = await qrCodeRepository.save(qrCode);
+    console.log('Updated QR code:', updatedQRCode); // Debug log
+
+    res.json(updatedQRCode);
   } catch (error) {
+    console.error('Error updating QR code:', error);
     res.status(500).json({ error: 'Error updating QR code' });
   }
 };
@@ -380,6 +393,11 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
 export const getPublicQRCode = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    if (!id) {
+      return res.status(400).json({ error: 'QR code ID is required' });
+    }
+
     const qrCode = await qrCodeRepository.findOne({
       where: { id },
       relations: ['user']
@@ -394,7 +412,24 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'QR code is not accessible. User account is not active.' });
     }
 
-    res.json(qrCode);
+    // Return the QR code data without sensitive information
+    const publicQRCode = {
+      id: qrCode.id,
+      name: qrCode.name,
+      type: qrCode.type,
+      url: qrCode.url,
+      originalUrl: qrCode.originalUrl,
+      logoUrl: qrCode.logoUrl,
+      foregroundColor: qrCode.foregroundColor,
+      backgroundColor: qrCode.backgroundColor,
+      textAbove: qrCode.textAbove,
+      textBelow: qrCode.textBelow,
+      links: qrCode.links,
+      menu: qrCode.menu,
+      scanCount: qrCode.scanCount || 0
+    };
+
+    res.json(publicQRCode);
   } catch (error) {
     console.error('Error fetching public QR code:', error);
     res.status(500).json({ error: 'Error fetching QR code' });
