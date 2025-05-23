@@ -537,9 +537,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         const menuData = {
           restaurantName: name || 'My Restaurant',
           description: '',
-          categories: menuCategories.map(category => ({
+          categories: menuCategories.map((category, categoryIndex) => ({
             name: category.name || 'Unnamed Category',
-            items: category.items.map(item => ({
+            items: category.items.map((item, itemIndex) => ({
               name: item.name || 'Unnamed Item',
               description: item.description || '',
               price: Number(item.price) || 0,
@@ -569,7 +569,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
             const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
-            formData.append('menuItemImages', file, `${categoryIndex}-${itemIndex}-${file.name}`);
+            // Create a unique filename that includes category and item indices
+            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+            formData.append('menuItemImages', file, uniqueFilename);
           }
         }
       }

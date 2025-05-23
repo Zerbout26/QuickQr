@@ -155,20 +155,27 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
             const menuItemImages = (req.files as any)['menuItemImages'];
             for (let i = 0; i < menuItemImages.length; i++) {
               const imageFile = menuItemImages[i];
-              const imageUrl = await uploadToCloudinary(imageFile);
-              
-              // Extract category and item indices from the filename
-              const filename = imageFile.originalname;
-              const parts = filename.split('-');
-              if (parts.length >= 2) {
-                const categoryIndex = parseInt(parts[0], 10);
-                const itemIndex = parseInt(parts[1], 10);
+              try {
+                // Upload image to Cloudinary
+                const imageUrl = await uploadToCloudinary(imageFile);
                 
-                if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
-                    parsedMenu.categories[categoryIndex] && 
-                    parsedMenu.categories[categoryIndex].items[itemIndex]) {
-                  parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
+                // Extract category and item indices from the filename
+                const filename = imageFile.originalname;
+                const parts = filename.split('-');
+                if (parts.length >= 2) {
+                  const categoryIndex = parseInt(parts[0], 10);
+                  const itemIndex = parseInt(parts[1], 10);
+                  
+                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
+                      parsedMenu.categories[categoryIndex] && 
+                      parsedMenu.categories[categoryIndex].items[itemIndex]) {
+                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
+                  }
                 }
+              } catch (uploadError) {
+                console.error('Error uploading image to Cloudinary:', uploadError);
+                // Continue with other images even if one fails
+                continue;
               }
             }
           }
