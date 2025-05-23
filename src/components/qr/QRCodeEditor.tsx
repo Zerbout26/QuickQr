@@ -16,7 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
 
-const API_BASE_URL = 'http://localhost:3000/api';
+const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
 interface QRCodeEditorProps {
   qrCode: QRCode;

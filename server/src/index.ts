@@ -36,7 +36,7 @@ const itemsDir = path.join(uploadsDir, 'items');
 app.use(cors({
   origin: function(origin, callback) {
     const allowedOrigins = [
-      process.env.FRONTEND_URL, // Production frontend URL
+      'https://warm-pithivier-90ecdb.netlify.app', // Production frontend URL
       'http://localhost:8080',  // Development frontend URL
       'http://localhost:5173'   // Vite default development URL
     ];
