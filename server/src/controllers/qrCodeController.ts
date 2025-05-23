@@ -6,6 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
+import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
@@ -129,7 +130,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       // Handle logo upload if present
       if (req.files && (req.files as any)['logo']) {
         const logoFile = (req.files as any)['logo'][0];
-        logoUrl = `${frontendDomain}/uploads/logos/${logoFile.filename}`;
+        logoUrl = await uploadToCloudinary(logoFile);
       }
 
       // Parse links if provided
@@ -152,22 +153,20 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
           // Handle menu item images
           if (req.files && (req.files as any)['menuItemImages']) {
             const menuItemImages = (req.files as any)['menuItemImages'];
-            menuItemImages.forEach((file: Express.Multer.File) => {
-              // Extract category and item indices from filename
-              const [categoryIndex, itemIndex] = file.originalname.split('-').map(Number);
+            for (let i = 0; i < menuItemImages.length; i++) {
+              const imageFile = menuItemImages[i];
+              const imageUrl = await uploadToCloudinary(imageFile);
+              
+              // Find the corresponding menu item and update its image URL
+              const categoryIndex = Math.floor(i / 5); // Assuming 5 items per category
+              const itemIndex = i % 5;
+              
               if (parsedMenu && 
                   parsedMenu.categories[categoryIndex] && 
                   parsedMenu.categories[categoryIndex].items[itemIndex]) {
-                // Use the server's domain for image URLs
-                const serverUrl = `${req.protocol}://${req.get('host')}`;
-                // Preserve all existing item data and only update the imageUrl
-                const item = parsedMenu.categories[categoryIndex].items[itemIndex];
-                parsedMenu.categories[categoryIndex].items[itemIndex] = {
-                  ...item,
-                  imageUrl: `${serverUrl}/uploads/items/${file.filename}`
-                };
+                parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
               }
-            });
+            }
           }
         } catch (e) {
           console.error('Error parsing menu:', e);
@@ -318,9 +317,32 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
+    // Delete logo from Cloudinary if exists
+    if (qrCode.logoUrl) {
+      const publicId = qrCode.logoUrl.split('/').pop()?.split('.')[0];
+      if (publicId) {
+        await deleteFromCloudinary(publicId);
+      }
+    }
+
+    // Delete menu item images from Cloudinary if they exist
+    if (qrCode.menu && qrCode.menu.categories) {
+      for (const category of qrCode.menu.categories) {
+        for (const item of category.items) {
+          if (item.imageUrl) {
+            const publicId = item.imageUrl.split('/').pop()?.split('.')[0];
+            if (publicId) {
+              await deleteFromCloudinary(publicId);
+            }
+          }
+        }
+      }
+    }
+
     await qrCodeRepository.remove(qrCode);
     res.status(204).send();
   } catch (error) {
+    console.error('Error deleting QR code:', error);
     res.status(500).json({ error: 'Error deleting QR code' });
   }
 };

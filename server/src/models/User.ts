@@ -21,10 +21,10 @@ export class User {
   })
   role!: string;
 
-  @Column({ type: "datetime" })
+  @Column({ type: "timestamp" })
   trialStartDate!: Date;
 
-  @Column({ type: "datetime" })
+  @Column({ type: "timestamp" })
   trialEndDate!: Date;
 
   @Column({ default: true })
