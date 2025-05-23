@@ -334,30 +334,43 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
-    // Delete logo from Cloudinary if exists
-    if (qrCode.logoUrl) {
-      const publicId = qrCode.logoUrl.split('/').pop()?.split('.')[0];
-      if (publicId) {
-        await deleteFromCloudinary(publicId);
+    try {
+      // Delete logo from Cloudinary if exists
+      if (qrCode.logoUrl) {
+        const publicId = qrCode.logoUrl.split('/').pop()?.split('.')[0];
+        if (publicId) {
+          await deleteFromCloudinary(publicId);
+        }
       }
-    }
 
-    // Delete menu item images from Cloudinary if they exist
-    if (qrCode.menu && qrCode.menu.categories) {
-      for (const category of qrCode.menu.categories) {
-        for (const item of category.items) {
-          if (item.imageUrl) {
-            const publicId = item.imageUrl.split('/').pop()?.split('.')[0];
-            if (publicId) {
-              await deleteFromCloudinary(publicId);
+      // Delete menu item images from Cloudinary if they exist
+      if (qrCode.menu && qrCode.menu.categories) {
+        for (const category of qrCode.menu.categories) {
+          if (category.items) {
+            for (const item of category.items) {
+              if (item.imageUrl) {
+                try {
+                  const publicId = item.imageUrl.split('/').pop()?.split('.')[0];
+                  if (publicId) {
+                    await deleteFromCloudinary(publicId);
+                  }
+                } catch (imageError) {
+                  console.error('Error deleting menu item image:', imageError);
+                  // Continue with other images even if one fails
+                }
+              }
             }
           }
         }
       }
-    }
 
-    await qrCodeRepository.remove(qrCode);
-    res.status(204).send();
+      // Delete the QR code from the database
+      await qrCodeRepository.remove(qrCode);
+      res.status(204).send();
+    } catch (deleteError) {
+      console.error('Error during deletion process:', deleteError);
+      throw deleteError; // Re-throw to be caught by outer catch block
+    }
   } catch (error) {
     console.error('Error deleting QR code:', error);
     res.status(500).json({ error: 'Error deleting QR code' });
