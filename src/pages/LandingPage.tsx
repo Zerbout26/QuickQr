@@ -16,34 +16,82 @@ const LandingPage = () => {
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
+
+  // Translations for menu display
+  const translations = {
+    en: {
+      price: 'Price',
+      available: 'Available',
+      notAvailable: 'Not Available',
+      poweredBy: 'Powered by',
+      loading: 'Loading...',
+      error: 'Error',
+      returnHome: 'Return to Home',
+      qrCodeNotFound: 'QR code not found',
+      failedToLoad: 'Failed to load QR code',
+      followUs: {
+        facebook: 'Follow us on Facebook',
+        instagram: 'Follow us on Instagram',
+        twitter: 'Follow us on Twitter',
+        linkedin: 'Connect on LinkedIn',
+        youtube: 'Subscribe on YouTube',
+        tiktok: 'Follow us on TikTok',
+        whatsapp: 'Chat on WhatsApp',
+        telegram: 'Join our Telegram',
+        website: 'Visit our Website',
+        other: 'Visit Link'
+      }
+    },
+    ar: {
+      price: 'السعر',
+      available: 'متوفر',
+      notAvailable: 'غير متوفر',
+      poweredBy: 'مدعوم بواسطة',
+      loading: 'جاري التحميل...',
+      error: 'خطأ',
+      returnHome: 'العودة للرئيسية',
+      qrCodeNotFound: 'رمز QR غير موجود',
+      failedToLoad: 'فشل تحميل رمز QR',
+      followUs: {
+        facebook: 'تابعنا على فيسبوك',
+        instagram: 'تابعنا على انستغرام',
+        twitter: 'تابعنا على تويتر',
+        linkedin: 'تواصل معنا على لينكد إن',
+        youtube: 'اشترك في قناتنا على يوتيوب',
+        tiktok: 'تابعنا على تيك توك',
+        whatsapp: 'تواصل معنا على واتساب',
+        telegram: 'انضم إلى قناتنا على تيليجرام',
+        website: 'زر موقعنا',
+        other: 'زيارة الرابط'
+      }
+    }
+  };
 
   // Function to map platform type to label, icon, and colors
   const getPlatformInfo = (type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
+    const platformLabels = translations[menuLanguage].followUs;
     switch (type) {
       case 'facebook':
-        return { label: 'Follow us on Facebook', icon: Facebook, bgColor: '#1877F2', hoverBgColor: '#166FE5' };
+        return { label: platformLabels.facebook, icon: Facebook, bgColor: '#1877F2', hoverBgColor: '#166FE5' };
       case 'instagram':
-        return { label: 'Follow us on Instagram', icon: Instagram, bgColor: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', hoverBgColor: 'linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%)' };
+        return { label: platformLabels.instagram, icon: Instagram, bgColor: 'linear-gradient(45deg, #f09433 0%, #e6683c 25%, #dc2743 50%, #cc2366 75%, #bc1888 100%)', hoverBgColor: 'linear-gradient(45deg, #e08423 0%, #d6582c 25%, #cc1733 50%, #bc1356 75%, #ac0878 100%)' };
       case 'twitter':
-        return { label: 'Follow us on Twitter', icon: Twitter, bgColor: '#1DA1F2', hoverBgColor: '#1A91DA' };
+        return { label: platformLabels.twitter, icon: Twitter, bgColor: '#1DA1F2', hoverBgColor: '#1A91DA' };
       case 'linkedin':
-        return { label: 'Connect on LinkedIn', icon: Linkedin, bgColor: '#0A66C2', hoverBgColor: '#095BB5' };
+        return { label: platformLabels.linkedin, icon: Linkedin, bgColor: '#0A66C2', hoverBgColor: '#095BB5' };
       case 'youtube':
-        return { label: 'Subscribe on YouTube', icon: Youtube, bgColor: '#FF0000', hoverBgColor: '#E60000' };
+        return { label: platformLabels.youtube, icon: Youtube, bgColor: '#FF0000', hoverBgColor: '#E60000' };
       case 'tiktok':
-        return { label: 'Follow us on TikTok', icon: Music, bgColor: '#000000', hoverBgColor: '#1A1A1A' };
+        return { label: platformLabels.tiktok, icon: Music, bgColor: '#000000', hoverBgColor: '#1A1A1A' };
       case 'whatsapp':
-        return { label: 'Chat on WhatsApp', icon: MessageCircle, bgColor: '#25D366', hoverBgColor: '#20BA56' };
+        return { label: platformLabels.whatsapp, icon: MessageCircle, bgColor: '#25D366', hoverBgColor: '#20BA56' };
       case 'telegram':
-        return { label: 'Join our Telegram', icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
+        return { label: platformLabels.telegram, icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
-        return { label: 'Visit our Website', icon: Globe, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
-      case 'link':
-        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
-      case 'menu':
-        return { label: 'View Menu', icon: Utensils, bgColor: 'var(--secondary)', hoverBgColor: 'var(--secondary-dark)' };
+        return { label: platformLabels.website, icon: Globe, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
       default:
-        return { label: 'Visit Link', icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+        return { label: platformLabels.other, icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
     }
   };
 
@@ -52,6 +100,44 @@ const LandingPage = () => {
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const today = days[new Date().getDay()];
     return item.availability?.[today] ?? true;
+  };
+
+  // Function to detect if text is in Arabic
+  const isArabicText = (text: string): boolean => {
+    const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+    return arabicPattern.test(text);
+  };
+
+  // Function to detect menu language
+  const detectMenuLanguage = (menu: any): 'en' | 'ar' => {
+    if (!menu) return 'en';
+    
+    // Check restaurant name
+    if (menu.restaurantName && isArabicText(menu.restaurantName)) {
+      return 'ar';
+    }
+
+    // Check categories and items
+    if (menu.categories) {
+      for (const category of menu.categories) {
+        // Check category name
+        if (category.name && isArabicText(category.name)) {
+          return 'ar';
+        }
+
+        // Check items
+        if (category.items) {
+          for (const item of category.items) {
+            if ((item.name && isArabicText(item.name)) || 
+                (item.description && isArabicText(item.description))) {
+              return 'ar';
+            }
+          }
+        }
+      }
+    }
+
+    return 'en';
   };
 
   useEffect(() => {
@@ -68,6 +154,13 @@ const LandingPage = () => {
         // Then fetch the updated QR code using the public endpoint
         const data = await qrCodeApi.getPublicQRCode(id);
         setQRCode(data);
+        
+        // Automatically detect and set menu language
+        if (data.menu) {
+          const detectedLanguage = detectMenuLanguage(data.menu);
+          setMenuLanguage(detectedLanguage);
+        }
+        
         setLoading(false);
       } catch (err: any) {
         console.error('Error fetching QR code:', err);
@@ -96,7 +189,7 @@ const LandingPage = () => {
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
         <div className="text-center">
           <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-700 font-medium tracking-tight">Loading...</p>
+          <p className="text-xl text-gray-700 font-medium tracking-tight">{translations[menuLanguage].loading}</p>
         </div>
       </div>
     );
@@ -106,13 +199,13 @@ const LandingPage = () => {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
         <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">Error</h1>
-          <p className="text-xl text-gray-600 mb-6">{error || 'QR code not found'}</p>
+          <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">{translations[menuLanguage].error}</h1>
+          <p className="text-xl text-gray-600 mb-6">{error || translations[menuLanguage].qrCodeNotFound}</p>
           <Button
             className="px-6 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary"
             onClick={() => navigate('/')}
           >
-            Return to Home
+            {translations[menuLanguage].returnHome}
           </Button>
         </div>
       </div>
@@ -144,6 +237,7 @@ const LandingPage = () => {
           <CardContent className="p-6 md:p-10">
             <h1
               className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight text-primary"
+              dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
             >
               {qrCode.name}
             </h1>
@@ -189,7 +283,7 @@ const LandingPage = () => {
 
             {/* Menu Section */}
             {hasMenu && (
-              <div className="space-y-8">
+              <div className="space-y-8" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="text-center mb-6">
                   <h2
                     className="text-3xl font-semibold tracking-tight text-primary"
@@ -230,7 +324,7 @@ const LandingPage = () => {
                                   <p
                                     className="text-lg font-semibold whitespace-nowrap ml-4 text-primary"
                                   >
-                                    ${item.price.toFixed(2)}
+                                    {translations[menuLanguage].price}: ${item.price.toFixed(2)}
                                   </p>
                                 </div>
                                 {item.description && (
@@ -267,7 +361,7 @@ const LandingPage = () => {
             {/* Footer */}
             <div className="mt-12 text-center">
               <p className="text-sm text-gray-500">
-                Powered by <span className="text-primary font-medium">QuickQR</span> - Digital Solutions for Business
+                {translations[menuLanguage].poweredBy} <span className="text-primary font-medium">QuickQR</span>
               </p>
             </div>
           </CardContent>

@@ -293,6 +293,55 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [textAbove, setTextAbove] = useState('Scan me');
   const [textBelow, setTextBelow] = useState('');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
+  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
+
+  // Translations for menu form
+  const translations = {
+    en: {
+      addCategory: 'Add Category',
+      categoryName: 'Category Name',
+      addMenuItem: 'Add Menu Item',
+      itemName: 'Item Name',
+      description: 'Description',
+      price: 'Price',
+      itemImage: 'Item Image',
+      availability: 'Availability',
+      removeItem: 'Remove Item',
+      changeImage: 'Change Image',
+      addImage: 'Add Image',
+      days: {
+        sunday: 'Sunday',
+        monday: 'Monday',
+        tuesday: 'Tuesday',
+        wednesday: 'Wednesday',
+        thursday: 'Thursday',
+        friday: 'Friday',
+        saturday: 'Saturday'
+      }
+    },
+    ar: {
+      addCategory: 'إضافة فئة',
+      categoryName: 'اسم الفئة',
+      addMenuItem: 'إضافة عنصر قائمة',
+      itemName: 'اسم العنصر',
+      description: 'الوصف',
+      price: 'السعر',
+      itemImage: 'صورة العنصر',
+      availability: 'التوفر',
+      removeItem: 'حذف العنصر',
+      changeImage: 'تغيير الصورة',
+      addImage: 'إضافة صورة',
+      days: {
+        sunday: 'الأحد',
+        monday: 'الاثنين',
+        tuesday: 'الثلاثاء',
+        wednesday: 'الأربعاء',
+        thursday: 'الخميس',
+        friday: 'الجمعة',
+        saturday: 'السبت'
+      }
+    }
+  };
 
   const resetForm = () => {
     setName('');
@@ -759,13 +808,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 {(type === 'menu' || type === 'both') && (
                   <div className="space-y-4">
+                    <div className="flex justify-end mb-4">
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={() => setMenuLanguage(menuLanguage === 'en' ? 'ar' : 'en')}
+                        className="flex items-center gap-2"
+                      >
+                        {menuLanguage === 'en' ? 'العربية' : 'English'}
+                      </Button>
+                    </div>
                     {menuCategories.map((category, categoryIndex) => (
                       <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
                         <div className="flex gap-2 items-center">
                           <Input
-                            placeholder="Category Name"
+                            placeholder={translations[menuLanguage].categoryName}
                             value={category.name}
                             onChange={(e) => updateCategory(categoryIndex, e.target.value)}
+                            dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
                           />
                           <Button
                             type="button"
@@ -780,23 +840,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           {category.items.map((item, itemIndex) => (
                             <div key={itemIndex} className="space-y-2 border p-2 rounded">
                               <Input
-                                placeholder="Item Name"
+                                placeholder={translations[menuLanguage].itemName}
                                 value={item.name}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <Textarea
-                                placeholder="Description"
+                                placeholder={translations[menuLanguage].description}
                                 value={item.description}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <Input
                                 type="number"
-                                placeholder="Price"
+                                placeholder={translations[menuLanguage].price}
                                 value={item.price}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
+                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <div className="space-y-2">
-                                <Label>Item Image</Label>
+                                <Label>{translations[menuLanguage].itemImage}</Label>
                                 <div className="flex items-center gap-4 mb-2">
                                   {item.imageUrl && (
                                     <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
@@ -814,12 +877,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                     }}
                                   >
                                     <Upload className="h-4 w-4 mr-2" />
-                                    {item.imageUrl ? 'Change Image' : 'Add Image'}
+                                    {item.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
                                   </Button>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <Label>Availability</Label>
+                                <Label>{translations[menuLanguage].availability}</Label>
                                 <div className="grid grid-cols-4 gap-2">
                                   {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
                                     <div key={day} className="flex items-center space-x-2">
@@ -834,7 +897,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                         htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                       >
-                                        {day.charAt(0).toUpperCase() + day.slice(1)}
+                                        {translations[menuLanguage].days[day as keyof typeof translations.en.days]}
                                       </label>
                                     </div>
                                   ))}
@@ -847,7 +910,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 onClick={() => removeMenuItem(categoryIndex, itemIndex)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                Remove Item
+                                {translations[menuLanguage].removeItem}
                               </Button>
                             </div>
                           ))}
@@ -858,7 +921,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             onClick={() => addMenuItem(categoryIndex)}
                           >
                             <Plus className="h-4 w-4 mr-2" />
-                            Add Menu Item
+                            {translations[menuLanguage].addMenuItem}
                           </Button>
                         </div>
                       </div>
@@ -870,7 +933,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={addCategory}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      Add Category
+                      {translations[menuLanguage].addCategory}
                     </Button>
                   </div>
                 )}
