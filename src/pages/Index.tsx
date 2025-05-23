@@ -138,28 +138,28 @@ const Index = () => {
                   <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-xl">
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="public/ChatGPT Image May 23, 2025, 12_04_53 AM.png"
+                        src="/ChatGPT Image May 23, 2025, 12_04_53 AM.png"
                         alt="QR Code in use" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="public/Design sans titre.png"
+                        src="/Design sans titre.png"
                         alt="Restaurant QR menu" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="public/ChatGPT Image May 23, 2025, 12_08_02 AM.png"
+                        src="/ChatGPT Image May 23, 2025, 12_08_02 AM.png"
                         alt="Retail store" 
                         className="w-full h-full object-cover"
                       />
                     </div>
                     <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
                       <img 
-                        src="public/ChatGPT Image May 23, 2025, 12_09_50 AM.png"
+                        src="/ChatGPT Image May 23, 2025, 12_09_50 AM.png"
                         alt="Digital menu scanning" 
                         className="w-full h-full object-cover"
                       />
