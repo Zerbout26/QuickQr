@@ -568,8 +568,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         // Then, upload each menu item image
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
-            const [_, categoryIndex, itemIndex] = key.split('-');
-            formData.append(`menuItemImages`, file, `${categoryIndex}-${itemIndex}-${file.name}`);
+            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
+            formData.append('menuItemImages', file, `${categoryIndex}-${itemIndex}-${file.name}`);
           }
         }
       }

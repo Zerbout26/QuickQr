@@ -159,12 +159,16 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
               
               // Extract category and item indices from the filename
               const filename = imageFile.originalname;
-              const [categoryIndex, itemIndex] = filename.split('-').slice(0, 2).map(Number);
-              
-              if (parsedMenu && 
-                  parsedMenu.categories[categoryIndex] && 
-                  parsedMenu.categories[categoryIndex].items[itemIndex]) {
-                parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
+              const parts = filename.split('-');
+              if (parts.length >= 2) {
+                const categoryIndex = parseInt(parts[0], 10);
+                const itemIndex = parseInt(parts[1], 10);
+                
+                if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
+                    parsedMenu.categories[categoryIndex] && 
+                    parsedMenu.categories[categoryIndex].items[itemIndex]) {
+                  parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
+                }
               }
             }
           }
