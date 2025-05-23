@@ -536,6 +536,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         // First, create the menu data without image URLs
         const menuData = {
           restaurantName: name,
+          description: '',
           categories: menuCategories.map(category => ({
             name: category.name,
             items: category.items.map(item => ({
@@ -544,7 +545,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               price: Number(item.price),
               category: category.name,
               imageUrl: '', // We'll update this after uploading images
-              availability: item.availability || defaultAvailability
+              availability: {
+                sunday: item.availability?.sunday ?? true,
+                monday: item.availability?.monday ?? true,
+                tuesday: item.availability?.tuesday ?? true,
+                wednesday: item.availability?.wednesday ?? true,
+                thursday: item.availability?.thursday ?? true,
+                friday: item.availability?.friday ?? true,
+                saturday: item.availability?.saturday ?? true
+              }
             }))
           }))
         };
