@@ -157,9 +157,9 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
               const imageFile = menuItemImages[i];
               const imageUrl = await uploadToCloudinary(imageFile);
               
-              // Find the corresponding menu item and update its image URL
-              const categoryIndex = Math.floor(i / 5); // Assuming 5 items per category
-              const itemIndex = i % 5;
+              // Extract category and item indices from the filename
+              const filename = imageFile.originalname;
+              const [categoryIndex, itemIndex] = filename.split('-').slice(0, 2).map(Number);
               
               if (parsedMenu && 
                   parsedMenu.categories[categoryIndex] && 

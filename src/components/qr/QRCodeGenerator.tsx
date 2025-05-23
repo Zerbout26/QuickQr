@@ -535,15 +535,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       if (type === 'menu' || type === 'both') {
         // First, create the menu data without image URLs
         const menuData = {
-          restaurantName: name,
+          restaurantName: name || 'My Restaurant',
           description: '',
           categories: menuCategories.map(category => ({
-            name: category.name,
+            name: category.name || 'Unnamed Category',
             items: category.items.map(item => ({
-              name: item.name,
+              name: item.name || 'Unnamed Item',
               description: item.description || '',
-              price: Number(item.price),
-              category: category.name,
+              price: Number(item.price) || 0,
+              category: category.name || 'Unnamed Category',
               imageUrl: '', // We'll update this after uploading images
               availability: {
                 sunday: item.availability?.sunday ?? true,
@@ -557,12 +557,20 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             }))
           }))
         };
+
+        // Validate menu data
+        if (!menuData.restaurantName || menuData.categories.length === 0) {
+          throw new Error('Please provide a restaurant name and at least one category with items');
+        }
+
         formData.append('menu', JSON.stringify(menuData));
 
         // Then, upload each menu item image
         for (const [key, file] of Object.entries(tempImages)) {
-          const [_, categoryIndex, itemIndex] = key.split('-');
-          formData.append(`menuItemImages`, file, `${categoryIndex}-${itemIndex}-${file.name}`);
+          if (file instanceof File) {
+            const [_, categoryIndex, itemIndex] = key.split('-');
+            formData.append(`menuItemImages`, file, `${categoryIndex}-${itemIndex}-${file.name}`);
+          }
         }
       }
       
