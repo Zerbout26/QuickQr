@@ -9,6 +9,7 @@ export interface MenuItem {
   price: number;
   category: string;
   imageUrl?: string;
+  imagePublicId?: string;
   availability: {
     sunday: boolean;
     monday: boolean;
@@ -40,7 +41,8 @@ export class QRCode {
   name!: string;
 
   @Column({
-    type: "varchar",
+    type: "enum",
+    enum: ['url', 'menu', 'both'],
     default: 'url'
   })
   type!: QRCodeType;
@@ -63,6 +65,9 @@ export class QRCode {
 
   @Column({ nullable: true })
   logoUrl!: string;
+
+  @Column({ nullable: true })
+  logoPublicId!: string;
 
   @Column()
   foregroundColor!: string;

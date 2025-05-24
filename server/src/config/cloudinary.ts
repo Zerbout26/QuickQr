@@ -23,7 +23,11 @@ export const uploadToCloudinary = async (file: Express.Multer.File) => {
       quality: 'auto'
     });
 
-    return result.secure_url;
+    // Return both the URL and public ID
+    return {
+      url: result.secure_url,
+      publicId: result.public_id
+    };
   } catch (error) {
     console.error('Error uploading to Cloudinary:', error);
     throw error;
@@ -36,5 +40,20 @@ export const deleteFromCloudinary = async (publicId: string) => {
   } catch (error) {
     console.error('Error deleting from Cloudinary:', error);
     throw error;
+  }
+};
+
+// Helper function to extract public ID from Cloudinary URL
+export const getPublicIdFromUrl = (url: string): string | null => {
+  try {
+    // Extract the public ID from the URL
+    const matches = url.match(/\/v\d+\/([^/]+)\./);
+    if (matches && matches[1]) {
+      return matches[1];
+    }
+    return null;
+  } catch (error) {
+    console.error('Error extracting public ID from URL:', error);
+    return null;
   }
 }; 

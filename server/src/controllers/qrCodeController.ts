@@ -6,7 +6,7 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
-import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
+import { uploadToCloudinary, deleteFromCloudinary, getPublicIdFromUrl } from '../config/cloudinary';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
@@ -61,8 +61,8 @@ export const uploadItemImageHandler = async (req: AuthRequest, res: Response) =>
       }
 
       // Upload directly to Cloudinary
-      const imageUrl = await uploadToCloudinary(req.file);
-      res.json({ imageUrl });
+      const result = await uploadToCloudinary(req.file);
+      res.json({ imageUrl: result.url });
     } catch (error) {
       console.error('Error uploading item image:', error);
       res.status(500).json({ error: 'Error uploading item image' });
@@ -86,11 +86,14 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
+      let logoPublicId = '';
 
       // Handle logo upload if present
       if (req.files && (req.files as any)['logo']) {
         const logoFile = (req.files as any)['logo'][0];
-        logoUrl = await uploadToCloudinary(logoFile);
+        const result = await uploadToCloudinary(logoFile);
+        logoUrl = result.url;
+        logoPublicId = result.publicId;
       }
 
       // Parse links if provided
@@ -117,7 +120,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
               const imageFile = menuItemImages[i];
               try {
                 // Upload image to Cloudinary
-                const imageUrl = await uploadToCloudinary(imageFile);
+                const result = await uploadToCloudinary(imageFile);
                 
                 // Extract category and item indices from the filename
                 const filename = imageFile.originalname;
@@ -130,8 +133,9 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
                       parsedMenu.categories[categoryIndex] && 
                       parsedMenu.categories[categoryIndex].items[itemIndex]) {
                     // Update the imageUrl in the menu item
-                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
-                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${imageUrl}`);
+                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = result.url;
+                    parsedMenu.categories[categoryIndex].items[itemIndex].imagePublicId = result.publicId;
+                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${result.url}`);
                   } else {
                     console.warn(`Invalid indices in filename: ${filename}`);
                   }
@@ -153,21 +157,24 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
 
       // Create QR code
       const qrCode = qrCodeRepository.create({
-        name: name || 'My QR Code',
-        foregroundColor: foregroundColor || '#6366F1',
-        backgroundColor: backgroundColor || '#FFFFFF',
-        links: parsedLinks,
+        name,
         type: type as QRCodeType,
-        menu: parsedMenu || { restaurantName: '', categories: [] },
-        textAbove: textAbove || 'Scan me',
-        textBelow: textBelow || '',
-        url: url || '',
+        url: url || `${frontendDomain}/landing/${crypto.randomUUID()}`,
+        originalUrl: url,
         logoUrl,
+        logoPublicId,
+        foregroundColor,
+        backgroundColor,
+        textAbove,
+        textBelow,
+        links: parsedLinks,
+        menu: parsedMenu,
         user: req.user
       });
 
-      await qrCodeRepository.save(qrCode);
-      res.status(201).json(qrCode);
+      // Save QR code
+      const savedQRCode = await qrCodeRepository.save(qrCode);
+      res.status(201).json(savedQRCode);
     } catch (error) {
       console.error('Error creating QR code:', error);
       res.status(500).json({ error: 'Error creating QR code' });
@@ -290,11 +297,8 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
 
     try {
       // Delete logo from Cloudinary if exists
-      if (qrCode.logoUrl) {
-        const publicId = qrCode.logoUrl.split('/').pop()?.split('.')[0];
-        if (publicId) {
-          await deleteFromCloudinary(publicId);
-        }
+      if (qrCode.logoPublicId) {
+        await deleteFromCloudinary(qrCode.logoPublicId);
       }
 
       // Delete menu item images from Cloudinary if they exist
@@ -302,12 +306,9 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
         for (const category of qrCode.menu.categories) {
           if (category.items) {
             for (const item of category.items) {
-              if (item.imageUrl) {
+              if (item.imagePublicId) {
                 try {
-                  const publicId = item.imageUrl.split('/').pop()?.split('.')[0];
-                  if (publicId) {
-                    await deleteFromCloudinary(publicId);
-                  }
+                  await deleteFromCloudinary(item.imagePublicId);
                 } catch (imageError) {
                   console.error('Error deleting menu item image:', imageError);
                   // Continue with other images even if one fails
