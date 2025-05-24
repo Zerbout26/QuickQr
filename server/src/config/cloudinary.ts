@@ -1,8 +1,12 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { Request } from 'express';
+import { Multer } from 'multer';
 
-// Configure Cloudinary using the URL
-cloudinary.config({
-  url: process.env.CLOUDINARY_URL || 'cloudinary://662334265464293:aTVyBOf1HcAwCFSaY3KLUEz_KTQ@dzersyviu'
+// Configure Cloudinary
+cloudinary.config({ 
+    cloud_name: 'dzersyviu', 
+    api_key: '157589271173533', 
+    api_secret: '8VVPxTpmdhp3_Kqv22gtQa3YMvw'
 });
 
 export const uploadToCloudinary = async (file: Express.Multer.File) => {

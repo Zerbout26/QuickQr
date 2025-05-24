@@ -21,17 +21,6 @@ const getFrontendDomain = (req: express.Request) => {
   return process.env.FRONTEND_URL || 'http://localhost:8080';
 };
 
-// Create uploads directories if they don't exist
-const uploadsDir = path.join(__dirname, '../uploads');
-const logosDir = path.join(uploadsDir, 'logos');
-const itemsDir = path.join(uploadsDir, 'items');
-
-[uploadsDir, logosDir, itemsDir].forEach(dir => {
-  if (!fs.existsSync(dir)) {
-    fs.mkdirSync(dir, { recursive: true });
-  }
-});
-
 // Middleware
 app.use(cors({
   origin: function(origin, callback) {
@@ -62,22 +51,6 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   (req as any).frontendDomain = getFrontendDomain(req);
   next();
 });
-
-// Serve static files from the uploads directory with CORS headers
-app.use('/uploads', (req, res, next) => {
-  // Set CORS headers for static files
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  res.setHeader('Cache-Control', 'public, max-age=31536000'); // Cache for 1 year
-  
-  // Handle OPTIONS request
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-  
-  next();
-}, express.static(path.join(__dirname, '../uploads')));
 
 // Add token refresh endpoint
 app.post('/api/users/refresh-token', auth, (req: AuthRequest, res: express.Response) => {

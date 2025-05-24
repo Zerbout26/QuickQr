@@ -11,31 +11,9 @@ import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
-// Configure multer for file uploads
+// Configure multer for memory storage
 const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-      let uploadDir = path.join(__dirname, '../../uploads/logos'); // Default to logos directory
-      if (file.fieldname === 'menuItemImages') {
-        uploadDir = path.join(__dirname, '../../uploads/items');
-      }
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    },
-    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      const ext = path.extname(file.originalname);
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      if (file.fieldname === 'logo') {
-        const filename = `${path.basename(file.originalname, ext)}-${uniqueSuffix}${ext}`;
-        cb(null, filename);
-      } else if (file.fieldname === 'menuItemImages') {
-        const filename = `item-${uniqueSuffix}${ext}`;
-        cb(null, filename);
-      }
-    }
-  }),
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 2 * 1024 * 1024, // 2MB limit
   },
@@ -52,21 +30,7 @@ const upload = multer({
 ]);
 
 const uploadItemImage = multer({
-  storage: multer.diskStorage({
-    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-      const uploadDir = path.join(__dirname, '../../uploads/items');
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    },
-    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      const ext = path.extname(file.originalname);
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      const filename = `item-${uniqueSuffix}${ext}`;
-      cb(null, filename);
-    }
-  }),
+  storage: multer.memoryStorage(),
   limits: {
     fileSize: 2 * 1024 * 1024 // 2MB limit
   },
@@ -96,9 +60,8 @@ export const uploadItemImageHandler = async (req: AuthRequest, res: Response) =>
         return res.status(400).json({ error: 'No image file provided' });
       }
 
-      // Use the server's domain for image URLs
-      const serverUrl = `${req.protocol}://${req.get('host')}`;
-      const imageUrl = `${serverUrl}/uploads/items/${req.file.filename}`;
+      // Upload directly to Cloudinary
+      const imageUrl = await uploadToCloudinary(req.file);
       res.json({ imageUrl });
     } catch (error) {
       console.error('Error uploading item image:', error);
@@ -119,9 +82,6 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         console.error('No user found in request');
         return res.status(401).json({ error: 'Not authenticated' });
       }
-
-      console.log('Request body:', req.body);
-      console.log('Request files:', req.files);
 
       const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url } = req.body;
       const frontendDomain = (req as any).frontendDomain;
@@ -191,44 +151,25 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      const qrCode = new QRCode();
-      qrCode.name = name || 'My QR Code';
-      qrCode.type = type || 'url';
-      qrCode.links = parsedLinks;
-      qrCode.menu = parsedMenu || { restaurantName: '', categories: [] };
-      qrCode.logoUrl = logoUrl;
-      qrCode.foregroundColor = foregroundColor || '#6366F1';
-      qrCode.backgroundColor = backgroundColor || '#FFFFFF';
-      qrCode.textAbove = textAbove || 'Scan me';
-      qrCode.textBelow = textBelow || '';
-      qrCode.user = req.user;
+      // Create QR code
+      const qrCode = qrCodeRepository.create({
+        name: name || 'My QR Code',
+        foregroundColor: foregroundColor || '#6366F1',
+        backgroundColor: backgroundColor || '#FFFFFF',
+        links: parsedLinks,
+        type: type as QRCodeType,
+        menu: parsedMenu || { restaurantName: '', categories: [] },
+        textAbove: textAbove || 'Scan me',
+        textBelow: textBelow || '',
+        url: url || '',
+        logoUrl,
+        user: req.user
+      });
 
-      if (type === 'direct' && url) {
-        const serverUrl = `${req.protocol}://${req.get('host')}`;
-        qrCode.url = `${serverUrl}/api/qrcodes/redirect/${encodeURIComponent(url)}`;
-        qrCode.originalUrl = url;
-      } else {
-        const tempId = crypto.randomUUID();
-        const tempUrl = `${frontendDomain}/landing/${tempId}`;
-        qrCode.url = tempUrl;
-        qrCode.originalUrl = tempUrl;
-
-        const savedQRCode = await qrCodeRepository.save(qrCode);
-        savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
-        savedQRCode.originalUrl = savedQRCode.url;
-        const finalQRCode = await qrCodeRepository.save(savedQRCode);
-        return res.status(201).json(finalQRCode);
-      }
-
-      const savedQRCode = await qrCodeRepository.save(qrCode);
-      res.status(201).json(savedQRCode);
-
+      await qrCodeRepository.save(qrCode);
+      res.status(201).json(qrCode);
     } catch (error) {
       console.error('Error creating QR code:', error);
-      if (error instanceof Error) {
-        console.error('Error details:', error.message);
-        console.error('Error stack:', error.stack);
-      }
       res.status(500).json({ error: 'Error creating QR code' });
     }
   });
