@@ -97,7 +97,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       // Parse links if provided
-      let parsedLinks = [];
+      let parsedLinks: { label: string; url: string; type: string }[] = [];
       if (links) {
         try {
           parsedLinks = JSON.parse(links);
@@ -108,7 +108,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       // Parse menu if provided
-      let parsedMenu: { restaurantName: string; description?: string; categories: MenuCategory[] } | null = null;
+      let parsedMenu: { restaurantName: string; description?: string; categories: MenuCategory[] } | undefined = undefined;
       if ((type === 'menu' || type === 'both') && menu) {
         try {
           parsedMenu = JSON.parse(menu) as { restaurantName: string; description?: string; categories: MenuCategory[] };
@@ -155,19 +155,19 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      // Create QR code
+      // Create QR code with required fields
       const qrCode = qrCodeRepository.create({
-        name,
-        type: type as QRCodeType,
+        name: name || 'My QR Code',
+        type: (type || 'url') as QRCodeType,
         url: url || `${frontendDomain}/landing/${crypto.randomUUID()}`,
-        originalUrl: url,
-        logoUrl,
-        logoPublicId,
-        foregroundColor,
-        backgroundColor,
-        textAbove,
-        textBelow,
-        links: parsedLinks,
+        originalUrl: url || '',
+        logoUrl: logoUrl || '',
+        logoPublicId: logoPublicId || '',
+        foregroundColor: foregroundColor || '#000000',
+        backgroundColor: backgroundColor || '#FFFFFF',
+        textAbove: textAbove || '',
+        textBelow: textBelow || '',
+        links: parsedLinks || [],
         menu: parsedMenu,
         user: req.user
       });
@@ -195,6 +195,7 @@ export const getQRCodes = async (req: AuthRequest, res: Response) => {
 
     res.json(qrCodes);
   } catch (error) {
+    console.error('Error fetching QR codes:', error);
     res.status(500).json({ error: 'Error fetching QR codes' });
   }
 };
