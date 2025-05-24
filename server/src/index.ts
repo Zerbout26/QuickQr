@@ -8,8 +8,27 @@ import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
+import axios from 'axios';
+import compression from 'compression';
+import helmet from 'helmet';
 
 const app = express();
+
+// Security middleware
+app.use(helmet({
+  contentSecurityPolicy: {
+    directives: {
+      defaultSrc: ["'self'"],
+      imgSrc: ["'self'", "data:", "https:", "blob:"],
+      styleSrc: ["'self'", "'unsafe-inline'", "https:"],
+      scriptSrc: ["'self'", "'unsafe-inline'", "'unsafe-eval'"],
+      connectSrc: ["'self'", "https:"],
+    },
+  },
+}));
+
+// Compression middleware
+app.use(compression());
 
 // Get the frontend domain from the request origin
 const getFrontendDomain = (req: express.Request) => {
@@ -20,6 +39,42 @@ const getFrontendDomain = (req: express.Request) => {
   // Fallback to environment variable or default
   return process.env.FRONTEND_URL || 'http://localhost:8080';
 };
+
+// Health check endpoint
+app.get('/health', (req, res) => {
+  res.status(200).json({ status: 'ok', timestamp: new Date().toISOString() });
+});
+
+// Function to get the server's own URL
+const getServerUrl = () => {
+  // If running on Render, use the RENDER_EXTERNAL_URL environment variable
+  if (process.env.RENDER_EXTERNAL_URL) {
+    return process.env.RENDER_EXTERNAL_URL;
+  }
+  
+  // If running on localhost, use the PORT environment variable or default to 3000
+  const port = process.env.PORT || 3000;
+  return `http://localhost:${port}`;
+};
+
+// Self-ping function to keep the server active
+const pingServer = async () => {
+  try {
+    const serverUrl = getServerUrl();
+    console.log('Pinging server at:', serverUrl);
+    const response = await axios.get(`${serverUrl}/health`);
+    console.log('Server pinged successfully:', response.data);
+  } catch (error) {
+    console.error('Error pinging server:', error);
+  }
+};
+
+// Start the self-ping interval
+const PING_INTERVAL = 10 * 60 * 1000; // 10 minutes
+setInterval(pingServer, PING_INTERVAL);
+
+// Initial ping
+pingServer();
 
 // Middleware
 app.use(cors({
@@ -44,7 +99,10 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
   credentials: true
 }));
-app.use(express.json());
+
+// Increase JSON payload limit for larger QR codes
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // Add frontend domain to request object
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {

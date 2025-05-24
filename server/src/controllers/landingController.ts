@@ -5,16 +5,65 @@ import { QRCode } from '../models/QRCode';
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
+// Cache for QR codes
+const qrCodeCache = new Map<string, { data: any; timestamp: number }>();
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+
+// Function to darken a color
+const darkenColor = (color: string, amount: number) => {
+  // Remove # if present
+  color = color.replace(/^#/, '');
+  
+  // Parse the color
+  let r = parseInt(color.substring(0, 2), 16);
+  let g = parseInt(color.substring(2, 4), 16);
+  let b = parseInt(color.substring(4, 6), 16);
+  
+  // Darken each channel
+  r = Math.max(0, Math.floor(r * (1 - amount)));
+  g = Math.max(0, Math.floor(g * (1 - amount)));
+  b = Math.max(0, Math.floor(b * (1 - amount)));
+  
+  // Convert back to hex
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+};
+
 export const getLandingPage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    
+    // Check cache first
+    const cachedData = qrCodeCache.get(id);
+    if (cachedData && Date.now() - cachedData.timestamp < CACHE_DURATION) {
+      return res.send(cachedData.data);
+    }
+
     const qrCode = await qrCodeRepository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        url: true,
+        originalUrl: true,
+        logoUrl: true,
+        foregroundColor: true,
+        backgroundColor: true,
+        textAbove: true,
+        textBelow: true,
+        links: true,
+        menu: true,
+        scanCount: true,
+        user: {
+          id: true,
+          isActive: true
+        }
+      }
     });
 
     if (!qrCode) {
-      return res.status(404).send(`
+      const notFoundHtml = `
         <html>
           <head>
             <title>QR Code Not Found</title>
@@ -51,7 +100,9 @@ export const getLandingPage = async (req: Request, res: Response) => {
             </div>
           </body>
         </html>
-      `);
+      `;
+      qrCodeCache.set(id, { data: notFoundHtml, timestamp: Date.now() });
+      return res.send(notFoundHtml);
     }
 
     // Check if user is active
@@ -77,8 +128,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
       ipAddress: req.ip || 'Unknown'
     });
     
-    // Save the updated QR code and wait for it to complete
-    await qrCodeRepository.save(qrCode);
+    // Save the updated QR code asynchronously
+    qrCodeRepository.save(qrCode).catch(error => {
+      console.error('Error saving QR code scan:', error);
+    });
 
     // Define primary color with fallback
     const primaryColor = qrCode.foregroundColor || '#4A90E2';
@@ -114,200 +167,169 @@ export const getLandingPage = async (req: Request, res: Response) => {
               justify-content: center;
               background: linear-gradient(135deg, var(--background-color) 0%, 
                 ${darkenColor(qrCode.backgroundColor || '#f9fafb', 0.1)} 100%);
-              color: var(--text-color);
-              line-height: 1.5;
             }
             
             .container {
               width: 100%;
-              max-width: 600px;
+              max-width: 800px;
+              margin: 2rem auto;
               padding: 2rem;
-              background: white;
+              background: rgba(255, 255, 255, 0.95);
               border-radius: var(--border-radius);
-              box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-              margin: 1rem;
-              border-left: 4px solid var(--primary-color);
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+              backdrop-filter: blur(10px);
             }
             
             .logo {
-              max-width: 150px;
-              max-height: 80px;
+              max-width: 200px;
               height: auto;
-              margin-bottom: 1.5rem;
-              object-fit: contain;
+              margin: 0 auto 2rem;
+              display: block;
             }
             
             .title {
-              font-size: 1.5rem;
+              font-size: 2.5rem;
               font-weight: 700;
-              color: var(--primary-color);
-              margin-bottom: 1.5rem;
+              color: var(--text-color);
+              text-align: center;
+              margin-bottom: 2rem;
             }
             
             .buttons {
-              display: flex;
-              flex-direction: column;
-              gap: 0.75rem;
-              width: 100%;
+              display: grid;
+              grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+              gap: 1rem;
+              margin-bottom: 2rem;
             }
             
             .button {
               display: inline-block;
-              padding: 0.75rem 1.5rem;
-              background-color: var(--primary-color);
+              padding: 1rem 2rem;
+              background: var(--primary-color);
               color: white;
               text-decoration: none;
-              border-radius: 0.5rem;
-              font-weight: 500;
-              transition: all 0.3s;
+              border-radius: var(--border-radius);
               text-align: center;
+              font-weight: 600;
+              transition: all 0.3s ease;
             }
             
             .button:hover {
-              opacity: 0.9;
               transform: translateY(-2px);
-              box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+              box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+            }
+            
+            .button.pulse {
+              animation: pulse 2s infinite;
+            }
+            
+            @keyframes pulse {
+              0% { transform: scale(1); }
+              50% { transform: scale(1.05); }
+              100% { transform: scale(1); }
             }
             
             .menu-section {
-              margin-top: 2rem;
-              border-top: 1px solid var(--border-color);
-              padding-top: 1.5rem;
-              width: 100%;
+              margin-top: 3rem;
             }
             
             .menu-header {
-              color: var(--primary-color);
-              font-size: 1.25rem;
+              font-size: 2rem;
+              color: var(--text-color);
+              text-align: center;
               margin-bottom: 1rem;
-              font-weight: 600;
             }
             
             .menu-categories {
-              display: flex;
-              flex-direction: column;
-              gap: 1.5rem;
+              display: grid;
+              gap: 2rem;
             }
             
             .category {
-              background: #f9fafb;
-              border-radius: 0.5rem;
+              background: white;
+              border-radius: var(--border-radius);
               overflow: hidden;
-              border-left: 3px solid var(--primary-color);
-              transition: all 0.3s;
-            }
-            
-            .category:hover {
-              box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-              transform: translateY(-2px);
+              box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
             }
             
             .category-name {
-              background-color: var(--primary-color);
+              background: var(--primary-color);
               color: white;
-              padding: 0.75rem;
-              font-size: 1.1rem;
+              padding: 1rem;
               font-weight: 600;
+              text-align: center;
             }
             
             .category-items {
-              display: grid;
-              grid-template-columns: 1fr;
-              gap: 0.75rem;
-              padding: 0.75rem;
-            }
-            
-            @media (min-width: 480px) {
-              .category-items {
-                grid-template-columns: repeat(2, 1fr);
-              }
+              padding: 1rem;
             }
             
             .item {
-              background: white;
-              padding: 0.75rem;
-              border-radius: 0.5rem;
-              box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-              display: flex;
-              flex-direction: column;
-              height: 100%;
-              transition: all 0.3s;
-              border: 1px solid var(--border-color);
+              padding: 1rem;
+              border-bottom: 1px solid var(--border-color);
             }
             
-            .item:hover {
-              box-shadow: 0 4px 6px rgba(0,0,0,0.1);
-              border-color: var(--primary-color);
+            .item:last-child {
+              border-bottom: none;
             }
             
             .item-header {
               display: flex;
               justify-content: space-between;
-              margin-bottom: 0.5rem;
               align-items: center;
+              margin-bottom: 0.5rem;
             }
             
             .item-name {
               font-weight: 600;
-              color: var(--primary-color);
+              color: var(--text-color);
             }
             
             .item-price {
+              color: var(--primary-color);
               font-weight: 600;
-              color: var(--secondary-color);
             }
             
             .item-description {
-              font-size: 0.85rem;
               color: var(--text-light);
-              margin-bottom: 0.75rem;
-              overflow: hidden;
-              text-overflow: ellipsis;
-              display: -webkit-box;
-              -webkit-line-clamp: 2;
-              -webkit-box-orient: vertical;
+              font-size: 0.9rem;
+              margin-bottom: 0.5rem;
             }
             
             .item-image {
               width: 100%;
-              height: 120px;
+              height: 200px;
               object-fit: cover;
-              border-radius: 0.25rem;
+              border-radius: var(--border-radius);
               margin-top: 0.5rem;
-              transition: transform 0.3s;
-            }
-            
-            .item-image:hover {
-              transform: scale(1.05);
             }
             
             .footer {
-              margin-top: 2rem;
               text-align: center;
-              font-size: 0.75rem;
+              margin-top: 3rem;
               color: var(--text-light);
+              font-size: 0.9rem;
             }
             
-            .pulse {
-              animation: pulse 2s infinite;
-            }
-            
-            @keyframes pulse {
-              0% {
-                transform: scale(1);
+            @media (max-width: 640px) {
+              .container {
+                margin: 1rem;
+                padding: 1rem;
               }
-              50% {
-                transform: scale(1.05);
+              
+              .title {
+                font-size: 2rem;
               }
-              100% {
-                transform: scale(1);
+              
+              .menu-header {
+                font-size: 1.5rem;
               }
             }
           </style>
         </head>
         <body>
           <div class="container">
-            ${qrCode.logoUrl ? `<img src="${qrCode.logoUrl}" alt="Logo" class="logo">` : ''}
+            ${qrCode.logoUrl ? `<img src="${qrCode.logoUrl}" alt="Logo" class="logo" loading="lazy">` : ''}
             <h1 class="title">${qrCode.name}</h1>
             
             ${qrCode.links && qrCode.links.length > 0 ? `
@@ -355,6 +377,9 @@ export const getLandingPage = async (req: Request, res: Response) => {
       </html>
     `;
 
+    // Cache the generated HTML
+    qrCodeCache.set(id, { data: html, timestamp: Date.now() });
+
     res.send(html);
   } catch (error) {
     console.error('Error generating landing page:', error);
@@ -362,21 +387,3 @@ export const getLandingPage = async (req: Request, res: Response) => {
   }
 };
 
-// Helper function to darken a color
-function darkenColor(hex: string, amount: number): string {
-  // Remove # if present
-  hex = hex.replace(/^#/, '');
-  
-  // Parse the color
-  let r = parseInt(hex.substring(0, 2), 16);
-  let g = parseInt(hex.substring(2, 4), 16);
-  let b = parseInt(hex.substring(4, 6), 16);
-  
-  // Darken each channel
-  r = Math.max(0, Math.floor(r * (1 - amount)));
-  g = Math.max(0, Math.floor(g * (1 - amount)));
-  b = Math.max(0, Math.floor(b * (1 - amount)));
-  
-  // Convert back to hex
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
-}
