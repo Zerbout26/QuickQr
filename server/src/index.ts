@@ -12,8 +12,6 @@ import landingRoutes from './routes/landingRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
 import axios from 'axios';
-import cluster from 'cluster';
-import os from 'os';
 
 const app = express();
 
@@ -358,50 +356,8 @@ const startServer = async () => {
   }
 };
 
-// Optimize cluster configuration
-if (process.env.NODE_ENV === 'production' && cluster.isPrimary) {
-  const numCPUs = Math.max(2, Math.min(os.cpus().length - 1, 4)); // Use 2-4 workers
-  console.log(`Primary ${process.pid} is running`);
-  console.log(`Forking for ${numCPUs} CPUs`);
-  
-  // Fork workers
-  for (let i = 0; i < numCPUs; i++) {
-    cluster.fork();
-  }
-  
-  // Enhanced worker management
-  cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died with code ${code} and signal ${signal}`);
-    
-    // Add delay before forking new worker
-    setTimeout(() => {
-      console.log('Starting new worker...');
-      cluster.fork();
-    }, 5000);
-  });
-
-  // Monitor worker health
-  setInterval(() => {
-    const workers = cluster.workers;
-    if (workers) {
-      for (const worker of Object.values(workers)) {
-        if (worker) {
-          worker.send('ping');
-        }
-      }
-    }
-  }, 30000);
-
-} else {
-  // Worker process
-  process.on('message', (msg) => {
-    if (msg === 'ping') {
-      process.send?.('pong');
-    }
-  });
-
-  startServer();
-}
+// Start server without clustering
+startServer();
 
 // Enhanced global error handler
 app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
