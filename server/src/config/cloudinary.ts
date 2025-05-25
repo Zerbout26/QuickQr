@@ -1,36 +1,64 @@
 import { v2 as cloudinary } from 'cloudinary';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import multer from 'multer';
 
-// Configure Cloudinary using the URL
+// Configure Cloudinary
 cloudinary.config({
-  url: process.env.CLOUDINARY_URL || 'cloudinary://662334265464293:aTVyBOf1HcAwCFSaY3KLUEz_KTQ@dzersyviu'
+    cloud_name: process.env.CLOUDINARY_CLOUD_NAME || 'dzersyviu',
+    api_key: process.env.CLOUDINARY_API_KEY || '157589271173533',
+    api_secret: process.env.CLOUDINARY_API_SECRET || '8VVPxTpmdhp3_Kqv22gtQa3YMvw'
 });
 
-export const uploadToCloudinary = async (file: Express.Multer.File) => {
-  try {
-    // Convert buffer to base64
-    const b64 = Buffer.from(file.buffer).toString('base64');
-    const dataURI = `data:${file.mimetype};base64,${b64}`;
+// Configure Cloudinary storage
+const storage = new CloudinaryStorage({
+    cloudinary: cloudinary,
+    params: {
+        folder: 'quickqr',
+        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
+        transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
+    }
+});
 
-    // Upload to Cloudinary
-    const result = await cloudinary.uploader.upload(dataURI, {
-      folder: 'quickqr',
-      resource_type: 'auto',
-      format: 'auto',
-      quality: 'auto'
-    });
+// Create multer upload instance
+export const upload = multer({ storage: storage });
 
-    return result.secure_url;
-  } catch (error) {
-    console.error('Error uploading to Cloudinary:', error);
-    throw error;
-  }
+// Helper function to upload a file to Cloudinary
+export const uploadToCloudinary = async (file: Express.Multer.File): Promise<string> => {
+    try {
+        const result = await cloudinary.uploader.upload(file.path, {
+            folder: 'quickqr',
+            resource_type: 'auto'
+        });
+        return result.secure_url;
+    } catch (error) {
+        console.error('Error uploading to Cloudinary:', error);
+        throw error;
+    }
 };
 
-export const deleteFromCloudinary = async (publicId: string) => {
-  try {
-    await cloudinary.uploader.destroy(publicId);
-  } catch (error) {
-    console.error('Error deleting from Cloudinary:', error);
-    throw error;
-  }
+// Helper function to delete a file from Cloudinary
+export const deleteFromCloudinary = async (publicId: string): Promise<void> => {
+    try {
+        await cloudinary.uploader.destroy(publicId);
+    } catch (error) {
+        console.error('Error deleting from Cloudinary:', error);
+        throw error;
+    }
+};
+
+// Helper function to get optimized URL
+export const getOptimizedUrl = (url: string, options: {
+    width?: number;
+    height?: number;
+    crop?: string;
+    quality?: string;
+    format?: string;
+} = {}): string => {
+    const defaultOptions = {
+        fetch_format: 'auto',
+        quality: 'auto',
+        ...options
+    };
+    
+    return cloudinary.url(url, defaultOptions);
 }; 

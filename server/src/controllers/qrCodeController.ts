@@ -6,47 +6,13 @@ import multer from 'multer';
 import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
-import { uploadToCloudinary, deleteFromCloudinary } from '../config/cloudinary';
+import { upload, uploadToCloudinary, deleteFromCloudinary, getOptimizedUrl } from '../config/cloudinary';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
 // Configure multer for file uploads
-const upload = multer({
-  storage: multer.diskStorage({
-    destination: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, destination: string) => void) => {
-      let uploadDir = path.join(__dirname, '../../uploads/logos'); // Default to logos directory
-      if (file.fieldname === 'menuItemImages') {
-        uploadDir = path.join(__dirname, '../../uploads/items');
-      }
-      if (!fs.existsSync(uploadDir)) {
-        fs.mkdirSync(uploadDir, { recursive: true });
-      }
-      cb(null, uploadDir);
-    },
-    filename: (req: Express.Request, file: Express.Multer.File, cb: (error: Error | null, filename: string) => void) => {
-      const ext = path.extname(file.originalname);
-      const uniqueSuffix = `${Date.now()}-${Math.round(Math.random() * 1E9)}`;
-      if (file.fieldname === 'logo') {
-        const filename = `${path.basename(file.originalname, ext)}-${uniqueSuffix}${ext}`;
-        cb(null, filename);
-      } else if (file.fieldname === 'menuItemImages') {
-        const filename = `item-${uniqueSuffix}${ext}`;
-        cb(null, filename);
-      }
-    }
-  }),
-  limits: {
-    fileSize: 2 * 1024 * 1024, // 2MB limit
-  },
-  fileFilter: (req, file, cb) => {
-    if (file.mimetype.startsWith('image/')) {
-      cb(null, true);
-    } else {
-      cb(new Error('Only image files are allowed'));
-    }
-  }
-}).fields([
+const uploadFields = upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'menuItemImages', maxCount: 20 } // Allow up to 20 menu item images
 ]);
@@ -81,34 +47,35 @@ const uploadItemImage = multer({
 }).single('image');
 
 export const uploadItemImageHandler = async (req: AuthRequest, res: Response) => {
-  uploadItemImage(req, res, async (err) => {
-    if (err) {
-      console.error('Multer error:', err);
-      return res.status(400).json({ error: err.message });
+  try {
+    if (!req.user) {
+      return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    try {
-      if (!req.user) {
-        return res.status(401).json({ error: 'Not authenticated' });
-      }
-
-      if (!req.file) {
-        return res.status(400).json({ error: 'No image file provided' });
-      }
-
-      // Use the server's domain for image URLs
-      const serverUrl = `${req.protocol}://${req.get('host')}`;
-      const imageUrl = `${serverUrl}/uploads/items/${req.file.filename}`;
-      res.json({ imageUrl });
-    } catch (error) {
-      console.error('Error uploading item image:', error);
-      res.status(500).json({ error: 'Error uploading item image' });
+    if (!req.file) {
+      return res.status(400).json({ error: 'No image file provided' });
     }
-  });
+
+    // Upload to Cloudinary and get the URL
+    const imageUrl = await uploadToCloudinary(req.file);
+    
+    // Get optimized URL for the image
+    const optimizedUrl = getOptimizedUrl(imageUrl, {
+      width: 500,
+      height: 500,
+      crop: 'fill',
+      quality: 'auto'
+    });
+
+    res.json({ imageUrl: optimizedUrl });
+  } catch (error) {
+    console.error('Error uploading item image:', error);
+    res.status(500).json({ error: 'Error uploading item image' });
+  }
 };
 
 export const createQRCode = async (req: AuthRequest, res: Response) => {
-  upload(req, res, async (err) => {
+  uploadFields(req, res, async (err) => {
     if (err) {
       console.error('Multer error:', err);
       return res.status(400).json({ error: err.message });
@@ -120,9 +87,6 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         return res.status(401).json({ error: 'Not authenticated' });
       }
 
-      console.log('Request body:', req.body);
-      console.log('Request files:', req.files);
-
       const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
@@ -131,6 +95,13 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       if (req.files && (req.files as any)['logo']) {
         const logoFile = (req.files as any)['logo'][0];
         logoUrl = await uploadToCloudinary(logoFile);
+        // Get optimized URL for the logo
+        logoUrl = getOptimizedUrl(logoUrl, {
+          width: 200,
+          height: 200,
+          crop: 'fill',
+          quality: 'auto'
+        });
       }
 
       // Parse links if provided
@@ -159,6 +130,14 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
                 // Upload image to Cloudinary
                 const imageUrl = await uploadToCloudinary(imageFile);
                 
+                // Get optimized URL for the menu item image
+                const optimizedUrl = getOptimizedUrl(imageUrl, {
+                  width: 500,
+                  height: 500,
+                  crop: 'fill',
+                  quality: 'auto'
+                });
+                
                 // Extract category and item indices from the filename
                 const filename = imageFile.originalname;
                 const parts = filename.split('-');
@@ -170,8 +149,8 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
                       parsedMenu.categories[categoryIndex] && 
                       parsedMenu.categories[categoryIndex].items[itemIndex]) {
                     // Update the imageUrl in the menu item
-                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = imageUrl;
-                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${imageUrl}`);
+                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = optimizedUrl;
+                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${optimizedUrl}`);
                   } else {
                     console.warn(`Invalid indices in filename: ${filename}`);
                   }
