@@ -14,6 +14,23 @@ import axios from 'axios';
 
 const app = express();
 
+// Get server URL from request or environment
+const getServerUrl = (req?: express.Request): string => {
+  if (req) {
+    const protocol = req.headers['x-forwarded-proto'] || req.protocol;
+    const host = req.headers['x-forwarded-host'] || req.get('host');
+    if (protocol && host) {
+      return `${protocol}://${host}`;
+    }
+  }
+  
+  // Fallback to environment variables or localhost
+  const port = process.env.PORT || 10000;
+  return process.env.NODE_ENV === 'production' 
+    ? process.env.SERVER_URL || `http://localhost:${port}`
+    : `http://localhost:${port}`;
+};
+
 // Rate limiting configuration
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000, // 15 minutes
@@ -130,9 +147,10 @@ app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
 // Self-ping function to keep the server alive
-const pingServer = async () => {
+const pingServer = async (req?: express.Request) => {
   try {
-    const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
+    const serverUrl = getServerUrl(req);
+    console.log('Attempting to ping server at:', serverUrl);
     await axios.get(`${serverUrl}/api/health`);
     console.log('Server self-ping successful');
   } catch (error) {
@@ -142,7 +160,14 @@ const pingServer = async () => {
 
 // Health check endpoint
 app.get('/api/health', (req, res) => {
-  res.status(200).json({ status: 'healthy' });
+  const serverUrl = getServerUrl(req);
+  res.status(200).json({ 
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    serverUrl: serverUrl,
+    environment: process.env.NODE_ENV || 'development'
+  });
 });
 
 // Initialize database connection with optimized settings
@@ -151,15 +176,24 @@ AppDataSource.initialize()
     console.log('Database connected');
     
     // Start server
-    const PORT = process.env.PORT || 3000;
-    app.listen(PORT, () => {
+    const PORT = process.env.PORT || 10000;
+    const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
       
       // Start self-ping every 10 minutes
-      setInterval(pingServer, 10 * 60 * 1000);
+      setInterval(() => pingServer(), 10 * 60 * 1000);
       
       // Initial ping
       pingServer();
+    });
+
+    // Handle server shutdown gracefully
+    process.on('SIGTERM', () => {
+      console.log('SIGTERM signal received: closing HTTP server');
+      server.close(() => {
+        console.log('HTTP server closed');
+        process.exit(0);
+      });
     });
   })
   .catch((error) => {
