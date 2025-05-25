@@ -6,17 +6,41 @@ import { getOptimizedUrl } from '../config/cloudinary';
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
-// Cache for QR codes
-const qrCodeCache = new Map<string, { data: QRCode, timestamp: number }>();
+// Optimized cache with size limits and LRU-like behavior
+const MAX_CACHE_SIZE = 1000; // Maximum number of items in cache
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const qrCodeCache = new Map<string, { data: QRCode, timestamp: number }>();
 
-// Preload critical assets
+// Cache cleanup function
+function cleanupCache() {
+  const now = Date.now();
+  for (const [key, value] of qrCodeCache.entries()) {
+    if (now - value.timestamp > CACHE_DURATION) {
+      qrCodeCache.delete(key);
+    }
+  }
+  // If still too many items, remove oldest
+  if (qrCodeCache.size > MAX_CACHE_SIZE) {
+    const entries = Array.from(qrCodeCache.entries());
+    entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
+    entries.slice(0, entries.length - MAX_CACHE_SIZE).forEach(([key]) => {
+      qrCodeCache.delete(key);
+    });
+  }
+}
+
+// Run cleanup every minute
+setInterval(cleanupCache, 60 * 1000);
+
+// Preload critical assets with preconnect
 const preloadAssets = (logoUrl: string) => `
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link rel="preload" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" as="style">
-  <link rel="preload" href="${logoUrl}" as="image">
+  <link rel="preload" href="${logoUrl}" as="image" fetchpriority="high">
 `;
 
-// Inline critical CSS
+// Inline critical CSS with optimized selectors
 const criticalCSS = `
   :root {
     --primary-color: #4A90E2;
@@ -41,6 +65,7 @@ const criticalCSS = `
     background: var(--background-color);
     color: var(--text-color);
     line-height: 1.5;
+    text-rendering: optimizeSpeed;
   }
   
   .container {
@@ -52,7 +77,68 @@ const criticalCSS = `
     box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
     margin: 1rem;
     border-left: 4px solid var(--primary-color);
+    will-change: transform;
   }
+`;
+
+// Optimized HTML template with minimal DOM
+const generateHTML = (qrCode: QRCode, logoUrl: string, customCSS: string) => `
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="${qrCode.name} - QR Code Landing Page">
+    <title>${qrCode.name}</title>
+    ${logoUrl ? preloadAssets(logoUrl) : ''}
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
+    <style>
+      ${criticalCSS}
+      ${customCSS}
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo" loading="eager" fetchpriority="high" width="150" height="80">` : ''}
+      <h1 class="title">${qrCode.name}</h1>
+      <div class="buttons">
+        ${qrCode.buttons?.map(button => `
+          <a href="${button.url}" class="button" target="_blank" rel="noopener">
+            ${button.text}
+          </a>
+        `).join('') || ''}
+      </div>
+      ${qrCode.menu ? `
+        <div class="menu-section">
+          <h2 class="menu-header">Menu</h2>
+          <div class="menu-categories">
+            ${qrCode.menu.categories.map(category => `
+              <div class="category">
+                <div class="category-name">${category.name}</div>
+                <div class="category-items">
+                  ${category.items.map(item => `
+                    <div class="item">
+                      <h3>${item.name}</h3>
+                      <p>${item.description}</p>
+                      <p><strong>${item.price}</strong></p>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+            `).join('')}
+          </div>
+        </div>
+      ` : ''}
+    </div>
+    <script>
+      // Defer non-critical operations
+      window.addEventListener('load', function() {
+        // Add any deferred functionality here
+        document.body.classList.add('loaded');
+      });
+    </script>
+  </body>
+</html>
 `;
 
 export const getLandingPage = async (req: Request, res: Response) => {
@@ -62,32 +148,35 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Check cache first
     const cachedQRCode = qrCodeCache.get(id);
     if (cachedQRCode && Date.now() - cachedQRCode.timestamp < CACHE_DURATION) {
+      // Update cache timestamp to mark as recently used
+      cachedQRCode.timestamp = Date.now();
       return serveLandingPage(res, cachedQRCode.data, req);
     }
 
-    // If not in cache, fetch from database
+    // If not in cache, fetch from database with optimized query
     const qrCode = await qrCodeRepository.findOne({
       where: { id },
-      relations: ['user']
+      relations: ['user'],
+      select: {
+        id: true,
+        name: true,
+        logoUrl: true,
+        foregroundColor: true,
+        backgroundColor: true,
+        buttons: true,
+        menu: true,
+        user: {
+          isActive: true
+        }
+      }
     });
 
     if (!qrCode) {
-      return res.status(404).send(`
-        <!DOCTYPE html>
-        <html>
-          <head>
-            <title>QR Code Not Found</title>
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <style>${criticalCSS}</style>
-          </head>
-          <body>
-            <div class="container">
-              <h1>QR Code Not Found</h1>
-              <p>The requested QR code does not exist or has been removed.</p>
-            </div>
-          </body>
-        </html>
-      `);
+      return res.status(404).send(generateHTML({
+        name: 'QR Code Not Found',
+        buttons: [],
+        menu: null
+      } as QRCode, '', criticalCSS));
     }
 
     // Check if user is active
@@ -96,10 +185,10 @@ export const getLandingPage = async (req: Request, res: Response) => {
       return res.redirect(`${frontendDomain}/payment-instructions`);
     }
 
-    // Update scan count and history
-    await updateScanStats(qrCode, req);
+    // Update scan stats in background without awaiting
+    updateScanStats(qrCode, req).catch(console.error);
 
-    // Cache the QR code
+    // Cache the QR code with current timestamp
     qrCodeCache.set(id, { data: qrCode, timestamp: Date.now() });
 
     // Serve the landing page
@@ -137,181 +226,137 @@ function serveLandingPage(res: Response, qrCode: QRCode, req: Request) {
     width: 150,
     height: 80,
     crop: 'fill',
-    quality: 'auto'
+    quality: 'auto',
+    format: 'webp'
   }) : '';
 
-  // Set cache headers
-  res.setHeader('Cache-Control', 'public, max-age=300'); // Cache for 5 minutes
+  // Set optimized cache headers for high-traffic
+  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
   res.setHeader('ETag', `"${qrCode.id}-${qrCode.updatedAt.getTime()}"`);
+  res.setHeader('Vary', 'Accept-Encoding');
 
-  // Generate HTML with optimized structure
-  const html = `
-    <!DOCTYPE html>
-    <html>
-      <head>
-        <title>${qrCode.name}</title>
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <meta name="description" content="${qrCode.description || 'QR Code Landing Page'}">
-        ${logoUrl ? preloadAssets(logoUrl) : ''}
-        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap">
-        <style>
-          ${criticalCSS}
-          :root {
-            --primary-color: ${qrCode.foregroundColor || '#4A90E2'};
-            --secondary-color: ${qrCode.backgroundColor || '#F4D03F'};
-            --background-color: ${qrCode.backgroundColor || '#FAFAFA'};
-            --text-color: ${qrCode.foregroundColor || '#2C3E50'};
-          }
-          
-          .logo {
-            max-width: 150px;
-            max-height: 80px;
-            height: auto;
-            margin-bottom: 1.5rem;
-            object-fit: contain;
-          }
-          
-          .title {
-            font-size: 1.5rem;
-            font-weight: 700;
-            color: var(--primary-color);
-            margin-bottom: 1.5rem;
-          }
-          
-          .buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 0.75rem;
-            width: 100%;
-          }
-          
-          .button {
-            display: inline-block;
-            padding: 0.75rem 1.5rem;
-            background-color: var(--primary-color);
-            color: white;
-            text-decoration: none;
-            border-radius: 0.5rem;
-            font-weight: 500;
-            transition: all 0.3s;
-            text-align: center;
-          }
-          
-          .button:hover {
-            opacity: 0.9;
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-          }
-          
-          .menu-section {
-            margin-top: 2rem;
-            border-top: 1px solid var(--border-color);
-            padding-top: 1.5rem;
-            width: 100%;
-          }
-          
-          .menu-header {
-            color: var(--primary-color);
-            font-size: 1.25rem;
-            margin-bottom: 1rem;
-            font-weight: 600;
-          }
-          
-          .menu-categories {
-            display: flex;
-            flex-direction: column;
-            gap: 1.5rem;
-          }
-          
-          .category {
-            background: #f9fafb;
-            border-radius: 0.5rem;
-            overflow: hidden;
-            border-left: 3px solid var(--primary-color);
-            transition: all 0.3s;
-          }
-          
-          .category:hover {
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            transform: translateY(-2px);
-          }
-          
-          .category-name {
-            background-color: var(--primary-color);
-            color: white;
-            padding: 0.75rem;
-            font-size: 1.1rem;
-            font-weight: 600;
-          }
-          
-          .category-items {
-            display: grid;
-            grid-template-columns: 1fr;
-            gap: 0.75rem;
-            padding: 0.75rem;
-          }
-          
-          @media (min-width: 480px) {
-            .category-items {
-              grid-template-columns: repeat(2, 1fr);
-            }
-          }
-          
-          .item {
-            background: white;
-            padding: 0.75rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
-            height: 100%;
-            transition: all 0.3s;
-            border: 1px solid var(--border-color);
-          }
-          
-          .item:hover {
-            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
-          }
-        </style>
-      </head>
-      <body>
-        <div class="container">
-          ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo" loading="eager">` : ''}
-          <h1 class="title">${qrCode.name}</h1>
-          <div class="buttons">
-            ${qrCode.buttons.map(button => `
-              <a href="${button.url}" class="button" target="_blank" rel="noopener">
-                ${button.text}
-              </a>
-            `).join('')}
-          </div>
-          ${qrCode.menu ? `
-            <div class="menu-section">
-              <h2 class="menu-header">Menu</h2>
-              <div class="menu-categories">
-                ${qrCode.menu.categories.map(category => `
-                  <div class="category">
-                    <div class="category-name">${category.name}</div>
-                    <div class="category-items">
-                      ${category.items.map(item => `
-                        <div class="item">
-                          <h3>${item.name}</h3>
-                          <p>${item.description}</p>
-                          <p><strong>${item.price}</strong></p>
-                        </div>
-                      `).join('')}
-                    </div>
-                  </div>
-                `).join('')}
-              </div>
-            </div>
-          ` : ''}
-        </div>
-      </body>
-    </html>
+  // Generate custom CSS with dynamic colors
+  const customCSS = `
+    :root {
+      --primary-color: ${qrCode.foregroundColor || '#4A90E2'};
+      --secondary-color: ${qrCode.backgroundColor || '#F4D03F'};
+      --background-color: ${qrCode.backgroundColor || '#FAFAFA'};
+      --text-color: ${qrCode.foregroundColor || '#2C3E50'};
+    }
+    
+    .logo {
+      max-width: 150px;
+      max-height: 80px;
+      height: auto;
+      margin-bottom: 1.5rem;
+      object-fit: contain;
+    }
+    
+    .title {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: var(--primary-color);
+      margin-bottom: 1.5rem;
+    }
+    
+    .buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+      width: 100%;
+    }
+    
+    .button {
+      display: inline-block;
+      padding: 0.75rem 1.5rem;
+      background-color: var(--primary-color);
+      color: white;
+      text-decoration: none;
+      border-radius: 0.5rem;
+      font-weight: 500;
+      transition: all 0.3s;
+      text-align: center;
+    }
+    
+    .button:hover {
+      opacity: 0.9;
+      transform: translateY(-2px);
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
+    
+    .menu-section {
+      margin-top: 2rem;
+      border-top: 1px solid var(--border-color);
+      padding-top: 1.5rem;
+      width: 100%;
+    }
+    
+    .menu-header {
+      color: var(--primary-color);
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      font-weight: 600;
+    }
+    
+    .menu-categories {
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+    
+    .category {
+      background: #f9fafb;
+      border-radius: 0.5rem;
+      overflow: hidden;
+      border-left: 3px solid var(--primary-color);
+      transition: all 0.3s;
+    }
+    
+    .category:hover {
+      box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+      transform: translateY(-2px);
+    }
+    
+    .category-name {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 0.75rem;
+      font-size: 1.1rem;
+      font-weight: 600;
+    }
+    
+    .category-items {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.75rem;
+      padding: 0.75rem;
+    }
+    
+    @media (min-width: 480px) {
+      .category-items {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    
+    .item {
+      background: white;
+      padding: 0.75rem;
+      border-radius: 0.5rem;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+      transition: all 0.3s;
+      border: 1px solid var(--border-color);
+    }
+    
+    .item:hover {
+      box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1);
+    }
   `;
 
-  res.send(html);
+  // Send optimized HTML
+  res.send(generateHTML(qrCode, logoUrl, customCSS));
 }
 
 function darkenColor(hex: string, amount: number): string {
