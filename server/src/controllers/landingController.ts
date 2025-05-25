@@ -2,14 +2,52 @@ import { Request, Response } from 'express';
 import { AppDataSource } from '../config/database';
 import { QRCode } from '../models/QRCode';
 import { getOptimizedUrl } from '../config/cloudinary';
+import { In } from 'typeorm';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Optimized cache with size limits and LRU-like behavior
-const MAX_CACHE_SIZE = 1000; // Maximum number of items in cache
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const MAX_CACHE_SIZE = 1000;
+const CACHE_DURATION = 5 * 60 * 1000;
 const qrCodeCache = new Map<string, { data: QRCode, timestamp: number }>();
+
+// Batch update queue for scan stats
+const scanStatsQueue = new Map<string, { count: number, history: any[] }>();
+const BATCH_UPDATE_INTERVAL = 30 * 1000; // 30 seconds
+
+// Process batch updates
+async function processBatchUpdates() {
+  if (scanStatsQueue.size === 0) return;
+
+  try {
+    const updates = Array.from(scanStatsQueue.entries()).map(([id, stats]) => ({
+      id,
+      scanCount: stats.count,
+      scanHistory: stats.history
+    }));
+
+    // Batch update using TypeORM
+    await qrCodeRepository
+      .createQueryBuilder()
+      .update(QRCode)
+      .set({
+        scanCount: () => `scan_count + 1`,
+        scanHistory: () => `array_append(scan_history, :history)`
+      })
+      .whereInIds(updates.map(u => u.id))
+      .setParameter('history', JSON.stringify(updates[0].scanHistory))
+      .execute();
+
+    // Clear the queue
+    scanStatsQueue.clear();
+  } catch (error) {
+    console.error('Error processing batch updates:', error);
+  }
+}
+
+// Run batch updates periodically
+setInterval(processBatchUpdates, BATCH_UPDATE_INTERVAL);
 
 // Cache cleanup function
 function cleanupCache() {
@@ -19,7 +57,6 @@ function cleanupCache() {
       qrCodeCache.delete(key);
     }
   }
-  // If still too many items, remove oldest
   if (qrCodeCache.size > MAX_CACHE_SIZE) {
     const entries = Array.from(qrCodeCache.entries());
     entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
@@ -31,6 +68,29 @@ function cleanupCache() {
 
 // Run cleanup every minute
 setInterval(cleanupCache, 60 * 1000);
+
+// Optimized Cloudinary URL generation with caching
+const cloudinaryUrlCache = new Map<string, string>();
+const CLOUDINARY_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
+
+function getOptimizedCloudinaryUrl(logoUrl: string): string {
+  const cached = cloudinaryUrlCache.get(logoUrl);
+  if (cached) return cached;
+
+  const optimizedUrl = getOptimizedUrl(logoUrl, {
+    width: 150,
+    height: 80,
+    crop: 'fill',
+    quality: 'auto',
+    format: 'webp',
+    fetch_format: 'auto',
+    dpr: 'auto',
+    responsive: true
+  });
+
+  cloudinaryUrlCache.set(logoUrl, optimizedUrl);
+  return optimizedUrl;
+}
 
 // Preload critical assets with preconnect
 const preloadAssets = (logoUrl: string) => `
@@ -148,28 +208,27 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Check cache first
     const cachedQRCode = qrCodeCache.get(id);
     if (cachedQRCode && Date.now() - cachedQRCode.timestamp < CACHE_DURATION) {
-      // Update cache timestamp to mark as recently used
       cachedQRCode.timestamp = Date.now();
       return serveLandingPage(res, cachedQRCode.data, req);
     }
 
-    // If not in cache, fetch from database with optimized query
-    const qrCode = await qrCodeRepository.findOne({
-      where: { id },
-      relations: ['user'],
-      select: {
-        id: true,
-        name: true,
-        logoUrl: true,
-        foregroundColor: true,
-        backgroundColor: true,
-        buttons: true,
-        menu: true,
-        user: {
-          isActive: true
-        }
-      }
-    });
+    // Optimized database query with specific fields and relations
+    const qrCode = await qrCodeRepository
+      .createQueryBuilder('qr')
+      .select([
+        'qr.id',
+        'qr.name',
+        'qr.logoUrl',
+        'qr.foregroundColor',
+        'qr.backgroundColor',
+        'qr.buttons',
+        'qr.menu',
+        'qr.updatedAt'
+      ])
+      .leftJoinAndSelect('qr.user', 'user', 'user.isActive = :isActive', { isActive: true })
+      .where('qr.id = :id', { id })
+      .cache(true) // Enable query caching
+      .getOne();
 
     if (!qrCode) {
       return res.status(404).send(generateHTML({
@@ -180,15 +239,23 @@ export const getLandingPage = async (req: Request, res: Response) => {
     }
 
     // Check if user is active
-    if (!qrCode.user.isActive) {
+    if (!qrCode.user?.isActive) {
       const frontendDomain = process.env.FRONTEND_URL || 'http://localhost:8080';
       return res.redirect(`${frontendDomain}/payment-instructions`);
     }
 
-    // Update scan stats in background without awaiting
-    updateScanStats(qrCode, req).catch(console.error);
+    // Queue scan stats update
+    const currentStats = scanStatsQueue.get(id) || { count: 0, history: [] };
+    scanStatsQueue.set(id, {
+      count: currentStats.count + 1,
+      history: [...currentStats.history, {
+        timestamp: new Date(),
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        ipAddress: req.ip || 'Unknown'
+      }]
+    });
 
-    // Cache the QR code with current timestamp
+    // Cache the QR code
     qrCodeCache.set(id, { data: qrCode, timestamp: Date.now() });
 
     // Serve the landing page
@@ -199,38 +266,11 @@ export const getLandingPage = async (req: Request, res: Response) => {
   }
 };
 
-async function updateScanStats(qrCode: QRCode, req: Request) {
-  // Initialize scan count and history if they don't exist
-  if (typeof qrCode.scanCount !== 'number') {
-    qrCode.scanCount = 0;
-  }
-  if (!Array.isArray(qrCode.scanHistory)) {
-    qrCode.scanHistory = [];
-  }
-
-  // Increment scan count and log scan history
-  qrCode.scanCount += 1;
-  qrCode.scanHistory.push({
-    timestamp: new Date(),
-    userAgent: req.headers['user-agent'] || 'Unknown',
-    ipAddress: req.ip || 'Unknown'
-  });
-  
-  // Save the updated QR code
-  await qrCodeRepository.save(qrCode);
-}
-
 function serveLandingPage(res: Response, qrCode: QRCode, req: Request) {
-  // Get optimized logo URL if it exists
-  const logoUrl = qrCode.logoUrl ? getOptimizedUrl(qrCode.logoUrl, {
-    width: 150,
-    height: 80,
-    crop: 'fill',
-    quality: 'auto',
-    format: 'webp'
-  }) : '';
+  // Get optimized logo URL with caching
+  const logoUrl = qrCode.logoUrl ? getOptimizedCloudinaryUrl(qrCode.logoUrl) : '';
 
-  // Set optimized cache headers for high-traffic
+  // Set optimized cache headers
   res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
   res.setHeader('ETag', `"${qrCode.id}-${qrCode.updatedAt.getTime()}"`);
   res.setHeader('Vary', 'Accept-Encoding');
