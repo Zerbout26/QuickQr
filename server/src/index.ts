@@ -145,13 +145,64 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   next();
 });
 
-// Optimized static file serving
+// Cache configuration
+const CACHE_DURATION = 60 * 1000; // 1 minute
+const cache = new Map<string, { data: any, timestamp: number }>();
+
+// Cache middleware
+const cacheMiddleware = (duration: number = CACHE_DURATION) => {
+  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
+    // Skip caching for non-GET requests
+    if (req.method !== 'GET') {
+      return next();
+    }
+
+    const key = `${req.originalUrl || req.url}`;
+    const cachedResponse = cache.get(key);
+
+    if (cachedResponse && Date.now() - cachedResponse.timestamp < duration) {
+      return res.json(cachedResponse.data);
+    }
+
+    // Store original res.json
+    const originalJson = res.json.bind(res);
+    res.json = (body: any) => {
+      cache.set(key, {
+        data: body,
+        timestamp: Date.now()
+      });
+      return originalJson(body);
+    };
+
+    next();
+  };
+};
+
+// Cache cleanup
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of cache.entries()) {
+    if (now - value.timestamp > CACHE_DURATION) {
+      cache.delete(key);
+    }
+  }
+}, CACHE_DURATION);
+
+// Apply caching to appropriate routes
+app.use('/api/qrcodes', cacheMiddleware(5 * 60 * 1000)); // Cache QR codes for 5 minutes
+app.use('/landing', cacheMiddleware(5 * 60 * 1000)); // Cache landing pages for 5 minutes
+
+// Optimize static file serving with better caching
 app.use('/uploads', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+  
+  // Enhanced caching headers
   res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   res.setHeader('Vary', 'Accept-Encoding');
+  res.setHeader('Surrogate-Control', 'max-age=31536000');
+  res.setHeader('Surrogate-Key', 'static');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -166,6 +217,10 @@ app.use('/uploads', (req, res, next) => {
   setHeaders: (res, path) => {
     if (path.endsWith('.webp')) {
       res.setHeader('Content-Type', 'image/webp');
+    }
+    // Add cache busting for non-immutable files
+    if (!path.endsWith('.webp')) {
+      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
     }
   }
 }));

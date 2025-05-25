@@ -33,8 +33,10 @@ export const AppDataSource = new DataSource({
     statement_timeout: 10000, // Query timeout
     idle_in_transaction_session_timeout: 10000, // Idle transaction timeout
   },
+  // Use database caching instead of Redis
   cache: {
+    type: "database",
     duration: 60000, // Cache duration in milliseconds
-    type: "ioredis", // Use Redis for caching if available
+    ignoreErrors: true
   }
 }); 
