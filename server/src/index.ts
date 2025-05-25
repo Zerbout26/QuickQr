@@ -297,8 +297,22 @@ app.get('/api/health', (req, res) => {
 // Initialize database and start server
 const startServer = async () => {
   try {
-    await AppDataSource.initialize();
-    console.log('Database connected');
+    // Add retry logic for database connection
+    let retries = 5;
+    while (retries > 0) {
+      try {
+        await AppDataSource.initialize();
+        console.log('Database connected successfully');
+        break;
+      } catch (error) {
+        retries--;
+        if (retries === 0) {
+          throw error;
+        }
+        console.log(`Database connection failed. Retrying... (${retries} attempts left)`);
+        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before retry
+      }
+    }
     
     const PORT = process.env.PORT || 10000;
     const server = app.listen(PORT, () => {
@@ -344,9 +358,9 @@ const startServer = async () => {
   }
 };
 
-// Start server in cluster mode if in production
+// Optimize cluster configuration
 if (process.env.NODE_ENV === 'production' && cluster.isPrimary) {
-  const numCPUs = os.cpus().length;
+  const numCPUs = Math.max(2, Math.min(os.cpus().length - 1, 4)); // Use 2-4 workers
   console.log(`Primary ${process.pid} is running`);
   console.log(`Forking for ${numCPUs} CPUs`);
   
@@ -355,12 +369,37 @@ if (process.env.NODE_ENV === 'production' && cluster.isPrimary) {
     cluster.fork();
   }
   
+  // Enhanced worker management
   cluster.on('exit', (worker, code, signal) => {
-    console.log(`Worker ${worker.process.pid} died`);
-    // Replace the dead worker
-    cluster.fork();
+    console.log(`Worker ${worker.process.pid} died with code ${code} and signal ${signal}`);
+    
+    // Add delay before forking new worker
+    setTimeout(() => {
+      console.log('Starting new worker...');
+      cluster.fork();
+    }, 5000);
   });
+
+  // Monitor worker health
+  setInterval(() => {
+    const workers = cluster.workers;
+    if (workers) {
+      for (const worker of Object.values(workers)) {
+        if (worker) {
+          worker.send('ping');
+        }
+      }
+    }
+  }, 30000);
+
 } else {
+  // Worker process
+  process.on('message', (msg) => {
+    if (msg === 'ping') {
+      process.send?.('pong');
+    }
+  });
+
   startServer();
 }
 
