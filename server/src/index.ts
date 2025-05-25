@@ -2,14 +2,30 @@ import express from 'express';
 import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
+import compression from 'compression';
+import rateLimit from 'express-rate-limit';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
+import axios from 'axios';
 
 const app = express();
+
+// Rate limiting configuration
+const limiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 100, // Limit each IP to 100 requests per windowMs
+  message: 'Too many requests from this IP, please try again later.'
+});
+
+// Apply rate limiting to all routes
+app.use(limiter);
+
+// Enable compression for all responses
+app.use(compression());
 
 // Get the frontend domain from the request origin
 const getFrontendDomain = (req: express.Request) => {
@@ -57,6 +73,15 @@ app.use(cors({
 }));
 app.use(express.json());
 
+// Add security headers
+app.use((req, res, next) => {
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  next();
+});
+
 // Add frontend domain to request object
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
   (req as any).frontendDomain = getFrontendDomain(req);
@@ -77,7 +102,11 @@ app.use('/uploads', (req, res, next) => {
   }
   
   next();
-}, express.static(path.join(__dirname, '../uploads')));
+}, express.static(path.join(__dirname, '../uploads'), {
+  maxAge: '1y',
+  etag: true,
+  lastModified: true
+}));
 
 // Add token refresh endpoint
 app.post('/api/users/refresh-token', auth, (req: AuthRequest, res: express.Response) => {
@@ -100,7 +129,23 @@ app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
-// Initialize database connection
+// Self-ping function to keep the server alive
+const pingServer = async () => {
+  try {
+    const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
+    await axios.get(`${serverUrl}/api/health`);
+    console.log('Server self-ping successful');
+  } catch (error) {
+    console.error('Server self-ping failed:', error);
+  }
+};
+
+// Health check endpoint
+app.get('/api/health', (req, res) => {
+  res.status(200).json({ status: 'healthy' });
+});
+
+// Initialize database connection with optimized settings
 AppDataSource.initialize()
   .then(() => {
     console.log('Database connected');
@@ -109,8 +154,24 @@ AppDataSource.initialize()
     const PORT = process.env.PORT || 3000;
     app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
+      
+      // Start self-ping every 10 minutes
+      setInterval(pingServer, 10 * 60 * 1000);
+      
+      // Initial ping
+      pingServer();
     });
   })
   .catch((error) => {
     console.error('Error connecting to database:', error);
+    process.exit(1); // Exit if database connection fails
   });
+
+// Global error handler
+app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+  console.error(err.stack);
+  res.status(500).json({
+    error: 'Internal Server Error',
+    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
+  });
+});
