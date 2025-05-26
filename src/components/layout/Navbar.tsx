@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
+import { useLanguage } from "@/context/LanguageContext";
 import {
   Sheet,
   SheetContent,
@@ -45,7 +46,8 @@ const translations = {
     daysLeft: "days left",
     trialExpired: "Trial expired",
     activeSubscription: "Active Subscription",
-    language: "العربية"
+    language: "العربية",
+    home: "Home"
   },
   ar: {
     signIn: "تسجيل الدخول",
@@ -60,18 +62,15 @@ const translations = {
     daysLeft: "أيام متبقية",
     trialExpired: "انتهت الفترة التجريبية",
     activeSubscription: "اشتراك نشط",
-    language: "English"
+    language: "English",
+    home: "الرئيسية"
   }
 };
 
 const Navbar = () => {
   const { user, signOut, isAdmin, daysLeftInTrial, isTrialActive, isTrialExpired } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ar' : 'en');
-  };
+  const { language, toggleLanguage } = useLanguage();
 
   return (
     <nav className="border-b shadow-sm bg-white sticky top-0 z-40" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -239,7 +238,7 @@ const Navbar = () => {
                       className="flex items-center px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100"
                       onClick={() => setMobileMenuOpen(false)}
                     >
-                      <Home className="h-5 w-5 mr-3 text-gray-500" /> Home
+                      <Home className="h-5 w-5 mr-3 text-gray-500" /> {translations[language].home}
                     </Link>
                     
                     {user && (

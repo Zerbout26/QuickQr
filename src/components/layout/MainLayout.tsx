@@ -1,15 +1,56 @@
-
 import React from 'react';
 import Navbar from './Navbar';
 import { Shield, Mail, Phone, Globe } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
+
+const translations = {
+  en: {
+    companyDescription: "Professional QR code solutions for businesses of all sizes.",
+    quickLinks: "Quick Links",
+    home: "Home",
+    features: "Features",
+    pricing: "Pricing",
+    faq: "FAQ",
+    resources: "Resources",
+    blog: "Blog",
+    documentation: "Documentation",
+    support: "Support",
+    contact: "Contact",
+    contactUs: "Contact Us",
+    email: "Email",
+    phone: "Phone",
+    address: "Address",
+    copyright: "© 2024 QRCreator. All rights reserved."
+  },
+  ar: {
+    companyDescription: "حلول رموز QR احترافية للشركات من جميع الأحجام.",
+    quickLinks: "روابط سريعة",
+    home: "الرئيسية",
+    features: "الميزات",
+    pricing: "التسعير",
+    faq: "الأسئلة الشائعة",
+    resources: "الموارد",
+    blog: "المدونة",
+    documentation: "الوثائق",
+    support: "الدعم",
+    contact: "اتصل بنا",
+    contactUs: "اتصل بنا",
+    email: "البريد الإلكتروني",
+    phone: "الهاتف",
+    address: "العنوان",
+    copyright: "© 2024 QRCreator. جميع الحقوق محفوظة."
+  }
+};
 
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
+  const { language } = useLanguage();
+
   return (
-    <div className="min-h-screen flex flex-col bg-gray-50">
+    <div className="min-h-screen flex flex-col bg-gray-50" dir={language === 'ar' ? 'rtl' : 'ltr'}>
       <Navbar />
       <main className="flex-grow">
         {children}
@@ -21,7 +62,7 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
             <div>
               <div className="text-qr-primary text-xl font-bold mb-4">QRCreator</div>
               <p className="text-gray-500 mb-4">
-                Professional QR code solutions for businesses of all sizes.
+                {translations[language].companyDescription}
               </p>
               <div className="flex space-x-4">
                 <a href="#" className="text-gray-400 hover:text-qr-primary transition-colors">
@@ -44,58 +85,47 @@ const MainLayout: React.FC<MainLayoutProps> = ({ children }) => {
 
             {/* Quick Links */}
             <div>
-              <h3 className="text-gray-900 font-semibold mb-4">Quick Links</h3>
+              <h3 className="text-gray-900 font-semibold mb-4">{translations[language].quickLinks}</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Home</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Features</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Pricing</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">FAQ</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].home}</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].features}</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].pricing}</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].faq}</a></li>
               </ul>
             </div>
 
             {/* Resources */}
             <div>
-              <h3 className="text-gray-900 font-semibold mb-4">Resources</h3>
+              <h3 className="text-gray-900 font-semibold mb-4">{translations[language].resources}</h3>
               <ul className="space-y-2">
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Support</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Documentation</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Privacy Policy</a></li>
-                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Terms of Service</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].blog}</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].documentation}</a></li>
+                <li><a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">{translations[language].support}</a></li>
               </ul>
             </div>
 
-            {/* Contact Info */}
+            {/* Contact */}
             <div>
-              <h3 className="text-gray-900 font-semibold mb-4">Contact</h3>
-              <ul className="space-y-3">
-                <li className="flex items-start">
-                  <Mail className="w-5 h-5 text-qr-primary mr-3 mt-0.5" />
-                  <a href="mailto:contact@qrcreator.com" className="text-gray-500 hover:text-qr-primary transition-colors">contact@qrcreator.com</a>
+              <h3 className="text-gray-900 font-semibold mb-4">{translations[language].contactUs}</h3>
+              <ul className="space-y-2">
+                <li className="flex items-center text-gray-500">
+                  <Mail className="w-4 h-4 mr-2" />
+                  <span>{translations[language].email}</span>
                 </li>
-                <li className="flex items-start">
-                  <Phone className="w-5 h-5 text-qr-primary mr-3 mt-0.5" />
-                  <a href="tel:+11234567890" className="text-gray-500 hover:text-qr-primary transition-colors">+1 (123) 456-7890</a>
+                <li className="flex items-center text-gray-500">
+                  <Phone className="w-4 h-4 mr-2" />
+                  <span>{translations[language].phone}</span>
                 </li>
-                <li className="flex items-start">
-                  <Globe className="w-5 h-5 text-qr-primary mr-3 mt-0.5" />
-                  <a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">www.qrcreator.com</a>
+                <li className="flex items-center text-gray-500">
+                  <Globe className="w-4 h-4 mr-2" />
+                  <span>{translations[language].address}</span>
                 </li>
               </ul>
             </div>
           </div>
-          
-          <div className="pt-8 border-t border-gray-100 flex flex-col md:flex-row justify-between items-center">
-            <div className="mb-4 md:mb-0 flex items-center">
-              <Shield className="w-4 h-4 text-qr-primary mr-2" />
-              <span className="text-sm text-gray-500">
-                &copy; {new Date().getFullYear()} QRCreator. All rights reserved.
-              </span>
-            </div>
-            <div className="flex space-x-6">
-              <a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Privacy Policy</a>
-              <a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Terms of Service</a>
-              <a href="#" className="text-gray-500 hover:text-qr-primary transition-colors">Cookie Policy</a>
-            </div>
+
+          <div className="border-t pt-8 text-center text-gray-500">
+            <p>{translations[language].copyright}</p>
           </div>
         </div>
       </footer>
