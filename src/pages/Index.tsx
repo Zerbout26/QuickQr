@@ -3,9 +3,11 @@ import { useNavigate } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { ArrowRight, Check, Shield, Star, Globe, ChartBar, Settings, Award, Smartphone, ExternalLink, Users } from 'lucide-react';
 import { useState } from 'react';
+import QRCodeSVG from 'qrcode.react';
 
 // Translations object
 const translations = {
@@ -224,7 +226,7 @@ const businessTypes = [
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const { language } = useLanguage();
 
   // If user is already logged in, redirect to dashboard
   useEffect(() => {
@@ -232,10 +234,6 @@ const Index = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ar' : 'en');
-  };
 
   return (
     <MainLayout>
@@ -298,42 +296,24 @@ const Index = () => {
                 className="relative"
               >
                 <div className="absolute -inset-4 rounded-xl bg-gradient-to-r from-primary to-secondary opacity-20 blur-lg"></div>
-                <div className="relative rounded-xl shadow-xl transform hover:rotate-0 transition-all duration-300">
-                  <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-xl">
-                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                      <img 
-                        src="/ChatGPT Image May 23, 2025, 12_04_53 AM.png"
-                        alt="QR Code in use" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                      <img 
-                        src="/Design sans titre.png"
-                        alt="Restaurant QR menu" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                      <img 
-                        src="/ChatGPT Image May 23, 2025, 12_08_02 AM.png"
-                        alt="Retail store" 
-                        className="w-full h-full object-cover"
-                      />
-                    </div>
-                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
-                      <img 
-                        src="/ChatGPT Image May 23, 2025, 12_09_50 AM.png"
-                        alt="Digital menu scanning" 
-                        className="w-full h-full object-cover"
-                      />
+                <div className="relative bg-white rounded-xl shadow-xl p-8">
+                  <div className="aspect-square w-full max-w-md mx-auto">
+                    <div className="w-full h-full flex items-center justify-center">
+                      <div className="text-center">
+                        <div className="w-48 h-48 mx-auto mb-4">
+                          <QRCodeSVG
+                            value="https://quickqr.com"
+                            size={192}
+                            bgColor="#ffffff"
+                            fgColor="#000000"
+                            level="H"
+                            includeMargin={false}
+                          />
+                        </div>
+                        <p className="text-sm text-gray-500">Scan to see a demo</p>
+                      </div>
                     </div>
                   </div>
-                </div>
-                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center p-4">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
-                    <path fill={`${getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()}`} d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
-                  </svg>
                 </div>
               </motion.div>
             </div>
@@ -341,50 +321,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Business Types Section - New section showing industry solutions */}
-      <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
-              {translations[language].solutionsForAllIndustries}
-            </span>
-            <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              {translations[language].qrCodesForEveryBusiness}
-            </h2>
-            <p className="text-xl text-gray-600">
-              {translations[language].discoverHow}
-            </p>
-          </div>
-          
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {businessTypes.map((business, index) => (
-              <motion.div 
-                key={index}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
-                className="bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 group"
-              >
-                <div className="bg-gray-50 p-4 rounded-xl inline-flex mb-6 group-hover:scale-110 transition-transform duration-300">
-                  {business.icon}
-                </div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">{business.name}</h3>
-                <p className="text-gray-600">{business.description}</p>
-              </motion.div>
-            ))}
-          </div>
-          
-          <div className="text-center mt-12">
-            <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-lg">
-              {translations[language].findYourSolution}
-              <ArrowRight className="w-4 h-4" />
-            </Button>
-          </div>
-        </div>
-      </section>
-
-      {/* Features Section - Updated with enhanced design */}
+      {/* Features Section */}
       <section className="py-24 bg-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -392,7 +329,7 @@ const Index = () => {
               {translations[language].features}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              All-in-One QR Solution for Your Business
+              {translations[language].allInOne}
             </h2>
             <p className="text-xl text-gray-600">
               {translations[language].featuresDescription}
@@ -418,7 +355,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* How It Works Section - Enhanced with cleaner design */}
+      {/* How It Works Section */}
       <section className="py-24 bg-gradient-to-br from-white to-gray-50">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -426,7 +363,7 @@ const Index = () => {
               {translations[language].simpleProcess}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Create Your QR Landing Page in Minutes
+              {translations[language].createInMinutes}
             </h2>
             <p className="text-xl text-gray-600">
               {translations[language].threeSteps}
@@ -492,101 +429,50 @@ const Index = () => {
         </div>
       </section>
 
-      {/* Testimonials Section - New section */}
-      <section className="py-24 bg-white">
+      {/* Business Types Section */}
+      <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
-              {translations[language].trustedByBusinesses}
+            <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
+              {translations[language].solutionsForAllIndustries}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              {translations[language].whatCustomersSay}
+              {translations[language].qrCodesForEveryBusiness}
             </h2>
             <p className="text-xl text-gray-600">
-              {translations[language].hearFromBusinesses}
+              {translations[language].discoverHow}
             </p>
           </div>
-
-          <div className="grid md:grid-cols-3 gap-8">
-            {/* Testimonial 1 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.5 }}
-              className="testimonial-card"
-            >
-              <div className="flex items-center mb-4">
-                <img src="https://randomuser.me/api/portraits/men/32.jpg" alt="Client" className="testimonial-avatar" />
-                <div className="ml-4">
-                  <h4 className="font-bold">Ahmed Benali</h4>
-                  <p className="text-sm text-gray-500">Restaurant Owner, Algiers</p>
+          
+          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+            {Object.entries(translations[language].businessTypes).map(([key, business], index) => (
+              <motion.div 
+                key={key}
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.1, duration: 0.5 }}
+                viewport={{ once: true }}
+                className="bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 group"
+              >
+                <div className="bg-gray-50 p-4 rounded-xl inline-flex mb-6 group-hover:scale-110 transition-transform duration-300">
+                  {businessTypes[index]?.icon}
                 </div>
-              </div>
-              <p className="testimonial-quote mb-4">
-                Since implementing QR code menus, we've seen a 30% increase in special order items. Customers love being able to see photos of our dishes!
-              </p>
-              <div className="flex text-accent">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-accent" />
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Testimonial 2 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.2, duration: 0.5 }}
-              className="testimonial-card"
-            >
-              <div className="flex items-center mb-4">
-                <img src="https://randomuser.me/api/portraits/women/44.jpg" alt="Client" className="testimonial-avatar" />
-                <div className="ml-4">
-                  <h4 className="font-bold">Samira Hakim</h4>
-                  <p className="text-sm text-gray-500">Boutique Owner, Oran</p>
-                </div>
-              </div>
-              <p className="testimonial-quote mb-4">
-                The QR codes have become an essential part of our marketing strategy. They connect our physical store to our online presence seamlessly.
-              </p>
-              <div className="flex text-accent">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-accent" />
-                ))}
-              </div>
-            </motion.div>
-
-            {/* Testimonial 3 */}
-            <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true }}
-              transition={{ delay: 0.4, duration: 0.5 }}
-              className="testimonial-card"
-            >
-              <div className="flex items-center mb-4">
-                <img src="https://randomuser.me/api/portraits/men/67.jpg" alt="Client" className="testimonial-avatar" />
-                <div className="ml-4">
-                  <h4 className="font-bold">Karim Meziane</h4>
-                  <p className="text-sm text-gray-500">Hotel Manager, Constantine</p>
-                </div>
-              </div>
-              <p className="testimonial-quote mb-4">
-                Our guests appreciate having easy access to hotel information, local attractions, and services through the QR landing pages we've created.
-              </p>
-              <div className="flex text-accent">
-                {[1, 2, 3, 4, 5].map((star) => (
-                  <Star key={star} className="w-5 h-5 fill-accent" />
-                ))}
-              </div>
-            </motion.div>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900">{business.name}</h3>
+                <p className="text-gray-600">{business.description}</p>
+              </motion.div>
+            ))}
+          </div>
+          
+          <div className="text-center mt-12">
+            <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-lg">
+              {translations[language].findYourSolution}
+              <ArrowRight className="w-4 h-4" />
+            </Button>
           </div>
         </div>
       </section>
-      
-      {/* Pricing Section - Enhanced design */}
+
+      {/* Pricing Section */}
       <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
@@ -649,7 +535,7 @@ const Index = () => {
         </div>
       </section>
 
-      {/* CTA Section - New bottom CTA */}
+      {/* CTA Section */}
       <section className="py-20 bg-gradient-to-r from-primary/10 to-secondary/10">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="max-w-4xl mx-auto text-center">
