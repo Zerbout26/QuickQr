@@ -67,7 +67,24 @@ const translations = {
         name: "Education",
         description: "Course materials, schedules, and campus information"
       }
-    }
+    },
+    solutionsForAllIndustries: "Solutions For All Industries",
+    qrCodesForEveryBusiness: "QR Codes For Every Type of Business",
+    discoverHow: "Discover how our QR solutions can help your specific industry connect with customers",
+    findYourSolution: "Find Your Solution",
+    trustedByBusinesses: "Trusted by Businesses",
+    whatCustomersSay: "What Our Customers Say",
+    hearFromBusinesses: "Hear from businesses that have transformed their customer engagement",
+    startCreatingNow: "Start Creating Now",
+    noCreditCard: "No credit card required to start your trial",
+    unlimitedQrCodes: "Unlimited QR codes",
+    customBranding: "Custom branding and colors",
+    restaurantMenuBuilder: "Restaurant menu builder",
+    multipleLinks: "Multiple links per QR code",
+    realTimeUpdates: "Real-time landing page updates",
+    analytics: "Analytics and scan tracking",
+    customerTools: "Direct customer interaction tools",
+    prioritySupport: "Priority support"
   },
   ar: {
     welcome: "مرحباً",
@@ -127,7 +144,24 @@ const translations = {
         name: "التعليم",
         description: "المواد التعليمية، الجداول الزمنية، ومعلومات الحرم الجامعي"
       }
-    }
+    },
+    solutionsForAllIndustries: "حلول لجميع الصناعات",
+    qrCodesForEveryBusiness: "رموز QR لكل نوع من الأعمال",
+    discoverHow: "اكتشف كيف يمكن لحلول QR الخاصة بنا مساعدة صناعتك المحددة في التواصل مع العملاء",
+    findYourSolution: "ابحث عن حلك",
+    trustedByBusinesses: "موثوق به من قبل الشركات",
+    whatCustomersSay: "ماذا يقول عملاؤنا",
+    hearFromBusinesses: "استمع إلى الشركات التي حولت تجربة عملائها",
+    startCreatingNow: "ابدأ الإنشاء الآن",
+    noCreditCard: "لا حاجة لبطاقة ائتمان لبدء تجربتك",
+    unlimitedQrCodes: "رموز QR غير محدودة",
+    customBranding: "تخصيص العلامة التجارية والألوان",
+    restaurantMenuBuilder: "منشئ قوائم المطاعم",
+    multipleLinks: "روابط متعددة لكل رمز QR",
+    realTimeUpdates: "تحديثات صفحة الهبوط في الوقت الفعلي",
+    analytics: "تحليلات وتتبع المسح",
+    customerTools: "أدوات التفاعل المباشر مع العملاء",
+    prioritySupport: "دعم ذو أولوية"
   }
 };
 
@@ -312,13 +346,13 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
-              Solutions For All Industries
+              {translations[language].solutionsForAllIndustries}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              QR Codes For Every Type of Business
+              {translations[language].qrCodesForEveryBusiness}
             </h2>
             <p className="text-xl text-gray-600">
-              Discover how our QR solutions can help your specific industry connect with customers
+              {translations[language].discoverHow}
             </p>
           </div>
           
@@ -343,7 +377,7 @@ const Index = () => {
           
           <div className="text-center mt-12">
             <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-lg">
-              Find Your Solution
+              {translations[language].findYourSolution}
               <ArrowRight className="w-4 h-4" />
             </Button>
           </div>
@@ -451,7 +485,7 @@ const Index = () => {
             className="text-center mt-16"
           >
             <Button onClick={() => navigate('/signup')} className="bg-gradient-to-r from-primary to-secondary text-lg py-6 px-8 flex items-center gap-2 group text-white rounded-lg shadow-lg hover:shadow-xl transition-all mx-auto">
-              Start Creating Now
+              {translations[language].startCreatingNow}
               <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
             </Button>
           </motion.div>
@@ -463,13 +497,13 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
-              Trusted by Businesses
+              {translations[language].trustedByBusinesses}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              What Our Customers Say
+              {translations[language].whatCustomersSay}
             </h2>
             <p className="text-xl text-gray-600">
-              Hear from businesses that have transformed their customer engagement
+              {translations[language].hearFromBusinesses}
             </p>
           </div>
 
@@ -560,7 +594,7 @@ const Index = () => {
               {translations[language].pricing}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
-              Simple, Transparent Pricing
+              {translations[language].simplePricing}
             </h2>
             <p className="text-xl text-gray-600">
               {translations[language].pricingDescription}
@@ -585,14 +619,14 @@ const Index = () => {
               <div className="p-8">
                 <ul className="space-y-5">
                   {[
-                    "Unlimited QR codes",
-                    "Custom branding and colors",
-                    "Restaurant menu builder",
-                    "Multiple links per QR code", 
-                    "Real-time landing page updates",
-                    "Analytics and scan tracking",
-                    "Direct customer interaction tools",
-                    "Priority support"
+                    translations[language].unlimitedQrCodes,
+                    translations[language].customBranding,
+                    translations[language].restaurantMenuBuilder,
+                    translations[language].multipleLinks,
+                    translations[language].realTimeUpdates,
+                    translations[language].analytics,
+                    translations[language].customerTools,
+                    translations[language].prioritySupport
                   ].map((feature, index) => (
                     <li key={index} className="flex items-start">
                       <div className="flex-shrink-0 mt-1">
@@ -603,11 +637,11 @@ const Index = () => {
                   ))}
                 </ul>
                 <Button onClick={() => navigate('/signup')} className="w-full mt-8 py-6 bg-accent hover:bg-accent/90 text-white">
-                  Start 14-Day Free Trial
+                  {translations[language].startFreeTrial}
                 </Button>
                 <p className="text-sm text-center text-gray-500 mt-4 flex items-center justify-center gap-1">
                   <Shield className="w-4 h-4" />
-                  No credit card required to start your trial
+                  {translations[language].noCreditCard}
                 </p>
               </div>
             </motion.div>
@@ -633,10 +667,10 @@ const Index = () => {
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button onClick={() => navigate('/signup')} className="bg-primary hover:bg-primary/90 text-white py-6 px-8 rounded-lg shadow-lg">
-                  Start Free Trial
+                  {translations[language].startFreeTrial}
                 </Button>
                 <Button onClick={() => navigate('/signin')} variant="outline" className="bg-white border-2 border-secondary text-secondary hover:bg-secondary/5 py-6 px-8 rounded-lg">
-                  Sign In
+                  {translations[language].signIn}
                 </Button>
               </div>
             </motion.div>

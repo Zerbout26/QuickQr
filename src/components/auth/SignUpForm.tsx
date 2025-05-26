@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { useNavigate, Link } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
@@ -6,6 +5,47 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Globe } from 'lucide-react';
+
+// Translations object
+const translations = {
+  en: {
+    createAccount: "Create Account",
+    signUpTrial: "Sign up and start your 14-day free trial",
+    email: "Email",
+    emailPlaceholder: "your@email.com",
+    password: "Password",
+    confirmPassword: "Confirm Password",
+    passwordsDoNotMatch: "Passwords do not match",
+    termsAndPrivacy: "By signing up, you agree to our",
+    termsOfService: "Terms of Service",
+    and: "and",
+    privacyPolicy: "Privacy Policy",
+    creatingAccount: "Creating Account...",
+    startFreeTrial: "Start Free Trial",
+    alreadyHaveAccount: "Already have an account?",
+    signIn: "Sign in",
+    language: "العربية"
+  },
+  ar: {
+    createAccount: "إنشاء حساب",
+    signUpTrial: "سجل وابدأ تجربتك المجانية لمدة 14 يومًا",
+    email: "البريد الإلكتروني",
+    emailPlaceholder: "بريدك@الإلكتروني.com",
+    password: "كلمة المرور",
+    confirmPassword: "تأكيد كلمة المرور",
+    passwordsDoNotMatch: "كلمات المرور غير متطابقة",
+    termsAndPrivacy: "بالتسجيل، فإنك توافق على",
+    termsOfService: "شروط الخدمة",
+    and: "و",
+    privacyPolicy: "سياسة الخصوصية",
+    creatingAccount: "جاري إنشاء الحساب...",
+    startFreeTrial: "ابدأ التجربة المجانية",
+    alreadyHaveAccount: "لديك حساب بالفعل؟",
+    signIn: "تسجيل الدخول",
+    language: "English"
+  }
+};
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
@@ -13,8 +53,13 @@ const SignUpForm = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const { signUp } = useAuth();
   const navigate = useNavigate();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -22,7 +67,7 @@ const SignUpForm = () => {
 
     // Validate passwords match
     if (password !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(translations[language].passwordsDoNotMatch);
       return;
     }
 
@@ -41,53 +86,63 @@ const SignUpForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Create Account</CardTitle>
+        <div className="flex justify-between items-center mb-4">
+          <CardTitle>{translations[language].createAccount}</CardTitle>
+          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center gap-2">
+            <Globe className="w-4 h-4" />
+            {translations[language].language}
+          </Button>
+        </div>
         <CardDescription>
-          Sign up and start your 14-day free trial
+          {translations[language].signUpTrial}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-4">
           {error && (
-            <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
+            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-2 rounded-md text-sm">
               {error}
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{translations[language].email}</Label>
             <Input 
               id="email"
               type="email" 
-              placeholder="your@email.com" 
+              placeholder={translations[language].emailPlaceholder}
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
               required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{translations[language].password}</Label>
             <Input 
               id="password"
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)}
               required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="confirmPassword">Confirm Password</Label>
+            <Label htmlFor="confirmPassword">{translations[language].confirmPassword}</Label>
             <Input 
               id="confirmPassword"
               type="password" 
               value={confirmPassword} 
               onChange={(e) => setConfirmPassword(e.target.value)}
               required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
           <div className="text-sm text-gray-500">
-            By signing up, you agree to our 
-            <a href="#" className="text-qr-secondary hover:underline"> Terms of Service</a> and 
-            <a href="#" className="text-qr-secondary hover:underline"> Privacy Policy</a>.
+            {translations[language].termsAndPrivacy}{' '}
+            <a href="#" className="text-qr-secondary hover:underline">{translations[language].termsOfService}</a>{' '}
+            {translations[language].and}{' '}
+            <a href="#" className="text-qr-secondary hover:underline">{translations[language].privacyPolicy}</a>.
           </div>
         </CardContent>
         <CardFooter className="flex flex-col">
@@ -96,12 +151,12 @@ const SignUpForm = () => {
             className="w-full qr-btn-primary" 
             disabled={isLoading}
           >
-            {isLoading ? 'Creating Account...' : 'Start Free Trial'}
+            {isLoading ? translations[language].creatingAccount : translations[language].startFreeTrial}
           </Button>
           <div className="text-center mt-4 text-sm text-gray-500">
-            Already have an account?{' '}
+            {translations[language].alreadyHaveAccount}{' '}
             <Link to="/signin" className="text-qr-secondary font-medium hover:underline">
-              Sign in
+              {translations[language].signIn}
             </Link>
           </div>
         </CardFooter>

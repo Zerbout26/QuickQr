@@ -5,6 +5,37 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Globe } from 'lucide-react';
+
+// Translations object
+const translations = {
+  en: {
+    signIn: "Sign In",
+    enterCredentials: "Enter your email and password to access your account",
+    email: "Email",
+    emailPlaceholder: "your@email.com",
+    password: "Password",
+    forgotPassword: "Forgot Password?",
+    signingIn: "Signing in...",
+    signInButton: "Sign In",
+    noAccount: "Don't have an account?",
+    signUp: "Sign up",
+    language: "العربية"
+  },
+  ar: {
+    signIn: "تسجيل الدخول",
+    enterCredentials: "أدخل بريدك الإلكتروني وكلمة المرور للوصول إلى حسابك",
+    email: "البريد الإلكتروني",
+    emailPlaceholder: "بريدك@الإلكتروني.com",
+    password: "كلمة المرور",
+    forgotPassword: "نسيت كلمة المرور؟",
+    signingIn: "جاري تسجيل الدخول...",
+    signInButton: "تسجيل الدخول",
+    noAccount: "ليس لديك حساب؟",
+    signUp: "إنشاء حساب",
+    language: "English"
+  }
+};
 
 interface LocationState {
   from?: string;
@@ -15,12 +46,17 @@ const SignInForm = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get the page the user was trying to visit
   const from = (location.state as LocationState)?.from || '/dashboard';
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -45,9 +81,15 @@ const SignInForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Sign In</CardTitle>
+        <div className="flex justify-between items-center mb-4">
+          <CardTitle>{translations[language].signIn}</CardTitle>
+          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center gap-2">
+            <Globe className="w-4 h-4" />
+            {translations[language].language}
+          </Button>
+        </div>
         <CardDescription>
-          Enter your email and password to access your account
+          {translations[language].enterCredentials}
         </CardDescription>
       </CardHeader>
       <form onSubmit={handleSubmit}>
@@ -58,28 +100,30 @@ const SignInForm = () => {
             </div>
           )}
           <div className="space-y-2">
-            <Label htmlFor="email">Email</Label>
+            <Label htmlFor="email">{translations[language].email}</Label>
             <Input 
               id="email"
               type="email" 
-              placeholder="your@email.com" 
+              placeholder={translations[language].emailPlaceholder}
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
               required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
           <div className="space-y-2">
-            <Label htmlFor="password">Password</Label>
+            <Label htmlFor="password">{translations[language].password}</Label>
             <Input 
               id="password"
               type="password" 
               value={password} 
               onChange={(e) => setPassword(e.target.value)}
               required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
             <div className="text-right">
               <Link to="/forgot-password" className="text-sm text-qr-secondary hover:underline">
-                Forgot Password?
+                {translations[language].forgotPassword}
               </Link>
             </div>
           </div>
@@ -90,12 +134,12 @@ const SignInForm = () => {
             className="w-full qr-btn-primary" 
             disabled={isLoading}
           >
-            {isLoading ? 'Signing in...' : 'Sign In'}
+            {isLoading ? translations[language].signingIn : translations[language].signInButton}
           </Button>
           <div className="text-center mt-4 text-sm text-gray-500">
-            Don't have an account?{' '}
+            {translations[language].noAccount}{' '}
             <Link to="/signup" className="text-qr-secondary font-medium hover:underline">
-              Sign up
+              {translations[language].signUp}
             </Link>
           </div>
         </CardFooter>

@@ -6,6 +6,57 @@ import { Label } from '@/components/ui/label';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { authApi } from '@/lib/api';
 import { toast } from '@/components/ui/use-toast';
+import { Globe } from 'lucide-react';
+
+// Translations object
+const translations = {
+  en: {
+    resetPassword: "Reset Password",
+    enterNewPassword: "Enter your new password below",
+    enterEmail: "Enter your email address to reset your password",
+    email: "Email",
+    emailPlaceholder: "your@email.com",
+    newPassword: "New Password",
+    confirmPassword: "Confirm Password",
+    passwordsDoNotMatch: "Passwords do not match",
+    verifying: "Verifying...",
+    verifyEmail: "Verify Email",
+    updating: "Updating...",
+    updatePassword: "Update Password",
+    rememberPassword: "Remember your password?",
+    signIn: "Sign in",
+    language: "العربية",
+    emailVerified: "Email verified",
+    enterNewPasswordPrompt: "Please enter your new password.",
+    noAccountFound: "No account found with this email address",
+    passwordUpdated: "Password updated",
+    passwordUpdateSuccess: "Your password has been successfully updated.",
+    error: "Error"
+  },
+  ar: {
+    resetPassword: "إعادة تعيين كلمة المرور",
+    enterNewPassword: "أدخل كلمة المرور الجديدة أدناه",
+    enterEmail: "أدخل عنوان بريدك الإلكتروني لإعادة تعيين كلمة المرور",
+    email: "البريد الإلكتروني",
+    emailPlaceholder: "بريدك@الإلكتروني.com",
+    newPassword: "كلمة المرور الجديدة",
+    confirmPassword: "تأكيد كلمة المرور",
+    passwordsDoNotMatch: "كلمات المرور غير متطابقة",
+    verifying: "جاري التحقق...",
+    verifyEmail: "التحقق من البريد الإلكتروني",
+    updating: "جاري التحديث...",
+    updatePassword: "تحديث كلمة المرور",
+    rememberPassword: "تتذكر كلمة المرور؟",
+    signIn: "تسجيل الدخول",
+    language: "English",
+    emailVerified: "تم التحقق من البريد الإلكتروني",
+    enterNewPasswordPrompt: "الرجاء إدخال كلمة المرور الجديدة.",
+    noAccountFound: "لم يتم العثور على حساب بهذا البريد الإلكتروني",
+    passwordUpdated: "تم تحديث كلمة المرور",
+    passwordUpdateSuccess: "تم تحديث كلمة المرور بنجاح.",
+    error: "خطأ"
+  }
+};
 
 const ForgotPasswordForm = () => {
   const [email, setEmail] = useState('');
@@ -14,7 +65,12 @@ const ForgotPasswordForm = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const [isEmailVerified, setIsEmailVerified] = useState(false);
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
   const navigate = useNavigate();
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   const handleEmailSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -26,22 +82,22 @@ const ForgotPasswordForm = () => {
       if (response.exists) {
         setIsEmailVerified(true);
         toast({
-          title: "Email verified",
-          description: "Please enter your new password.",
+          title: translations[language].emailVerified,
+          description: translations[language].enterNewPasswordPrompt,
         });
       } else {
-        setError('No account found with this email address');
+        setError(translations[language].noAccountFound);
         toast({
           variant: "destructive",
-          title: "Error",
-          description: "No account found with this email address",
+          title: translations[language].error,
+          description: translations[language].noAccountFound,
         });
       }
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to verify email');
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translations[language].error,
         description: err.response?.data?.error || 'Failed to verify email',
       });
     } finally {
@@ -54,7 +110,7 @@ const ForgotPasswordForm = () => {
     setError('');
 
     if (newPassword !== confirmPassword) {
-      setError('Passwords do not match');
+      setError(translations[language].passwordsDoNotMatch);
       return;
     }
 
@@ -63,15 +119,15 @@ const ForgotPasswordForm = () => {
     try {
       await authApi.resetPassword({ email, newPassword, confirmPassword });
       toast({
-        title: "Password updated",
-        description: "Your password has been successfully updated.",
+        title: translations[language].passwordUpdated,
+        description: translations[language].passwordUpdateSuccess,
       });
       navigate('/signin');
     } catch (err: any) {
       setError(err.response?.data?.error || 'Failed to update password');
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translations[language].error,
         description: err.response?.data?.error || 'Failed to update password',
       });
     } finally {
@@ -82,11 +138,17 @@ const ForgotPasswordForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <CardTitle>Reset Password</CardTitle>
+        <div className="flex justify-between items-center mb-4">
+          <CardTitle>{translations[language].resetPassword}</CardTitle>
+          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center gap-2">
+            <Globe className="w-4 h-4" />
+            {translations[language].language}
+          </Button>
+        </div>
         <CardDescription>
           {isEmailVerified 
-            ? "Enter your new password below"
-            : "Enter your email address to reset your password"
+            ? translations[language].enterNewPassword
+            : translations[language].enterEmail
           }
         </CardDescription>
       </CardHeader>
@@ -94,19 +156,20 @@ const ForgotPasswordForm = () => {
         <form onSubmit={handleEmailSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-2 rounded-md text-sm">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
+              <Label htmlFor="email">{translations[language].email}</Label>
               <Input 
                 id="email"
                 type="email" 
-                placeholder="your@email.com" 
+                placeholder={translations[language].emailPlaceholder}
                 value={email} 
                 onChange={(e) => setEmail(e.target.value)}
                 required
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
               />
             </div>
           </CardContent>
@@ -116,12 +179,12 @@ const ForgotPasswordForm = () => {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Verifying...' : 'Verify Email'}
+              {isLoading ? translations[language].verifying : translations[language].verifyEmail}
             </Button>
             <div className="text-center mt-4 text-sm text-gray-500">
-              Remember your password?{' '}
+              {translations[language].rememberPassword}{' '}
               <Link to="/signin" className="text-qr-secondary font-medium hover:underline">
-                Sign in
+                {translations[language].signIn}
               </Link>
             </div>
           </CardFooter>
@@ -130,28 +193,30 @@ const ForgotPasswordForm = () => {
         <form onSubmit={handlePasswordSubmit}>
           <CardContent className="space-y-4">
             {error && (
-              <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-2 rounded-md text-sm">
+              <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-2 rounded-md text-sm">
                 {error}
               </div>
             )}
             <div className="space-y-2">
-              <Label htmlFor="newPassword">New Password</Label>
+              <Label htmlFor="newPassword">{translations[language].newPassword}</Label>
               <Input 
                 id="newPassword"
                 type="password" 
                 value={newPassword} 
                 onChange={(e) => setNewPassword(e.target.value)}
                 required
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="confirmPassword">Confirm Password</Label>
+              <Label htmlFor="confirmPassword">{translations[language].confirmPassword}</Label>
               <Input 
                 id="confirmPassword"
                 type="password" 
                 value={confirmPassword} 
                 onChange={(e) => setConfirmPassword(e.target.value)}
                 required
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
               />
             </div>
           </CardContent>
@@ -161,7 +226,7 @@ const ForgotPasswordForm = () => {
               className="w-full"
               disabled={isLoading}
             >
-              {isLoading ? 'Updating...' : 'Update Password'}
+              {isLoading ? translations[language].updating : translations[language].updatePassword}
             </Button>
           </CardFooter>
         </form>
