@@ -19,6 +19,7 @@ import {
   Lock, Download, Eye, Edit, Trash2, ExternalLink, 
   Plus, Calendar, CheckCircle, AlertCircle
 } from 'lucide-react';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Translations object
 const translations = {
@@ -249,11 +250,7 @@ const Dashboard = () => {
   const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
-  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
-
-  const toggleLanguage = () => {
-    setMenuLanguage(prev => prev === 'en' ? 'ar' : 'en');
-  };
+  const { language } = useLanguage();
 
   // Function to fetch QR codes
   const fetchQRCodes = async () => {
@@ -644,21 +641,14 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className={`container mx-auto px-4 py-8 ${menuLanguage === 'ar' ? 'rtl' : 'ltr'}`}>
+      <div className={`container mx-auto px-4 py-8 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
         <div className="flex justify-between items-center mb-8">
           <h1 className="text-3xl font-bold text-gray-900">
-            {translations[menuLanguage].dashboard}
+            {translations[language].dashboard}
           </h1>
           <div className="flex items-center gap-4">
-            <Button
-              variant="outline"
-              onClick={toggleLanguage}
-              className="flex items-center gap-2"
-            >
-              {menuLanguage === 'en' ? 'العربية' : 'English'}
-            </Button>
             <Button onClick={() => navigate('/create')}>
-              {translations[menuLanguage].createNewQR}
+              {translations[language].createNewQR}
             </Button>
           </div>
         </div>
@@ -777,12 +767,12 @@ const Dashboard = () => {
           <TabsList className="grid w-full max-w-md grid-cols-2 p-1 rounded-xl bg-gray-100">
             <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4" /> {translations[menuLanguage].createNewQR}
+                <Plus className="w-4 h-4" /> {translations[language].createNewQR}
               </div>
             </TabsTrigger>
             <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
-                <Edit className="w-4 h-4" /> {translations[menuLanguage].myQRCodes}
+                <Edit className="w-4 h-4" /> {translations[language].myQRCodes}
               </div>
             </TabsTrigger>
           </TabsList>
@@ -797,12 +787,12 @@ const Dashboard = () => {
           {/* QR Code Management Tab */}
           <TabsContent value="manage" className="py-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold font-cairo">{translations[menuLanguage].myQRCodes}</h2>
+              <h2 className="text-2xl font-semibold font-cairo">{translations[language].myQRCodes}</h2>
               <Button 
                 onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                 className="dz-button flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" /> {translations[menuLanguage].createNewQR}
+                <Plus className="w-4 h-4" /> {translations[language].createNewQR}
               </Button>
             </div>
             
@@ -810,7 +800,7 @@ const Dashboard = () => {
               <div className="flex justify-center py-16">
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-500">{translations[menuLanguage].loading}</p>
+                  <p className="text-gray-500">{translations[language].loading}</p>
                 </div>
               </div>
             ) : qrCodes.length === 0 ? (
@@ -819,14 +809,14 @@ const Dashboard = () => {
                   <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                     <Plus className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-medium text-gray-700 font-cairo">{translations[menuLanguage].noQRCodes}</h3>
-                  <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. {translations[menuLanguage].createNewQR} to get started.</p>
+                  <h3 className="text-xl font-medium text-gray-700 font-cairo">{translations[language].noQRCodes}</h3>
+                  <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. {translations[language].createNewQR} to get started.</p>
                   <Button 
                     onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                     variant="outline" 
                     className="mt-3 border-primary text-primary hover:bg-primary/5"
                   >
-                    {translations[menuLanguage].createNewQR}
+                    {translations[language].createNewQR}
                   </Button>
                 </div>
               </div>
@@ -857,7 +847,7 @@ const Dashboard = () => {
                           <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg pointer-events-none z-10">
                             <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-3">
                               <Lock className="w-6 h-6 text-gray-600 mb-2 mx-auto" />
-                              <p className="text-gray-700 text-sm font-medium">{translations[menuLanguage].previewMode}</p>
+                              <p className="text-gray-700 text-sm font-medium">{translations[language].previewMode}</p>
                             </div>
                           </div>
                         )}
@@ -891,7 +881,7 @@ const Dashboard = () => {
                       
                       <div className="mb-4 space-y-2">
                         <div>
-                          <Label className="text-xs text-gray-500">{translations[menuLanguage].url}</Label>
+                          <Label className="text-xs text-gray-500">{translations[language].url}</Label>
                           <div className="flex items-center gap-1">
                             <p className="text-sm truncate font-medium">{qr.url}</p>
                             <a 
@@ -905,7 +895,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-500">{translations[menuLanguage].created}</Label>
+                          <Label className="text-xs text-gray-500">{translations[language].created}</Label>
                           <p className="text-sm">{new Date(qr.createdAt).toLocaleDateString(undefined, { 
                             year: 'numeric', 
                             month: 'short', 
@@ -922,35 +912,35 @@ const Dashboard = () => {
                             onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Edit className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].edit}
+                            <Edit className="w-3.5 h-3.5 mr-1.5" /> {translations[language].edit}
                           </Button>
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full hover:bg-gray-50 font-cairo">
-                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].edit}
+                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> {translations[language].edit}
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle className="font-cairo">{translations[menuLanguage].editQRCodeURL}</DialogTitle>
+                                <DialogTitle className="font-cairo">{translations[language].editQRCodeURL}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
-                                  <Label htmlFor="newUrl">{translations[menuLanguage].newURL}</Label>
+                                  <Label htmlFor="newUrl">{translations[language].newURL}</Label>
                                   <Input
                                     id="newUrl"
                                     value={newUrl}
                                     onChange={(e) => setNewUrl(e.target.value)}
-                                    placeholder={translations[menuLanguage].enterNewURL}
+                                    placeholder={translations[language].enterNewURL}
                                     className="border-primary/20 focus:border-primary"
                                   />
                                 </div>
                                 <div className="flex justify-end gap-2">
                                   <Button variant="outline" onClick={() => setEditingQR(null)}>
-                                    {translations[menuLanguage].cancel}
+                                    {translations[language].cancel}
                                   </Button>
                                   <Button onClick={handleUpdateQR} className="dz-button">
-                                    {translations[menuLanguage].updateURL}
+                                    {translations[language].updateURL}
                                   </Button>
                                 </div>
                               </div>
@@ -964,7 +954,7 @@ const Dashboard = () => {
                             onClick={() => handleDownload(qr, 'png')}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].downloadPNG}
+                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[language].downloadPNG}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -972,7 +962,7 @@ const Dashboard = () => {
                             onClick={() => handleDownload(qr, 'svg')}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].downloadSVG}
+                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[language].downloadSVG}
                           </Button>
                         </div>
 
@@ -985,29 +975,29 @@ const Dashboard = () => {
                               onClick={() => setDeleteConfirmQR(qr)}
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-                              {translations[menuLanguage].deleteQRCode}
+                              {translations[language].deleteQRCode}
                             </Button>
                           </DialogTrigger>
                           {deleteConfirmQR && (
                             <DialogContent aria-describedby="delete-dialog-description">
                               <DialogHeader>
-                                <DialogTitle className="font-cairo">{translations[menuLanguage].confirmDeletion}</DialogTitle>
+                                <DialogTitle className="font-cairo">{translations[language].confirmDeletion}</DialogTitle>
                                 <DialogDescription id="delete-dialog-description">
-                                  {translations[menuLanguage].thisActionCannotBeUndone}
+                                  {translations[language].thisActionCannotBeUndone}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="py-4">
-                                <p>{translations[menuLanguage].areYouSureYouWantToDelete} "{deleteConfirmQR.name}"?</p>
+                                <p>{translations[language].areYouSureYouWantToDelete} "{deleteConfirmQR.name}"?</p>
                               </div>
                               <div className="flex justify-end space-x-2">
                                 <Button variant="outline" onClick={() => setDeleteConfirmQR(null)}>
-                                  {translations[menuLanguage].cancel}
+                                  {translations[language].cancel}
                                 </Button>
                                 <Button 
                                   variant="destructive" 
                                   onClick={() => handleDeleteQR(deleteConfirmQR.id)}
                                 >
-                                  {translations[menuLanguage].delete}
+                                  {translations[language].delete}
                                 </Button>
                               </div>
                             </DialogContent>
@@ -1027,7 +1017,7 @@ const Dashboard = () => {
       <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-cairo">{translations[menuLanguage].qrCodePreview}</DialogTitle>
+            <DialogTitle className="font-cairo">{translations[language].qrCodePreview}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             {previewQR && (
@@ -1039,7 +1029,7 @@ const Dashboard = () => {
                   <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg">
                     <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-4">
                       <Lock className="w-8 h-8 text-gray-600 mb-2" />
-                      <p className="text-gray-700 font-medium">{translations[menuLanguage].previewMode}</p>
+                      <p className="text-gray-700 font-medium">{translations[language].previewMode}</p>
                     </div>
                   </div>
                   <QRCodeSVG
@@ -1058,13 +1048,13 @@ const Dashboard = () => {
                   />
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  {translations[menuLanguage].activateAccountToDownloadHighResolutionQR}
+                  {translations[language].activateAccountToDownloadHighResolutionQR}
                 </p>
                 <Button 
                   onClick={() => navigate('/payment-instructions')}
                   className="dz-button flex items-center gap-2"
                 >
-                  <CheckCircle className="w-4 h-4" /> {translations[menuLanguage].activateAccount}
+                  <CheckCircle className="w-4 h-4" /> {translations[language].activateAccount}
                 </Button>
               </div>
             )}
