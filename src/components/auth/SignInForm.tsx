@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { useNavigate, Link, useLocation } from 'react-router-dom';
 import { useAuth } from '@/context/AuthContext';
+import { useLanguage } from '@/context/LanguageContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -46,17 +47,13 @@ const SignInForm = () => {
   const [password, setPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
-  const [language, setLanguage] = useState<'en' | 'ar'>('en');
+  const { language } = useLanguage();
   const { signIn } = useAuth();
   const navigate = useNavigate();
   const location = useLocation();
   
   // Get the page the user was trying to visit
   const from = (location.state as LocationState)?.from || '/dashboard';
-
-  const toggleLanguage = () => {
-    setLanguage(language === 'en' ? 'ar' : 'en');
-  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
