@@ -81,13 +81,7 @@ const SignInForm = () => {
   return (
     <Card className="w-full max-w-md mx-auto">
       <CardHeader>
-        <div className="flex justify-between items-center mb-4">
-          <CardTitle>{translations[language].signIn}</CardTitle>
-          <Button variant="ghost" onClick={toggleLanguage} className="flex items-center gap-2">
-            <Globe className="w-4 h-4" />
-            {translations[language].language}
-          </Button>
-        </div>
+        <CardTitle>{translations[language].signIn}</CardTitle>
         <CardDescription>
           {translations[language].enterCredentials}
         </CardDescription>
