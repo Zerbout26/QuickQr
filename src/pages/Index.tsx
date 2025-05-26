@@ -169,23 +169,23 @@ const translations = {
 
 const features = [
   {
-    title: 'Dynamic QR Landing Pages',
-    description: 'Create beautiful landing pages with links and menus that update in real-time.',
+    title: (lang: 'en' | 'ar') => translations[lang].features,
+    description: (lang: 'en' | 'ar') => translations[lang].featuresDescription,
     icon: <Globe className="w-10 h-10 text-primary" />,
   },
   {
-    title: 'Custom Branding',
-    description: 'Add your logo and brand colors to make your QR codes stand out.',
+    title: (lang: 'en' | 'ar') => translations[lang].customBranding,
+    description: (lang: 'en' | 'ar') => translations[lang].customBranding,
     icon: <Star className="w-10 h-10 text-primary" />,
   },
   {
-    title: 'Restaurant Menus',
-    description: 'Create digital menus with categories, descriptions, and images.',
+    title: (lang: 'en' | 'ar') => translations[lang].restaurantMenuBuilder,
+    description: (lang: 'en' | 'ar') => translations[lang].restaurantMenuBuilder,
     icon: <ChartBar className="w-10 h-10 text-primary" />,
   },
   {
-    title: 'Multi-Link Support',
-    description: 'Add multiple links to your QR landing page for versatile customer interactions.',
+    title: (lang: 'en' | 'ar') => translations[lang].multipleLinks,
+    description: (lang: 'en' | 'ar') => translations[lang].multipleLinks,
     icon: <Settings className="w-10 h-10 text-primary" />,
   },
 ];
@@ -347,8 +347,8 @@ const Index = () => {
                 className="bg-white rounded-xl p-8 shadow-sm hover:shadow-xl transition-all border-l-4 border-l-primary/80 flex flex-col h-full hover:translate-y-[-5px] duration-300"
               >
                 <div className="bg-primary/5 p-3 rounded-xl inline-flex mb-6">{feature.icon}</div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">{feature.title}</h3>
-                <p className="text-gray-600 flex-grow">{feature.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>{feature.title(language)}</h3>
+                <p className="text-gray-600 flex-grow" dir={language === 'ar' ? 'rtl' : 'ltr'}>{feature.description(language)}</p>
               </motion.div>
             ))}
           </div>
@@ -457,8 +457,8 @@ const Index = () => {
                 <div className="bg-gray-50 p-4 rounded-xl inline-flex mb-6 group-hover:scale-110 transition-transform duration-300">
                   {businessTypes[index]?.icon}
                 </div>
-                <h3 className="text-xl font-semibold mb-3 text-gray-900">{business.name}</h3>
-                <p className="text-gray-600">{business.description}</p>
+                <h3 className="text-xl font-semibold mb-3 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>{business.name}</h3>
+                <p className="text-gray-600" dir={language === 'ar' ? 'rtl' : 'ltr'}>{business.description}</p>
               </motion.div>
             ))}
           </div>
