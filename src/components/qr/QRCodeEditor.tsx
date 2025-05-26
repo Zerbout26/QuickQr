@@ -53,22 +53,98 @@ const defaultAvailability = {
   saturday: true,
 };
 
+// Translations object
+const translations = {
+  en: {
+    basic: "Basic",
+    advanced: "Advanced",
+    qrCodeLogo: "QR Code Logo",
+    uploadLogo: "Upload Logo",
+    changeLogo: "Change Logo",
+    links: "Links",
+    addLink: "Add Link",
+    selectPlatform: "Select platform",
+    website: "Website",
+    facebook: "Facebook",
+    instagram: "Instagram",
+    twitter: "Twitter",
+    linkedin: "LinkedIn",
+    youtube: "YouTube",
+    whatsapp: "WhatsApp",
+    telegram: "Telegram",
+    other: "Other",
+    foregroundColor: "Foreground Color",
+    backgroundColor: "Background Color",
+    logo: "Logo",
+    saving: "Saving...",
+    saveChanges: "Save Changes",
+    success: "Success",
+    error: "Error",
+    imageUploaded: "Image uploaded successfully",
+    failedToUpload: "Failed to upload image",
+    invalidFileType: "Invalid file type",
+    pleaseUploadImage: "Please upload an image file (PNG, JPG, etc.)",
+    fileTooLarge: "File too large",
+    imageMustBeLess: "Image must be less than 2MB",
+    url: "URL"
+  },
+  ar: {
+    basic: "أساسي",
+    advanced: "متقدم",
+    qrCodeLogo: "شعار رمز QR",
+    uploadLogo: "تحميل الشعار",
+    changeLogo: "تغيير الشعار",
+    links: "الروابط",
+    addLink: "إضافة رابط",
+    selectPlatform: "اختر المنصة",
+    website: "موقع إلكتروني",
+    facebook: "فيسبوك",
+    instagram: "انستغرام",
+    twitter: "تويتر",
+    linkedin: "لينكد إن",
+    youtube: "يوتيوب",
+    whatsapp: "واتساب",
+    telegram: "تيليجرام",
+    other: "أخرى",
+    foregroundColor: "لون المقدمة",
+    backgroundColor: "لون الخلفية",
+    logo: "الشعار",
+    saving: "جاري الحفظ...",
+    saveChanges: "حفظ التغييرات",
+    success: "نجاح",
+    error: "خطأ",
+    imageUploaded: "تم تحميل الصورة بنجاح",
+    failedToUpload: "فشل تحميل الصورة",
+    invalidFileType: "نوع ملف غير صالح",
+    pleaseUploadImage: "يرجى تحميل ملف صورة (PNG، JPG، إلخ)",
+    fileTooLarge: "الملف كبير جداً",
+    imageMustBeLess: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت",
+    url: "رابط"
+  }
+};
+
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [name, setName] = useState(qrCode.name);
   // Fix: Cast to a compatible type, ignoring 'direct' which isn't handled in the UI
   const [type, setType] = useState<'url' | 'menu' | 'both'>(
     qrCode.type === 'direct' ? 'url' : qrCode.type as 'url' | 'menu' | 'both'
   );
-  const [links, setLinks] = useState<Link[]>(qrCode.links.map(link => ({ 
-    ...link, 
-    type: (link.type || 'website') as Link['type']
-  })));
+  const allowedTypes = [
+    'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'whatsapp', 'telegram'
+  ] as const;
+  const [links, setLinks] = useState<Link[]>(
+    (qrCode.links || []).map(link => ({
+      ...link,
+      type: allowedTypes.includes(link.type as any) ? link.type as Link['type'] : 'website'
+    }))
+  );
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>(qrCode.menu?.categories || []);
-  const [foregroundColor, setForegroundColor] = useState(qrCode.foregroundColor);
-  const [backgroundColor, setBackgroundColor] = useState(qrCode.backgroundColor);
-  const [logoUrl, setLogoUrl] = useState<string | undefined>(qrCode.logoUrl);
+  const [foregroundColor, setForegroundColor] = useState(qrCode.foregroundColor || '#000000');
+  const [backgroundColor, setBackgroundColor] = useState(qrCode.backgroundColor || '#FFFFFF');
+  const [logoUrl, setLogoUrl] = useState<string | null>(qrCode.logoUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
 
   const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
@@ -409,13 +485,13 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
         <Tabs defaultValue="basic" className="space-y-4">
           <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="basic">Basic</TabsTrigger>
-            <TabsTrigger value="advanced">Advanced</TabsTrigger>
+            <TabsTrigger value="basic">{translations[menuLanguage].basic}</TabsTrigger>
+            <TabsTrigger value="advanced">{translations[menuLanguage].advanced}</TabsTrigger>
           </TabsList>
 
           <TabsContent value="basic" className="space-y-4">
             <div className="space-y-2">
-              <Label>QR Code Logo</Label>
+              <Label>{translations[menuLanguage].qrCodeLogo}</Label>
               <div className="flex items-center gap-4">
                 {logoUrl && (
                   <img src={logoUrl} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
@@ -426,7 +502,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  {logoUrl ? 'Change Logo' : 'Upload Logo'}
+                  {logoUrl ? translations[menuLanguage].changeLogo : translations[menuLanguage].uploadLogo}
                 </Button>
                 <input
                   type="file"
@@ -441,10 +517,10 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             {(type === 'url' || type === 'both') && (
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">Links</h3>
+                  <h3 className="text-lg font-medium">{translations[menuLanguage].links}</h3>
                   <Button type="button" onClick={addLink} variant="outline" size="sm">
                     <Plus className="h-4 w-4 mr-2" />
-                    Add Link
+                    {translations[menuLanguage].addLink}
                   </Button>
                 </div>
 
@@ -452,7 +528,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   <div key={index} className="space-y-2 border p-4 rounded-lg">
                     <div className="flex gap-2">
                       <div className="flex-1">
-                        <Label>Platform</Label>
+                        <Label>{translations[menuLanguage].selectPlatform}</Label>
                         <Select
                           value={link.type}
                           onValueChange={(value) => updateLink(index, 'type', value)}
@@ -469,49 +545,49 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             <SelectItem value="website">
                               <div className="flex items-center gap-2">
                                 <Globe className="h-4 w-4" />
-                                <span>Website</span>
+                                <span>{translations[menuLanguage].website}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="facebook">
                               <div className="flex items-center gap-2">
                                 <Facebook className="h-4 w-4" />
-                                <span>Facebook</span>
+                                <span>{translations[menuLanguage].facebook}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="instagram">
                               <div className="flex items-center gap-2">
                                 <Instagram className="h-4 w-4" />
-                                <span>Instagram</span>
+                                <span>{translations[menuLanguage].instagram}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="twitter">
                               <div className="flex items-center gap-2">
                                 <Twitter className="h-4 w-4" />
-                                <span>Twitter</span>
+                                <span>{translations[menuLanguage].twitter}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="linkedin">
                               <div className="flex items-center gap-2">
                                 <Linkedin className="h-4 w-4" />
-                                <span>LinkedIn</span>
+                                <span>{translations[menuLanguage].linkedin}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="youtube">
                               <div className="flex items-center gap-2">
                                 <Youtube className="h-4 w-4" />
-                                <span>YouTube</span>
+                                <span>{translations[menuLanguage].youtube}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="whatsapp">
                               <div className="flex items-center gap-2">
                                 <MessageCircle className="h-4 w-4" />
-                                <span>WhatsApp</span>
+                                <span>{translations[menuLanguage].whatsapp}</span>
                               </div>
                             </SelectItem>
                             <SelectItem value="telegram">
                               <div className="flex items-center gap-2">
                                 <Send className="h-4 w-4" />
-                                <span>Telegram</span>
+                                <span>{translations[menuLanguage].telegram}</span>
                               </div>
                             </SelectItem>
                           </SelectContent>
@@ -520,12 +596,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     </div>
                     <div className="flex gap-2">
                       <Input
-                        placeholder="Label"
-                        value={link.label}
-                        onChange={(e) => updateLink(index, 'label', e.target.value)}
-                      />
-                      <Input
-                        placeholder="URL"
+                        placeholder={translations[menuLanguage].url}
                         value={link.url}
                         onChange={(e) => updateLink(index, 'url', e.target.value)}
                       />
@@ -662,30 +733,48 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
           <TabsContent value="advanced" className="space-y-4">
             <div className="space-y-2">
-              <Label htmlFor="foregroundColor">Foreground Color</Label>
-              <Input
-                id="foregroundColor"
-                type="color"
-                value={foregroundColor}
-                onChange={(e) => setForegroundColor(e.target.value)}
-              />
+              <Label htmlFor="foregroundColor">{translations[menuLanguage].foregroundColor}</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="foregroundColor"
+                  type="color"
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
+                  className="w-20"
+                />
+                <Input
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
             </div>
             <div className="space-y-2">
-              <Label htmlFor="backgroundColor">Background Color</Label>
-              <Input
-                id="backgroundColor"
-                type="color"
-                value={backgroundColor}
-                onChange={(e) => setBackgroundColor(e.target.value)}
-              />
+              <Label htmlFor="backgroundColor">{translations[menuLanguage].backgroundColor}</Label>
+              <div className="flex gap-2">
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                  className="w-20"
+                />
+                <Input
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
             </div>
           </TabsContent>
         </Tabs>
       </div>
 
-      <Button type="submit" className="w-full" disabled={isLoading}>
-        {isLoading ? 'Updating...' : 'Update QR Code'}
-      </Button>
+      <div className="mt-4 flex justify-end">
+        <Button type="submit" disabled={isLoading}>
+          {isLoading ? translations[menuLanguage].saving : translations[menuLanguage].saveChanges}
+        </Button>
+      </div>
     </form>
   );
 };

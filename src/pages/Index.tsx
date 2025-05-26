@@ -4,7 +4,132 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { motion } from 'framer-motion';
-import { ArrowRight, Check, Shield, Star, Globe, ChartBar, Settings, Award, Smartphone, Users, ExternalLink } from 'lucide-react';
+import { ArrowRight, Check, Shield, Star, Globe, ChartBar, Settings, Award, Smartphone, ExternalLink, Users } from 'lucide-react';
+import { useState } from 'react';
+
+// Translations object
+const translations = {
+  en: {
+    welcome: "Welcome",
+    digitalSolutions: "Digital Solutions for Your Business",
+    createEngaging: "Create Engaging QR Landing Pages For Your Business",
+    description: "Generate beautiful QR codes that lead to custom landing pages with your links, menus, and business information - perfect for any type of business in Algeria and beyond.",
+    startFreeTrial: "Start Free Trial",
+    signIn: "Sign In",
+    features: "Features That Deliver Results",
+    allInOne: "All-in-One QR Solution for Your Business",
+    featuresDescription: "Create custom landing pages with links and menus that engage your audience and drive results",
+    simpleProcess: "Simple Process",
+    createInMinutes: "Create Your QR Landing Page in Minutes",
+    threeSteps: "Three simple steps to get your QR landing page online",
+    step1: {
+      title: "Create Your QR Code",
+      description: "Design your QR code with your brand colors and logo to match your business identity"
+    },
+    step2: {
+      title: "Add Links & Menus",
+      description: "Customize your landing page with links, restaurant menus and promotional content"
+    },
+    step3: {
+      title: "Share & Update",
+      description: "Download your QR code and update your landing page anytime without creating new codes"
+    },
+    pricing: "Pricing",
+    simplePricing: "Simple, Transparent Pricing",
+    pricingDescription: "Everything you need to create professional QR landing pages",
+    businessPlan: "Business Plan",
+    perMonth: "DZD/month",
+    everythingYouNeed: "Everything you need for your business",
+    readyToTransform: "Ready to Transform Your Business with Smart QR Solutions?",
+    joinBusinesses: "Join businesses across Algeria that are elevating their customer experience with our easy-to-use QR landing page platform.",
+    businessTypes: {
+      restaurants: {
+        name: "Restaurants",
+        description: "Digital menus, specials, and online ordering"
+      },
+      retail: {
+        name: "Retail Stores",
+        description: "Product catalogs, promotions, and loyalty programs"
+      },
+      services: {
+        name: "Professional Services",
+        description: "Appointment booking, testimonials, and service lists"
+      },
+      tourism: {
+        name: "Tourism & Hospitality",
+        description: "Virtual tours, booking links, and local attractions"
+      },
+      events: {
+        name: "Event Planners",
+        description: "Event schedules, maps, and registration links"
+      },
+      education: {
+        name: "Education",
+        description: "Course materials, schedules, and campus information"
+      }
+    }
+  },
+  ar: {
+    welcome: "مرحباً",
+    digitalSolutions: "حلول رقمية لعملك",
+    createEngaging: "أنشئ صفحات QR جذابة لعملك",
+    description: "قم بإنشاء رموز QR جميلة تؤدي إلى صفحات هبوط مخصصة مع روابطك وقوائم الطعام ومعلومات عملك - مثالية لأي نوع من الأعمال في الجزائر وما بعدها.",
+    startFreeTrial: "ابدأ التجربة المجانية",
+    signIn: "تسجيل الدخول",
+    features: "ميزات تحقق النتائج",
+    allInOne: "حل QR متكامل لعملك",
+    featuresDescription: "أنشئ صفحات هبوط مخصصة مع روابط وقوائم طعام تجذب جمهورك وتحقق النتائج",
+    simpleProcess: "عملية بسيطة",
+    createInMinutes: "أنشئ صفحة QR في دقائق",
+    threeSteps: "ثلاث خطوات بسيطة للحصول على صفحة QR الخاصة بك",
+    step1: {
+      title: "أنشئ رمز QR الخاص بك",
+      description: "صمم رمز QR بألوان علامتك التجارية وشعارك ليتناسب مع هوية عملك"
+    },
+    step2: {
+      title: "أضف الروابط والقوائم",
+      description: "خصص صفحة الهبوط الخاصة بك بالروابط وقوائم المطاعم والمحتوى الترويجي"
+    },
+    step3: {
+      title: "شارك وحدث",
+      description: "قم بتنزيل رمز QR الخاص بك وتحديث صفحة الهبوط في أي وقت دون إنشاء رموز جديدة"
+    },
+    pricing: "التسعير",
+    simplePricing: "تسعير بسيط وشفاف",
+    pricingDescription: "كل ما تحتاجه لإنشاء صفحات QR احترافية",
+    businessPlan: "الخطة التجارية",
+    perMonth: "دج/شهرياً",
+    everythingYouNeed: "كل ما تحتاجه لعملك",
+    readyToTransform: "هل أنت مستعد لتحويل عملك بحلول QR الذكية؟",
+    joinBusinesses: "انضم إلى الشركات في جميع أنحاء الجزائر التي تعزز تجربة عملائها من خلال منصة صفحات QR سهلة الاستخدام.",
+    businessTypes: {
+      restaurants: {
+        name: "المطاعم",
+        description: "قوائم طعام رقمية، عروض خاصة، وطلب عبر الإنترنت"
+      },
+      retail: {
+        name: "متاجر التجزئة",
+        description: "كتالوجات المنتجات، العروض الترويجية، وبرامج الولاء"
+      },
+      services: {
+        name: "الخدمات المهنية",
+        description: "حجز المواعيد، الشهادات، وقوائم الخدمات"
+      },
+      tourism: {
+        name: "السياحة والضيافة",
+        description: "جولات افتراضية، روابط الحجز، والمعالم المحلية"
+      },
+      events: {
+        name: "منظمي الفعاليات",
+        description: "جداول الفعاليات، الخرائط، وروابط التسجيل"
+      },
+      education: {
+        name: "التعليم",
+        description: "المواد التعليمية، الجداول الزمنية، ومعلومات الحرم الجامعي"
+      }
+    }
+  }
+};
 
 const features = [
   {
@@ -31,33 +156,33 @@ const features = [
 
 const businessTypes = [
   {
-    name: 'Restaurants',
-    description: 'Digital menus, specials, and online ordering',
+    name: translations.en.businessTypes.restaurants.name,
+    description: translations.en.businessTypes.restaurants.description,
     icon: <ChartBar className="w-10 h-10 text-primary" />,
   },
   {
-    name: 'Retail Stores',
-    description: 'Product catalogs, promotions, and loyalty programs',
+    name: translations.en.businessTypes.retail.name,
+    description: translations.en.businessTypes.retail.description,
     icon: <Users className="w-10 h-10 text-secondary" />,
   },
   {
-    name: 'Professional Services',
-    description: 'Appointment booking, testimonials, and service lists',
+    name: translations.en.businessTypes.services.name,
+    description: translations.en.businessTypes.services.description,
     icon: <Award className="w-10 h-10 text-accent" />,
   },
   {
-    name: 'Tourism & Hospitality',
-    description: 'Virtual tours, booking links, and local attractions',
+    name: translations.en.businessTypes.tourism.name,
+    description: translations.en.businessTypes.tourism.description,
     icon: <Globe className="w-10 h-10 text-secondary" />,
   },
   {
-    name: 'Event Planners',
-    description: 'Event schedules, maps, and registration links',
+    name: translations.en.businessTypes.events.name,
+    description: translations.en.businessTypes.events.description,
     icon: <ExternalLink className="w-10 h-10 text-accent" />,
   },
   {
-    name: 'Education',
-    description: 'Course materials, schedules, and campus information',
+    name: translations.en.businessTypes.education.name,
+    description: translations.en.businessTypes.education.description,
     icon: <Smartphone className="w-10 h-10 text-primary" />,
   },
 ];
@@ -65,6 +190,7 @@ const businessTypes = [
 const Index = () => {
   const { user } = useAuth();
   const navigate = useNavigate();
+  const [language, setLanguage] = useState<'en' | 'ar'>('en');
 
   // If user is already logged in, redirect to dashboard
   useEffect(() => {
@@ -72,6 +198,10 @@ const Index = () => {
       navigate('/dashboard');
     }
   }, [user, navigate]);
+
+  const toggleLanguage = () => {
+    setLanguage(language === 'en' ? 'ar' : 'en');
+  };
 
   return (
     <MainLayout>
@@ -91,13 +221,13 @@ const Index = () => {
                 className="mb-6"
               >
                 <span className="inline-block py-1 px-4 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
-                  <span className="arabic mx-1">مرحبا</span> | Digital Solutions for Your Business
+                  <span className="arabic mx-1">{translations[language].welcome}</span> | {translations[language].digitalSolutions}
                 </span>
-                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight">
-                  Create <span className="text-primary">Engaging</span> QR Landing Pages For Your <span className="text-secondary">Business</span>
+                <h1 className="text-4xl sm:text-5xl lg:text-6xl font-bold text-gray-900 mb-6 leading-tight" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].createEngaging}
                 </h1>
-                <p className="text-xl text-gray-600 mb-8 leading-relaxed">
-                  Generate beautiful QR codes that lead to custom landing pages with your links, menus, and business information - perfect for any type of business in Algeria and beyond.
+                <p className="text-xl text-gray-600 mb-8 leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].description}
                 </p>
               </motion.div>
               
@@ -108,11 +238,11 @@ const Index = () => {
                 className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4"
               >
                 <Button onClick={() => navigate('/signup')} className="business-cta-btn text-lg py-6 px-8 flex items-center gap-2 group">
-                  Start Free Trial
+                  {translations[language].startFreeTrial}
                   <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                 </Button>
                 <Button onClick={() => navigate('/signin')} variant="outline" className="text-lg py-6 px-8 border-2 hover:bg-gray-50">
-                  Sign In
+                  {translations[language].signIn}
                 </Button>
               </motion.div>
               
@@ -225,13 +355,13 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-sm mb-4">
-              Features That Deliver Results
+              {translations[language].features}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               All-in-One QR Solution for Your Business
             </h2>
             <p className="text-xl text-gray-600">
-              Create custom landing pages with links and menus that engage your audience and drive results
+              {translations[language].featuresDescription}
             </p>
           </div>
           
@@ -259,13 +389,13 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
-              Simple Process
+              {translations[language].simpleProcess}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Create Your QR Landing Page in Minutes
             </h2>
             <p className="text-xl text-gray-600">
-              Three simple steps to get your QR landing page online
+              {translations[language].threeSteps}
             </p>
           </div>
           
@@ -282,8 +412,8 @@ const Index = () => {
               className="text-center relative z-10"
             >
               <div className="bg-primary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">1</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Create Your QR Code</h3>
-              <p className="text-gray-600">Design your QR code with your brand colors and logo to match your business identity</p>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{translations[language].step1.title}</h3>
+              <p className="text-gray-600">{translations[language].step1.description}</p>
             </motion.div>
             
             {/* Step 2 */}
@@ -295,8 +425,8 @@ const Index = () => {
               className="text-center relative z-10"
             >
               <div className="bg-secondary w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">2</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Add Links & Menus</h3>
-              <p className="text-gray-600">Customize your landing page with links, restaurant menus and promotional content</p>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{translations[language].step2.title}</h3>
+              <p className="text-gray-600">{translations[language].step2.description}</p>
             </motion.div>
             
             {/* Step 3 */}
@@ -308,8 +438,8 @@ const Index = () => {
               className="text-center relative z-10"
             >
               <div className="bg-accent w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-6 shadow-md text-white text-2xl font-bold border-4 border-white">3</div>
-              <h3 className="text-xl font-semibold mb-3 text-gray-900">Share & Update</h3>
-              <p className="text-gray-600">Download your QR code and update your landing page anytime without creating new codes</p>
+              <h3 className="text-xl font-semibold mb-3 text-gray-900">{translations[language].step3.title}</h3>
+              <p className="text-gray-600">{translations[language].step3.description}</p>
             </motion.div>
           </div>
           
@@ -427,13 +557,13 @@ const Index = () => {
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
           <div className="text-center max-w-3xl mx-auto mb-16">
             <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-sm mb-4">
-              Pricing
+              {translations[language].pricing}
             </span>
             <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-4">
               Simple, Transparent Pricing
             </h2>
             <p className="text-xl text-gray-600">
-              Everything you need to create professional QR landing pages
+              {translations[language].pricingDescription}
             </p>
           </div>
           
@@ -448,9 +578,9 @@ const Index = () => {
               <div className="bg-gradient-to-r from-primary to-secondary p-6 text-white text-center relative overflow-hidden">
                 <div className="absolute top-0 right-0 transform translate-x-1/4 -translate-y-1/4 w-32 h-32 bg-white/10 rounded-full"></div>
                 <div className="absolute bottom-0 left-0 transform -translate-x-1/4 translate-y-1/4 w-40 h-40 bg-white/10 rounded-full"></div>
-                <h3 className="text-2xl font-bold relative z-10">Business Plan</h3>
-                <div className="text-4xl font-bold mt-2 relative z-10">500<span className="text-lg font-normal"> DZD/month</span></div>
-                <p className="mt-2 opacity-90 relative z-10">Everything you need for your business</p>
+                <h3 className="text-2xl font-bold relative z-10">{translations[language].businessPlan}</h3>
+                <div className="text-4xl font-bold mt-2 relative z-10">500<span className="text-lg font-normal">{translations[language].perMonth}</span></div>
+                <p className="mt-2 opacity-90 relative z-10">{translations[language].everythingYouNeed}</p>
               </div>
               <div className="p-8">
                 <ul className="space-y-5">
@@ -496,10 +626,10 @@ const Index = () => {
               transition={{ duration: 0.5 }}
             >
               <h2 className="text-3xl sm:text-4xl font-bold text-gray-900 mb-6">
-                Ready to Transform Your Business with Smart QR Solutions?
+                {translations[language].readyToTransform}
               </h2>
               <p className="text-xl text-gray-600 mb-10 max-w-2xl mx-auto">
-                Join businesses across Algeria that are elevating their customer experience with our easy-to-use QR landing page platform.
+                {translations[language].joinBusinesses}
               </p>
               <div className="flex flex-col sm:flex-row justify-center gap-4">
                 <Button onClick={() => navigate('/signup')} className="bg-primary hover:bg-primary/90 text-white py-6 px-8 rounded-lg shadow-lg">

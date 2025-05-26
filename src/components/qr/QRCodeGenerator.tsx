@@ -275,6 +275,136 @@ interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
 }
 
+// Translations object
+const translations = {
+  en: {
+    basic: "Basic",
+    advanced: "Advanced",
+    name: "Name",
+    myQRCode: "My QR Code",
+    textAboveQR: "Text Above QR Code",
+    enterTextAbove: "Enter text to display above QR code",
+    textBelowQR: "Text Below QR Code",
+    enterTextBelow: "Enter text to display below QR code",
+    type: "Type",
+    url: "URL",
+    menu: "Menu",
+    both: "Both",
+    directLink: "Direct Link",
+    enterURL: "Enter URL",
+    links: "Links",
+    selectPlatform: "Select platform",
+    website: "Website",
+    facebook: "Facebook",
+    instagram: "Instagram",
+    twitter: "Twitter",
+    linkedin: "LinkedIn",
+    youtube: "YouTube",
+    tiktok: "TikTok",
+    whatsapp: "WhatsApp",
+    telegram: "Telegram",
+    other: "Other",
+    foregroundColor: "Foreground Color",
+    backgroundColor: "Background Color",
+    logo: "Logo",
+    creating: "Creating...",
+    createQRCode: "Create QR Code",
+    downloadPNG: "Download PNG",
+    downloadSVG: "Download SVG",
+    success: "Success",
+    error: "Error",
+    qrCodeDownloaded: "QR code downloaded as",
+    failedToDownload: "Failed to download QR code",
+    invalidFileType: "Invalid file type",
+    pleaseUploadImage: "Please upload an image file (PNG, JPG, etc.)",
+    fileTooLarge: "File too large",
+    logoImageMustBeLess: "Logo image must be less than 2MB",
+    addImage: "Add Image",
+    changeImage: "Change Image",
+    itemImage: "Item Image",
+    categoryName: "Category Name",
+    itemName: "Item Name",
+    description: "Description",
+    price: "Price",
+    availability: "Availability",
+    days: {
+      sunday: "Sunday",
+      monday: "Monday",
+      tuesday: "Tuesday",
+      wednesday: "Wednesday",
+      thursday: "Thursday",
+      friday: "Friday",
+      saturday: "Saturday"
+    },
+    removeItem: "Remove Item",
+    addMenuItem: "Add Menu Item",
+    addCategory: "Add Category"
+  },
+  ar: {
+    basic: "أساسي",
+    advanced: "متقدم",
+    name: "الاسم",
+    myQRCode: "رمز QR الخاص بي",
+    textAboveQR: "نص فوق رمز QR",
+    enterTextAbove: "أدخل النص لعرضه فوق رمز QR",
+    textBelowQR: "نص تحت رمز QR",
+    enterTextBelow: "أدخل النص لعرضه تحت رمز QR",
+    type: "النوع",
+    url: "رابط",
+    menu: "قائمة",
+    both: "كلاهما",
+    directLink: "رابط مباشر",
+    enterURL: "أدخل الرابط",
+    links: "الروابط",
+    selectPlatform: "اختر المنصة",
+    website: "موقع إلكتروني",
+    facebook: "فيسبوك",
+    instagram: "انستغرام",
+    twitter: "تويتر",
+    linkedin: "لينكد إن",
+    youtube: "يوتيوب",
+    tiktok: "تيك توك",
+    whatsapp: "واتساب",
+    telegram: "تيليجرام",
+    other: "أخرى",
+    foregroundColor: "لون المقدمة",
+    backgroundColor: "لون الخلفية",
+    logo: "الشعار",
+    creating: "جاري الإنشاء...",
+    createQRCode: "إنشاء رمز QR",
+    downloadPNG: "تحميل PNG",
+    downloadSVG: "تحميل SVG",
+    success: "نجاح",
+    error: "خطأ",
+    qrCodeDownloaded: "تم تحميل رمز QR كملف",
+    failedToDownload: "فشل تحميل رمز QR",
+    invalidFileType: "نوع ملف غير صالح",
+    pleaseUploadImage: "يرجى تحميل ملف صورة (PNG، JPG، إلخ)",
+    fileTooLarge: "الملف كبير جداً",
+    logoImageMustBeLess: "يجب أن يكون حجم صورة الشعار أقل من 2 ميجابايت",
+    addImage: "إضافة صورة",
+    changeImage: "تغيير الصورة",
+    itemImage: "صورة العنصر",
+    categoryName: "اسم الفئة",
+    itemName: "اسم العنصر",
+    description: "الوصف",
+    price: "السعر",
+    availability: "التوفر",
+    days: {
+      sunday: "الأحد",
+      monday: "الاثنين",
+      tuesday: "الثلاثاء",
+      wednesday: "الأربعاء",
+      thursday: "الخميس",
+      friday: "الجمعة",
+      saturday: "السبت"
+    },
+    removeItem: "حذف العنصر",
+    addMenuItem: "إضافة عنصر",
+    addCategory: "إضافة فئة"
+  }
+};
+
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
@@ -294,54 +424,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [textBelow, setTextBelow] = useState('');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
-
-  // Translations for menu form
-  const translations = {
-    en: {
-      addCategory: 'Add Category',
-      categoryName: 'Category Name',
-      addMenuItem: 'Add Menu Item',
-      itemName: 'Item Name',
-      description: 'Description',
-      price: 'Price',
-      itemImage: 'Item Image',
-      availability: 'Availability',
-      removeItem: 'Remove Item',
-      changeImage: 'Change Image',
-      addImage: 'Add Image',
-      days: {
-        sunday: 'Sunday',
-        monday: 'Monday',
-        tuesday: 'Tuesday',
-        wednesday: 'Wednesday',
-        thursday: 'Thursday',
-        friday: 'Friday',
-        saturday: 'Saturday'
-      }
-    },
-    ar: {
-      addCategory: 'إضافة فئة',
-      categoryName: 'اسم الفئة',
-      addMenuItem: 'إضافة عنصر قائمة',
-      itemName: 'اسم العنصر',
-      description: 'الوصف',
-      price: 'السعر',
-      itemImage: 'صورة العنصر',
-      availability: 'التوفر',
-      removeItem: 'حذف العنصر',
-      changeImage: 'تغيير الصورة',
-      addImage: 'إضافة صورة',
-      days: {
-        sunday: 'الأحد',
-        monday: 'الاثنين',
-        tuesday: 'الثلاثاء',
-        wednesday: 'الأربعاء',
-        thursday: 'الخميس',
-        friday: 'الجمعة',
-        saturday: 'السبت'
-      }
-    }
-  };
 
   const resetForm = () => {
     setName('');
@@ -671,40 +753,40 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         <form onSubmit={handleSubmit}>
           <Tabs defaultValue="basic" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">Basic</TabsTrigger>
-              <TabsTrigger value="advanced">Advanced</TabsTrigger>
+              <TabsTrigger value="basic">{translations[menuLanguage].basic}</TabsTrigger>
+              <TabsTrigger value="advanced">{translations[menuLanguage].advanced}</TabsTrigger>
             </TabsList>
             <TabsContent value="basic" className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">Name</Label>
+                  <Label htmlFor="name">{translations[menuLanguage].name}</Label>
                   <Input
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="My QR Code"
+                    placeholder={translations[menuLanguage].myQRCode}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="textAbove">Text Above QR Code</Label>
+                  <Label htmlFor="textAbove">{translations[menuLanguage].textAboveQR}</Label>
                   <Input
                     id="textAbove"
                     value={textAbove}
                     onChange={(e) => setTextAbove(e.target.value)}
-                    placeholder="Enter text to display above QR code"
+                    placeholder={translations[menuLanguage].enterTextAbove}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="textBelow">Text Below QR Code</Label>
+                  <Label htmlFor="textBelow">{translations[menuLanguage].textBelowQR}</Label>
                   <Input
                     id="textBelow"
                     value={textBelow}
                     onChange={(e) => setTextBelow(e.target.value)}
-                    placeholder="Enter text to display below QR code"
+                    placeholder={translations[menuLanguage].enterTextBelow}
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label>Type</Label>
+                  <Label>{translations[menuLanguage].type}</Label>
                   <div className="flex gap-2">
                     <Button
                       type="button"
@@ -712,7 +794,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('url')}
                       className="flex-1"
                     >
-                      URL
+                      {translations[menuLanguage].url}
                     </Button>
                     <Button
                       type="button"
@@ -720,7 +802,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('menu')}
                       className="flex-1"
                     >
-                      Menu
+                      {translations[menuLanguage].menu}
                     </Button>
                     <Button
                       type="button"
@@ -728,7 +810,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('both')}
                       className="flex-1"
                     >
-                      Both
+                      {translations[menuLanguage].both}
                     </Button>
                     <Button
                       type="button"
@@ -736,25 +818,25 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('direct')}
                       className="flex-1"
                     >
-                      Direct Link
+                      {translations[menuLanguage].directLink}
                     </Button>
                   </div>
                 </div>
                 {type === 'direct' && (
                   <div className="space-y-2">
-                    <Label htmlFor="directUrl">URL</Label>
+                    <Label htmlFor="directUrl">{translations[menuLanguage].url}</Label>
                     <Input
                       id="directUrl"
                       type="url"
                       value={directUrl}
                       onChange={(e) => setDirectUrl(e.target.value)}
-                      placeholder="Enter URL"
+                      placeholder={translations[menuLanguage].enterURL}
                     />
                   </div>
                 )}
                 {(type === 'url' || type === 'both') && (
                   <div className="space-y-2">
-                    <Label>Links</Label>
+                    <Label>{translations[menuLanguage].links}</Label>
                     <div className="space-y-2">
                       {links.map((link, index) => (
                         <div key={index} className="flex gap-2">
@@ -763,46 +845,29 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             onValueChange={(value) => updateLink(index, 'type', value)}
                           >
                             <SelectTrigger className="w-[180px]">
-                              <SelectValue placeholder="Select platform" />
+                              <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="website">Website</SelectItem>
-                              <SelectItem value="facebook">Facebook</SelectItem>
-                              <SelectItem value="instagram">Instagram</SelectItem>
-                              <SelectItem value="twitter">Twitter</SelectItem>
-                              <SelectItem value="linkedin">LinkedIn</SelectItem>
-                              <SelectItem value="youtube">YouTube</SelectItem>
-                              <SelectItem value="tiktok">TikTok</SelectItem>
-                              <SelectItem value="whatsapp">WhatsApp</SelectItem>
-                              <SelectItem value="telegram">Telegram</SelectItem>
-                              <SelectItem value="other">Other</SelectItem>
+                              <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
+                              <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
+                              <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
+                              <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
+                              <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
+                              <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
+                              <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
+                              <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
+                              <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                              <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
                             </SelectContent>
                           </Select>
                           <Input
-                            placeholder="URL"
+                            placeholder={translations[menuLanguage].url}
                             type="url"
                             value={link.url}
                             onChange={(e) => updateLink(index, 'url', e.target.value)}
                           />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeLink(index)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
                         </div>
                       ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={addLink}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Link
-                      </Button>
                     </div>
                   </div>
                 )}
@@ -952,7 +1017,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             <TabsContent value="advanced" className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="foregroundColor">Foreground Color</Label>
+                  <Label htmlFor="foregroundColor">{translations[menuLanguage].foregroundColor}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="foregroundColor"
@@ -969,7 +1034,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor">Background Color</Label>
+                  <Label htmlFor="backgroundColor">{translations[menuLanguage].backgroundColor}</Label>
                   <div className="flex gap-2">
                     <Input
                       id="backgroundColor"
@@ -986,7 +1051,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="logo">Logo</Label>
+                  <Label htmlFor="logo">{translations[menuLanguage].logo}</Label>
                   <Input
                     id="logo"
                     type="file"
@@ -1000,7 +1065,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           </Tabs>
           <div className="mt-4 flex justify-end">
             <Button type="submit" disabled={isLoading}>
-              {isLoading ? 'Creating...' : 'Create QR Code'}
+              {isLoading ? translations[menuLanguage].creating : translations[menuLanguage].createQRCode}
             </Button>
           </div>
         </form>

@@ -20,6 +20,226 @@ import {
   Plus, Calendar, CheckCircle, AlertCircle
 } from 'lucide-react';
 
+// Translations object
+const translations = {
+  en: {
+    dashboard: "Dashboard",
+    createNewQR: "Create New QR Code",
+    myQRCodes: "My QR Codes",
+    noQRCodes: "No QR codes found. Create your first QR code!",
+    name: "Name",
+    type: "Type",
+    created: "Created",
+    actions: "Actions",
+    view: "View",
+    edit: "Edit",
+    delete: "Delete",
+    download: "Download",
+    downloadPNG: "Download PNG",
+    downloadSVG: "Download SVG",
+    success: "Success",
+    error: "Error",
+    qrCodeDeleted: "QR code deleted successfully",
+    failedToDelete: "Failed to delete QR code",
+    confirmDelete: "Are you sure you want to delete this QR code?",
+    cancel: "Cancel",
+    deleteQRCode: "Delete QR Code",
+    loading: "Loading...",
+    noResults: "No results found",
+    search: "Search",
+    filter: "Filter",
+    all: "All",
+    url: "URL",
+    menu: "Menu",
+    both: "Both",
+    direct: "Direct Link",
+    sortBy: "Sort by",
+    newest: "Newest",
+    oldest: "Oldest",
+    nameAZ: "Name (A-Z)",
+    nameZA: "Name (Z-A)",
+    typeAZ: "Type (A-Z)",
+    typeZA: "Type (Z-A)",
+    createdNewest: "Created (Newest)",
+    createdOldest: "Created (Oldest)",
+    status: "Status",
+    active: "Active",
+    inactive: "Inactive",
+    archived: "Archived",
+    dateRange: "Date Range",
+    from: "From",
+    to: "To",
+    apply: "Apply",
+    reset: "Reset",
+    export: "Export",
+    import: "Import",
+    bulkActions: "Bulk Actions",
+    selectAll: "Select All",
+    deselectAll: "Deselect All",
+    bulkDelete: "Delete Selected",
+    bulkExport: "Export Selected",
+    bulkArchive: "Archive Selected",
+    bulkActivate: "Activate Selected",
+    bulkDeactivate: "Deactivate Selected",
+    bulkMove: "Move Selected",
+    bulkCopy: "Copy Selected",
+    bulkEdit: "Edit Selected",
+    bulkShare: "Share Selected",
+    bulkDownload: "Download Selected",
+    bulkPrint: "Print Selected",
+    bulkEmail: "Email Selected",
+    bulkSMS: "SMS Selected",
+    bulkWhatsApp: "WhatsApp Selected",
+    bulkTelegram: "Telegram Selected",
+    bulkFacebook: "Facebook Selected",
+    bulkInstagram: "Instagram Selected",
+    bulkTwitter: "Twitter Selected",
+    bulkLinkedIn: "LinkedIn Selected",
+    bulkYouTube: "YouTube Selected",
+    bulkTikTok: "TikTok Selected",
+    bulkWebsite: "Website Selected",
+    bulkOther: "Other Selected",
+    bulkCustom: "Custom Selected",
+    bulkNone: "None Selected",
+    bulkAll: "All Selected",
+    bulkSome: "Some Selected",
+    bulkNoneSelected: "No items selected",
+    bulkSomeSelected: "items selected",
+    bulkAllSelected: "All items selected",
+    bulkActionSuccess: "Bulk action completed successfully",
+    bulkActionError: "Failed to complete bulk action",
+    bulkActionConfirm: "Are you sure you want to perform this bulk action?",
+    bulkActionCancel: "Cancel",
+    bulkActionProcessing: "Processing...",
+    bulkActionComplete: "Complete",
+    bulkActionFailed: "Failed",
+    bulkActionPartial: "Partial",
+    bulkActionNone: "None",
+    bulkActionSome: "Some",
+    bulkActionAll: "All",
+    bulkActionCustom: "Custom",
+    previewMode: "Preview Mode",
+    editQRCodeURL: "Edit QR Code URL",
+    newURL: "New URL",
+    enterNewURL: "Enter new URL",
+    updateURL: "Update URL",
+    confirmDeletion: "Confirm Deletion",
+    thisActionCannotBeUndone: "This action cannot be undone. This will permanently delete your QR code and all associated data.",
+    areYouSureYouWantToDelete: "Are you sure you want to delete",
+    qrCodePreview: "QR Code Preview",
+    activateAccountToDownloadHighResolutionQR: "Activate your account to download high-resolution QR codes",
+    activateAccount: "Activate Account"
+  },
+  ar: {
+    dashboard: "لوحة التحكم",
+    createNewQR: "إنشاء رمز QR جديد",
+    myQRCodes: "رموز QR الخاصة بي",
+    noQRCodes: "لم يتم العثور على رموز QR. قم بإنشاء أول رمز QR!",
+    name: "الاسم",
+    type: "النوع",
+    created: "تاريخ الإنشاء",
+    actions: "الإجراءات",
+    view: "عرض",
+    edit: "تعديل",
+    delete: "حذف",
+    download: "تحميل",
+    downloadPNG: "تحميل PNG",
+    downloadSVG: "تحميل SVG",
+    success: "نجاح",
+    error: "خطأ",
+    qrCodeDeleted: "تم حذف رمز QR بنجاح",
+    failedToDelete: "فشل حذف رمز QR",
+    confirmDelete: "هل أنت متأكد أنك تريد حذف رمز QR هذا؟",
+    cancel: "إلغاء",
+    deleteQRCode: "حذف رمز QR",
+    loading: "جاري التحميل...",
+    noResults: "لم يتم العثور على نتائج",
+    search: "بحث",
+    filter: "تصفية",
+    all: "الكل",
+    url: "رابط",
+    menu: "قائمة",
+    both: "كلاهما",
+    direct: "رابط مباشر",
+    sortBy: "ترتيب حسب",
+    newest: "الأحدث",
+    oldest: "الأقدم",
+    nameAZ: "الاسم (أ-ي)",
+    nameZA: "الاسم (ي-أ)",
+    typeAZ: "النوع (أ-ي)",
+    typeZA: "النوع (ي-أ)",
+    createdNewest: "تاريخ الإنشاء (الأحدث)",
+    createdOldest: "تاريخ الإنشاء (الأقدم)",
+    status: "الحالة",
+    active: "نشط",
+    inactive: "غير نشط",
+    archived: "مؤرشف",
+    dateRange: "نطاق التاريخ",
+    from: "من",
+    to: "إلى",
+    apply: "تطبيق",
+    reset: "إعادة تعيين",
+    export: "تصدير",
+    import: "استيراد",
+    bulkActions: "إجراءات متعددة",
+    selectAll: "تحديد الكل",
+    deselectAll: "إلغاء تحديد الكل",
+    bulkDelete: "حذف المحدد",
+    bulkExport: "تصدير المحدد",
+    bulkArchive: "أرشفة المحدد",
+    bulkActivate: "تفعيل المحدد",
+    bulkDeactivate: "إلغاء تفعيل المحدد",
+    bulkMove: "نقل المحدد",
+    bulkCopy: "نسخ المحدد",
+    bulkEdit: "تعديل المحدد",
+    bulkShare: "مشاركة المحدد",
+    bulkDownload: "تحميل المحدد",
+    bulkPrint: "طباعة المحدد",
+    bulkEmail: "بريد إلكتروني للمحدد",
+    bulkSMS: "رسالة نصية للمحدد",
+    bulkWhatsApp: "واتساب للمحدد",
+    bulkTelegram: "تيليجرام للمحدد",
+    bulkFacebook: "فيسبوك للمحدد",
+    bulkInstagram: "انستغرام للمحدد",
+    bulkTwitter: "تويتر للمحدد",
+    bulkLinkedIn: "لينكد إن للمحدد",
+    bulkYouTube: "يوتيوب للمحدد",
+    bulkTikTok: "تيك توك للمحدد",
+    bulkWebsite: "موقع إلكتروني للمحدد",
+    bulkOther: "أخرى للمحدد",
+    bulkCustom: "مخصص للمحدد",
+    bulkNone: "لا شيء محدد",
+    bulkAll: "الكل محدد",
+    bulkSome: "بعض محدد",
+    bulkNoneSelected: "لم يتم تحديد أي عناصر",
+    bulkSomeSelected: "عناصر محددة",
+    bulkAllSelected: "تم تحديد جميع العناصر",
+    bulkActionSuccess: "تم إكمال الإجراء المتعدد بنجاح",
+    bulkActionError: "فشل إكمال الإجراء المتعدد",
+    bulkActionConfirm: "هل أنت متأكد أنك تريد تنفيذ هذا الإجراء المتعدد؟",
+    bulkActionCancel: "إلغاء",
+    bulkActionProcessing: "جاري المعالجة...",
+    bulkActionComplete: "مكتمل",
+    bulkActionFailed: "فشل",
+    bulkActionPartial: "جزئي",
+    bulkActionNone: "لا شيء",
+    bulkActionSome: "بعض",
+    bulkActionAll: "الكل",
+    bulkActionCustom: "مخصص",
+    previewMode: "وضع المعاينة",
+    editQRCodeURL: "تعديل رابط رمز QR",
+    newURL: "رابط جديد",
+    enterNewURL: "أدخل الرابط الجديد",
+    updateURL: "تحديث الرابط",
+    confirmDeletion: "تأكيد الحذف",
+    thisActionCannotBeUndone: "لا يمكن التراجع عن هذا الإجراء. سيتم حذف رمز QR وجميع البيانات المرتبطة به بشكل دائم.",
+    areYouSureYouWantToDelete: "هل أنت متأكد أنك تريد حذف",
+    qrCodePreview: "معاينة رمز QR",
+    activateAccountToDownloadHighResolutionQR: "قم بتفعيل حسابك لتنزيل رموز QR عالية الدقة",
+    activateAccount: "تفعيل الحساب"
+  }
+};
+
 const Dashboard = () => {
   const { user, isTrialExpired, isTrialActive, daysLeftInTrial } = useAuth();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
@@ -29,6 +249,11 @@ const Dashboard = () => {
   const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
+  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
+
+  const toggleLanguage = () => {
+    setMenuLanguage(prev => prev === 'en' ? 'ar' : 'en');
+  };
 
   // Function to fetch QR codes
   const fetchQRCodes = async () => {
@@ -419,7 +644,24 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className="container mx-auto px-4 py-8">
+      <div className={`container mx-auto px-4 py-8 ${menuLanguage === 'ar' ? 'rtl' : 'ltr'}`}>
+        <div className="flex justify-between items-center mb-8">
+          <h1 className="text-3xl font-bold text-gray-900">
+            {translations[menuLanguage].dashboard}
+          </h1>
+          <div className="flex items-center gap-4">
+            <Button
+              variant="outline"
+              onClick={toggleLanguage}
+              className="flex items-center gap-2"
+            >
+              {menuLanguage === 'en' ? 'العربية' : 'English'}
+            </Button>
+            <Button onClick={() => navigate('/create')}>
+              {translations[menuLanguage].createNewQR}
+            </Button>
+          </div>
+        </div>
         {/* Header with welcome message */}
         <div className="mb-8">
           <div className="flex flex-wrap items-center justify-between">
@@ -535,12 +777,12 @@ const Dashboard = () => {
           <TabsList className="grid w-full max-w-md grid-cols-2 p-1 rounded-xl bg-gray-100">
             <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4" /> Create QR Code
+                <Plus className="w-4 h-4" /> {translations[menuLanguage].createNewQR}
               </div>
             </TabsTrigger>
             <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
-                <Edit className="w-4 h-4" /> Manage QR Codes
+                <Edit className="w-4 h-4" /> {translations[menuLanguage].myQRCodes}
               </div>
             </TabsTrigger>
           </TabsList>
@@ -555,12 +797,12 @@ const Dashboard = () => {
           {/* QR Code Management Tab */}
           <TabsContent value="manage" className="py-6">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold font-cairo">Your QR Codes</h2>
+              <h2 className="text-2xl font-semibold font-cairo">{translations[menuLanguage].myQRCodes}</h2>
               <Button 
                 onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                 className="dz-button flex items-center gap-2"
               >
-                <Plus className="w-4 h-4" /> Create New
+                <Plus className="w-4 h-4" /> {translations[menuLanguage].createNewQR}
               </Button>
             </div>
             
@@ -568,7 +810,7 @@ const Dashboard = () => {
               <div className="flex justify-center py-16">
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-500">Loading your QR codes...</p>
+                  <p className="text-gray-500">{translations[menuLanguage].loading}</p>
                 </div>
               </div>
             ) : qrCodes.length === 0 ? (
@@ -577,14 +819,14 @@ const Dashboard = () => {
                   <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
                     <Plus className="w-8 h-8 text-gray-400" />
                   </div>
-                  <h3 className="text-xl font-medium text-gray-700 font-cairo">No QR codes yet</h3>
-                  <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. Create your first QR code to get started.</p>
+                  <h3 className="text-xl font-medium text-gray-700 font-cairo">{translations[menuLanguage].noQRCodes}</h3>
+                  <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. {translations[menuLanguage].createNewQR} to get started.</p>
                   <Button 
                     onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
                     variant="outline" 
                     className="mt-3 border-primary text-primary hover:bg-primary/5"
                   >
-                    Create your first QR code
+                    {translations[menuLanguage].createNewQR}
                   </Button>
                 </div>
               </div>
@@ -615,7 +857,7 @@ const Dashboard = () => {
                           <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg pointer-events-none z-10">
                             <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-3">
                               <Lock className="w-6 h-6 text-gray-600 mb-2 mx-auto" />
-                              <p className="text-gray-700 text-sm font-medium">Preview Mode</p>
+                              <p className="text-gray-700 text-sm font-medium">{translations[menuLanguage].previewMode}</p>
                             </div>
                           </div>
                         )}
@@ -649,7 +891,7 @@ const Dashboard = () => {
                       
                       <div className="mb-4 space-y-2">
                         <div>
-                          <Label className="text-xs text-gray-500">URL</Label>
+                          <Label className="text-xs text-gray-500">{translations[menuLanguage].url}</Label>
                           <div className="flex items-center gap-1">
                             <p className="text-sm truncate font-medium">{qr.url}</p>
                             <a 
@@ -663,7 +905,7 @@ const Dashboard = () => {
                           </div>
                         </div>
                         <div>
-                          <Label className="text-xs text-gray-500">Created</Label>
+                          <Label className="text-xs text-gray-500">{translations[menuLanguage].created}</Label>
                           <p className="text-sm">{new Date(qr.createdAt).toLocaleDateString(undefined, { 
                             year: 'numeric', 
                             month: 'short', 
@@ -680,35 +922,35 @@ const Dashboard = () => {
                             onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Edit className="w-3.5 h-3.5 mr-1.5" /> Edit Content
+                            <Edit className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].edit}
                           </Button>
                           <Dialog>
                             <DialogTrigger asChild>
                               <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full hover:bg-gray-50 font-cairo">
-                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> Edit URL
+                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].edit}
                               </Button>
                             </DialogTrigger>
                             <DialogContent>
                               <DialogHeader>
-                                <DialogTitle className="font-cairo">Edit QR Code URL</DialogTitle>
+                                <DialogTitle className="font-cairo">{translations[menuLanguage].editQRCodeURL}</DialogTitle>
                               </DialogHeader>
                               <div className="space-y-4">
                                 <div>
-                                  <Label htmlFor="newUrl">New URL</Label>
+                                  <Label htmlFor="newUrl">{translations[menuLanguage].newURL}</Label>
                                   <Input
                                     id="newUrl"
                                     value={newUrl}
                                     onChange={(e) => setNewUrl(e.target.value)}
-                                    placeholder="Enter new URL"
+                                    placeholder={translations[menuLanguage].enterNewURL}
                                     className="border-primary/20 focus:border-primary"
                                   />
                                 </div>
                                 <div className="flex justify-end gap-2">
                                   <Button variant="outline" onClick={() => setEditingQR(null)}>
-                                    Cancel
+                                    {translations[menuLanguage].cancel}
                                   </Button>
                                   <Button onClick={handleUpdateQR} className="dz-button">
-                                    Update URL
+                                    {translations[menuLanguage].updateURL}
                                   </Button>
                                 </div>
                               </div>
@@ -722,7 +964,7 @@ const Dashboard = () => {
                             onClick={() => handleDownload(qr, 'png')}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> Download PNG
+                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].downloadPNG}
                           </Button>
                           <Button 
                             variant="outline" 
@@ -730,7 +972,7 @@ const Dashboard = () => {
                             onClick={() => handleDownload(qr, 'svg')}
                             className="w-full hover:bg-gray-50 font-cairo"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> Download SVG
+                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[menuLanguage].downloadSVG}
                           </Button>
                         </div>
 
@@ -743,29 +985,29 @@ const Dashboard = () => {
                               onClick={() => setDeleteConfirmQR(qr)}
                             >
                               <Trash2 className="w-3.5 h-3.5 mr-1.5" />
-                              Delete QR Code
+                              {translations[menuLanguage].deleteQRCode}
                             </Button>
                           </DialogTrigger>
                           {deleteConfirmQR && (
                             <DialogContent aria-describedby="delete-dialog-description">
                               <DialogHeader>
-                                <DialogTitle className="font-cairo">Confirm Deletion</DialogTitle>
+                                <DialogTitle className="font-cairo">{translations[menuLanguage].confirmDeletion}</DialogTitle>
                                 <DialogDescription id="delete-dialog-description">
-                                  This action cannot be undone. This will permanently delete your QR code and all associated data.
+                                  {translations[menuLanguage].thisActionCannotBeUndone}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="py-4">
-                                <p>Are you sure you want to delete "{deleteConfirmQR.name}"?</p>
+                                <p>{translations[menuLanguage].areYouSureYouWantToDelete} "{deleteConfirmQR.name}"?</p>
                               </div>
                               <div className="flex justify-end space-x-2">
                                 <Button variant="outline" onClick={() => setDeleteConfirmQR(null)}>
-                                  Cancel
+                                  {translations[menuLanguage].cancel}
                                 </Button>
                                 <Button 
                                   variant="destructive" 
                                   onClick={() => handleDeleteQR(deleteConfirmQR.id)}
                                 >
-                                  Delete
+                                  {translations[menuLanguage].delete}
                                 </Button>
                               </div>
                             </DialogContent>
@@ -785,7 +1027,7 @@ const Dashboard = () => {
       <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
         <DialogContent className="max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-cairo">QR Code Preview</DialogTitle>
+            <DialogTitle className="font-cairo">{translations[menuLanguage].qrCodePreview}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             {previewQR && (
@@ -797,7 +1039,7 @@ const Dashboard = () => {
                   <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg">
                     <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-4">
                       <Lock className="w-8 h-8 text-gray-600 mb-2" />
-                      <p className="text-gray-700 font-medium">Preview Mode</p>
+                      <p className="text-gray-700 font-medium">{translations[menuLanguage].previewMode}</p>
                     </div>
                   </div>
                   <QRCodeSVG
@@ -816,13 +1058,13 @@ const Dashboard = () => {
                   />
                 </div>
                 <p className="text-sm text-gray-600 mb-4">
-                  Activate your account to download high-resolution QR codes
+                  {translations[menuLanguage].activateAccountToDownloadHighResolutionQR}
                 </p>
                 <Button 
                   onClick={() => navigate('/payment-instructions')}
                   className="dz-button flex items-center gap-2"
                 >
-                  <CheckCircle className="w-4 h-4" /> Activate Account
+                  <CheckCircle className="w-4 h-4" /> {translations[menuLanguage].activateAccount}
                 </Button>
               </div>
             )}
