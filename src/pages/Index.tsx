@@ -296,24 +296,42 @@ const Index = () => {
                 className="relative"
               >
                 <div className="absolute -inset-4 rounded-xl bg-gradient-to-r from-primary to-secondary opacity-20 blur-lg"></div>
-                <div className="relative bg-white rounded-xl shadow-xl p-8">
-                  <div className="aspect-square w-full max-w-md mx-auto">
-                    <div className="w-full h-full flex items-center justify-center">
-                      <div className="text-center">
-                        <div className="w-48 h-48 mx-auto mb-4">
-                          <QRCodeSVG
-                            value="https://quickqr.com"
-                            size={192}
-                            bgColor="#ffffff"
-                            fgColor="#000000"
-                            level="H"
-                            includeMargin={false}
-                          />
-                        </div>
-                        <p className="text-sm text-gray-500">Scan to see a demo</p>
-                      </div>
+                <div className="relative rounded-xl shadow-xl transform hover:rotate-0 transition-all duration-300">
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-xl">
+                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_04_53 AM.png"
+                        alt="QR Code in use" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src="/Design sans titre.png"
+                        alt="Restaurant QR menu" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_08_02 AM.png"
+                        alt="Retail store" 
+                        className="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div className="aspect-square rounded-lg overflow-hidden shadow-md transform hover:scale-105 transition-transform duration-300">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_09_50 AM.png"
+                        alt="Digital menu scanning" 
+                        className="w-full h-full object-cover"
+                      />
                     </div>
                   </div>
+                </div>
+                <div className="absolute -top-6 -right-6 w-24 h-24 bg-white rounded-xl shadow-lg flex items-center justify-center p-4">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
+                    <path fill={`${getComputedStyle(document.documentElement).getPropertyValue('--primary').trim()}`} d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
+                  </svg>
                 </div>
               </motion.div>
             </div>
