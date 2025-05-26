@@ -17,7 +17,7 @@ import ReactDOM from 'react-dom/client';
 import { qrCodeApi } from '@/lib/api';
 import { 
   Lock, Download, Eye, Edit, Trash2, ExternalLink, 
-  Plus, Calendar, CheckCircle, AlertCircle
+  Plus, Calendar, CheckCircle, AlertCircle, Globe
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -129,7 +129,13 @@ const translations = {
     areYouSureYouWantToDelete: "Are you sure you want to delete",
     qrCodePreview: "QR Code Preview",
     activateAccountToDownloadHighResolutionQR: "Activate your account to download high-resolution QR codes",
-    activateAccount: "Activate Account"
+    activateAccount: "Activate Account",
+    welcome: "Hello",
+    dashboardDescription: "Manage your QR codes and subscription from your personalized dashboard",
+    trial: "Trial",
+    daysLeft: "days left",
+    trialExpired: "Trial expired",
+    activeSubscription: "Active Subscription"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -237,7 +243,13 @@ const translations = {
     areYouSureYouWantToDelete: "هل أنت متأكد أنك تريد حذف",
     qrCodePreview: "معاينة رمز QR",
     activateAccountToDownloadHighResolutionQR: "قم بتفعيل حسابك لتنزيل رموز QR عالية الدقة",
-    activateAccount: "تفعيل الحساب"
+    activateAccount: "تفعيل الحساب",
+    welcome: "مرحبا",
+    dashboardDescription: "إدارة كودات QR الخاصة بك واشتراكك من لوحة التحكم الشخصية",
+    trial: "تجريبي",
+    daysLeft: "يتبقى",
+    trialExpired: "انتهى التجريبي",
+    activeSubscription: "اشتراك نشط"
   }
 };
 
@@ -250,7 +262,7 @@ const Dashboard = () => {
   const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
 
   // Function to fetch QR codes
   const fetchQRCodes = async () => {
@@ -657,18 +669,27 @@ const Dashboard = () => {
           <div className="flex flex-wrap items-center justify-between">
             <div>
               <h1 className="text-3xl font-bold text-gray-900 mb-1 font-cairo">
-                <span className="text-primary">مرحبا</span> {/* Hello in Arabic */}
+                <span className="text-primary">{translations[language].welcome}</span>
                 <span>, {user.name || user.email.split('@')[0]}</span>
               </h1>
-              <p className="text-gray-600 mb-4">Manage your QR codes and subscription from your personalized dashboard</p>
+              <p className="text-gray-600 mb-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                {translations[language].dashboardDescription}
+              </p>
             </div>
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
+              <Button
+                variant="ghost"
+                onClick={toggleLanguage}
+                className="flex items-center gap-2"
+              >
+                <Globe className="w-4 h-4" />
+                {translations[language].language}
+              </Button>
               <img 
                 src="/algeria-flag-icon.png" 
                 alt="Algeria"
-                className="w-8 h-8 mr-2 rounded shadow-sm"
+                className="w-8 h-8 rounded shadow-sm"
                 onError={(e) => {
-                  // Fallback if image doesn't exist
                   e.currentTarget.style.display = 'none';
                 }}
               />
@@ -676,23 +697,21 @@ const Dashboard = () => {
           </div>
           
           {/* Subscription status badges */}
-          <div className="flex flex-wrap gap-3 mt-2">
-            {user.hasActiveSubscription && (
-              <span className="bg-secondary/10 text-secondary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <CheckCircle className="w-4 h-4" /> Active Subscription
-              </span>
-            )}
-            
+          <div className="flex flex-wrap gap-4 mt-4">
             {isTrialActive() && (
-              <span className="bg-primary/10 text-primary px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <Calendar className="w-4 h-4" /> Trial: {daysLeftInTrial()} days left
-              </span>
+              <div className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <Calendar className="w-4 h-4" /> {translations[language].trial}: {daysLeftInTrial()} {translations[language].daysLeft}
+              </div>
             )}
-            
             {isTrialExpired() && !user.hasActiveSubscription && (
-              <span className="bg-destructive/10 text-destructive px-3 py-1 rounded-full text-sm font-medium flex items-center gap-1">
-                <AlertCircle className="w-4 h-4" /> Trial expired
-              </span>
+              <div className="text-sm text-red-600 bg-red-100 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <AlertCircle className="w-4 h-4" /> {translations[language].trialExpired}
+              </div>
+            )}
+            {user.hasActiveSubscription && (
+              <div className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full flex items-center gap-1.5">
+                <CheckCircle className="w-4 h-4" /> {translations[language].activeSubscription}
+              </div>
             )}
           </div>
         </div>
