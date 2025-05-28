@@ -338,7 +338,8 @@ const translations = {
     },
     removeItem: "Remove Item",
     addMenuItem: "Add Menu Item",
-    addCategory: "Add Category"
+    addCategory: "Add Category",
+    addLink: "Add Link"
   },
   ar: {
     basic: "أساسي",
@@ -401,7 +402,8 @@ const translations = {
     },
     removeItem: "حذف العنصر",
     addMenuItem: "إضافة عنصر",
-    addCategory: "إضافة فئة"
+    addCategory: "إضافة فئة",
+    addLink: "إضافة رابط"
   }
 };
 
@@ -836,7 +838,19 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 {(type === 'url' || type === 'both') && (
                   <div className="space-y-2">
-                    <Label>{translations[menuLanguage].links}</Label>
+                    <div className="flex justify-between items-center">
+                      <Label>{translations[menuLanguage].links}</Label>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={addLink}
+                        className="flex items-center gap-2"
+                      >
+                        <Plus className="h-4 w-4" />
+                        {translations[menuLanguage].addLink}
+                      </Button>
+                    </div>
                     <div className="space-y-2">
                       {links.map((link, index) => (
                         <div key={index} className="flex gap-2">
