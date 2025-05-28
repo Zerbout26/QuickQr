@@ -461,15 +461,15 @@ const Index = () => {
               {translations[language].discoverHow}
             </p>
           </div>
-          
+
           <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
             {Object.entries(translations[language].businessTypes).map(([key, business], index) => (
-              <motion.div 
+            <motion.div
                 key={key}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.1, duration: 0.5 }}
-                viewport={{ once: true }}
+              viewport={{ once: true }}
                 className="bg-white rounded-xl p-8 shadow-md hover:shadow-xl transition-all border border-gray-100 group"
               >
                 <div className="bg-gray-50 p-4 rounded-xl inline-flex mb-6 group-hover:scale-110 transition-transform duration-300">
@@ -477,9 +477,9 @@ const Index = () => {
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>{business.name}</h3>
                 <p className="text-gray-600" dir={language === 'ar' ? 'rtl' : 'ltr'}>{business.description}</p>
-              </motion.div>
-            ))}
-          </div>
+            </motion.div>
+                ))}
+              </div>
           
           <div className="text-center mt-12">
             <Button onClick={() => navigate('/signup')} className="inline-flex items-center gap-2 bg-accent hover:bg-accent/90 text-white py-2 px-4 rounded-lg">
@@ -489,7 +489,7 @@ const Index = () => {
           </div>
         </div>
       </section>
-
+      
       {/* Pricing Section */}
       <section className="py-24 bg-gradient-to-br from-gray-50 to-white">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
