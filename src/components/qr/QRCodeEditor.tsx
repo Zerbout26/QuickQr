@@ -442,14 +442,14 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       const updatedQRCode = await response.json();
       onUpdated(updatedQRCode);
       toast({
-        title: "Success",
+        title: translations[menuLanguage].success,
         description: "QR code updated successfully",
       });
     } catch (error) {
       console.error('Error updating QR code:', error);
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translations[menuLanguage].error,
         description: error instanceof Error ? error.message : 'Failed to update QR code',
       });
     } finally {

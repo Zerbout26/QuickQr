@@ -252,63 +252,133 @@ export const getQRCode = async (req: AuthRequest, res: Response) => {
 };
 
 export const updateQRCode = async (req: AuthRequest, res: Response) => {
-  try {
-    if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+  uploadFields(req, res, async (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ error: err.message });
     }
 
-    const { id } = req.params;
-    const { name, url, logoUrl, foregroundColor, backgroundColor, links, type, menu } = req.body;
-
-    console.log('Update request body:', req.body); // Debug log
-
-    const qrCode = await qrCodeRepository.findOne({
-      where: { id, user: { id: req.user.id } }
-    });
-
-    if (!qrCode) {
-      return res.status(404).json({ error: 'QR code not found' });
-    }
-
-    // Update basic fields
-    if (name !== undefined) qrCode.name = name;
-    if (url !== undefined) qrCode.url = url;
-    if (logoUrl !== undefined) qrCode.logoUrl = logoUrl;
-    if (foregroundColor !== undefined) qrCode.foregroundColor = foregroundColor;
-    if (backgroundColor !== undefined) qrCode.backgroundColor = backgroundColor;
-    if (type !== undefined) qrCode.type = type as QRCodeType;
-    
-    // Handle links
-    if (links !== undefined) {
-      try {
-        // If links is already an array, use it directly
-        qrCode.links = Array.isArray(links) ? links : JSON.parse(links);
-      } catch (e) {
-        console.error('Error parsing links:', e);
-        return res.status(400).json({ error: 'Invalid links format' });
+    try {
+      if (!req.user) {
+        return res.status(401).json({ error: 'Not authenticated' });
       }
-    }
 
-    // Handle menu
-    if (menu !== undefined && (type === 'menu' || type === 'both')) {
-      try {
-        // If menu is already an object, use it directly
-        qrCode.menu = typeof menu === 'object' ? menu : JSON.parse(menu);
-      } catch (e) {
-        console.error('Error parsing menu:', e);
-        return res.status(400).json({ error: 'Invalid menu format' });
+      const { id } = req.params;
+      const { name, foregroundColor, backgroundColor, links, type, menu } = req.body;
+      let logoUrl = '';
+
+      const qrCode = await qrCodeRepository.findOne({
+        where: { id, user: { id: req.user.id } }
+      });
+
+      if (!qrCode) {
+        return res.status(404).json({ error: 'QR code not found' });
       }
+
+      // Handle logo upload if present
+      if (req.files && (req.files as any)['logo']) {
+        // Delete old logo if exists
+        if (qrCode.logoUrl) {
+          const publicId = qrCode.logoUrl.split('/').pop()?.split('.')[0];
+          if (publicId) {
+            await deleteFromCloudinary(publicId);
+          }
+        }
+
+        const logoFile = (req.files as any)['logo'][0];
+        logoUrl = await uploadToCloudinary(logoFile);
+        // Get optimized URL for the logo
+        logoUrl = getOptimizedUrl(logoUrl, {
+          width: 200,
+          height: 200,
+          crop: 'fill',
+          quality: 'auto'
+        });
+        qrCode.logoUrl = logoUrl;
+      }
+
+      // Update basic fields
+      if (name !== undefined) qrCode.name = name;
+      if (foregroundColor !== undefined) qrCode.foregroundColor = foregroundColor;
+      if (backgroundColor !== undefined) qrCode.backgroundColor = backgroundColor;
+      if (type !== undefined) qrCode.type = type as QRCodeType;
+      
+      // Handle links
+      if (links !== undefined) {
+        try {
+          qrCode.links = Array.isArray(links) ? links : JSON.parse(links);
+        } catch (e) {
+          console.error('Error parsing links:', e);
+          return res.status(400).json({ error: 'Invalid links format' });
+        }
+      }
+
+      // Handle menu
+      if (menu !== undefined && (type === 'menu' || type === 'both')) {
+        try {
+          const parsedMenu = typeof menu === 'object' ? menu : JSON.parse(menu);
+          
+          // Handle menu item images
+          if (req.files && (req.files as any)['menuItemImages']) {
+            const menuItemImages = (req.files as any)['menuItemImages'];
+            for (let i = 0; i < menuItemImages.length; i++) {
+              const imageFile = menuItemImages[i];
+              try {
+                // Upload image to Cloudinary
+                const imageUrl = await uploadToCloudinary(imageFile);
+                
+                // Get optimized URL for the menu item image
+                const optimizedUrl = getOptimizedUrl(imageUrl, {
+                  width: 500,
+                  height: 500,
+                  crop: 'fill',
+                  quality: 'auto'
+                });
+                
+                // Extract category and item indices from the filename
+                const filename = imageFile.originalname;
+                const parts = filename.split('-');
+                if (parts.length >= 2) {
+                  const categoryIndex = parseInt(parts[0], 10);
+                  const itemIndex = parseInt(parts[1], 10);
+                  
+                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
+                      parsedMenu.categories[categoryIndex] && 
+                      parsedMenu.categories[categoryIndex].items[itemIndex]) {
+                    // Delete old image if exists
+                    const oldImageUrl = parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl;
+                    if (oldImageUrl) {
+                      const publicId = oldImageUrl.split('/').pop()?.split('.')[0];
+                      if (publicId) {
+                        await deleteFromCloudinary(publicId);
+                      }
+                    }
+                    // Update the imageUrl in the menu item
+                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = optimizedUrl;
+                  }
+                }
+              } catch (uploadError) {
+                console.error('Error uploading image to Cloudinary:', uploadError);
+                continue;
+              }
+            }
+          }
+          
+          qrCode.menu = parsedMenu;
+        } catch (e) {
+          console.error('Error parsing menu:', e);
+          return res.status(400).json({ error: 'Invalid menu format' });
+        }
+      }
+
+      // Save the updated QR code
+      const updatedQRCode = await qrCodeRepository.save(qrCode);
+      res.json(updatedQRCode);
+    } catch (error) {
+      console.error('Error updating QR code:', error);
+      res.status(500).json({ error: 'Error updating QR code' });
     }
-
-    // Save the updated QR code
-    const updatedQRCode = await qrCodeRepository.save(qrCode);
-    console.log('Updated QR code:', updatedQRCode); // Debug log
-
-    res.json(updatedQRCode);
-  } catch (error) {
-    console.error('Error updating QR code:', error);
-    res.status(500).json({ error: 'Error updating QR code' });
-  }
+  });
 };
 
 export const deleteQRCode = async (req: AuthRequest, res: Response) => {
