@@ -40,7 +40,7 @@ interface MenuCategory {
 interface Link {
   label: string;
   url: string;
-  type: 'website' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'whatsapp' | 'telegram';
+  type: 'website' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'whatsapp' | 'telegram' | 'tiktok' | 'other';
 }
 
 const defaultAvailability = {
@@ -86,7 +86,8 @@ const translations = {
     pleaseUploadImage: "Please upload an image file (PNG, JPG, etc.)",
     fileTooLarge: "File too large",
     imageMustBeLess: "Image must be less than 2MB",
-    url: "URL"
+    url: "URL",
+    tiktok: "TikTok"
   },
   ar: {
     basic: "أساسي",
@@ -119,7 +120,8 @@ const translations = {
     pleaseUploadImage: "يرجى تحميل ملف صورة (PNG، JPG، إلخ)",
     fileTooLarge: "الملف كبير جداً",
     imageMustBeLess: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت",
-    url: "رابط"
+    url: "رابط",
+    tiktok: "تيكتوك"
   }
 };
 
@@ -130,7 +132,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     qrCode.type === 'direct' ? 'url' : qrCode.type as 'url' | 'menu' | 'both'
   );
   const allowedTypes = [
-    'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'whatsapp', 'telegram'
+    'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'whatsapp', 'telegram', 'tiktok', 'other'
   ] as const;
   const [links, setLinks] = useState<Link[]>(
     (qrCode.links || []).map(link => ({
@@ -241,7 +243,9 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     linkedin: 'linkedin',
     youtube: 'youtube',
     whatsapp: 'whatsapp',
-    telegram: 'telegram'
+    telegram: 'telegram',
+    tiktok: 'tiktok',
+    other: 'other'
   } as const;
 
   const getDefaultUrl = (type: Link['type']): string => {
@@ -254,6 +258,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       case 'whatsapp': return 'https://wa.me/';
       case 'telegram': return 'https://t.me/';
       case 'website': return 'https://';
+      case 'tiktok': return 'https://tiktok.com/';
+      case 'other': return '';
       default: return '';
     }
   };
@@ -268,6 +274,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       case 'whatsapp': return <MessageCircle className="h-4 w-4" />;
       case 'telegram': return <Send className="h-4 w-4" />;
       case 'website': return <Globe className="h-4 w-4" />;
+      case 'tiktok': return <Globe className="h-4 w-4" />;
     }
   };
 
@@ -281,6 +288,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       case 'whatsapp': return 'Chat on WhatsApp';
       case 'telegram': return 'Join our Telegram';
       case 'website': return 'Visit our Website';
+      case 'tiktok': return 'Follow us on TikTok';
+      case 'other': return 'Visit Link';
       default: return 'Visit Link';
     }
   };
@@ -518,85 +527,44 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
               <div className="space-y-4">
                 <div className="flex justify-between items-center">
                   <h3 className="text-lg font-medium">{translations[menuLanguage].links}</h3>
-                  <Button type="button" onClick={addLink} variant="outline" size="sm">
-                    <Plus className="h-4 w-4 mr-2" />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={addLink}
+                    className="flex items-center gap-2"
+                  >
+                    <Plus className="h-4 w-4" />
                     {translations[menuLanguage].addLink}
                   </Button>
                 </div>
 
-                {links.map((link, index) => (
-                  <div key={index} className="space-y-2 border p-4 rounded-lg">
-                    <div className="flex gap-2">
-                      <div className="flex-1">
-                        <Label>{translations[menuLanguage].selectPlatform}</Label>
-                        <Select
-                          value={link.type}
-                          onValueChange={(value) => updateLink(index, 'type', value)}
-                        >
-                          <SelectTrigger className="w-full">
-                            <SelectValue>
-                              <div className="flex items-center gap-2">
-                                {getPlatformIcon(link.type)}
-                                <span>{getPlatformLabel(link.type)}</span>
-                              </div>
-                            </SelectValue>
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="website">
-                              <div className="flex items-center gap-2">
-                                <Globe className="h-4 w-4" />
-                                <span>{translations[menuLanguage].website}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="facebook">
-                              <div className="flex items-center gap-2">
-                                <Facebook className="h-4 w-4" />
-                                <span>{translations[menuLanguage].facebook}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="instagram">
-                              <div className="flex items-center gap-2">
-                                <Instagram className="h-4 w-4" />
-                                <span>{translations[menuLanguage].instagram}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="twitter">
-                              <div className="flex items-center gap-2">
-                                <Twitter className="h-4 w-4" />
-                                <span>{translations[menuLanguage].twitter}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="linkedin">
-                              <div className="flex items-center gap-2">
-                                <Linkedin className="h-4 w-4" />
-                                <span>{translations[menuLanguage].linkedin}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="youtube">
-                              <div className="flex items-center gap-2">
-                                <Youtube className="h-4 w-4" />
-                                <span>{translations[menuLanguage].youtube}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="whatsapp">
-                              <div className="flex items-center gap-2">
-                                <MessageCircle className="h-4 w-4" />
-                                <span>{translations[menuLanguage].whatsapp}</span>
-                              </div>
-                            </SelectItem>
-                            <SelectItem value="telegram">
-                              <div className="flex items-center gap-2">
-                                <Send className="h-4 w-4" />
-                                <span>{translations[menuLanguage].telegram}</span>
-                              </div>
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
+                <div className="space-y-2">
+                  {links.map((link, index) => (
+                    <div key={index} className="flex gap-2">
+                      <Select
+                        value={link.type || 'website'}
+                        onValueChange={(value) => updateLink(index, 'type', value)}
+                      >
+                        <SelectTrigger className="w-[180px]">
+                          <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
+                          <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
+                          <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
+                          <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
+                          <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
+                          <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
+                          <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
+                          <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
+                          <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                          <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
+                        </SelectContent>
+                      </Select>
                       <Input
                         placeholder={translations[menuLanguage].url}
+                        type="url"
                         value={link.url}
                         onChange={(e) => updateLink(index, 'url', e.target.value)}
                       />
@@ -609,8 +577,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                         <Trash2 className="h-4 w-4" />
                       </Button>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
               </div>
             )}
 
