@@ -127,7 +127,6 @@ const translations = {
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [name, setName] = useState(qrCode.name);
-  // Fix: Cast to a compatible type, ignoring 'direct' which isn't handled in the UI
   const [type, setType] = useState<'url' | 'menu' | 'both'>(
     qrCode.type === 'direct' ? 'url' : qrCode.type as 'url' | 'menu' | 'both'
   );
@@ -144,12 +143,15 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [foregroundColor, setForegroundColor] = useState(qrCode.foregroundColor || '#000000');
   const [backgroundColor, setBackgroundColor] = useState(qrCode.backgroundColor || '#FFFFFF');
   const [logoUrl, setLogoUrl] = useState<string | null>(qrCode.logoUrl || null);
+  const [logoFile, setLogoFile] = useState<File | null>(null);
+  const [logoPreview, setLogoPreview] = useState<string | null>(qrCode.logoUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
+  const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
 
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+  const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0];
     if (!file) return;
 
     // Check file type
@@ -167,41 +169,26 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       toast({
         variant: "destructive",
         title: "File too large",
-        description: "Image must be less than 2MB",
+        description: "Logo image must be less than 2MB",
       });
       return;
     }
 
-    const formData = new FormData();
-    formData.append('image', file);
+    setLogoFile(file);
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
+    // Create preview
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setLogoPreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const data = await response.json();
-      setLogoUrl(data.imageUrl);
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to upload image',
-      });
+  const removeLogo = () => {
+    setLogoFile(null);
+    setLogoPreview(null);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = '';
     }
   };
 
@@ -360,37 +347,27 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    const formData = new FormData();
-    formData.append('image', file);
+    // Store the file temporarily
+    const key = `menu-${categoryIndex}-${itemIndex}`;
+    setTempImages(prev => ({ ...prev, [key]: file }));
 
-    try {
-      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(file);
+    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
+  };
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Upload failed');
-      }
-
-      const data = await response.json();
-      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', data.imageUrl);
-      toast({
-        title: "Success",
-        description: "Image uploaded successfully",
-      });
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to upload image',
-      });
-    }
+  const removeItemImage = (categoryIndex: number, itemIndex: number) => {
+    const newCategories = [...menuCategories];
+    newCategories[categoryIndex].items[itemIndex].imageUrl = '';
+    setMenuCategories(newCategories);
+    
+    // Remove from temp images if exists
+    const key = `menu-${categoryIndex}-${itemIndex}`;
+    setTempImages(prev => {
+      const newTempImages = { ...prev };
+      delete newTempImages[key];
+      return newTempImages;
+    });
   };
 
   const handleItemAvailabilityChange = (categoryIndex: number, itemIndex: number, day: string, checked: boolean) => {
@@ -404,35 +381,51 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setIsLoading(true);
 
     try {
-      // Fix: Convert links array to proper format rather than stringifying
-      const updatedQRCode = await qrCodeApi.update(qrCode.id, {
-        name,
-        type,
-        foregroundColor,
-        backgroundColor,
-        logoUrl,
-        links: links.map(link => ({
-          label: link.label,
-          url: link.url,
-          type: link.type
-        })),
-        menu: {
-          restaurantName: qrCode.menu?.restaurantName || '',
-          description: qrCode.menu?.description || '',
-          categories: menuCategories.map(category => ({
-            name: category.name,
-            items: category.items.map(item => ({
-              name: item.name,
+      const formData = new FormData();
+      formData.append('name', name);
+      formData.append('type', type);
+      formData.append('foregroundColor', foregroundColor);
+      formData.append('backgroundColor', backgroundColor);
+      
+      if (type === 'url' || type === 'both') {
+        formData.append('links', JSON.stringify(links));
+      }
+      
+      if (type === 'menu' || type === 'both') {
+        // First, create the menu data without image URLs
+        const menuData = {
+          restaurantName: name || 'My Restaurant',
+          description: '',
+          categories: menuCategories.map((category, categoryIndex) => ({
+            name: category.name || 'Unnamed Category',
+            items: category.items.map((item, itemIndex) => ({
+              name: item.name || 'Unnamed Item',
               description: item.description || '',
               price: Number(item.price) || 0,
-              category: category.name,
-              imageUrl: item.imageUrl,
+              category: category.name || 'Unnamed Category',
+              imageUrl: item.imageUrl || '',
               availability: item.availability || defaultAvailability
             }))
           }))
-        },
-      });
+        };
 
+        formData.append('menu', JSON.stringify(menuData));
+
+        // Then, upload each menu item image
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File) {
+            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
+            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+            formData.append('menuItemImages', file, uniqueFilename);
+          }
+        }
+      }
+      
+      if (logoFile) {
+        formData.append('logo', logoFile);
+      }
+
+      const updatedQRCode = await qrCodeApi.update(qrCode.id, formData);
       onUpdated(updatedQRCode);
       toast({
         title: "Success",
@@ -502,8 +495,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             <div className="space-y-2">
               <Label>{translations[menuLanguage].qrCodeLogo}</Label>
               <div className="flex items-center gap-4">
-                {logoUrl && (
-                  <img src={logoUrl} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
+                {logoPreview && (
+                  <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
                 )}
                 <Button
                   type="button"
@@ -511,12 +504,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   onClick={() => fileInputRef.current?.click()}
                 >
                   <Upload className="h-4 w-4 mr-2" />
-                  {logoUrl ? translations[menuLanguage].changeLogo : translations[menuLanguage].uploadLogo}
+                  {logoPreview ? translations[menuLanguage].changeLogo : translations[menuLanguage].uploadLogo}
                 </Button>
                 <input
                   type="file"
                   ref={fileInputRef}
-                  onChange={handleImageUpload}
+                  onChange={handleLogoUpload}
                   accept="image/*"
                   className="hidden"
                 />
@@ -667,7 +660,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                            onClick={() => removeItemImage(categoryIndex, itemIndex)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Remove Item
