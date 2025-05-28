@@ -158,8 +158,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (!file.type.startsWith('image/')) {
       toast({
         variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload an image file (PNG, JPG, etc.)",
+        title: translations[menuLanguage].invalidFileType,
+        description: translations[menuLanguage].pleaseUploadImage,
       });
       return;
     }
@@ -168,8 +168,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (file.size > 2 * 1024 * 1024) {
       toast({
         variant: "destructive",
-        title: "File too large",
-        description: "Logo image must be less than 2MB",
+        title: translations[menuLanguage].fileTooLarge,
+        description: translations[menuLanguage].imageMustBeLess,
       });
       return;
     }
@@ -331,8 +331,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (!file.type.startsWith('image/')) {
       toast({
         variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload an image file (PNG, JPG, etc.)",
+        title: translations[menuLanguage].invalidFileType,
+        description: translations[menuLanguage].pleaseUploadImage,
       });
       return;
     }
@@ -341,8 +341,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (file.size > 2 * 1024 * 1024) {
       toast({
         variant: "destructive",
-        title: "File too large",
-        description: "Image must be less than 2MB",
+        title: translations[menuLanguage].fileTooLarge,
+        description: translations[menuLanguage].imageMustBeLess,
       });
       return;
     }
