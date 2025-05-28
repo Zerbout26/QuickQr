@@ -425,17 +425,32 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         formData.append('logo', logoFile);
       }
 
-      const updatedQRCode = await qrCodeApi.update(qrCode.id, formData);
+      // Use fetch directly for file upload
+      const response = await fetch(`${API_BASE_URL}/qrcodes/${qrCode.id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to update QR code');
+      }
+
+      const updatedQRCode = await response.json();
       onUpdated(updatedQRCode);
       toast({
         title: "Success",
         description: "QR code updated successfully",
       });
     } catch (error) {
+      console.error('Error updating QR code:', error);
       toast({
         variant: "destructive",
         title: "Error",
-        description: "Failed to update QR code",
+        description: error instanceof Error ? error.message : 'Failed to update QR code',
       });
     } finally {
       setIsLoading(false);
