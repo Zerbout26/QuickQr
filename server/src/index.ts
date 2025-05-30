@@ -11,6 +11,8 @@ import landingRoutes from './routes/landingRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
 import axios from 'axios';
+import { User } from './models/User';
+import bcrypt from 'bcryptjs';
 
 const app = express();
 
@@ -175,10 +177,70 @@ app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/landing', landingRoutes);
 
+// Function to create admin user
+async function createAdminUser() {
+  try {
+    const userRepository = AppDataSource.getRepository(User);
+
+    // Check if admin already exists
+    const existingAdmin = await userRepository.findOne({ where: { email: 'admin@quickqr.com' } });
+    if (existingAdmin) {
+      console.log('Admin user already exists');
+      return;
+    }
+
+    // Create admin user
+    const hashedPassword = await bcrypt.hash('admin123', 10);
+    const trialStartDate = new Date();
+    const trialEndDate = new Date();
+    trialEndDate.setDate(trialEndDate.getDate() + 14); // 14-day trial
+
+    const admin = userRepository.create({
+      email: 'admin@quickqr.com',
+      password: hashedPassword,
+      name: 'Admin User',
+      role: 'admin',
+      trialStartDate,
+      trialEndDate,
+      isActive: true,
+      hasActiveSubscription: true
+    });
+
+    await userRepository.save(admin);
+    console.log('Admin user created successfully with email: admin@quickqr.com and password: admin123');
+  } catch (error) {
+    console.error('Error creating admin:', error);
+    // Retry once if failed
+    try {
+      const userRepository = AppDataSource.getRepository(User);
+      const hashedPassword = await bcrypt.hash('admin123', 10);
+      const trialStartDate = new Date();
+      const trialEndDate = new Date();
+      trialEndDate.setDate(trialEndDate.getDate() + 14);
+
+      const admin = userRepository.create({
+        email: 'admin@quickqr.com',
+        password: hashedPassword,
+        name: 'Admin User',
+        role: 'admin',
+        trialStartDate,
+        trialEndDate,
+        isActive: true,
+        hasActiveSubscription: true
+      });
+
+      await userRepository.save(admin);
+      console.log('Admin user created successfully on retry');
+    } catch (retryError) {
+      console.error('Failed to create admin user after retry:', retryError);
+    }
+  }
+}
+
 // Initialize database and start server
 const startServer = async () => {
   try {
-    // Add retry logic for database connection
+    // Initialize database with retry logic
     let retries = 3;
     while (retries > 0) {
       try {
@@ -191,24 +253,26 @@ const startServer = async () => {
           throw error;
         }
         console.log(`Database connection failed. Retrying... (${retries} attempts left)`);
-        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before retry
+        await new Promise(resolve => setTimeout(resolve, 3000));
       }
     }
-    
-    const PORT = process.env.PORT || 10000;
+
+    // Create admin user
+    await createAdminUser();
+
+    // Start server
+    const PORT = process.env.PORT || 3001;
     const server = app.listen(PORT, () => {
-      console.log(`Server running on port ${PORT}`);
+      console.log(`Server is running on port ${PORT}`);
     });
 
     // Enhanced server shutdown handling
     const shutdown = async () => {
       console.log('Shutdown signal received');
       
-      // Close server
       server.close(async () => {
         console.log('HTTP server closed');
         
-        // Close database connection
         if (AppDataSource.isInitialized) {
           await AppDataSource.destroy();
           console.log('Database connection closed');
@@ -217,7 +281,6 @@ const startServer = async () => {
         process.exit(0);
       });
       
-      // Force close after 5 seconds
       setTimeout(() => {
         console.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
@@ -226,7 +289,6 @@ const startServer = async () => {
 
     process.on('SIGTERM', shutdown);
     process.on('SIGINT', shutdown);
-    
   } catch (error) {
     console.error('Error during server startup:', error);
     process.exit(1);
