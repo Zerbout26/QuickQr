@@ -245,7 +245,7 @@ const LandingPage = () => {
             {/* Links Section */}
             {hasUrls && (
               <div className="mb-12">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 max-w-4xl mx-auto">
                   {qrCode.links.map((link, index) => {
                     const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
                     return (
@@ -257,7 +257,7 @@ const LandingPage = () => {
                         className="block"
                       >
                         <Button
-                          className="w-full text-xl py-8 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
+                          className="w-full text-2xl py-10 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
                           style={{
                             background: bgColor,
                             color: '#ffffff',
@@ -266,7 +266,7 @@ const LandingPage = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)}
                           onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)}
                         >
-                          <Icon size={28} />
+                          <Icon size={32} />
                           <span>{label}</span>
                         </Button>
                       </a>
@@ -297,38 +297,38 @@ const LandingPage = () => {
                   )}
                 </div>
 
-                <div className="space-y-12">
+                <div className="space-y-12 max-w-5xl mx-auto">
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
                       <h3
-                        className="text-2xl font-semibold text-center py-4 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
+                        className="text-3xl font-semibold text-center py-6 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
                       >
                         {category.name}
                       </h3>
 
-                      <div className="space-y-4 p-6 rounded-b-2xl bg-gray-50/50">
+                      <div className="space-y-6 p-8 rounded-b-2xl bg-gray-50/50">
                         {category.items
                           .filter(item => isItemAvailableToday(item))
                           .map((item, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+                              className="flex items-center justify-between bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
                             >
-                              <div className="flex-1 pr-8">
-                                <div className="flex justify-between items-start mb-3">
+                              <div className="flex-1 pr-10">
+                                <div className="flex justify-between items-start mb-4">
                                   <h4
-                                    className="text-xl font-semibold text-primary"
+                                    className="text-2xl font-semibold text-primary"
                                   >
                                     {item.name}
                                   </h4>
                                   <p
-                                    className="text-xl font-semibold whitespace-nowrap ml-6 text-primary"
+                                    className="text-2xl font-semibold whitespace-nowrap ml-8 text-primary"
                                   >
                                     {translations[menuLanguage].price}: ${item.price.toFixed(2)}
                                   </p>
                                 </div>
                                 {item.description && (
-                                  <p className="text-gray-600 text-base line-clamp-3">
+                                  <p className="text-gray-600 text-xl line-clamp-3">
                                     {item.description}
                                   </p>
                                 )}
@@ -339,12 +339,12 @@ const LandingPage = () => {
                                   <img
                                     src={item.imageUrl}
                                     alt={item.name}
-                                    className="h-28 w-28 object-cover rounded-xl transition-transform duration-200 hover:scale-110"
+                                    className="h-36 w-36 object-cover rounded-xl transition-transform duration-200 hover:scale-110"
                                     loading="lazy"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
                                       target.onerror = null;
-                                      target.src = 'https://via.placeholder.com/112?text=No+Image';
+                                      target.src = 'https://via.placeholder.com/144?text=No+Image';
                                     }}
                                   />
                                 </div>
