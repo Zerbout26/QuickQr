@@ -245,7 +245,7 @@ const LandingPage = () => {
             {/* Links Section */}
             {hasUrls && (
               <div className="mb-12">
-                <div className="grid gap-8 sm:grid-cols-1 lg:grid-cols-2 max-w-4xl mx-auto">
+                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto">
                   {qrCode.links.map((link, index) => {
                     const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
                     return (
@@ -254,10 +254,10 @@ const LandingPage = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="block"
+                        className={`block ${qrCode.links.length % 2 === 1 && index === qrCode.links.length - 1 ? 'sm:col-span-2 max-w-md mx-auto' : ''}`}
                       >
                         <Button
-                          className="w-full text-2xl py-10 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
+                          className="w-full text-2xl py-10 rounded-2xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
                           style={{
                             background: bgColor,
                             color: '#ffffff',
@@ -286,7 +286,7 @@ const LandingPage = () => {
               <div className="space-y-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
                 <div className="text-center mb-8">
                   <h2
-                    className="text-4xl font-semibold tracking-tight text-primary"
+                    className="text-4xl font-bold tracking-tight text-primary"
                   >
                     {qrCode.menu?.restaurantName}
                   </h2>
@@ -301,7 +301,7 @@ const LandingPage = () => {
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
                       <h3
-                        className="text-3xl font-semibold text-center py-6 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
+                        className="text-3xl font-bold text-center py-6 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
                       >
                         {category.name}
                       </h3>
@@ -315,20 +315,20 @@ const LandingPage = () => {
                               className="flex items-center justify-between bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
                             >
                               <div className="flex-1 pr-10">
-                                <div className="flex justify-between items-start mb-4">
+                                <div className="flex justify-between items-start mb-2">
                                   <h4
-                                    className="text-2xl font-semibold text-primary"
+                                    className="text-2xl font-bold text-primary leading-tight"
                                   >
                                     {item.name}
                                   </h4>
                                   <p
-                                    className="text-2xl font-semibold whitespace-nowrap ml-8 text-primary"
+                                    className="text-2xl font-bold whitespace-nowrap ml-8 text-primary"
                                   >
                                     {translations[menuLanguage].price}: ${item.price.toFixed(2)}
                                   </p>
                                 </div>
                                 {item.description && (
-                                  <p className="text-gray-600 text-xl line-clamp-3">
+                                  <p className="text-gray-600 text-xl font-medium leading-snug mt-1">
                                     {item.description}
                                   </p>
                                 )}
