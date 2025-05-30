@@ -3,7 +3,6 @@ import cors from 'cors';
 import path from 'path';
 import fs from 'fs';
 import compression from 'compression';
-import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
 import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
@@ -30,23 +29,6 @@ const getServerUrl = (req?: express.Request): string => {
     ? process.env.SERVER_URL || `http://localhost:${port}`
     : `http://localhost:${port}`;
 };
-
-// Enhanced rate limiting configuration
-const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // Limit each IP to 100 requests per windowMs
-  message: 'Too many requests from this IP, please try again later.',
-  standardHeaders: true,
-  legacyHeaders: false,
-  skip: (req) => req.path.startsWith('/uploads/'), // Skip rate limiting for static files
-  keyGenerator: (req) => {
-    // Use IP + User Agent for better rate limiting
-    return `${req.ip}-${req.headers['user-agent']}`;
-  }
-});
-
-// Apply rate limiting to all routes
-app.use(limiter);
 
 // Enhanced compression settings
 app.use(compression({
@@ -117,25 +99,10 @@ app.use(helmet({
       frameSrc: ["'none'"],
       objectSrc: ["'none'"]
     }
-  },
-  crossOriginEmbedderPolicy: true,
-  crossOriginOpenerPolicy: true,
-  crossOriginResourcePolicy: { policy: "cross-origin" },
-  dnsPrefetchControl: { allow: true },
-  frameguard: { action: "deny" },
-  hidePoweredBy: true,
-  hsts: {
-    maxAge: 31536000,
-    includeSubDomains: true,
-    preload: true
-  },
-  ieNoOpen: true,
-  noSniff: true,
-  referrerPolicy: { policy: "strict-origin-when-cross-origin" },
-  xssFilter: true
+  }
 }));
 
-app.use(express.json({ limit: '1mb' })); // Limit JSON payload size
+app.use(express.json({ limit: '1mb' }));
 
 // Add frontend domain to request object
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -143,64 +110,11 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   next();
 });
 
-// Cache configuration
-const CACHE_DURATION = 60 * 1000; // 1 minute
-const cache = new Map<string, { data: any, timestamp: number }>();
-
-// Cache middleware
-const cacheMiddleware = (duration: number = CACHE_DURATION) => {
-  return (req: express.Request, res: express.Response, next: express.NextFunction) => {
-    // Skip caching for non-GET requests
-    if (req.method !== 'GET') {
-      return next();
-    }
-
-    const key = `${req.originalUrl || req.url}`;
-    const cachedResponse = cache.get(key);
-
-    if (cachedResponse && Date.now() - cachedResponse.timestamp < duration) {
-      return res.json(cachedResponse.data);
-    }
-
-    // Store original res.json
-    const originalJson = res.json.bind(res);
-    res.json = (body: any) => {
-      cache.set(key, {
-        data: body,
-        timestamp: Date.now()
-      });
-      return originalJson(body);
-    };
-
-    next();
-  };
-};
-
-// Cache cleanup
-setInterval(() => {
-  const now = Date.now();
-  for (const [key, value] of cache.entries()) {
-    if (now - value.timestamp > CACHE_DURATION) {
-      cache.delete(key);
-    }
-  }
-}, CACHE_DURATION);
-
-// Apply caching to appropriate routes
-app.use('/api/qrcodes', cacheMiddleware(5 * 60 * 1000)); // Cache QR codes for 5 minutes
-app.use('/landing', cacheMiddleware(5 * 60 * 1000)); // Cache landing pages for 5 minutes
-
-// Optimize static file serving with better caching
+// Optimize static file serving
 app.use('/uploads', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
-  
-  // Enhanced caching headers
-  res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
-  res.setHeader('Vary', 'Accept-Encoding');
-  res.setHeader('Surrogate-Control', 'max-age=31536000');
-  res.setHeader('Surrogate-Key', 'static');
   
   if (req.method === 'OPTIONS') {
     return res.status(200).end();
@@ -216,21 +130,11 @@ app.use('/uploads', (req, res, next) => {
     if (path.endsWith('.webp')) {
       res.setHeader('Content-Type', 'image/webp');
     }
-    // Add cache busting for non-immutable files
-    if (!path.endsWith('.webp')) {
-      res.setHeader('Cache-Control', 'public, max-age=3600, must-revalidate');
-    }
   }
 }));
 
-// Token refresh endpoint with rate limiting
-const refreshLimiter = rateLimit({
-  windowMs: 15 * 60 * 1000,
-  max: 5, // Limit to 5 refresh attempts per 15 minutes
-  message: 'Too many token refresh attempts, please try again later.'
-});
-
-app.post('/api/users/refresh-token', refreshLimiter, auth, (req: AuthRequest, res: express.Response) => {
+// Token refresh endpoint
+app.post('/api/users/refresh-token', auth, (req: AuthRequest, res: express.Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -242,32 +146,6 @@ app.post('/api/users/refresh-token', refreshLimiter, auth, (req: AuthRequest, re
     res.status(500).json({ error: 'Failed to refresh token' });
   }
 });
-
-// API routes
-app.use('/api/users', userRoutes);
-app.use('/api/qrcodes', qrCodeRoutes);
-app.use('/landing', landingRoutes);
-
-// Enhanced self-ping function
-const pingServer = async (req?: express.Request) => {
-  try {
-    const serverUrl = getServerUrl(req);
-    const response = await axios.get(`${serverUrl}/api/health`, {
-      timeout: 5000,
-      headers: {
-        'User-Agent': 'Server-Self-Ping'
-      }
-    });
-    
-    if (response.status === 200) {
-      console.log('Server self-ping successful');
-    } else {
-      console.error('Server self-ping failed with status:', response.status);
-    }
-  } catch (error) {
-    console.error('Server self-ping failed:', error);
-  }
-};
 
 // Enhanced health check endpoint
 app.get('/api/health', (req, res) => {
@@ -292,11 +170,16 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Mount API routes
+app.use('/api/users', userRoutes);
+app.use('/api/qrcodes', qrCodeRoutes);
+app.use('/landing', landingRoutes);
+
 // Initialize database and start server
 const startServer = async () => {
   try {
     // Add retry logic for database connection
-    let retries = 5;
+    let retries = 3;
     while (retries > 0) {
       try {
         await AppDataSource.initialize();
@@ -308,19 +191,13 @@ const startServer = async () => {
           throw error;
         }
         console.log(`Database connection failed. Retrying... (${retries} attempts left)`);
-        await new Promise(resolve => setTimeout(resolve, 5000)); // Wait 5 seconds before retry
+        await new Promise(resolve => setTimeout(resolve, 3000)); // Wait 3 seconds before retry
       }
     }
     
     const PORT = process.env.PORT || 10000;
     const server = app.listen(PORT, () => {
       console.log(`Server running on port ${PORT}`);
-      
-      // Start self-ping every 10 minutes
-      setInterval(() => pingServer(), 10 * 60 * 1000);
-      
-      // Initial ping
-      pingServer();
     });
 
     // Enhanced server shutdown handling
@@ -340,11 +217,11 @@ const startServer = async () => {
         process.exit(0);
       });
       
-      // Force close after 10 seconds
+      // Force close after 5 seconds
       setTimeout(() => {
         console.error('Could not close connections in time, forcefully shutting down');
         process.exit(1);
-      }, 10000);
+      }, 5000);
     };
 
     process.on('SIGTERM', shutdown);
@@ -356,21 +233,4 @@ const startServer = async () => {
   }
 };
 
-// Start server without clustering
 startServer();
-
-// Enhanced global error handler
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
-  console.error('Error:', {
-    message: err.message,
-    stack: err.stack,
-    path: req.path,
-    method: req.method,
-    ip: req.ip
-  });
-  
-  res.status(500).json({
-    error: 'Internal Server Error',
-    message: process.env.NODE_ENV === 'development' ? err.message : 'Something went wrong'
-  });
-});
