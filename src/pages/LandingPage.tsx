@@ -217,26 +217,26 @@ const LandingPage = () => {
 
   return (
     <div
-      className="min-h-screen py-12 px-4 font-sans"
+      className="min-h-screen py-8 px-4 font-sans"
       style={{
         background: `radial-gradient(circle at top, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -30) : '#e5e7eb'} 100%)`,
       }}
     >
-      <div className="container mx-auto max-w-5xl">
-        <Card className="overflow-hidden rounded-2xl shadow-2xl border-none bg-white/95 backdrop-blur-sm">
+      <div className="container mx-auto max-w-7xl">
+        <Card className="overflow-hidden rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-sm">
           {qrCode.logoUrl && (
-            <div className="flex justify-center pt-10">
+            <div className="flex justify-center pt-12">
               <img
                 src={qrCode.logoUrl}
                 alt="Logo"
-                className="h-28 w-auto object-contain transition-transform duration-200 hover:scale-105"
+                className="h-36 w-auto object-contain transition-transform duration-200 hover:scale-105"
               />
             </div>
           )}
 
-          <CardContent className="p-6 md:p-10">
+          <CardContent className="p-8 md:p-12">
             <h1
-              className="text-4xl md:text-5xl font-extrabold text-center mb-8 tracking-tight text-primary"
+              className="text-5xl md:text-6xl font-extrabold text-center mb-10 tracking-tight text-primary"
               dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
             >
               {qrCode.name}
@@ -244,8 +244,8 @@ const LandingPage = () => {
 
             {/* Links Section */}
             {hasUrls && (
-              <div className="mb-10">
-                <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              <div className="mb-12">
+                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
                   {qrCode.links.map((link, index) => {
                     const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
                     return (
@@ -257,7 +257,7 @@ const LandingPage = () => {
                         className="block"
                       >
                         <Button
-                          className="w-full text-lg py-6 rounded-full font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-3"
+                          className="w-full text-xl py-8 rounded-2xl font-semibold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
                           style={{
                             background: bgColor,
                             color: '#ffffff',
@@ -266,7 +266,7 @@ const LandingPage = () => {
                           onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)}
                           onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)}
                         >
-                          <Icon size={24} />
+                          <Icon size={28} />
                           <span>{label}</span>
                         </Button>
                       </a>
@@ -278,57 +278,57 @@ const LandingPage = () => {
 
             {/* Separator for sections */}
             {hasUrls && hasMenu && (
-              <Separator className="my-10 bg-gray-200/50" />
+              <Separator className="my-12 bg-gray-200/50" />
             )}
 
             {/* Menu Section */}
             {hasMenu && (
-              <div className="space-y-8" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="text-center mb-6">
+              <div className="space-y-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+                <div className="text-center mb-8">
                   <h2
-                    className="text-3xl font-semibold tracking-tight text-primary"
+                    className="text-4xl font-semibold tracking-tight text-primary"
                   >
                     {qrCode.menu?.restaurantName}
                   </h2>
                   {qrCode.menu?.description && (
-                    <p className="text-gray-500 mt-3 text-base max-w-2xl mx-auto">
+                    <p className="text-gray-500 mt-4 text-lg max-w-3xl mx-auto">
                       {qrCode.menu.description}
                     </p>
                   )}
                 </div>
 
-                <div className="space-y-8">
+                <div className="space-y-12">
                   {qrCode.menu?.categories.map((category) => (
                     <div key={category.name} className="menu-category">
                       <h3
-                        className="text-xl font-semibold text-center py-3 rounded-t-lg border-b-2 transition-colors duration-200 text-primary border-primary"
+                        className="text-2xl font-semibold text-center py-4 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
                       >
                         {category.name}
                       </h3>
 
-                      <div className="space-y-3 p-4 rounded-b-lg bg-gray-50/50">
+                      <div className="space-y-4 p-6 rounded-b-2xl bg-gray-50/50">
                         {category.items
                           .filter(item => isItemAvailableToday(item))
                           .map((item, index) => (
                             <div
                               key={index}
-                              className="flex items-center justify-between bg-white p-4 rounded-lg shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
+                              className="flex items-center justify-between bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
                             >
-                              <div className="flex-1 pr-6">
-                                <div className="flex justify-between items-start mb-2">
+                              <div className="flex-1 pr-8">
+                                <div className="flex justify-between items-start mb-3">
                                   <h4
-                                    className="text-lg font-semibold text-primary"
+                                    className="text-xl font-semibold text-primary"
                                   >
                                     {item.name}
                                   </h4>
                                   <p
-                                    className="text-lg font-semibold whitespace-nowrap ml-4 text-primary"
+                                    className="text-xl font-semibold whitespace-nowrap ml-6 text-primary"
                                   >
                                     {translations[menuLanguage].price}: ${item.price.toFixed(2)}
                                   </p>
                                 </div>
                                 {item.description && (
-                                  <p className="text-gray-600 text-sm line-clamp-3">
+                                  <p className="text-gray-600 text-base line-clamp-3">
                                     {item.description}
                                   </p>
                                 )}
@@ -339,12 +339,12 @@ const LandingPage = () => {
                                   <img
                                     src={item.imageUrl}
                                     alt={item.name}
-                                    className="h-20 w-20 object-cover rounded-lg transition-transform duration-200 hover:scale-110"
+                                    className="h-28 w-28 object-cover rounded-xl transition-transform duration-200 hover:scale-110"
                                     loading="lazy"
                                     onError={(e) => {
                                       const target = e.target as HTMLImageElement;
                                       target.onerror = null;
-                                      target.src = 'https://via.placeholder.com/80?text=No+Image';
+                                      target.src = 'https://via.placeholder.com/112?text=No+Image';
                                     }}
                                   />
                                 </div>
@@ -359,8 +359,8 @@ const LandingPage = () => {
             )}
 
             {/* Footer */}
-            <div className="mt-12 text-center">
-              <p className="text-sm text-gray-500">
+            <div className="mt-16 text-center">
+              <p className="text-base text-gray-500">
                 {translations[menuLanguage].poweredBy} <span className="text-primary font-medium">QuickQR</span>
               </p>
             </div>
