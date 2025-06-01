@@ -254,7 +254,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
 interface Link {
   label: string;
   url: string;
-  type?: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' | 'whatsapp' | 'telegram' | 'website' | 'other';
+  type: string;
 }
 
 interface MenuItem {
@@ -339,7 +339,59 @@ const translations = {
     removeItem: "Remove Item",
     addMenuItem: "Add Menu Item",
     addCategory: "Add Category",
-    addLink: "Add Link"
+    addLink: "Add Link",
+    vitrine: "Vitrine",
+    enterBusinessName: "Business Name",
+    enterTagline: "Tagline",
+    enterCtaText: "CTA Text",
+    enterCtaLink: "CTA Link",
+    enterDescription: "Description",
+    enterCity: "City",
+    addService: "Add Service",
+    enterServiceName: "Service Name",
+    enterServiceDescription: "Service Description",
+    uploadServiceImage: "Upload Service Image",
+    changeServiceImage: "Change Service Image",
+    removeService: "Remove Service",
+    gallery: "Gallery",
+    enterImageTitle: "Image Title",
+    enterImageDescription: "Image Description",
+    testimonials: "Testimonials",
+    addTestimonial: "Add Testimonial",
+    enterTestimonialText: "Testimonial Text",
+    enterAuthor: "Author",
+    enterAddress: "Address",
+    enterPhone: "Phone",
+    enterEmail: "Email",
+    socialMedia: "Social Media",
+    enterFacebook: "Facebook URL",
+    enterInstagram: "Instagram URL",
+    enterTwitter: "Twitter URL",
+    enterLinkedin: "LinkedIn URL",
+    enterYoutube: "YouTube URL",
+    enterTiktok: "TikTok URL",
+    enableContactForm: "Enable Contact Form",
+    formFields: "Form Fields",
+    addField: "Add Field",
+    enterFieldName: "Field Name",
+    fieldType: "Field Type",
+    textField: "Text",
+    emailField: "Email",
+    phoneField: "Phone",
+    textareaField: "Textarea",
+    required: "Required",
+    footer: "Footer",
+    quickLinks: "Quick Links",
+    addQuickLink: "Add Quick Link",
+    enterQuickLinkLabel: "Label",
+    enterQuickLinkUrl: "URL",
+    hero: "Hero",
+    about: "About",
+    services: "Services",
+    socialIcons: "Social Icons",
+    removeImage: "Remove Image",
+    removeTestimonial: "Remove Testimonial",
+    contact: "Contact"
   },
   ar: {
     basic: "أساسي",
@@ -403,7 +455,59 @@ const translations = {
     removeItem: "حذف العنصر",
     addMenuItem: "إضافة عنصر",
     addCategory: "إضافة فئة",
-    addLink: "إضافة رابط"
+    addLink: "إضافة رابط",
+    vitrine: "فيترين",
+    enterBusinessName: "اسم الشركة",
+    enterTagline: "العنوان",
+    enterCtaText: "نص الإطلاق",
+    enterCtaLink: "رابط الإطلاق",
+    enterDescription: "الوصف",
+    enterCity: "المدينة",
+    addService: "إضافة خدمة",
+    enterServiceName: "اسم الخدمة",
+    enterServiceDescription: "وصف الخدمة",
+    uploadServiceImage: "رفع صورة الخدمة",
+    changeServiceImage: "تغيير صورة الخدمة",
+    removeService: "إزالة الخدمة",
+    gallery: "المعرض",
+    enterImageTitle: "عنوان الصورة",
+    enterImageDescription: "وصف الصورة",
+    testimonials: "التعليقات",
+    addTestimonial: "إضافة تعليق",
+    enterTestimonialText: "نص التعليق",
+    enterAuthor: "المؤلف",
+    enterAddress: "العنوان",
+    enterPhone: "الهاتف",
+    enterEmail: "البريد الإلكتروني",
+    socialMedia: "الوسائل التواصلية",
+    enterFacebook: "رابط فيسبوك",
+    enterInstagram: "رابط انستغرام",
+    enterTwitter: "رابط تويتر",
+    enterLinkedin: "رابط لينكد إن",
+    enterYoutube: "رابط يوتيوب",
+    enterTiktok: "رابط تيك توك",
+    enableContactForm: "تفعيل نموذج الاتصال",
+    formFields: "حقول النموذج",
+    addField: "إضافة حقل",
+    enterFieldName: "اسم الحقل",
+    fieldType: "نوع الحقل",
+    textField: "نص",
+    emailField: "بريد إلكتروني",
+    phoneField: "هاتف",
+    textareaField: "نص طويل",
+    required: "مطلوب",
+    footer: "الأسفل",
+    quickLinks: "روابط سريعة",
+    addQuickLink: "إضافة رابط سريع",
+    enterQuickLinkLabel: "التسمية",
+    enterQuickLinkUrl: "الرابط",
+    hero: "الرئيسية",
+    about: "حول",
+    services: "الخدمات",
+    socialIcons: "أيقونات التواصل الاجتماعي",
+    removeImage: "إزالة الصورة",
+    removeTestimonial: "إزالة التعليق",
+    contact: "اتصل بنا"
   }
 };
 
@@ -870,6 +974,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     >
                       {translations[menuLanguage].directLink}
                     </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'vitrine' ? 'default' : 'outline'}
+                      onClick={() => setType('vitrine')}
+                      className="flex-1"
+                    >
+                      {translations[menuLanguage].vitrine}
+                    </Button>
                   </div>
                 </div>
                 {type === 'direct' && (
@@ -1062,6 +1174,699 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       <Plus className="h-4 w-4 mr-2" />
                       {translations[menuLanguage].addCategory}
                     </Button>
+                  </div>
+                )}
+                {type === 'vitrine' && (
+                  <div className="space-y-4">
+                    {/* Hero Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <h3 className="text-lg font-semibold">{translations[menuLanguage].hero}</h3>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder={translations[menuLanguage].enterBusinessName}
+                          value={vitrine.hero.businessName}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            hero: { ...vitrine.hero, businessName: e.target.value }
+                          })}
+                        />
+                        <Input
+                          placeholder={translations[menuLanguage].enterTagline}
+                          value={vitrine.hero.tagline}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            hero: { ...vitrine.hero, tagline: e.target.value }
+                          })}
+                        />
+                        <div className="flex gap-2">
+                          <Input
+                            placeholder={translations[menuLanguage].enterCtaText}
+                            value={vitrine.hero.cta.text}
+                            onChange={(e) => setVitrine({
+                              ...vitrine,
+                              hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, text: e.target.value } }
+                            })}
+                          />
+                          <Input
+                            placeholder={translations[menuLanguage].enterCtaLink}
+                            value={vitrine.hero.cta.link}
+                            onChange={(e) => setVitrine({
+                              ...vitrine,
+                              hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, link: e.target.value } }
+                            })}
+                          />
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* About Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <h3 className="text-lg font-semibold">{translations[menuLanguage].about}</h3>
+                      <div className="space-y-2">
+                        <Textarea
+                          placeholder={translations[menuLanguage].enterDescription}
+                          value={vitrine.about.description}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            about: { ...vitrine.about, description: e.target.value }
+                          })}
+                        />
+                        <Input
+                          placeholder={translations[menuLanguage].enterCity}
+                          value={vitrine.about.city}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            about: { ...vitrine.about, city: e.target.value }
+                          })}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Services Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold">{translations[menuLanguage].services}</h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setVitrine({
+                            ...vitrine,
+                            services: [...vitrine.services, { name: '', description: '', imageUrl: '' }]
+                          })}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {translations[menuLanguage].addService}
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        {vitrine.services.map((service, index) => (
+                          <div key={index} className="space-y-2 border p-2 rounded">
+                            <Input
+                              placeholder={translations[menuLanguage].enterServiceName}
+                              value={service.name}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, name: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterServiceDescription}
+                              value={service.description}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, description: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <div className="flex items-center gap-4">
+                              {service.imageUrl && (
+                                <img src={service.imageUrl} alt={service.name} className="w-16 h-16 object-cover rounded" />
+                              )}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const input = document.createElement('input');
+                                  input.type = 'file';
+                                  input.accept = 'image/*';
+                                  input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement).files?.[0];
+                                    if (file) {
+                                      const key = `service-${index}`;
+                                      setTempImages(prev => ({ ...prev, [key]: file }));
+                                      const tempUrl = URL.createObjectURL(file);
+                                      const newServices = [...vitrine.services];
+                                      newServices[index] = { ...service, imageUrl: tempUrl };
+                                      setVitrine({ ...vitrine, services: newServices });
+                                    }
+                                  };
+                                  input.click();
+                                }}
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                {service.imageUrl ? translations[menuLanguage].changeServiceImage : translations[menuLanguage].uploadServiceImage}
+                              </Button>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newServices = vitrine.services.filter((_, i) => i !== index);
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].removeService}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Gallery Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold">{translations[menuLanguage].gallery}</h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setVitrine({
+                            ...vitrine,
+                            gallery: [...vitrine.gallery, { imageUrl: '', title: '', description: '' }]
+                          })}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {translations[menuLanguage].addImage}
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        {vitrine.gallery.map((item, index) => (
+                          <div key={index} className="space-y-2 border p-2 rounded">
+                            <Input
+                              placeholder={translations[menuLanguage].enterImageTitle}
+                              value={item.title}
+                              onChange={(e) => {
+                                const newGallery = [...vitrine.gallery];
+                                newGallery[index] = { ...item, title: e.target.value };
+                                setVitrine({ ...vitrine, gallery: newGallery });
+                              }}
+                            />
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterImageDescription}
+                              value={item.description}
+                              onChange={(e) => {
+                                const newGallery = [...vitrine.gallery];
+                                newGallery[index] = { ...item, description: e.target.value };
+                                setVitrine({ ...vitrine, gallery: newGallery });
+                              }}
+                            />
+                            <div className="flex items-center gap-4">
+                              {item.imageUrl && (
+                                <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded" />
+                              )}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const input = document.createElement('input');
+                                  input.type = 'file';
+                                  input.accept = 'image/*';
+                                  input.onchange = (e) => {
+                                    const file = (e.target as HTMLInputElement).files?.[0];
+                                    if (file) {
+                                      const key = `gallery-${index}`;
+                                      setTempImages(prev => ({ ...prev, [key]: file }));
+                                      const tempUrl = URL.createObjectURL(file);
+                                      const newGallery = [...vitrine.gallery];
+                                      newGallery[index] = { ...item, imageUrl: tempUrl };
+                                      setVitrine({ ...vitrine, gallery: newGallery });
+                                    }
+                                  };
+                                  input.click();
+                                }}
+                              >
+                                <Upload className="h-4 w-4 mr-2" />
+                                {item.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
+                              </Button>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newGallery = vitrine.gallery.filter((_, i) => i !== index);
+                                setVitrine({ ...vitrine, gallery: newGallery });
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].removeImage}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Testimonials Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex justify-between items-center">
+                        <h3 className="text-lg font-semibold">{translations[menuLanguage].testimonials}</h3>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setVitrine({
+                            ...vitrine,
+                            testimonials: [...vitrine.testimonials, { text: '', author: '', city: '' }]
+                          })}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {translations[menuLanguage].addTestimonial}
+                        </Button>
+                      </div>
+                      <div className="space-y-4">
+                        {vitrine.testimonials.map((testimonial, index) => (
+                          <div key={index} className="space-y-2 border p-2 rounded">
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterTestimonialText}
+                              value={testimonial.text}
+                              onChange={(e) => {
+                                const newTestimonials = [...vitrine.testimonials];
+                                newTestimonials[index] = { ...testimonial, text: e.target.value };
+                                setVitrine({ ...vitrine, testimonials: newTestimonials });
+                              }}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterAuthor}
+                              value={testimonial.author}
+                              onChange={(e) => {
+                                const newTestimonials = [...vitrine.testimonials];
+                                newTestimonials[index] = { ...testimonial, author: e.target.value };
+                                setVitrine({ ...vitrine, testimonials: newTestimonials });
+                              }}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterCity}
+                              value={testimonial.city}
+                              onChange={(e) => {
+                                const newTestimonials = [...vitrine.testimonials];
+                                newTestimonials[index] = { ...testimonial, city: e.target.value };
+                                setVitrine({ ...vitrine, testimonials: newTestimonials });
+                              }}
+                            />
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newTestimonials = vitrine.testimonials.filter((_, i) => i !== index);
+                                setVitrine({ ...vitrine, testimonials: newTestimonials });
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].removeTestimonial}
+                            </Button>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* Contact Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <h3 className="text-lg font-semibold">{translations[menuLanguage].contact}</h3>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder={translations[menuLanguage].enterAddress}
+                          value={vitrine.contact.address}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            contact: { ...vitrine.contact, address: e.target.value }
+                          })}
+                        />
+                        <Input
+                          placeholder={translations[menuLanguage].enterPhone}
+                          value={vitrine.contact.phone}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            contact: { ...vitrine.contact, phone: e.target.value }
+                          })}
+                        />
+                        <Input
+                          placeholder={translations[menuLanguage].enterEmail}
+                          type="email"
+                          value={vitrine.contact.email}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            contact: { ...vitrine.contact, email: e.target.value }
+                          })}
+                        />
+                        <div className="space-y-2">
+                          <h4 className="font-medium">{translations[menuLanguage].socialMedia}</h4>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              placeholder={translations[menuLanguage].enterFacebook}
+                              value={vitrine.contact.socialMedia.facebook}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, facebook: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterInstagram}
+                              value={vitrine.contact.socialMedia.instagram}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, instagram: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterTwitter}
+                              value={vitrine.contact.socialMedia.twitter}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, twitter: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterLinkedin}
+                              value={vitrine.contact.socialMedia.linkedin}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, linkedin: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterYoutube}
+                              value={vitrine.contact.socialMedia.youtube}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, youtube: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterTiktok}
+                              value={vitrine.contact.socialMedia.tiktok}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  socialMedia: { ...vitrine.contact.socialMedia, tiktok: e.target.value }
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                        <div className="space-y-2">
+                          <div className="flex items-center space-x-2">
+                            <Checkbox
+                              id="contactForm"
+                              checked={vitrine.contact.contactForm?.enabled}
+                              onCheckedChange={(checked) => setVitrine({
+                                ...vitrine,
+                                contact: {
+                                  ...vitrine.contact,
+                                  contactForm: {
+                                    ...vitrine.contact.contactForm,
+                                    enabled: checked === true
+                                  }
+                                }
+                              })}
+                            />
+                            <label htmlFor="contactForm" className="text-sm font-medium">
+                              {translations[menuLanguage].enableContactForm}
+                            </label>
+                          </div>
+                          {vitrine.contact.contactForm?.enabled && (
+                            <div className="space-y-2">
+                              <div className="flex justify-between items-center">
+                                <h4 className="font-medium">{translations[menuLanguage].formFields}</h4>
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => setVitrine({
+                                    ...vitrine,
+                                    contact: {
+                                      ...vitrine.contact,
+                                      contactForm: {
+                                        ...vitrine.contact.contactForm,
+                                        fields: [
+                                          ...(vitrine.contact.contactForm?.fields || []),
+                                          { name: '', type: 'text', required: false }
+                                        ]
+                                      }
+                                    }
+                                  })}
+                                >
+                                  <Plus className="h-4 w-4 mr-2" />
+                                  {translations[menuLanguage].addField}
+                                </Button>
+                              </div>
+                              {vitrine.contact.contactForm?.fields.map((field, index) => (
+                                <div key={index} className="flex gap-2">
+                                  <Input
+                                    placeholder={translations[menuLanguage].enterFieldName}
+                                    value={field.name}
+                                    onChange={(e) => {
+                                      const newFields = [...(vitrine.contact.contactForm?.fields || [])];
+                                      newFields[index] = { ...field, name: e.target.value };
+                                      setVitrine({
+                                        ...vitrine,
+                                        contact: {
+                                          ...vitrine.contact,
+                                          contactForm: {
+                                            ...vitrine.contact.contactForm,
+                                            fields: newFields
+                                          }
+                                        }
+                                      });
+                                    }}
+                                  />
+                                  <Select
+                                    value={field.type}
+                                    onValueChange={(value) => {
+                                      const newFields = [...(vitrine.contact.contactForm?.fields || [])];
+                                      newFields[index] = { ...field, type: value as any };
+                                      setVitrine({
+                                        ...vitrine,
+                                        contact: {
+                                          ...vitrine.contact,
+                                          contactForm: {
+                                            ...vitrine.contact.contactForm,
+                                            fields: newFields
+                                          }
+                                        }
+                                      });
+                                    }}
+                                  >
+                                    <SelectTrigger className="w-[180px]">
+                                      <SelectValue placeholder={translations[menuLanguage].fieldType} />
+                                    </SelectTrigger>
+                                    <SelectContent>
+                                      <SelectItem value="text">{translations[menuLanguage].textField}</SelectItem>
+                                      <SelectItem value="email">{translations[menuLanguage].emailField}</SelectItem>
+                                      <SelectItem value="phone">{translations[menuLanguage].phoneField}</SelectItem>
+                                      <SelectItem value="textarea">{translations[menuLanguage].textareaField}</SelectItem>
+                                    </SelectContent>
+                                  </Select>
+                                  <div className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`required-${index}`}
+                                      checked={field.required}
+                                      onCheckedChange={(checked) => {
+                                        const newFields = [...(vitrine.contact.contactForm?.fields || [])];
+                                        newFields[index] = { ...field, required: checked === true };
+                                        setVitrine({
+                                          ...vitrine,
+                                          contact: {
+                                            ...vitrine.contact,
+                                            contactForm: {
+                                              ...vitrine.contact.contactForm,
+                                              fields: newFields
+                                            }
+                                          }
+                                        });
+                                      }}
+                                    />
+                                    <label htmlFor={`required-${index}`} className="text-sm">
+                                      {translations[menuLanguage].required}
+                                    </label>
+                                  </div>
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="icon"
+                                    onClick={() => {
+                                      const newFields = vitrine.contact.contactForm?.fields.filter((_, i) => i !== index);
+                                      setVitrine({
+                                        ...vitrine,
+                                        contact: {
+                                          ...vitrine.contact,
+                                          contactForm: {
+                                            ...vitrine.contact.contactForm,
+                                            fields: newFields || []
+                                          }
+                                        }
+                                      });
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Footer Section */}
+                    <div className="space-y-2 border p-4 rounded-lg">
+                      <h3 className="text-lg font-semibold">{translations[menuLanguage].footer}</h3>
+                      <div className="space-y-2">
+                        <Input
+                          placeholder={translations[menuLanguage].enterBusinessName}
+                          value={vitrine.footer.businessName}
+                          onChange={(e) => setVitrine({
+                            ...vitrine,
+                            footer: { ...vitrine.footer, businessName: e.target.value }
+                          })}
+                        />
+                        <div className="space-y-2">
+                          <div className="flex justify-between items-center">
+                            <h4 className="font-medium">{translations[menuLanguage].quickLinks}</h4>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  quickLinks: [...vitrine.footer.quickLinks, { label: '', url: '', type: 'link' }]
+                                }
+                              })}
+                            >
+                              <Plus className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].addQuickLink}
+                            </Button>
+                          </div>
+                          {vitrine.footer.quickLinks.map((link, index) => (
+                            <div key={index} className="flex gap-2">
+                              <Input
+                                placeholder={translations[menuLanguage].enterQuickLinkLabel}
+                                value={link.label}
+                                onChange={(e) => {
+                                  const newLinks = [...vitrine.footer.quickLinks];
+                                  newLinks[index] = { ...link, label: e.target.value };
+                                  setVitrine({
+                                    ...vitrine,
+                                    footer: { ...vitrine.footer, quickLinks: newLinks }
+                                  });
+                                }}
+                              />
+                              <Input
+                                placeholder={translations[menuLanguage].enterQuickLinkUrl}
+                                value={link.url}
+                                onChange={(e) => {
+                                  const newLinks = [...vitrine.footer.quickLinks];
+                                  newLinks[index] = { ...link, url: e.target.value };
+                                  setVitrine({
+                                    ...vitrine,
+                                    footer: { ...vitrine.footer, quickLinks: newLinks }
+                                  });
+                                }}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="icon"
+                                onClick={() => {
+                                  const newLinks = vitrine.footer.quickLinks.filter((_, i) => i !== index);
+                                  setVitrine({
+                                    ...vitrine,
+                                    footer: { ...vitrine.footer, quickLinks: newLinks }
+                                  });
+                                }}
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </Button>
+                            </div>
+                          ))}
+                        </div>
+                        <div className="space-y-2">
+                          <h4 className="font-medium">{translations[menuLanguage].socialIcons}</h4>
+                          <div className="grid grid-cols-2 gap-2">
+                            <Input
+                              placeholder={translations[menuLanguage].enterFacebook}
+                              value={vitrine.footer.socialIcons.facebook}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, facebook: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterInstagram}
+                              value={vitrine.footer.socialIcons.instagram}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, instagram: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterTwitter}
+                              value={vitrine.footer.socialIcons.twitter}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, twitter: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterLinkedin}
+                              value={vitrine.footer.socialIcons.linkedin}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, linkedin: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterYoutube}
+                              value={vitrine.footer.socialIcons.youtube}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, youtube: e.target.value }
+                                }
+                              })}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterTiktok}
+                              value={vitrine.footer.socialIcons.tiktok}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                footer: {
+                                  ...vitrine.footer,
+                                  socialIcons: { ...vitrine.footer.socialIcons, tiktok: e.target.value }
+                                }
+                              })}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   </div>
                 )}
                 <div className="mt-4">
