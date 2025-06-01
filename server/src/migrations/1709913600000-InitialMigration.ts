@@ -43,6 +43,7 @@ export class InitialMigration1709913600000 implements MigrationInterface {
                 "textBelow" character varying,
                 "scanCount" integer NOT NULL DEFAULT '0',
                 "scanHistory" jsonb NOT NULL DEFAULT '[]',
+                "vitrine" jsonb,
                 "createdAt" TIMESTAMP NOT NULL DEFAULT now(),
                 "updatedAt" TIMESTAMP NOT NULL DEFAULT now(),
                 "userId" uuid,

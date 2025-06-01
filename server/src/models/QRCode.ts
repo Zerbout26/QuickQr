@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
 import { User } from "./User";
 
-export type QRCodeType = 'url' | 'menu' | 'both' | 'direct';
+export type QRCodeType = 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
 
 export interface MenuItem {
   name: string;
@@ -29,6 +29,73 @@ export interface Link {
   label: string;
   url: string;
   type?: 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'tiktok' | 'whatsapp' | 'telegram' | 'website' | 'other';
+}
+
+export interface VitrineSection {
+  hero: {
+    businessName: string;
+    logo?: string;
+    tagline: string;
+    cta: {
+      text: string;
+      link: string;
+    };
+  };
+  about: {
+    description: string;
+    city: string;
+  };
+  services: Array<{
+    name: string;
+    description?: string;
+  }>;
+  gallery: Array<{
+    imageUrl: string;
+    title?: string;
+    description?: string;
+  }>;
+  testimonials: Array<{
+    text: string;
+    author: string;
+    city?: string;
+  }>;
+  contact: {
+    address?: string;
+    phone: string;
+    email: string;
+    socialMedia: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+      youtube?: string;
+      tiktok?: string;
+    };
+    contactForm?: {
+      enabled: boolean;
+      fields: Array<{
+        name: string;
+        type: 'text' | 'email' | 'phone' | 'textarea';
+        required: boolean;
+      }>;
+    };
+  };
+  footer: {
+    copyright: string;
+    businessName: string;
+    quickLinks: Array<{
+      label: string;
+      url: string;
+    }>;
+    socialIcons: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+      youtube?: string;
+      tiktok?: string;
+    };
+  };
 }
 
 @Entity()
@@ -85,6 +152,9 @@ export class QRCode {
     userAgent: string;
     ipAddress: string;
   }[];
+
+  @Column("simple-json", { nullable: true })
+  vitrine!: VitrineSection;
 
   @ManyToOne(() => User, user => user.qrCodes)
   user!: User;

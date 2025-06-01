@@ -411,10 +411,58 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
   const [name, setName] = useState('');
   const [id, setId] = useState('');
-  const [type, setType] = useState<'url' | 'menu' | 'both' | 'direct'>('url');
+  const [type, setType] = useState<'url' | 'menu' | 'both' | 'direct' | 'vitrine'>('url');
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [vitrine, setVitrine] = useState({
+    hero: {
+      businessName: '',
+      logo: '',
+      tagline: '',
+      cta: {
+        text: 'Contact Us',
+        link: ''
+      }
+    },
+    about: {
+      description: '',
+      city: ''
+    },
+    services: [],
+    gallery: [],
+    testimonials: [],
+    contact: {
+      address: '',
+      phone: '',
+      email: '',
+      socialMedia: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        youtube: '',
+        tiktok: ''
+      },
+      contactForm: {
+        enabled: false,
+        fields: []
+      }
+    },
+    footer: {
+      copyright: `© ${new Date().getFullYear()}`,
+      businessName: '',
+      quickLinks: [],
+      socialIcons: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        youtube: '',
+        tiktok: ''
+      }
+    }
+  });
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
   const [backgroundColor, setBackgroundColor] = useState('#FFFFFF');
   const [logoFile, setLogoFile] = useState<File | null>(null);
@@ -697,53 +745,53 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         }
 
         formData.append('menu', JSON.stringify(menuData));
-
-        // Then, upload each menu item image
-        for (const [key, file] of Object.entries(tempImages)) {
-          if (file instanceof File) {
-            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
-            // Create a unique filename that includes category and item indices
-            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
-            formData.append('menuItemImages', file, uniqueFilename);
-          }
-        }
       }
-      
-      formData.append('textAbove', textAbove);
-      formData.append('textBelow', textBelow);
-      
+
+      if (type === 'vitrine') {
+        formData.append('vitrine', JSON.stringify(vitrine));
+      }
+
+      // Handle logo upload
       if (logoFile) {
         formData.append('logo', logoFile);
       }
 
-      const response = await fetch(`${API_BASE_URL}/qrcodes`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to create QR code');
+      // Handle menu item images
+      if (type === 'menu' || type === 'both') {
+        Object.entries(tempImages).forEach(([key, file]) => {
+          formData.append('menuItemImages', file);
+        });
       }
 
-      const data = await response.json();
-      setId(data.id);
-      onCreated(data);
-      toast({
-        title: "Success",
-        description: "QR code created successfully",
+      // Handle vitrine images
+      if (type === 'vitrine') {
+        Object.entries(tempImages).forEach(([key, file]) => {
+          formData.append('vitrineImages', file);
+        });
+      }
+
+      const response = await qrCodeApi.create({
+        name: name || 'My QR Code',
+        type,
+        url: type === 'direct' ? directUrl : undefined,
+        links: type === 'url' || type === 'both' ? links : undefined,
+        menu: type === 'menu' || type === 'both' ? {
+          restaurantName: name || 'My Restaurant',
+          description: '',
+          categories: menuCategories
+        } : undefined,
+        vitrine: type === 'vitrine' ? vitrine : undefined,
+        foregroundColor,
+        backgroundColor,
+        textAbove,
+        textBelow
       });
-      resetForm(); // Reset form after successful creation
-    } catch (error) {
+
+      onCreated(response);
+      resetForm();
+    } catch (error: any) {
       console.error('Error creating QR code:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: error instanceof Error ? error.message : 'Failed to create QR code',
-      });
+      setError(error.message || 'Failed to create QR code');
     } finally {
       setIsLoading(false);
     }

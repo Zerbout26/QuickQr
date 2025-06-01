@@ -158,7 +158,7 @@ export const authApi = {
 export const qrCodeApi = {
   create: async (data: {
     name: string;
-    type: 'url' | 'menu' | 'both' | 'direct';
+    type: 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
     url?: string;
     logoUrl?: string;
     foregroundColor: string;
@@ -179,6 +179,73 @@ export const qrCodeApi = {
         }[];
       }[];
     };
+    vitrine?: {
+      hero: {
+        businessName: string;
+        logo?: string;
+        tagline: string;
+        cta: {
+          text: string;
+          link: string;
+        };
+      };
+      about: {
+        description: string;
+        city: string;
+      };
+      services: Array<{
+        name: string;
+        description?: string;
+        imageUrl?: string;
+      }>;
+      gallery: Array<{
+        imageUrl: string;
+        title?: string;
+        description?: string;
+      }>;
+      testimonials: Array<{
+        text: string;
+        author: string;
+        city?: string;
+      }>;
+      contact: {
+        address?: string;
+        phone: string;
+        email: string;
+        socialMedia: {
+          facebook?: string;
+          instagram?: string;
+          twitter?: string;
+          linkedin?: string;
+          youtube?: string;
+          tiktok?: string;
+        };
+        contactForm?: {
+          enabled: boolean;
+          fields: Array<{
+            name: string;
+            type: 'text' | 'email' | 'phone' | 'textarea';
+            required: boolean;
+          }>;
+        };
+      };
+      footer: {
+        copyright: string;
+        businessName: string;
+        quickLinks: Array<{
+          label: string;
+          url: string;
+        }>;
+        socialIcons: {
+          facebook?: string;
+          instagram?: string;
+          twitter?: string;
+          linkedin?: string;
+          youtube?: string;
+          tiktok?: string;
+        };
+      };
+    };
   }) => {
     const response = await api.post('/qrcodes', data);
     return response.data;
@@ -186,7 +253,7 @@ export const qrCodeApi = {
 
   update: async (id: string, data: {
     name?: string;
-    type?: 'url' | 'menu' | 'both' | 'direct';
+    type?: 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
     url?: string;
     logoUrl?: string;
     foregroundColor?: string;
@@ -206,6 +273,73 @@ export const qrCodeApi = {
           imageUrl?: string;
         }[];
       }[];
+    };
+    vitrine?: {
+      hero: {
+        businessName: string;
+        logo?: string;
+        tagline: string;
+        cta: {
+          text: string;
+          link: string;
+        };
+      };
+      about: {
+        description: string;
+        city: string;
+      };
+      services: Array<{
+        name: string;
+        description?: string;
+        imageUrl?: string;
+      }>;
+      gallery: Array<{
+        imageUrl: string;
+        title?: string;
+        description?: string;
+      }>;
+      testimonials: Array<{
+        text: string;
+        author: string;
+        city?: string;
+      }>;
+      contact: {
+        address?: string;
+        phone: string;
+        email: string;
+        socialMedia: {
+          facebook?: string;
+          instagram?: string;
+          twitter?: string;
+          linkedin?: string;
+          youtube?: string;
+          tiktok?: string;
+        };
+        contactForm?: {
+          enabled: boolean;
+          fields: Array<{
+            name: string;
+            type: 'text' | 'email' | 'phone' | 'textarea';
+            required: boolean;
+          }>;
+        };
+      };
+      footer: {
+        copyright: string;
+        businessName: string;
+        quickLinks: Array<{
+          label: string;
+          url: string;
+        }>;
+        socialIcons: {
+          facebook?: string;
+          instagram?: string;
+          twitter?: string;
+          linkedin?: string;
+          youtube?: string;
+          tiktok?: string;
+        };
+      };
     };
   }) => {
     const response = await api.put(`/qrcodes/${id}`, data);
