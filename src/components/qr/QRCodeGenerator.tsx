@@ -851,8 +851,93 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         formData.append('menu', JSON.stringify(menuData));
       }
 
+      let validatedVitrine;
       if (type === 'vitrine') {
-        formData.append('vitrine', JSON.stringify(vitrine));
+        // Validate vitrine data
+        if (!vitrine.hero.businessName) {
+          throw new Error('Business name is required');
+        }
+        if (!vitrine.about.description) {
+          throw new Error('About description is required');
+        }
+        if (!vitrine.contact.email) {
+          throw new Error('Contact email is required');
+        }
+        if (!vitrine.footer.businessName) {
+          throw new Error('Footer business name is required');
+        }
+
+        // Ensure all required fields are present
+        validatedVitrine = {
+          hero: {
+            businessName: vitrine.hero.businessName,
+            logo: vitrine.hero.logo || '',
+            tagline: vitrine.hero.tagline || '',
+            cta: {
+              text: vitrine.hero.cta.text || 'Contact Us',
+              link: vitrine.hero.cta.link || ''
+            }
+          },
+          about: {
+            description: vitrine.about.description,
+            city: vitrine.about.city || ''
+          },
+          services: vitrine.services.map(service => ({
+            name: service.name || '',
+            description: service.description || '',
+            imageUrl: service.imageUrl || ''
+          })),
+          gallery: vitrine.gallery.map(item => ({
+            imageUrl: item.imageUrl || '',
+            title: item.title || '',
+            description: item.description || ''
+          })),
+          testimonials: vitrine.testimonials.map(testimonial => ({
+            text: testimonial.text || '',
+            author: testimonial.author || '',
+            city: testimonial.city || ''
+          })),
+          contact: {
+            address: vitrine.contact.address || '',
+            phone: vitrine.contact.phone || '',
+            email: vitrine.contact.email,
+            socialMedia: {
+              facebook: vitrine.contact.socialMedia.facebook || '',
+              instagram: vitrine.contact.socialMedia.instagram || '',
+              twitter: vitrine.contact.socialMedia.twitter || '',
+              linkedin: vitrine.contact.socialMedia.linkedin || '',
+              youtube: vitrine.contact.socialMedia.youtube || '',
+              tiktok: vitrine.contact.socialMedia.tiktok || ''
+            },
+            contactForm: {
+              enabled: vitrine.contact.contactForm?.enabled || false,
+              fields: (vitrine.contact.contactForm?.fields || []).map(field => ({
+                name: field.name || '',
+                type: field.type || 'text',
+                required: field.required || false
+              }))
+            }
+          },
+          footer: {
+            copyright: vitrine.footer.copyright || `© ${new Date().getFullYear()}`,
+            businessName: vitrine.footer.businessName,
+            quickLinks: vitrine.footer.quickLinks.map(link => ({
+              label: link.label || '',
+              url: link.url || '',
+              type: link.type || 'link'
+            })),
+            socialIcons: {
+              facebook: vitrine.footer.socialIcons.facebook || '',
+              instagram: vitrine.footer.socialIcons.instagram || '',
+              twitter: vitrine.footer.socialIcons.twitter || '',
+              linkedin: vitrine.footer.socialIcons.linkedin || '',
+              youtube: vitrine.footer.socialIcons.youtube || '',
+              tiktok: vitrine.footer.socialIcons.tiktok || ''
+            }
+          }
+        };
+
+        formData.append('vitrine', JSON.stringify(validatedVitrine));
       }
 
       // Handle logo upload
@@ -884,7 +969,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           description: '',
           categories: menuCategories
         } : undefined,
-        vitrine: type === 'vitrine' ? vitrine : undefined,
+        vitrine: type === 'vitrine' ? validatedVitrine : undefined,
         foregroundColor,
         backgroundColor,
         textAbove,
@@ -896,6 +981,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     } catch (error: any) {
       console.error('Error creating QR code:', error);
       setError(error.message || 'Failed to create QR code');
+      toast({
+        variant: "destructive",
+        title: "Error",
+        description: error.message || 'Failed to create QR code',
+      });
     } finally {
       setIsLoading(false);
     }
@@ -1307,7 +1397,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 }}
                               >
                                 <Upload className="h-4 w-4 mr-2" />
-                                {service.imageUrl ? translations[menuLanguage].changeServiceImage : translations[menuLanguage].uploadServiceImage}
+                                {service.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].uploadServiceImage}
                               </Button>
                             </div>
                             <Button
