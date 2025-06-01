@@ -247,7 +247,40 @@ export const qrCodeApi = {
       };
     };
   }) => {
-    const response = await api.post('/qrcodes', data);
+    const formData = new FormData();
+    
+    // Add basic fields
+    formData.append('name', data.name);
+    formData.append('type', data.type);
+    formData.append('foregroundColor', data.foregroundColor);
+    formData.append('backgroundColor', data.backgroundColor);
+    
+    if (data.textAbove) formData.append('textAbove', data.textAbove);
+    if (data.textBelow) formData.append('textBelow', data.textBelow);
+    
+    // Add type-specific data
+    if (data.type === 'direct' && data.url) {
+      formData.append('url', data.url);
+    }
+    
+    if ((data.type === 'url' || data.type === 'both') && data.links) {
+      formData.append('links', JSON.stringify(data.links));
+    }
+    
+    if ((data.type === 'menu' || data.type === 'both') && data.menu) {
+      formData.append('menu', JSON.stringify(data.menu));
+    }
+    
+    if (data.type === 'vitrine' && data.vitrine) {
+      formData.append('vitrine', JSON.stringify(data.vitrine));
+    }
+    
+    const response = await api.post('/qrcodes', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    });
+    
     return response.data;
   },
 
