@@ -895,7 +895,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           services: vitrine.services.map(service => ({
             name: service.name || '',
             description: service.description || '',
-            imageUrl: service.imageUrl || '',
+            imageUrl: '', // Reset imageUrl as it will be updated after Cloudinary upload
             title: service.title || '',
             imageDescription: service.imageDescription || ''
           })),

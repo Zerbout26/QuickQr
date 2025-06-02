@@ -91,6 +91,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url, vitrine } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
+      const qrCodeData: any = {};
 
       // Handle logo upload if present
       if (req.files && (req.files as any)['logo']) {
@@ -171,55 +172,39 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      // Parse vitrine if provided
-      let parsedVitrine = null;
-      if (type === 'vitrine' && vitrine) {
-        try {
-          parsedVitrine = JSON.parse(vitrine);
-          
-          // Handle vitrine images (gallery, services, etc.)
-          if (req.files && (req.files as any)['vitrineImages']) {
-            const vitrineImages = (req.files as any)['vitrineImages'];
-            for (let i = 0; i < vitrineImages.length; i++) {
-              const imageFile = vitrineImages[i];
-              try {
-                // Upload image to Cloudinary
-                const imageUrl = await uploadToCloudinary(imageFile);
-                
-                // Get optimized URL for the image
-                const optimizedUrl = getOptimizedUrl(imageUrl, {
-                  width: 800,
-                  height: 600,
-                  crop: 'fill',
-                  quality: 'auto'
-                });
-                
-                // Extract section and index from filename
-                const filename = imageFile.originalname;
-                const parts = filename.split('-');
-                if (parts.length >= 2) {
-                  const section = parts[0]; // gallery, services, etc.
-                  const index = parseInt(parts[1], 10);
-                  
-                  if (!isNaN(index) && parsedVitrine[section]) {
-                    // Update the imageUrl in the appropriate section
-                    if (Array.isArray(parsedVitrine[section])) {
-                      if (parsedVitrine[section][index]) {
-                        parsedVitrine[section][index].imageUrl = optimizedUrl;
-                      }
-                    }
-                  }
-                }
-              } catch (uploadError) {
-                console.error('Error uploading vitrine image to Cloudinary:', uploadError);
-                continue;
+      // Handle vitrine images
+      if (req.files && 'vitrineImages' in req.files) {
+        const vitrineImages = req.files['vitrineImages'] as Express.Multer.File[];
+        const vitrine = JSON.parse(req.body.vitrine);
+
+        // Upload images to Cloudinary and update URLs
+        for (const file of vitrineImages) {
+          try {
+            const imageUrl = await uploadToCloudinary(file);
+            if (imageUrl) {
+              const optimizedUrl = getOptimizedUrl(imageUrl, {
+                width: 800,
+                height: 600,
+                crop: 'fill',
+                quality: 'auto'
+              });
+              
+              // Extract section and index from filename (format: section-index-timestamp-filename)
+              const [section, index] = file.originalname.split('-');
+              
+              if (section === 'service' && vitrine.services[parseInt(index)]) {
+                vitrine.services[parseInt(index)].imageUrl = optimizedUrl;
+              } else if (section === 'gallery' && vitrine.gallery[parseInt(index)]) {
+                vitrine.gallery[parseInt(index)].imageUrl = optimizedUrl;
               }
             }
+          } catch (error) {
+            console.error('Error uploading vitrine image to Cloudinary:', error);
           }
-        } catch (e) {
-          console.error('Error parsing vitrine:', e);
-          return res.status(400).json({ error: 'Invalid vitrine format' });
         }
+
+        // Update the vitrine data with the new image URLs
+        qrCodeData.vitrine = vitrine;
       }
 
       const qrCode = new QRCode();
@@ -227,7 +212,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.type = type || 'url';
       qrCode.links = parsedLinks;
       qrCode.menu = parsedMenu || { restaurantName: '', categories: [] };
-      qrCode.vitrine = parsedVitrine;
+      qrCode.vitrine = qrCodeData.vitrine;
       qrCode.logoUrl = logoUrl;
       qrCode.foregroundColor = foregroundColor || '#6366F1';
       qrCode.backgroundColor = backgroundColor || '#FFFFFF';
