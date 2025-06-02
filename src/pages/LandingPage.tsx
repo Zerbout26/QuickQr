@@ -294,6 +294,12 @@ const LandingPage = () => {
                                 src={service.imageUrl}
                                 alt={service.name}
                                 className="w-full h-48 object-cover"
+                                loading="lazy"
+                                onError={(e) => {
+                                  const target = e.target as HTMLImageElement;
+                                  target.onerror = null;
+                                  target.src = 'https://via.placeholder.com/144?text=No+Image';
+                                }}
                               />
                             </div>
                           )}
