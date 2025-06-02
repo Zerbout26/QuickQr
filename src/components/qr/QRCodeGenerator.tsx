@@ -810,6 +810,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       formData.append('type', type);
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
+      formData.append('textAbove', textAbove);
+      formData.append('textBelow', textBelow);
       
       if (type === 'direct') {
         formData.append('url', directUrl);
@@ -829,7 +831,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               description: item.description || '',
               price: Number(item.price) || 0,
               category: category.name || 'Unnamed Category',
-              imageUrl: item.imageUrl || '', // Keep the existing imageUrl if it exists
+              imageUrl: item.imageUrl || '',
               availability: {
                 sunday: item.availability?.sunday ?? true,
                 monday: item.availability?.monday ?? true,
@@ -849,9 +851,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         }
 
         formData.append('menu', JSON.stringify(menuData));
+
+        // Then, upload each menu item image
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File) {
+            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
+            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+            formData.append('menuItemImages', file, uniqueFilename);
+          }
+        }
       }
 
-      let validatedVitrine;
       if (type === 'vitrine') {
         // Validate vitrine data
         if (!vitrine.hero.businessName) {
@@ -868,7 +878,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         }
 
         // Ensure all required fields are present
-        validatedVitrine = {
+        const validatedVitrine = {
           hero: {
             businessName: vitrine.hero.businessName,
             logo: vitrine.hero.logo || '',
@@ -938,6 +948,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         };
 
         formData.append('vitrine', JSON.stringify(validatedVitrine));
+
+        // Upload vitrine images
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File) {
+            const [section, index] = key.split('-');
+            const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
+            formData.append('vitrineImages', file, uniqueFilename);
+          }
+        }
       }
 
       // Handle logo upload
@@ -945,45 +964,33 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         formData.append('logo', logoFile);
       }
 
-      // Handle menu item images
-      if (type === 'menu' || type === 'both') {
-        Object.entries(tempImages).forEach(([key, file]) => {
-          formData.append('menuItemImages', file);
-        });
-      }
-
-      // Handle vitrine images
-      if (type === 'vitrine') {
-        Object.entries(tempImages).forEach(([key, file]) => {
-          formData.append('vitrineImages', file);
-        });
-      }
-
-      const response = await qrCodeApi.create({
-        name: name || 'My QR Code',
-        type,
-        url: type === 'direct' ? directUrl : undefined,
-        links: type === 'url' || type === 'both' ? links : undefined,
-        menu: type === 'menu' || type === 'both' ? {
-          restaurantName: name || 'My Restaurant',
-          description: '',
-          categories: menuCategories
-        } : undefined,
-        vitrine: type === 'vitrine' ? validatedVitrine : undefined,
-        foregroundColor,
-        backgroundColor,
-        textAbove,
-        textBelow
+      // Use fetch directly for file upload
+      const response = await fetch(`${API_BASE_URL}/qrcodes`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        },
+        body: formData,
       });
 
-      onCreated(response);
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create QR code');
+      }
+
+      const createdQRCode = await response.json();
+      onCreated(createdQRCode);
       resetForm();
+      toast({
+        title: translations[menuLanguage].success,
+        description: "QR code created successfully",
+      });
     } catch (error: any) {
       console.error('Error creating QR code:', error);
       setError(error.message || 'Failed to create QR code');
       toast({
         variant: "destructive",
-        title: "Error",
+        title: translations[menuLanguage].error,
         description: error.message || 'Failed to create QR code',
       });
     } finally {
