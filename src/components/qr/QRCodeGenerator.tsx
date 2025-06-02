@@ -1361,6 +1361,42 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       <div className="space-y-4">
                         {vitrine.services.map((service, index) => (
                           <div key={index} className="space-y-2 border p-2 rounded">
+                            <Input
+                              placeholder={translations[menuLanguage].enterServiceName}
+                              value={service.name}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, name: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterServiceDescription}
+                              value={service.description}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, description: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterImageTitle}
+                              value={service.title}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, title: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterImageDescription}
+                              value={service.imageDescription}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, imageDescription: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
                             <div className="flex items-center gap-4">
                               {service.imageUrl && (
                                 <div className="relative w-24 h-24">
@@ -1396,46 +1432,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                   </Button>
                                 </div>
                               )}
-                              <div className="flex-1 space-y-2">
-                                <Input
-                                  placeholder={translations[menuLanguage].enterServiceName}
-                                  value={service.name}
-                                  onChange={(e) => {
-                                    const newServices = [...vitrine.services];
-                                    newServices[index] = { ...service, name: e.target.value };
-                                    setVitrine({ ...vitrine, services: newServices });
-                                  }}
-                                />
-                                <Textarea
-                                  placeholder={translations[menuLanguage].enterServiceDescription}
-                                  value={service.description}
-                                  onChange={(e) => {
-                                    const newServices = [...vitrine.services];
-                                    newServices[index] = { ...service, description: e.target.value };
-                                    setVitrine({ ...vitrine, services: newServices });
-                                  }}
-                                />
-                                <Input
-                                  placeholder={translations[menuLanguage].enterImageTitle}
-                                  value={service.title}
-                                  onChange={(e) => {
-                                    const newServices = [...vitrine.services];
-                                    newServices[index] = { ...service, title: e.target.value };
-                                    setVitrine({ ...vitrine, services: newServices });
-                                  }}
-                                />
-                                <Textarea
-                                  placeholder={translations[menuLanguage].enterImageDescription}
-                                  value={service.imageDescription}
-                                  onChange={(e) => {
-                                    const newServices = [...vitrine.services];
-                                    newServices[index] = { ...service, imageDescription: e.target.value };
-                                    setVitrine({ ...vitrine, services: newServices });
-                                  }}
-                                />
-                              </div>
-                            </div>
-                            <div className="flex justify-between items-center">
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1461,26 +1457,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 <Upload className="h-4 w-4 mr-2" />
                                 {service.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
                               </Button>
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const newServices = vitrine.services.filter((_, i) => i !== index);
-                                  setVitrine({ ...vitrine, services: newServices });
-                                  // Remove from tempImages if exists
-                                  const key = `service-${index}`;
-                                  if (tempImages[key]) {
-                                    const newTempImages = { ...tempImages };
-                                    delete newTempImages[key];
-                                    setTempImages(newTempImages);
-                                  }
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4 mr-2" />
-                                {translations[menuLanguage].removeService}
-                              </Button>
                             </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newServices = vitrine.services.filter((_, i) => i !== index);
+                                setVitrine({ ...vitrine, services: newServices });
+                                // Remove from tempImages if exists
+                                const key = `service-${index}`;
+                                if (tempImages[key]) {
+                                  const newTempImages = { ...tempImages };
+                                  delete newTempImages[key];
+                                  setTempImages(newTempImages);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].removeService}
+                            </Button>
                           </div>
                         ))}
                       </div>
