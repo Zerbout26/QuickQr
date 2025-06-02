@@ -13,7 +13,7 @@ export interface User {
   updatedAt: Date;
 }
 
-export type QRCodeType = 'url' | 'menu' | 'both' | 'direct';
+export type QRCodeType = 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
 
 export interface MenuItem {
   name: string;
@@ -43,6 +43,76 @@ export interface Menu {
   categories: MenuCategory[];
 }
 
+export interface VitrineSection {
+  hero: {
+    businessName: string;
+    logo?: string;
+    tagline: string;
+    cta: {
+      text: string;
+      link: string;
+    };
+  };
+  about: {
+    description: string;
+    city: string;
+  };
+  services: Array<{
+    name: string;
+    description?: string;
+    imageUrl?: string;
+    title?: string;
+    imageDescription?: string;
+  }>;
+  gallery: Array<{
+    imageUrl: string;
+    title?: string;
+    description?: string;
+  }>;
+  testimonials: Array<{
+    text: string;
+    author: string;
+    city?: string;
+  }>;
+  contact: {
+    address?: string;
+    phone: string;
+    email: string;
+    socialMedia: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+      youtube?: string;
+      tiktok?: string;
+    };
+    contactForm?: {
+      enabled: boolean;
+      fields: Array<{
+        name: string;
+        type: 'text' | 'email' | 'phone' | 'textarea';
+        required: boolean;
+      }>;
+    };
+  };
+  footer: {
+    copyright: string;
+    businessName: string;
+    quickLinks: Array<{
+      label: string;
+      url: string;
+    }>;
+    socialIcons: {
+      facebook?: string;
+      instagram?: string;
+      twitter?: string;
+      linkedin?: string;
+      youtube?: string;
+      tiktok?: string;
+    };
+  };
+}
+
 export interface QRCodeLink {
   label: string;
   url: string;
@@ -57,6 +127,7 @@ export interface QRCode {
   originalUrl: string;
   links: QRCodeLink[];
   menu?: Menu;
+  vitrine?: VitrineSection;
   logoUrl?: string;
   foregroundColor: string;
   backgroundColor: string;

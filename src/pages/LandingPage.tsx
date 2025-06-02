@@ -214,6 +214,7 @@ const LandingPage = () => {
 
   const hasUrls = qrCode.links && qrCode.links.length > 0;
   const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
+  const hasVitrine = qrCode.type === 'vitrine' && qrCode.vitrine;
 
   return (
     <div
@@ -241,6 +242,202 @@ const LandingPage = () => {
             >
               {qrCode.name}
             </h1>
+
+            {/* Vitrine Section */}
+            {hasVitrine && (
+              <div className="space-y-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+                {/* Hero Section */}
+                <div className="text-center mb-8">
+                  <h2 className="text-4xl font-bold tracking-tight text-primary">
+                    {qrCode.vitrine.hero.businessName}
+                  </h2>
+                  {qrCode.vitrine.hero.tagline && (
+                    <p className="text-gray-500 mt-4 text-lg max-w-3xl mx-auto">
+                      {qrCode.vitrine.hero.tagline}
+                    </p>
+                  )}
+                  {qrCode.vitrine.hero.cta.link && (
+                    <Button
+                      className="mt-6 px-8 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200"
+                      onClick={() => window.open(qrCode.vitrine.hero.cta.link, '_blank')}
+                    >
+                      {qrCode.vitrine.hero.cta.text}
+                    </Button>
+                  )}
+                </div>
+
+                {/* About Section */}
+                {qrCode.vitrine.about.description && (
+                  <div className="max-w-3xl mx-auto text-center">
+                    <h3 className="text-2xl font-bold text-primary mb-4">About Us</h3>
+                    <p className="text-gray-600 text-lg">
+                      {qrCode.vitrine.about.description}
+                    </p>
+                    {qrCode.vitrine.about.city && (
+                      <p className="text-gray-500 mt-2">
+                        {qrCode.vitrine.about.city}
+                      </p>
+                    )}
+                  </div>
+                )}
+
+                {/* Services Section */}
+                {qrCode.vitrine.services.length > 0 && (
+                  <div className="space-y-8">
+                    <h3 className="text-2xl font-bold text-primary text-center">Our Services</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {qrCode.vitrine.services.map((service, index) => (
+                        <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                          {service.imageUrl && (
+                            <div className="aspect-w-16 aspect-h-9">
+                              <img
+                                src={service.imageUrl}
+                                alt={service.name}
+                                className="w-full h-48 object-cover"
+                              />
+                            </div>
+                          )}
+                          <div className="p-6">
+                            <h4 className="text-xl font-bold text-primary mb-2">{service.name}</h4>
+                            {service.description && (
+                              <p className="text-gray-600 mb-4">{service.description}</p>
+                            )}
+                            {service.title && (
+                              <p className="text-sm font-medium text-gray-500">{service.title}</p>
+                            )}
+                            {service.imageDescription && (
+                              <p className="text-sm text-gray-500 mt-2">{service.imageDescription}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Gallery Section */}
+                {qrCode.vitrine.gallery.length > 0 && (
+                  <div className="space-y-8">
+                    <h3 className="text-2xl font-bold text-primary text-center">Gallery</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+                      {qrCode.vitrine.gallery.map((item, index) => (
+                        <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
+                          <div className="aspect-w-16 aspect-h-9">
+                            <img
+                              src={item.imageUrl}
+                              alt={item.title || `Gallery image ${index + 1}`}
+                              className="w-full h-48 object-cover"
+                            />
+                          </div>
+                          <div className="p-6">
+                            {item.title && (
+                              <h4 className="text-xl font-bold text-primary mb-2">{item.title}</h4>
+                            )}
+                            {item.description && (
+                              <p className="text-gray-600">{item.description}</p>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Testimonials Section */}
+                {qrCode.vitrine.testimonials.length > 0 && (
+                  <div className="space-y-8">
+                    <h3 className="text-2xl font-bold text-primary text-center">Testimonials</h3>
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                      {qrCode.vitrine.testimonials.map((testimonial, index) => (
+                        <div key={index} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
+                          <p className="text-gray-600 italic mb-4">"{testimonial.text}"</p>
+                          <div className="flex items-center justify-between">
+                            <span className="font-bold text-primary">{testimonial.author}</span>
+                            {testimonial.city && (
+                              <span className="text-gray-500">{testimonial.city}</span>
+                            )}
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Contact Section */}
+                <div className="space-y-8">
+                  <h3 className="text-2xl font-bold text-primary text-center">Contact Us</h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
+                    <div className="space-y-4">
+                      {qrCode.vitrine.contact.address && (
+                        <div>
+                          <h4 className="font-medium text-gray-900">Address</h4>
+                          <p className="text-gray-600">{qrCode.vitrine.contact.address}</p>
+                        </div>
+                      )}
+                      {qrCode.vitrine.contact.phone && (
+                        <div>
+                          <h4 className="font-medium text-gray-900">Phone</h4>
+                          <p className="text-gray-600">{qrCode.vitrine.contact.phone}</p>
+                        </div>
+                      )}
+                      {qrCode.vitrine.contact.email && (
+                        <div>
+                          <h4 className="font-medium text-gray-900">Email</h4>
+                          <p className="text-gray-600">{qrCode.vitrine.contact.email}</p>
+                        </div>
+                      )}
+                    </div>
+                    <div className="space-y-4">
+                      <h4 className="font-medium text-gray-900">Follow Us</h4>
+                      <div className="flex flex-wrap gap-4">
+                        {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
+                          if (!url) return null;
+                          const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
+                          return (
+                            <a
+                              key={platform}
+                              href={url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="p-2 rounded-full text-white transition-colors duration-200"
+                              style={{ backgroundColor: bgColor }}
+                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = hoverBgColor}
+                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = bgColor}
+                            >
+                              <Icon className="h-6 w-6" />
+                            </a>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Footer Section */}
+                <div className="border-t pt-8 mt-12">
+                  <div className="text-center">
+                    <p className="text-gray-600">
+                      {qrCode.vitrine.footer.copyright} {qrCode.vitrine.footer.businessName}
+                    </p>
+                    {qrCode.vitrine.footer.quickLinks.length > 0 && (
+                      <div className="flex flex-wrap justify-center gap-4 mt-4">
+                        {qrCode.vitrine.footer.quickLinks.map((link, index) => (
+                          <a
+                            key={index}
+                            href={link.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="text-primary hover:text-primary/80 transition-colors duration-200"
+                          >
+                            {link.label}
+                          </a>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Links Section */}
             {hasUrls && (

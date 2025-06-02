@@ -197,6 +197,8 @@ export const qrCodeApi = {
         name: string;
         description?: string;
         imageUrl?: string;
+        title?: string;
+        imageDescription?: string;
       }>;
       gallery: Array<{
         imageUrl: string;
@@ -325,6 +327,8 @@ export const qrCodeApi = {
         name: string;
         description?: string;
         imageUrl?: string;
+        title?: string;
+        imageDescription?: string;
       }>;
       gallery: Array<{
         imageUrl: string;

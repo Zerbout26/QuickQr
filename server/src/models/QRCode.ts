@@ -48,6 +48,9 @@ export interface VitrineSection {
   services: Array<{
     name: string;
     description?: string;
+    imageUrl?: string;
+    title?: string;
+    imageDescription?: string;
   }>;
   gallery: Array<{
     imageUrl: string;

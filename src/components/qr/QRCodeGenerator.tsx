@@ -895,7 +895,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           services: vitrine.services.map(service => ({
             name: service.name || '',
             description: service.description || '',
-            imageUrl: service.imageUrl || ''
+            imageUrl: service.imageUrl || '',
+            title: service.title || '',
+            imageDescription: service.imageDescription || ''
           })),
           gallery: vitrine.gallery.map(item => ({
             imageUrl: item.imageUrl || '',
@@ -1349,7 +1351,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           size="sm"
                           onClick={() => setVitrine({
                             ...vitrine,
-                            services: [...vitrine.services, { name: '', description: '', imageUrl: '' }]
+                            services: [...vitrine.services, { name: '', description: '', imageUrl: '', title: '', imageDescription: '' }]
                           })}
                         >
                           <Plus className="h-4 w-4 mr-2" />
@@ -1374,6 +1376,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               onChange={(e) => {
                                 const newServices = [...vitrine.services];
                                 newServices[index] = { ...service, description: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Input
+                              placeholder={translations[menuLanguage].enterImageTitle}
+                              value={service.title}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, title: e.target.value };
+                                setVitrine({ ...vitrine, services: newServices });
+                              }}
+                            />
+                            <Textarea
+                              placeholder={translations[menuLanguage].enterImageDescription}
+                              value={service.imageDescription}
+                              onChange={(e) => {
+                                const newServices = [...vitrine.services];
+                                newServices[index] = { ...service, imageDescription: e.target.value };
                                 setVitrine({ ...vitrine, services: newServices });
                               }}
                             />
@@ -1404,7 +1424,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 }}
                               >
                                 <Upload className="h-4 w-4 mr-2" />
-                                {service.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].uploadServiceImage}
+                                {service.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
                               </Button>
                             </div>
                             <Button
