@@ -528,7 +528,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       tagline: '',
       cta: {
         text: 'Contact Us',
-        link: ''
+        link: '',
+        type: 'website' // Add type field
       }
     },
     about: {
@@ -887,7 +888,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             tagline: vitrine.hero.tagline || '',
             cta: {
               text: vitrine.hero.cta.text || 'Contact Us',
-              link: vitrine.hero.cta.link || ''
+              link: vitrine.hero.cta.link || '',
+              type: vitrine.hero.cta.type || 'website'
             }
           },
           about: {
@@ -1309,14 +1311,39 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, text: e.target.value } }
                             })}
                           />
-                          <Input
-                            placeholder={translations[menuLanguage].enterCtaLink}
-                            value={vitrine.hero.cta.link}
-                            onChange={(e) => setVitrine({
-                              ...vitrine,
-                              hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, link: e.target.value } }
-                            })}
-                          />
+                          <div className="flex gap-2">
+                            <Select
+                              value={vitrine.hero.cta.type || 'website'}
+                              onValueChange={(value) => setVitrine({
+                                ...vitrine,
+                                hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, type: value } }
+                              })}
+                            >
+                              <SelectTrigger className="w-[180px]">
+                                <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
+                              </SelectTrigger>
+                              <SelectContent>
+                                <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
+                                <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
+                                <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
+                                <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
+                                <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
+                                <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
+                                <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
+                                <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
+                                <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                                <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
+                              </SelectContent>
+                            </Select>
+                            <Input
+                              placeholder={translations[menuLanguage].enterCtaLink}
+                              value={vitrine.hero.cta.link}
+                              onChange={(e) => setVitrine({
+                                ...vitrine,
+                                hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, link: e.target.value } }
+                              })}
+                            />
+                          </div>
                         </div>
                       </div>
                     </div>
