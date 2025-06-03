@@ -401,7 +401,7 @@ const LandingPage = () => {
                   href={cta.link}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+                  className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap"
                   style={{
                     background: bgColor,
                     '--hover-bg': hoverBgColor,
@@ -410,7 +410,7 @@ const LandingPage = () => {
                   whileTap={{ scale: 0.98 }}
                 >
                   <Icon className="w-6 h-6" />
-                  <span>{cta.text}</span>
+                  <span className="text-base sm:text-lg">{label}</span>
                 </motion.a>
               );
             })}
