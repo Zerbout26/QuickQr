@@ -498,75 +498,31 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       }
 
       if (type === 'menu' || type === 'both') {
-        // Create a copy of menu categories to update with Cloudinary URLs
-        const updatedCategories = [...menuCategories];
+        formData.append('menu', JSON.stringify({
+          categories: menuCategories
+        }));
 
         // Handle menu item images
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
-            const [section, categoryIndex, itemIndex] = key.split('-');
-            if (section === 'menu') {
-              const formDataImage = new FormData();
-              formDataImage.append('image', file);
-              
-              // Upload to Cloudinary
-              const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-                },
-                body: formDataImage,
-              });
-
-              if (response.ok) {
-                const data = await response.json();
-                // Update the menu item with the Cloudinary URL
-                updatedCategories[parseInt(categoryIndex)].items[parseInt(itemIndex)].imageUrl = data.imageUrl;
-              }
-            }
+            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
+            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+            formData.append('menuItemImages', file, uniqueFilename);
           }
         }
-
-        formData.append('menu', JSON.stringify({
-          categories: updatedCategories
-        }));
       }
 
       if (type === 'vitrine') {
-        // Create a copy of vitrine data to update with Cloudinary URLs
-        const updatedVitrine = { ...vitrine };
+        formData.append('vitrine', JSON.stringify(vitrine));
 
         // Handle vitrine images
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
-            const [section, type, index] = key.split('-');
-            if (section === 'vitrine') {
-              const formDataImage = new FormData();
-              formDataImage.append('image', file);
-              
-              // Upload to Cloudinary
-              const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-                method: 'POST',
-                headers: {
-                  'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-                },
-                body: formDataImage,
-              });
-
-              if (response.ok) {
-                const data = await response.json();
-                // Update the vitrine item with the Cloudinary URL
-                if (type === 'services') {
-                  updatedVitrine.services[parseInt(index)].imageUrl = data.imageUrl;
-                } else if (type === 'gallery') {
-                  updatedVitrine.gallery[parseInt(index)].imageUrl = data.imageUrl;
-                }
-              }
-            }
+            const [section, index] = key.split('-');
+            const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
+            formData.append('vitrineImages', file, uniqueFilename);
           }
         }
-
-        formData.append('vitrine', JSON.stringify(updatedVitrine));
       }
 
       if (logoFile) {
