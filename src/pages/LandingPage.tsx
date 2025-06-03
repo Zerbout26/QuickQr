@@ -184,12 +184,25 @@ const LandingPage = () => {
     fetchQRCode();
   }, [id, navigate]);
 
+  useEffect(() => {
+    // Add smooth scrolling behavior
+    document.documentElement.style.scrollBehavior = 'smooth';
+    
+    // Cleanup
+    return () => {
+      document.documentElement.style.scrollBehavior = '';
+    };
+  }, []);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
-        <div className="text-center">
-          <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-          <p className="text-xl text-gray-700 font-medium tracking-tight">{translations[menuLanguage].loading}</p>
+        <div className="text-center space-y-6">
+          <div className="relative">
+            <div className="w-20 h-20 border-4 border-primary/20 rounded-full"></div>
+            <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+          </div>
+          <p className="text-xl text-gray-700 font-medium tracking-tight animate-pulse">{translations[menuLanguage].loading}</p>
         </div>
       </div>
     );
@@ -198,11 +211,16 @@ const LandingPage = () => {
   if (error || !qrCode) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
-        <div className="text-center">
-          <h1 className="text-4xl font-extrabold text-gray-900 mb-4 tracking-tight">{translations[menuLanguage].error}</h1>
-          <p className="text-xl text-gray-600 mb-6">{error || translations[menuLanguage].qrCodeNotFound}</p>
+        <div className="text-center space-y-6 max-w-sm mx-auto px-4">
+          <div className="w-24 h-24 mx-auto bg-red-50 rounded-full flex items-center justify-center">
+            <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">{translations[menuLanguage].error}</h1>
+          <p className="text-lg text-gray-600">{error || translations[menuLanguage].qrCodeNotFound}</p>
           <Button
-            className="px-6 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200 focus:ring-2 focus:ring-offset-2 focus:ring-primary"
+            className="px-6 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-lg hover:shadow-xl"
             onClick={() => navigate('/')}
           >
             {translations[menuLanguage].returnHome}
@@ -216,355 +234,363 @@ const LandingPage = () => {
   const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
   const hasVitrine = qrCode.type === 'vitrine' && qrCode.vitrine;
 
+  // Function to render social links
+  const renderSocialLinks = () => {
+    if (!qrCode.links || qrCode.links.length === 0) return null;
+
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+        {qrCode.links.map((link, index) => {
+          const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
+          return (
+            <motion.a
+              key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center justify-center gap-3 p-4 rounded-2xl text-white font-medium transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+              style={{
+                background: bgColor,
+                '--hover-bg': hoverBgColor,
+              } as any}
+              whileHover={{ y: -2 }}
+              whileTap={{ scale: 0.98 }}
+            >
+              <Icon className="w-6 h-6" />
+              <span className="text-base sm:text-lg">{label}</span>
+            </motion.a>
+          );
+        })}
+      </div>
+    );
+  };
+
+  // Function to render menu items
+  const renderMenuItems = () => {
+    if (!qrCode.menu?.categories) return null;
+
+    return (
+      <div className="space-y-8 mt-8">
+        {qrCode.menu.categories.map((category, categoryIndex) => (
+          <div key={categoryIndex} className="space-y-4">
+            <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
+              {category.name}
+            </h2>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              {category.items.map((item, itemIndex) => {
+                const isAvailable = isItemAvailableToday(item);
+                return (
+                  <motion.div
+                    key={itemIndex}
+                    className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300"
+                    whileHover={{ y: -4 }}
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: itemIndex * 0.1 }}
+                  >
+                    <div className="flex justify-between items-start gap-4">
+                      <div className="flex-1">
+                        <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
+                        {item.description && (
+                          <p className="text-sm sm:text-base text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                        )}
+                        <div className="flex items-center justify-between">
+                          <span className="text-lg sm:text-xl font-bold text-primary">
+                            {item.price} {qrCode.menu?.currency || '$'}
+                          </span>
+                          <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                            isAvailable
+                              ? 'bg-green-100 text-green-800'
+                              : 'bg-red-100 text-red-800'
+                          }`}>
+                            {isAvailable ? translations[menuLanguage].available : translations[menuLanguage].notAvailable}
+                          </span>
+                        </div>
+                      </div>
+                      {item.imageUrl && (
+                        <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden">
+                          <img
+                            src={item.imageUrl}
+                            alt={item.name}
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                            loading="lazy"
+                          />
+                        </div>
+                      )}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
+          </div>
+        ))}
+      </div>
+    );
+  };
+
+  // Function to render vitrine section
+  const renderVitrine = () => {
+    if (!hasVitrine || !qrCode.vitrine) return null;
+
+    return (
+      <div className="space-y-12 mt-8" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+        {/* Hero Section */}
+        <div className="text-center mb-8">
+          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+            {qrCode.vitrine.hero.businessName}
+          </h2>
+          {qrCode.vitrine.hero.tagline && (
+            <p className="text-gray-600 mt-4 text-base sm:text-lg max-w-3xl mx-auto">
+              {qrCode.vitrine.hero.tagline}
+            </p>
+          )}
+          {qrCode.vitrine.hero.cta.link && (
+            <Button
+              className="mt-6 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+              onClick={() => window.open(qrCode.vitrine.hero.cta.link, '_blank')}
+            >
+              {qrCode.vitrine.hero.cta.text}
+            </Button>
+          )}
+        </div>
+
+        {/* About Section */}
+        {qrCode.vitrine.about.description && (
+          <div className="max-w-3xl mx-auto text-center">
+            <h3 className="text-2xl sm:text-3xl font-bold text-primary mb-4">About Us</h3>
+            <p className="text-gray-600 text-base sm:text-lg">
+              {qrCode.vitrine.about.description}
+            </p>
+            {qrCode.vitrine.about.city && (
+              <p className="text-gray-500 mt-2 text-sm sm:text-base">
+                {qrCode.vitrine.about.city}
+              </p>
+            )}
+          </div>
+        )}
+
+        {/* Services Section */}
+        {qrCode.vitrine.services.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Our Services</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {qrCode.vitrine.services.map((service, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                  whileHover={{ y: -4 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  {service.imageUrl && (
+                    <div className="aspect-w-16 aspect-h-9">
+                      <img
+                        src={service.imageUrl}
+                        alt={service.name}
+                        className="w-full h-48 object-cover"
+                        loading="lazy"
+                        onError={(e) => {
+                          const target = e.target as HTMLImageElement;
+                          target.onerror = null;
+                          target.src = 'https://via.placeholder.com/144?text=No+Image';
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="p-6">
+                    <h4 className="text-xl font-bold text-primary mb-2">{service.name}</h4>
+                    {service.description && (
+                      <p className="text-gray-600 mb-4 text-sm sm:text-base">{service.description}</p>
+                    )}
+                    {service.title && (
+                      <p className="text-sm font-medium text-gray-500">{service.title}</p>
+                    )}
+                    {service.imageDescription && (
+                      <p className="text-sm text-gray-500 mt-2">{service.imageDescription}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Gallery Section */}
+        {qrCode.vitrine.gallery.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Gallery</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              {qrCode.vitrine.gallery.map((item, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                  whileHover={{ y: -4 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <div className="aspect-w-16 aspect-h-9">
+                    <img
+                      src={item.imageUrl}
+                      alt={item.title || `Gallery image ${index + 1}`}
+                      className="w-full h-48 object-cover"
+                      loading="lazy"
+                    />
+                  </div>
+                  <div className="p-6">
+                    {item.title && (
+                      <h4 className="text-xl font-bold text-primary mb-2">{item.title}</h4>
+                    )}
+                    {item.description && (
+                      <p className="text-gray-600 text-sm sm:text-base">{item.description}</p>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Testimonials Section */}
+        {qrCode.vitrine.testimonials.length > 0 && (
+          <div className="space-y-8">
+            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Testimonials</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              {qrCode.vitrine.testimonials.map((testimonial, index) => (
+                <motion.div
+                  key={index}
+                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-6"
+                  whileHover={{ y: -4 }}
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: index * 0.1 }}
+                >
+                  <p className="text-gray-600 italic mb-4 text-sm sm:text-base">"{testimonial.text}"</p>
+                  <div className="flex items-center justify-between">
+                    <span className="font-bold text-primary">{testimonial.author}</span>
+                    {testimonial.city && (
+                      <span className="text-gray-500 text-sm">{testimonial.city}</span>
+                    )}
+                  </div>
+                </motion.div>
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Contact Section */}
+        <div className="space-y-8">
+          <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Contact Us</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
+            <div className="space-y-4">
+              {qrCode.vitrine.contact.address && (
+                <div>
+                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Address</h4>
+                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.address}</p>
+                </div>
+              )}
+              {qrCode.vitrine.contact.phone && (
+                <div>
+                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Phone</h4>
+                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.phone}</p>
+                </div>
+              )}
+              {qrCode.vitrine.contact.email && (
+                <div>
+                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Email</h4>
+                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.email}</p>
+                </div>
+              )}
+            </div>
+            <div className="space-y-4">
+              <h4 className="font-medium text-gray-900 text-base sm:text-lg">Follow Us</h4>
+              <div className="flex flex-wrap gap-4">
+                {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
+                  if (!url) return null;
+                  const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
+                  return (
+                    <motion.a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full text-white transition-all duration-300 hover:scale-110"
+                      style={{ backgroundColor: bgColor }}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Icon className="h-6 w-6" />
+                    </motion.a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer Section */}
+        <div className="border-t pt-8 mt-12">
+          <div className="text-center">
+            <p className="text-gray-600 text-sm sm:text-base">
+              {qrCode.vitrine.footer.copyright} {qrCode.vitrine.footer.businessName}
+            </p>
+            {qrCode.vitrine.footer.quickLinks.length > 0 && (
+              <div className="flex flex-wrap justify-center gap-4 mt-4">
+                {qrCode.vitrine.footer.quickLinks.map((link, index) => (
+                  <a
+                    key={index}
+                    href={link.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-primary hover:text-primary/80 transition-colors duration-200 text-sm sm:text-base"
+                  >
+                    {link.label}
+                  </a>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <div
-      className="min-h-screen py-8 px-4 font-sans"
+      className="min-h-screen py-4 sm:py-8 px-4 font-sans"
       style={{
         background: `radial-gradient(circle at top, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -30) : '#e5e7eb'} 100%)`,
       }}
     >
-      <div className="container mx-auto max-w-7xl">
-        <Card className="overflow-hidden rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-sm">
+      <div className="container mx-auto max-w-sm sm:max-w-2xl lg:max-w-7xl">
+        <Card className="overflow-hidden rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-xl transition-all duration-300 hover:shadow-3xl">
           {qrCode.logoUrl && (
-            <div className="flex justify-center pt-12">
+            <div className="flex justify-center pt-8 sm:pt-12">
               <img
                 src={qrCode.logoUrl}
                 alt="Logo"
-                className="h-36 w-auto object-contain transition-transform duration-200 hover:scale-105"
+                className="h-24 sm:h-36 w-auto object-contain transition-all duration-300 hover:scale-105"
+                loading="lazy"
               />
             </div>
           )}
 
-          <CardContent className="p-8 md:p-12">
+          <CardContent className="p-6 sm:p-8 md:p-12">
             <h1
-              className="text-5xl md:text-6xl font-extrabold text-center mb-10 tracking-tight text-primary"
+              className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 sm:mb-10 tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
               dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
             >
               {qrCode.name}
             </h1>
 
-            {/* Vitrine Section */}
-            {hasVitrine && (
-              <div className="space-y-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
-                {/* Hero Section */}
-                <div className="text-center mb-8">
-                  <h2 className="text-4xl font-bold tracking-tight text-primary">
-                    {qrCode.vitrine.hero.businessName}
-                  </h2>
-                  {qrCode.vitrine.hero.tagline && (
-                    <p className="text-gray-500 mt-4 text-lg max-w-3xl mx-auto">
-                      {qrCode.vitrine.hero.tagline}
-                    </p>
-                  )}
-                  {qrCode.vitrine.hero.cta.link && (
-                    <Button
-                      className="mt-6 px-8 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-200"
-                      onClick={() => window.open(qrCode.vitrine.hero.cta.link, '_blank')}
-                    >
-                      {qrCode.vitrine.hero.cta.text}
-                    </Button>
-                  )}
-                </div>
+            {hasUrls && renderSocialLinks()}
+            {hasMenu && renderMenuItems()}
+            {hasVitrine && renderVitrine()}
 
-                {/* About Section */}
-                {qrCode.vitrine.about.description && (
-                  <div className="max-w-3xl mx-auto text-center">
-                    <h3 className="text-2xl font-bold text-primary mb-4">About Us</h3>
-                    <p className="text-gray-600 text-lg">
-                      {qrCode.vitrine.about.description}
-                    </p>
-                    {qrCode.vitrine.about.city && (
-                      <p className="text-gray-500 mt-2">
-                        {qrCode.vitrine.about.city}
-                      </p>
-                    )}
-                  </div>
-                )}
-
-                {/* Services Section */}
-                {qrCode.vitrine.services.length > 0 && (
-                  <div className="space-y-8">
-                    <h3 className="text-2xl font-bold text-primary text-center">Our Services</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {qrCode.vitrine.services.map((service, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                          {service.imageUrl && (
-                            <div className="aspect-w-16 aspect-h-9">
-                              <img
-                                src={service.imageUrl}
-                                alt={service.name}
-                                className="w-full h-48 object-cover"
-                                loading="lazy"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.onerror = null;
-                                  target.src = 'https://via.placeholder.com/144?text=No+Image';
-                                }}
-                              />
-                            </div>
-                          )}
-                          <div className="p-6">
-                            <h4 className="text-xl font-bold text-primary mb-2">{service.name}</h4>
-                            {service.description && (
-                              <p className="text-gray-600 mb-4">{service.description}</p>
-                            )}
-                            {service.title && (
-                              <p className="text-sm font-medium text-gray-500">{service.title}</p>
-                            )}
-                            {service.imageDescription && (
-                              <p className="text-sm text-gray-500 mt-2">{service.imageDescription}</p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Gallery Section */}
-                {qrCode.vitrine.gallery.length > 0 && (
-                  <div className="space-y-8">
-                    <h3 className="text-2xl font-bold text-primary text-center">Gallery</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-                      {qrCode.vitrine.gallery.map((item, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-200">
-                          <div className="aspect-w-16 aspect-h-9">
-                            <img
-                              src={item.imageUrl}
-                              alt={item.title || `Gallery image ${index + 1}`}
-                              className="w-full h-48 object-cover"
-                            />
-                          </div>
-                          <div className="p-6">
-                            {item.title && (
-                              <h4 className="text-xl font-bold text-primary mb-2">{item.title}</h4>
-                            )}
-                            {item.description && (
-                              <p className="text-gray-600">{item.description}</p>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Testimonials Section */}
-                {qrCode.vitrine.testimonials.length > 0 && (
-                  <div className="space-y-8">
-                    <h3 className="text-2xl font-bold text-primary text-center">Testimonials</h3>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                      {qrCode.vitrine.testimonials.map((testimonial, index) => (
-                        <div key={index} className="bg-white rounded-xl shadow-md p-6 hover:shadow-lg transition-shadow duration-200">
-                          <p className="text-gray-600 italic mb-4">"{testimonial.text}"</p>
-                          <div className="flex items-center justify-between">
-                            <span className="font-bold text-primary">{testimonial.author}</span>
-                            {testimonial.city && (
-                              <span className="text-gray-500">{testimonial.city}</span>
-                            )}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Contact Section */}
-                <div className="space-y-8">
-                  <h3 className="text-2xl font-bold text-primary text-center">Contact Us</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 max-w-4xl mx-auto">
-                    <div className="space-y-4">
-                      {qrCode.vitrine.contact.address && (
-                        <div>
-                          <h4 className="font-medium text-gray-900">Address</h4>
-                          <p className="text-gray-600">{qrCode.vitrine.contact.address}</p>
-                        </div>
-                      )}
-                      {qrCode.vitrine.contact.phone && (
-                        <div>
-                          <h4 className="font-medium text-gray-900">Phone</h4>
-                          <p className="text-gray-600">{qrCode.vitrine.contact.phone}</p>
-                        </div>
-                      )}
-                      {qrCode.vitrine.contact.email && (
-                        <div>
-                          <h4 className="font-medium text-gray-900">Email</h4>
-                          <p className="text-gray-600">{qrCode.vitrine.contact.email}</p>
-                        </div>
-                      )}
-                    </div>
-                    <div className="space-y-4">
-                      <h4 className="font-medium text-gray-900">Follow Us</h4>
-                      <div className="flex flex-wrap gap-4">
-                        {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
-                          if (!url) return null;
-                          const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
-                          return (
-                            <a
-                              key={platform}
-                              href={url}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="p-2 rounded-full text-white transition-colors duration-200"
-                              style={{ backgroundColor: bgColor }}
-                              onMouseOver={(e) => e.currentTarget.style.backgroundColor = hoverBgColor}
-                              onMouseOut={(e) => e.currentTarget.style.backgroundColor = bgColor}
-                            >
-                              <Icon className="h-6 w-6" />
-                            </a>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Section */}
-                <div className="border-t pt-8 mt-12">
-                  <div className="text-center">
-                    <p className="text-gray-600">
-                      {qrCode.vitrine.footer.copyright} {qrCode.vitrine.footer.businessName}
-                    </p>
-                    {qrCode.vitrine.footer.quickLinks.length > 0 && (
-                      <div className="flex flex-wrap justify-center gap-4 mt-4">
-                        {qrCode.vitrine.footer.quickLinks.map((link, index) => (
-                          <a
-                            key={index}
-                            href={link.url}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-primary hover:text-primary/80 transition-colors duration-200"
-                          >
-                            {link.label}
-                          </a>
-                        ))}
-                      </div>
-                    )}
-                  </div>
-                </div>
-              </div>
-            )}
-
-            {/* Links Section */}
-            {hasUrls && (
-              <div className="mb-12">
-                <div className="grid gap-8 grid-cols-1 sm:grid-cols-2 max-w-4xl mx-auto">
-                  {qrCode.links.map((link, index) => {
-                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'default');
-                    return (
-                      <a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`block ${qrCode.links.length % 2 === 1 && index === qrCode.links.length - 1 ? 'sm:col-span-2 max-w-md mx-auto' : ''}`}
-                      >
-                        <Button
-                          className="w-full text-2xl py-10 rounded-2xl font-bold transition-all duration-300 hover:scale-105 hover:shadow-xl focus:ring-4 focus:ring-offset-2 focus:ring-opacity-50 focus:ring-primary flex items-center justify-center gap-4"
-                          style={{
-                            background: bgColor,
-                            color: '#ffffff',
-                            '--hover-bg': hoverBgColor,
-                          } as React.CSSProperties}
-                          onMouseEnter={(e) => (e.currentTarget.style.background = hoverBgColor)}
-                          onMouseLeave={(e) => (e.currentTarget.style.background = bgColor)}
-                        >
-                          <Icon size={32} />
-                          <span>{label}</span>
-                        </Button>
-                      </a>
-                    );
-                  })}
-                </div>
-              </div>
-            )}
-
-            {/* Separator for sections */}
-            {hasUrls && hasMenu && (
-              <Separator className="my-12 bg-gray-200/50" />
-            )}
-
-            {/* Menu Section */}
-            {hasMenu && (
-              <div className="space-y-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
-                <div className="text-center mb-8">
-                  <h2
-                    className="text-4xl font-bold tracking-tight text-primary"
-                  >
-                    {qrCode.menu?.restaurantName}
-                  </h2>
-                  {qrCode.menu?.description && (
-                    <p className="text-gray-500 mt-4 text-lg max-w-3xl mx-auto">
-                      {qrCode.menu.description}
-                    </p>
-                  )}
-                </div>
-
-                <div className="space-y-12 max-w-5xl mx-auto">
-                  {qrCode.menu?.categories.map((category) => (
-                    <div key={category.name} className="menu-category">
-                      <h3
-                        className="text-3xl font-bold text-center py-6 rounded-t-2xl border-b-2 transition-colors duration-200 text-primary border-primary"
-                      >
-                        {category.name}
-                      </h3>
-
-                      <div className="space-y-6 p-8 rounded-b-2xl bg-gray-50/50">
-                        {category.items
-                          .filter(item => isItemAvailableToday(item))
-                          .map((item, index) => (
-                            <div
-                              key={index}
-                              className="flex items-center justify-between bg-white p-8 rounded-xl shadow-sm hover:shadow-md transition-all duration-200 hover:-translate-y-1"
-                            >
-                              <div className="flex-1 pr-10">
-                                <div className="flex justify-between items-start mb-2">
-                                  <h4
-                                    className="text-2xl font-bold text-primary leading-tight"
-                                  >
-                                    {item.name}
-                                  </h4>
-                                  <p
-                                    className="text-2xl font-bold whitespace-nowrap ml-8 text-primary"
-                                  >
-                                    {translations[menuLanguage].price}: ${item.price.toFixed(2)}
-                                  </p>
-                                </div>
-                                {item.description && (
-                                  <p className="text-gray-600 text-xl font-medium leading-snug mt-1">
-                                    {item.description}
-                                  </p>
-                                )}
-                              </div>
-
-                              {item.imageUrl && (
-                                <div className="flex-shrink-0">
-                                  <img
-                                    src={item.imageUrl}
-                                    alt={item.name}
-                                    className="h-36 w-36 object-cover rounded-xl transition-transform duration-200 hover:scale-110"
-                                    loading="lazy"
-                                    onError={(e) => {
-                                      const target = e.target as HTMLImageElement;
-                                      target.onerror = null;
-                                      target.src = 'https://via.placeholder.com/144?text=No+Image';
-                                    }}
-                                  />
-                                </div>
-                              )}
-                            </div>
-                          ))}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            )}
-
-            {/* Footer */}
-            <div className="mt-16 text-center">
-              <p className="text-base text-gray-500">
-                {translations[menuLanguage].poweredBy} <span className="text-primary font-medium">QuickQR</span>
+            <div className="mt-12 text-center">
+              <p className="text-sm text-gray-500">
+                {translations[menuLanguage].poweredBy} <span className="font-medium">QuickQR</span>
               </p>
             </div>
           </CardContent>

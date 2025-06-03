@@ -41,6 +41,7 @@ export interface Menu {
   restaurantName: string;
   description?: string;
   categories: MenuCategory[];
+  currency?: string;
 }
 
 export interface VitrineSection {
