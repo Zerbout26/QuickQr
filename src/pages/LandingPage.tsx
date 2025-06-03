@@ -381,18 +381,19 @@ const LandingPage = () => {
     if (!hasVitrine || !qrCode.vitrine) return null;
 
     return (
-      <div className="space-y-12 mt-8" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="space-y-16 mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
         {/* Hero Section */}
-        <div className="text-center mb-8">
-          <h2 className="text-3xl sm:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent">
+        <div className="text-center mb-12 relative">
+          <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent -z-10 rounded-3xl"></div>
+          <h2 className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent mb-6">
             {qrCode.vitrine.hero.businessName}
           </h2>
           {qrCode.vitrine.hero.tagline && (
-            <p className="text-gray-600 mt-4 text-base sm:text-lg max-w-3xl mx-auto px-4">
+            <p className="text-gray-600 mt-4 text-lg sm:text-xl max-w-3xl mx-auto px-4 leading-relaxed">
               {qrCode.vitrine.hero.tagline}
             </p>
           )}
-          <div className="flex flex-wrap justify-center gap-4 mt-6">
+          <div className="flex flex-wrap justify-center gap-4 mt-8">
             {qrCode.vitrine.hero.ctas.map((cta, index) => {
               const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
               return (
@@ -419,13 +420,14 @@ const LandingPage = () => {
 
         {/* About Section */}
         {qrCode.vitrine.about.description && (
-          <div className="max-w-3xl mx-auto text-center px-4">
-            <h3 className="text-2xl sm:text-3xl font-bold text-primary mb-4">About Us</h3>
-            <p className="text-gray-600 text-base sm:text-lg">
+          <div className="max-w-3xl mx-auto text-center px-4 relative">
+            <div className="absolute inset-0 bg-gradient-to-b from-primary/5 to-transparent -z-10 rounded-3xl"></div>
+            <h3 className="text-3xl sm:text-4xl font-bold text-primary mb-6">About Us</h3>
+            <p className="text-gray-600 text-lg sm:text-xl leading-relaxed">
               {qrCode.vitrine.about.description}
             </p>
             {qrCode.vitrine.about.city && (
-              <p className="text-gray-500 mt-2 text-sm sm:text-base">
+              <p className="text-primary/80 mt-4 text-lg font-medium">
                 {qrCode.vitrine.about.city}
               </p>
             )}
@@ -434,24 +436,24 @@ const LandingPage = () => {
 
         {/* Services Section */}
         {qrCode.vitrine.services.length > 0 && (
-          <div className="space-y-8 px-4">
-            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Our Services</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-10 px-4">
+            <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Our Services</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {qrCode.vitrine.services.map((service, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
                   whileHover={{ y: -4 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
                   {service.imageUrl && (
-                    <div className="aspect-w-16 aspect-h-9">
+                    <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                       <img
                         src={service.imageUrl}
                         alt={service.name}
-                        className="w-full h-48 object-cover"
+                        className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                         loading="lazy"
                         onError={(e) => {
                           const target = e.target as HTMLImageElement;
@@ -462,15 +464,15 @@ const LandingPage = () => {
                     </div>
                   )}
                   <div className="p-6">
-                    <h4 className="text-xl font-bold text-primary mb-2">{service.name}</h4>
+                    <h4 className="text-2xl font-bold text-primary mb-3">{service.name}</h4>
                     {service.description && (
-                      <p className="text-gray-600 mb-4 text-sm sm:text-base">{service.description}</p>
+                      <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
                     )}
                     {service.title && (
-                      <p className="text-sm font-medium text-gray-500">{service.title}</p>
+                      <p className="text-primary/80 font-medium">{service.title}</p>
                     )}
                     {service.imageDescription && (
-                      <p className="text-sm text-gray-500 mt-2">{service.imageDescription}</p>
+                      <p className="text-gray-500 mt-2 text-sm">{service.imageDescription}</p>
                     )}
                   </div>
                 </motion.div>
@@ -481,32 +483,32 @@ const LandingPage = () => {
 
         {/* Gallery Section */}
         {qrCode.vitrine.gallery.length > 0 && (
-          <div className="space-y-8 px-4">
-            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Gallery</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="space-y-10 px-4">
+            <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Gallery</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
               {qrCode.vitrine.gallery.map((item, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 overflow-hidden"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
                   whileHover={{ y: -4 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <div className="aspect-w-16 aspect-h-9">
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
                       src={item.imageUrl}
                       alt={item.title || `Gallery image ${index + 1}`}
-                      className="w-full h-48 object-cover"
+                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
                       loading="lazy"
                     />
                   </div>
                   <div className="p-6">
                     {item.title && (
-                      <h4 className="text-xl font-bold text-primary mb-2">{item.title}</h4>
+                      <h4 className="text-2xl font-bold text-primary mb-3">{item.title}</h4>
                     )}
                     {item.description && (
-                      <p className="text-gray-600 text-sm sm:text-base">{item.description}</p>
+                      <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
                     )}
                   </div>
                 </motion.div>
@@ -517,23 +519,24 @@ const LandingPage = () => {
 
         {/* Testimonials Section */}
         {qrCode.vitrine.testimonials.length > 0 && (
-          <div className="space-y-8 px-4">
-            <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Testimonials</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
+          <div className="space-y-10 px-4">
+            <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Testimonials</h3>
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
               {qrCode.vitrine.testimonials.map((testimonial, index) => (
                 <motion.div
                   key={index}
-                  className="bg-white rounded-2xl shadow-sm hover:shadow-lg transition-all duration-300 p-6"
+                  className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 relative"
                   whileHover={{ y: -4 }}
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ delay: index * 0.1 }}
                 >
-                  <p className="text-gray-600 italic mb-4 text-sm sm:text-base">"{testimonial.text}"</p>
+                  <div className="absolute top-4 left-4 text-6xl text-primary/10 font-serif">"</div>
+                  <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
                   <div className="flex items-center justify-between">
-                    <span className="font-bold text-primary">{testimonial.author}</span>
+                    <span className="font-bold text-primary text-lg">{testimonial.author}</span>
                     {testimonial.city && (
-                      <span className="text-gray-500 text-sm">{testimonial.city}</span>
+                      <span className="text-primary/80 text-base">{testimonial.city}</span>
                     )}
                   </div>
                 </motion.div>
@@ -543,31 +546,31 @@ const LandingPage = () => {
         )}
 
         {/* Contact Section */}
-        <div className="space-y-8 px-4">
-          <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Contact Us</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
-            <div className="space-y-4">
+        <div className="space-y-10 px-4">
+          <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Contact Us</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
+            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
               {qrCode.vitrine.contact.address && (
                 <div>
-                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Address</h4>
-                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.address}</p>
+                  <h4 className="font-bold text-primary text-lg mb-2">Address</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.address}</p>
                 </div>
               )}
               {qrCode.vitrine.contact.phone && (
                 <div>
-                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Phone</h4>
-                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.phone}</p>
+                  <h4 className="font-bold text-primary text-lg mb-2">Phone</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.phone}</p>
                 </div>
               )}
               {qrCode.vitrine.contact.email && (
                 <div>
-                  <h4 className="font-medium text-gray-900 text-base sm:text-lg">Email</h4>
-                  <p className="text-gray-600 text-sm sm:text-base">{qrCode.vitrine.contact.email}</p>
+                  <h4 className="font-bold text-primary text-lg mb-2">Email</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.email}</p>
                 </div>
               )}
             </div>
-            <div className="space-y-4">
-              <h4 className="font-medium text-gray-900 text-base sm:text-lg">Follow Us</h4>
+            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
+              <h4 className="font-bold text-primary text-lg mb-4">Follow Us</h4>
               <div className="flex flex-wrap gap-4">
                 {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
                   if (!url) return null;
@@ -578,7 +581,7 @@ const LandingPage = () => {
                       href={url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="p-3 rounded-full text-white transition-all duration-300 hover:scale-110"
+                      className="p-4 rounded-full text-white transition-all duration-300 hover:scale-110"
                       style={{ backgroundColor: bgColor }}
                       whileHover={{ y: -2 }}
                       whileTap={{ scale: 0.95 }}
@@ -593,20 +596,20 @@ const LandingPage = () => {
         </div>
 
         {/* Footer Section */}
-        <div className="border-t pt-8 mt-12 px-4">
+        <div className="border-t border-gray-200 pt-12 mt-16 px-4">
           <div className="text-center">
-            <p className="text-gray-600 text-sm sm:text-base">
+            <p className="text-gray-600 text-base">
               {qrCode.vitrine.footer.copyright} {qrCode.vitrine.footer.businessName}
             </p>
             {qrCode.vitrine.footer.quickLinks.length > 0 && (
-              <div className="flex flex-wrap justify-center gap-4 mt-4">
+              <div className="flex flex-wrap justify-center gap-6 mt-6">
                 {qrCode.vitrine.footer.quickLinks.map((link, index) => (
                   <a
                     key={index}
                     href={link.url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="text-primary hover:text-primary/80 transition-colors duration-200 text-sm sm:text-base"
+                    className="text-primary hover:text-primary/80 transition-colors duration-200 text-base font-medium"
                   >
                     {link.label}
                   </a>
