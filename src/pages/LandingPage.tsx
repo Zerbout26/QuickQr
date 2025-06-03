@@ -434,11 +434,65 @@ const LandingPage = () => {
           </div>
         )}
 
+        {/* Contact Section */}
+        <div className="space-y-10 px-4">
+          <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Contact Us</h3>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
+            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
+              {qrCode.vitrine.contact.address && (
+                <div>
+                  <h4 className="font-bold text-primary text-lg mb-2">Address</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.address}</p>
+                </div>
+              )}
+              {qrCode.vitrine.contact.phone && (
+                <div>
+                  <h4 className="font-bold text-primary text-lg mb-2">Phone</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.phone}</p>
+                </div>
+              )}
+              {qrCode.vitrine.contact.email && (
+                <div>
+                  <h4 className="font-bold text-primary text-lg mb-2">Email</h4>
+                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.email}</p>
+                </div>
+              )}
+            </div>
+            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
+              <h4 className="font-bold text-primary text-lg mb-4">Follow Us</h4>
+              <div className="flex flex-wrap justify-center gap-4">
+                {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
+                  if (!url) return null;
+                  const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
+                  return (
+                    <motion.a
+                      key={platform}
+                      href={url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="p-3 rounded-full text-white transition-all duration-300 hover:scale-110"
+                      style={{ backgroundColor: bgColor }}
+                      whileHover={{ y: -2 }}
+                      whileTap={{ scale: 0.95 }}
+                    >
+                      <Icon className="h-5 w-5" />
+                    </motion.a>
+                  );
+                })}
+              </div>
+            </div>
+          </div>
+        </div>
+
         {/* Services Section */}
         {qrCode.vitrine.services.length > 0 && (
           <div className="space-y-10 px-4">
             <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Our Services</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={`grid gap-8 ${
+              qrCode.vitrine.services.length === 1 
+                ? 'grid-cols-1 max-w-2xl mx-auto' 
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            }`}>
               {qrCode.vitrine.services.map((service, index) => (
                 <motion.div
                   key={index}
@@ -485,7 +539,11 @@ const LandingPage = () => {
         {qrCode.vitrine.gallery.length > 0 && (
           <div className="space-y-10 px-4">
             <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Gallery</h3>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            <div className={`grid gap-8 ${
+              qrCode.vitrine.gallery.length === 1 
+                ? 'grid-cols-1 max-w-2xl mx-auto' 
+                : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
+            }`}>
               {qrCode.vitrine.gallery.map((item, index) => (
                 <motion.div
                   key={index}
@@ -544,56 +602,6 @@ const LandingPage = () => {
             </div>
           </div>
         )}
-
-        {/* Contact Section */}
-        <div className="space-y-10 px-4">
-          <h3 className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8">Contact Us</h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
-            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
-              {qrCode.vitrine.contact.address && (
-                <div>
-                  <h4 className="font-bold text-primary text-lg mb-2">Address</h4>
-                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.address}</p>
-                </div>
-              )}
-              {qrCode.vitrine.contact.phone && (
-                <div>
-                  <h4 className="font-bold text-primary text-lg mb-2">Phone</h4>
-                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.phone}</p>
-                </div>
-              )}
-              {qrCode.vitrine.contact.email && (
-                <div>
-                  <h4 className="font-bold text-primary text-lg mb-2">Email</h4>
-                  <p className="text-gray-600 text-base">{qrCode.vitrine.contact.email}</p>
-                </div>
-              )}
-            </div>
-            <div className="space-y-6 bg-white rounded-2xl p-8 shadow-lg">
-              <h4 className="font-bold text-primary text-lg mb-4">Follow Us</h4>
-              <div className="flex flex-wrap gap-4">
-                {Object.entries(qrCode.vitrine.contact.socialMedia).map(([platform, url]) => {
-                  if (!url) return null;
-                  const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
-                  return (
-                    <motion.a
-                      key={platform}
-                      href={url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="p-4 rounded-full text-white transition-all duration-300 hover:scale-110"
-                      style={{ backgroundColor: bgColor }}
-                      whileHover={{ y: -2 }}
-                      whileTap={{ scale: 0.95 }}
-                    >
-                      <Icon className="h-6 w-6" />
-                    </motion.a>
-                  );
-                })}
-              </div>
-            </div>
-          </div>
-        </div>
 
         {/* Footer Section */}
         <div className="border-t border-gray-200 pt-12 mt-16 px-4">
