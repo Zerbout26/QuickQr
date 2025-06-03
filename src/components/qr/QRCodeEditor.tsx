@@ -235,36 +235,13 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    try {
-      // Create FormData for the upload
-      const formData = new FormData();
-      formData.append('image', file);
+    // Store the file temporarily with a unique key
+    const key = `vitrine-${section}-${index}-${Date.now()}`;
+    setTempImages(prev => ({ ...prev, [key]: file }));
 
-      // Upload to Cloudinary
-      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const data = await response.json();
-      
-      // Update the vitrine item with the Cloudinary URL
-      updateVitrineItem(section, index, 'imageUrl', data.imageUrl);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].error,
-        description: translations[menuLanguage].failedToUpload,
-      });
-    }
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(file);
+    updateVitrineItem(section, index, 'imageUrl', tempUrl);
   };
 
   const removeVitrineImage = (section: 'services' | 'gallery', index: number) => {
@@ -476,36 +453,13 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    try {
-      // Create FormData for the upload
-      const formData = new FormData();
-      formData.append('image', file);
+    // Store the file temporarily with a unique key
+    const key = `menu-${categoryIndex}-${itemIndex}-${Date.now()}`;
+    setTempImages(prev => ({ ...prev, [key]: file }));
 
-      // Upload to Cloudinary
-      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
-        method: 'POST',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error('Failed to upload image');
-      }
-
-      const data = await response.json();
-      
-      // Update the menu item with the Cloudinary URL
-      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', data.imageUrl);
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].error,
-        description: translations[menuLanguage].failedToUpload,
-      });
-    }
+    // Create a temporary URL for preview
+    const tempUrl = URL.createObjectURL(file);
+    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
   };
 
   const removeItemImage = (categoryIndex: number, itemIndex: number) => {
@@ -544,27 +498,75 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       }
 
       if (type === 'menu' || type === 'both') {
-        formData.append('menu', JSON.stringify({
-          categories: menuCategories
-        }));
+        // Create a copy of menu categories to update with Cloudinary URLs
+        const updatedCategories = [...menuCategories];
 
         // Handle menu item images
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
-            formData.append('menuItemImages', file, key);
+            const [section, categoryIndex, itemIndex] = key.split('-');
+            if (section === 'menu') {
+              const formDataImage = new FormData();
+              formDataImage.append('image', file);
+              
+              // Upload to Cloudinary
+              const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+                },
+                body: formDataImage,
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                // Update the menu item with the Cloudinary URL
+                updatedCategories[parseInt(categoryIndex)].items[parseInt(itemIndex)].imageUrl = data.imageUrl;
+              }
+            }
           }
         }
+
+        formData.append('menu', JSON.stringify({
+          categories: updatedCategories
+        }));
       }
 
       if (type === 'vitrine') {
-        formData.append('vitrine', JSON.stringify(vitrine));
+        // Create a copy of vitrine data to update with Cloudinary URLs
+        const updatedVitrine = { ...vitrine };
 
         // Handle vitrine images
         for (const [key, file] of Object.entries(tempImages)) {
           if (file instanceof File) {
-            formData.append('vitrineImages', file, key);
+            const [section, type, index] = key.split('-');
+            if (section === 'vitrine') {
+              const formDataImage = new FormData();
+              formDataImage.append('image', file);
+              
+              // Upload to Cloudinary
+              const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
+                method: 'POST',
+                headers: {
+                  'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+                },
+                body: formDataImage,
+              });
+
+              if (response.ok) {
+                const data = await response.json();
+                // Update the vitrine item with the Cloudinary URL
+                if (type === 'services') {
+                  updatedVitrine.services[parseInt(index)].imageUrl = data.imageUrl;
+                } else if (type === 'gallery') {
+                  updatedVitrine.gallery[parseInt(index)].imageUrl = data.imageUrl;
+                }
+              }
+            }
           }
         }
+
+        formData.append('vitrine', JSON.stringify(updatedVitrine));
       }
 
       if (logoFile) {
