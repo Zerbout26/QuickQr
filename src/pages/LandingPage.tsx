@@ -340,7 +340,7 @@ const LandingPage = () => {
             {qrCode.vitrine.hero.businessName}
           </h2>
           {qrCode.vitrine.hero.tagline && (
-            <p className="text-gray-600 mt-4 text-base sm:text-lg max-w-3xl mx-auto">
+            <p className="text-gray-600 mt-4 text-base sm:text-lg max-w-3xl mx-auto px-4">
               {qrCode.vitrine.hero.tagline}
             </p>
           )}
@@ -356,7 +356,7 @@ const LandingPage = () => {
 
         {/* About Section */}
         {qrCode.vitrine.about.description && (
-          <div className="max-w-3xl mx-auto text-center">
+          <div className="max-w-3xl mx-auto text-center px-4">
             <h3 className="text-2xl sm:text-3xl font-bold text-primary mb-4">About Us</h3>
             <p className="text-gray-600 text-base sm:text-lg">
               {qrCode.vitrine.about.description}
@@ -371,7 +371,7 @@ const LandingPage = () => {
 
         {/* Services Section */}
         {qrCode.vitrine.services.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-8 px-4">
             <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Our Services</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {qrCode.vitrine.services.map((service, index) => (
@@ -418,7 +418,7 @@ const LandingPage = () => {
 
         {/* Gallery Section */}
         {qrCode.vitrine.gallery.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-8 px-4">
             <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Gallery</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
               {qrCode.vitrine.gallery.map((item, index) => (
@@ -454,7 +454,7 @@ const LandingPage = () => {
 
         {/* Testimonials Section */}
         {qrCode.vitrine.testimonials.length > 0 && (
-          <div className="space-y-8">
+          <div className="space-y-8 px-4">
             <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Testimonials</h3>
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
               {qrCode.vitrine.testimonials.map((testimonial, index) => (
@@ -480,7 +480,7 @@ const LandingPage = () => {
         )}
 
         {/* Contact Section */}
-        <div className="space-y-8">
+        <div className="space-y-8 px-4">
           <h3 className="text-2xl sm:text-3xl font-bold text-primary text-center">Contact Us</h3>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-8 max-w-4xl mx-auto">
             <div className="space-y-4">
@@ -530,7 +530,7 @@ const LandingPage = () => {
         </div>
 
         {/* Footer Section */}
-        <div className="border-t pt-8 mt-12">
+        <div className="border-t pt-8 mt-12 px-4">
           <div className="text-center">
             <p className="text-gray-600 text-sm sm:text-base">
               {qrCode.vitrine.footer.copyright} {qrCode.vitrine.footer.businessName}
@@ -558,13 +558,13 @@ const LandingPage = () => {
 
   return (
     <div
-      className="min-h-screen py-4 sm:py-8 px-4 font-sans"
+      className="min-h-screen py-4 sm:py-8 px-0 sm:px-4 font-sans"
       style={{
         background: `radial-gradient(circle at top, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -30) : '#e5e7eb'} 100%)`,
       }}
     >
-      <div className="container mx-auto max-w-sm sm:max-w-2xl lg:max-w-7xl">
-        <Card className="overflow-hidden rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-xl transition-all duration-300 hover:shadow-3xl">
+      <div className="w-full sm:max-w-2xl lg:max-w-7xl mx-auto">
+        <Card className="overflow-hidden rounded-none sm:rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-xl transition-all duration-300 hover:shadow-3xl">
           {qrCode.logoUrl && (
             <div className="flex justify-center pt-8 sm:pt-12">
               <img
@@ -576,7 +576,7 @@ const LandingPage = () => {
             </div>
           )}
 
-          <CardContent className="p-6 sm:p-8 md:p-12">
+          <CardContent className="p-4 sm:p-8 md:p-12">
             <h1
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 sm:mb-10 tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
               dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
