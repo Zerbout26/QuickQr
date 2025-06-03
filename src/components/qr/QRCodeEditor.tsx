@@ -235,13 +235,36 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    // Store the file temporarily with a unique key
-    const key = `vitrine-${section}-${index}-${Date.now()}`;
-    setTempImages(prev => ({ ...prev, [key]: file }));
+    try {
+      // Create FormData for the upload
+      const formData = new FormData();
+      formData.append('image', file);
 
-    // Create a temporary URL for preview
-    const tempUrl = URL.createObjectURL(file);
-    updateVitrineItem(section, index, 'imageUrl', tempUrl);
+      // Upload to Cloudinary
+      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      
+      // Update the vitrine item with the Cloudinary URL
+      updateVitrineItem(section, index, 'imageUrl', data.imageUrl);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        variant: "destructive",
+        title: translations[menuLanguage].error,
+        description: translations[menuLanguage].failedToUpload,
+      });
+    }
   };
 
   const removeVitrineImage = (section: 'services' | 'gallery', index: number) => {
@@ -453,13 +476,36 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    // Store the file temporarily with a unique key
-    const key = `menu-${categoryIndex}-${itemIndex}-${Date.now()}`;
-    setTempImages(prev => ({ ...prev, [key]: file }));
+    try {
+      // Create FormData for the upload
+      const formData = new FormData();
+      formData.append('image', file);
 
-    // Create a temporary URL for preview
-    const tempUrl = URL.createObjectURL(file);
-    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
+      // Upload to Cloudinary
+      const response = await fetch(`${API_BASE_URL}/qrcodes/upload/item-image`, {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+        },
+        body: formData,
+      });
+
+      if (!response.ok) {
+        throw new Error('Failed to upload image');
+      }
+
+      const data = await response.json();
+      
+      // Update the menu item with the Cloudinary URL
+      updateMenuItem(categoryIndex, itemIndex, 'imageUrl', data.imageUrl);
+    } catch (error) {
+      console.error('Error uploading image:', error);
+      toast({
+        variant: "destructive",
+        title: translations[menuLanguage].error,
+        description: translations[menuLanguage].failedToUpload,
+      });
+    }
   };
 
   const removeItemImage = (categoryIndex: number, itemIndex: number) => {
