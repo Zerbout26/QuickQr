@@ -49,10 +49,11 @@ export interface VitrineSection {
     businessName: string;
     logo?: string;
     tagline: string;
-    cta: {
+    ctas: Array<{
       text: string;
       link: string;
-    };
+      type: string;
+    }>;
   };
   about: {
     description: string;

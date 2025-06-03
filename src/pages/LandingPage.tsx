@@ -392,14 +392,17 @@ const LandingPage = () => {
               {qrCode.vitrine.hero.tagline}
             </p>
           )}
-          {qrCode.vitrine.hero.cta.link && (
-            <Button
-              className="mt-6 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
-              onClick={() => window.open(qrCode.vitrine.hero.cta.link, '_blank')}
-            >
-              {qrCode.vitrine.hero.cta.text}
-            </Button>
-          )}
+          <div className="flex flex-wrap justify-center gap-4 mt-6">
+            {qrCode.vitrine.hero.ctas.map((cta, index) => (
+              <Button
+                key={index}
+                className="px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 shadow-lg hover:shadow-xl"
+                onClick={() => window.open(cta.link, '_blank')}
+              >
+                {cta.text}
+              </Button>
+            ))}
+          </div>
         </div>
 
         {/* About Section */}
