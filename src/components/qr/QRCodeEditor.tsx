@@ -501,10 +501,24 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         formData.append('menu', JSON.stringify({
           categories: menuCategories
         }));
+
+        // Handle menu item images
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File) {
+            formData.append('menuItemImages', file, key);
+          }
+        }
       }
 
       if (type === 'vitrine') {
         formData.append('vitrine', JSON.stringify(vitrine));
+
+        // Handle vitrine images
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File) {
+            formData.append('vitrineImages', file, key);
+          }
+        }
       }
 
       if (logoFile) {
