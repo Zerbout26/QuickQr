@@ -391,7 +391,8 @@ const translations = {
     socialIcons: "Social Icons",
     removeImage: "Remove Image",
     removeTestimonial: "Remove Testimonial",
-    contact: "Contact"
+    contact: "Contact",
+    cta: "CTA"
   },
   ar: {
     basic: "أساسي",
@@ -507,7 +508,8 @@ const translations = {
     socialIcons: "أيقونات التواصل الاجتماعي",
     removeImage: "إزالة الصورة",
     removeTestimonial: "إزالة التعليق",
-    contact: "اتصل بنا"
+    contact: "اتصل بنا",
+    cta: "الإطلاق"
   }
 };
 
@@ -1297,7 +1299,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             hero: { ...vitrine.hero, tagline: e.target.value }
                           })}
                         />
-                        <div className="flex gap-2">
+                        <div className="space-y-2">
+                          <Label>{translations[menuLanguage].cta}</Label>
                           <Input
                             placeholder={translations[menuLanguage].enterCtaText}
                             value={vitrine.hero.cta.text}
@@ -1898,7 +1901,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 ...vitrine,
                                 footer: {
                                   ...vitrine.footer,
-                                  quickLinks: [...vitrine.footer.quickLinks, { label: '', url: '', type: 'link' }]
+                                  quickLinks: [...vitrine.footer.quickLinks, { label: '', url: '' }]
                                 }
                               })}
                             >
