@@ -392,7 +392,8 @@ const translations = {
     removeImage: "Remove Image",
     removeTestimonial: "Remove Testimonial",
     contact: "Contact",
-    cta: "CTA"
+    cta: "CTA",
+    addCta: "Add CTA"
   },
   ar: {
     basic: "أساسي",
@@ -509,7 +510,8 @@ const translations = {
     removeImage: "إزالة الصورة",
     removeTestimonial: "إزالة التعليق",
     contact: "اتصل بنا",
-    cta: "الإطلاق"
+    cta: "الإطلاق",
+    addCta: "إضافة CTA"
   }
 };
 
@@ -526,11 +528,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       businessName: '',
       logo: '',
       tagline: '',
-      cta: {
+      ctas: [{
         text: 'Contact Us',
         link: '',
-        type: 'website' // Add type field
-      }
+        type: 'website'
+      }]
     },
     about: {
       description: '',
@@ -886,11 +888,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             businessName: vitrine.hero.businessName,
             logo: vitrine.hero.logo || '',
             tagline: vitrine.hero.tagline || '',
-            cta: {
-              text: vitrine.hero.cta.text || 'Contact Us',
-              link: vitrine.hero.cta.link || '',
-              type: vitrine.hero.cta.type || 'website'
-            }
+            ctas: vitrine.hero.ctas.map(cta => ({
+              text: cta.text || 'Contact Us',
+              link: cta.link || '',
+              type: cta.type || 'website'
+            }))
           },
           about: {
             description: vitrine.about.description,
@@ -1302,48 +1304,95 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <div className="space-y-2">
-                          <Label>{translations[menuLanguage].cta}</Label>
-                          <Input
-                            placeholder={translations[menuLanguage].enterCtaText}
-                            value={vitrine.hero.cta.text}
-                            onChange={(e) => setVitrine({
-                              ...vitrine,
-                              hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, text: e.target.value } }
-                            })}
-                          />
-                          <div className="flex gap-2">
-                            <Select
-                              value={vitrine.hero.cta.type || 'website'}
-                              onValueChange={(value) => setVitrine({
+                          <div className="flex justify-between items-center">
+                            <Label>{translations[menuLanguage].cta}</Label>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => setVitrine({
                                 ...vitrine,
-                                hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, type: value } }
+                                hero: {
+                                  ...vitrine.hero,
+                                  ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
+                                }
                               })}
                             >
-                              <SelectTrigger className="w-[180px]">
-                                <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
-                                <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
-                                <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
-                                <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
-                                <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
-                                <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
-                                <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
-                                <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
-                                <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
-                                <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Input
-                              placeholder={translations[menuLanguage].enterCtaLink}
-                              value={vitrine.hero.cta.link}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                hero: { ...vitrine.hero, cta: { ...vitrine.hero.cta, link: e.target.value } }
-                              })}
-                            />
+                              <Plus className="h-4 w-4 mr-2" />
+                              {translations[menuLanguage].addCta}
+                            </Button>
                           </div>
+                          {vitrine.hero.ctas.map((cta, index) => (
+                            <div key={index} className="space-y-2 border p-2 rounded">
+                              <Input
+                                placeholder={translations[menuLanguage].enterCtaText}
+                                value={cta.text}
+                                onChange={(e) => {
+                                  const newCtas = [...vitrine.hero.ctas];
+                                  newCtas[index] = { ...cta, text: e.target.value };
+                                  setVitrine({
+                                    ...vitrine,
+                                    hero: { ...vitrine.hero, ctas: newCtas }
+                                  });
+                                }}
+                              />
+                              <div className="flex gap-2">
+                                <Select
+                                  value={cta.type || 'website'}
+                                  onValueChange={(value) => {
+                                    const newCtas = [...vitrine.hero.ctas];
+                                    newCtas[index] = { ...cta, type: value };
+                                    setVitrine({
+                                      ...vitrine,
+                                      hero: { ...vitrine.hero, ctas: newCtas }
+                                    });
+                                  }}
+                                >
+                                  <SelectTrigger className="w-[180px]">
+                                    <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
+                                  </SelectTrigger>
+                                  <SelectContent>
+                                    <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
+                                    <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
+                                    <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
+                                    <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
+                                    <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
+                                    <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
+                                    <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
+                                    <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
+                                    <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                                    <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
+                                  </SelectContent>
+                                </Select>
+                                <Input
+                                  placeholder={translations[menuLanguage].enterCtaLink}
+                                  value={cta.link}
+                                  onChange={(e) => {
+                                    const newCtas = [...vitrine.hero.ctas];
+                                    newCtas[index] = { ...cta, link: e.target.value };
+                                    setVitrine({
+                                      ...vitrine,
+                                      hero: { ...vitrine.hero, ctas: newCtas }
+                                    });
+                                  }}
+                                />
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="icon"
+                                  onClick={() => {
+                                    const newCtas = vitrine.hero.ctas.filter((_, i) => i !== index);
+                                    setVitrine({
+                                      ...vitrine,
+                                      hero: { ...vitrine.hero, ctas: newCtas }
+                                    });
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     </div>
