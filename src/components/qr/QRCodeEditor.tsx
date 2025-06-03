@@ -235,8 +235,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    // Store the file temporarily
-    const key = `vitrine-${section}-${index}`;
+    // Store the file temporarily with a unique key
+    const key = `vitrine-${section}-${index}-${Date.now()}`;
     setTempImages(prev => ({ ...prev, [key]: file }));
 
     // Create a temporary URL for preview
@@ -453,8 +453,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       return;
     }
 
-    // Store the file temporarily
-    const key = `menu-${categoryIndex}-${itemIndex}`;
+    // Store the file temporarily with a unique key
+    const key = `menu-${categoryIndex}-${itemIndex}-${Date.now()}`;
     setTempImages(prev => ({ ...prev, [key]: file }));
 
     // Create a temporary URL for preview
