@@ -1,4 +1,4 @@
-import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, Index } from "typeorm";
 import { User } from "./User";
 
 export type QRCodeType = 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
@@ -167,4 +167,16 @@ export class QRCode {
 
   @UpdateDateColumn()
   updatedAt!: Date;
+
+  @Index()
+  @Column()
+  url!: string;
+
+  @Index()
+  @Column()
+  originalUrl!: string;
+
+  @Index()
+  @Column({ default: 0 })
+  scanCount!: number;
 } 

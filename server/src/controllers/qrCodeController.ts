@@ -276,7 +276,22 @@ export const getQRCode = async (req: AuthRequest, res: Response) => {
 
     const { id } = req.params;
     const qrCode = await qrCodeRepository.findOne({
-      where: { id, user: { id: req.user.id } }
+      select: {
+        id: true,
+        name: true,
+        type: true,
+        url: true,
+        originalUrl: true,
+        logoUrl: true,
+        foregroundColor: true,
+        backgroundColor: true,
+        menu: true,
+        scanCount: true,
+        createdAt: true,
+        updatedAt: true
+      },
+      where: { id, user: { id: req.user.id } },
+      relations: ['user']
     });
 
     if (!qrCode) {
@@ -588,8 +603,17 @@ export const redirectToUrl = async (req: Request, res: Response) => {
       return res.status(400).json({ error: 'Invalid URL' });
     }
 
-    // Find the QR code that contains this URL
+    // Find the QR code that contains this URL with optimized query
     const qrCode = await qrCodeRepository.findOne({
+      select: {
+        id: true,
+        scanCount: true,
+        scanHistory: true,
+        user: {
+          id: true,
+          isActive: true
+        }
+      },
       where: [
         { originalUrl: decodedUrl },
         { url: decodedUrl }
@@ -606,17 +630,21 @@ export const redirectToUrl = async (req: Request, res: Response) => {
       return res.status(403).json({ error: 'QR code is not accessible. User account is not active.' });
     }
 
-    // Increment scan count and log scan history
-    qrCode.scanCount = (qrCode.scanCount || 0) + 1;
-    qrCode.scanHistory = qrCode.scanHistory || [];
-    qrCode.scanHistory.push({
-      timestamp: new Date(),
-      userAgent: req.headers['user-agent'] || 'Unknown',
-      ipAddress: req.ip || 'Unknown'
-    });
-    
-    // Save the updated QR code
-    await qrCodeRepository.save(qrCode);
+    // Use a more efficient update query
+    await qrCodeRepository
+      .createQueryBuilder()
+      .update(QRCode)
+      .set({
+        scanCount: () => 'scan_count + 1',
+        scanHistory: () => `array_append(scan_history, :history)`
+      })
+      .where('id = :id', { id: qrCode.id })
+      .setParameter('history', JSON.stringify({
+        timestamp: new Date(),
+        userAgent: req.headers['user-agent'] || 'Unknown',
+        ipAddress: req.ip || 'Unknown'
+      }))
+      .execute();
 
     // Redirect to the original URL
     res.redirect(decodedUrl);

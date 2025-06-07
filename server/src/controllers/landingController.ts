@@ -9,7 +9,7 @@ const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
 
 // Optimized cache with size limits and LRU-like behavior
 const MAX_CACHE_SIZE = 1000;
-const CACHE_DURATION = 5 * 60 * 1000;
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 const qrCodeCache = new Map<string, { data: QRCode, timestamp: number }>();
 
 // Batch update queue for scan stats
@@ -49,25 +49,29 @@ async function processBatchUpdates() {
 // Run batch updates periodically
 setInterval(processBatchUpdates, BATCH_UPDATE_INTERVAL);
 
-// Cache cleanup function
+// Enhanced cache cleanup function with memory optimization
 function cleanupCache() {
   const now = Date.now();
-  for (const [key, value] of qrCodeCache.entries()) {
+  const entries = Array.from(qrCodeCache.entries());
+  
+  // Remove expired entries
+  entries.forEach(([key, value]) => {
     if (now - value.timestamp > CACHE_DURATION) {
       qrCodeCache.delete(key);
     }
-  }
+  });
+
+  // If still over size limit, remove oldest entries
   if (qrCodeCache.size > MAX_CACHE_SIZE) {
-    const entries = Array.from(qrCodeCache.entries());
-    entries.sort((a, b) => a[1].timestamp - b[1].timestamp);
-    entries.slice(0, entries.length - MAX_CACHE_SIZE).forEach(([key]) => {
-      qrCodeCache.delete(key);
-    });
+    entries
+      .sort((a, b) => a[1].timestamp - b[1].timestamp)
+      .slice(0, entries.length - MAX_CACHE_SIZE)
+      .forEach(([key]) => qrCodeCache.delete(key));
   }
 }
 
-// Run cleanup every minute
-setInterval(cleanupCache, 60 * 1000);
+// Run cleanup more frequently for better memory management
+setInterval(cleanupCache, 30 * 1000); // Every 30 seconds
 
 // Optimized Cloudinary URL generation with caching
 const cloudinaryUrlCache = new Map<string, string>();
