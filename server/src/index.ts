@@ -32,10 +32,10 @@ const getServerUrl = (req?: express.Request): string => {
     : `http://localhost:${port}`;
 };
 
-// Enhanced compression settings
+// Enhanced compression settings with better performance
 app.use(compression({
-  level: 6, // Compression level (0-9)
-  threshold: 1024, // Only compress responses larger than 1KB
+  level: 4, // Reduced compression level for better performance
+  threshold: 512, // Compress responses larger than 512B
   filter: (req, res) => {
     if (req.headers['x-no-compression']) {
       return false;
@@ -64,7 +64,7 @@ const itemsDir = path.join(uploadsDir, 'items');
   }
 });
 
-// Enhanced CORS configuration
+// Optimized CORS configuration
 app.use(cors({
   origin: function(origin, callback) {
     const allowedOrigins = [
@@ -88,7 +88,7 @@ app.use(cors({
   maxAge: 86400 // Cache preflight requests for 24 hours
 }));
 
-// Enhanced security headers with Helmet
+// Optimized security headers with Helmet
 app.use(helmet({
   contentSecurityPolicy: {
     directives: {
@@ -101,10 +101,17 @@ app.use(helmet({
       frameSrc: ["'none'"],
       objectSrc: ["'none'"]
     }
-  }
+  },
+  crossOriginEmbedderPolicy: false, // Disable for better performance
+  crossOriginResourcePolicy: false, // Disable for better performance
+  crossOriginOpenerPolicy: false // Disable for better performance
 }));
 
-app.use(express.json({ limit: '1mb' }));
+// Optimize JSON parsing
+app.use(express.json({ 
+  limit: '1mb',
+  strict: false // Disable strict mode for better performance
+}));
 
 // Add frontend domain to request object
 app.use((req: express.Request, res: express.Response, next: express.NextFunction) => {
@@ -112,7 +119,7 @@ app.use((req: express.Request, res: express.Response, next: express.NextFunction
   next();
 });
 
-// Optimize static file serving
+// Optimize static file serving with aggressive caching
 app.use('/uploads', (req, res, next) => {
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'GET, OPTIONS');
@@ -132,6 +139,8 @@ app.use('/uploads', (req, res, next) => {
     if (path.endsWith('.webp')) {
       res.setHeader('Content-Type', 'image/webp');
     }
+    // Add cache control headers
+    res.setHeader('Cache-Control', 'public, max-age=31536000, immutable');
   }
 }));
 

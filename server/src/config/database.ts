@@ -22,29 +22,29 @@ export const AppDataSource = new DataSource({
   subscribers: [],
   // Performance optimizations
   maxQueryExecutionTime: 1000, // Log slow queries
-  poolSize: 10, // Reduced pool size for better stability
+  poolSize: 20, // Increased pool size for better concurrency
   extra: {
     // Connection pool settings
-    max: 10, // Reduced max connections
-    min: 2,  // Reduced min connections
-    idleTimeoutMillis: 60000, // Increased idle timeout
-    connectionTimeoutMillis: 5000, // Increased connection timeout
+    max: 20, // Increased max connections
+    min: 5,  // Increased min connections
+    idleTimeoutMillis: 30000, // Reduced idle timeout
+    connectionTimeoutMillis: 3000, // Reduced connection timeout
     // Query optimization
-    statement_timeout: 30000, // Increased query timeout
-    idle_in_transaction_session_timeout: 30000, // Increased idle transaction timeout
+    statement_timeout: 15000, // Reduced query timeout
+    idle_in_transaction_session_timeout: 15000, // Reduced idle transaction timeout
     // Connection retry settings
     retry_strategy: {
-      retries: 5,
+      retries: 3,
       factor: 2,
-      minTimeout: 1000,
-      maxTimeout: 5000,
+      minTimeout: 500,
+      maxTimeout: 2000,
       randomize: true
     }
   },
   // Use database caching instead of Redis
   cache: {
     type: "database",
-    duration: 60000, // Cache duration in milliseconds
+    duration: 30000, // Reduced cache duration for more frequent updates
     ignoreErrors: true
   }
 }); 
