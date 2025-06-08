@@ -5,10 +5,8 @@ import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
-import * as LucideIcons from 'lucide-react';
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Utensils } from 'lucide-react';
 import { motion } from 'framer-motion';
-import { Utensils } from 'lucide-react';
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -41,6 +39,7 @@ const LandingPage = () => {
         whatsapp: 'Chat on WhatsApp',
         telegram: 'Join our Telegram',
         website: 'Visit our Website',
+        location: 'Find our Location',
         other: 'Visit Link'
       }
     },
@@ -64,6 +63,7 @@ const LandingPage = () => {
         whatsapp: 'تواصل معنا على واتساب',
         telegram: 'انضم إلى قناتنا على تيليجرام',
         website: 'زر موقعنا',
+        location: 'اعثر على موقعنا',
         other: 'زيارة الرابط'
       }
     }
@@ -91,6 +91,8 @@ const LandingPage = () => {
         return { label: platformLabels.telegram, icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
         return { label: platformLabels.website, icon: Globe, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+      case 'location':
+        return { label: platformLabels.location, icon: MapPin, bgColor: '#FF4B4B', hoverBgColor: '#E63E3E' };
       default:
         return { label: platformLabels.other, icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
     }

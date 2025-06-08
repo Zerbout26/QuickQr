@@ -9,7 +9,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
-import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download } from 'lucide-react';
+import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download, MapPin } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -393,7 +393,8 @@ const translations = {
     removeTestimonial: "Remove Testimonial",
     contact: "Contact",
     cta: "CTA",
-    addCta: "Add CTA"
+    addCta: "Add CTA",
+    location: "Location"
   },
   ar: {
     basic: "أساسي",
@@ -412,7 +413,7 @@ const translations = {
     enterURL: "أدخل الرابط",
     links: "الروابط",
     selectPlatform: "اختر المنصة",
-    website: "موقع إلكتروني",
+    website: "الموقع الإلكتروني",
     facebook: "فيسبوك",
     instagram: "انستغرام",
     twitter: "تويتر",
@@ -511,7 +512,8 @@ const translations = {
     removeTestimonial: "إزالة التعليق",
     contact: "اتصل بنا",
     cta: "الإطلاق",
-    addCta: "إضافة CTA"
+    addCta: "إضافة CTA",
+    location: "الموقع"
   }
 };
 
@@ -666,26 +668,34 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
   const getPlatformLabel = (type: string): string => {
     switch (type) {
-      case 'facebook':
-        return 'Follow us on Facebook';
-      case 'instagram':
-        return 'Follow us on Instagram';
-      case 'twitter':
-        return 'Follow us on Twitter';
-      case 'linkedin':
-        return 'Connect on LinkedIn';
-      case 'youtube':
-        return 'Subscribe on YouTube';
-      case 'tiktok':
-        return 'Follow us on TikTok';
-      case 'whatsapp':
-        return 'Chat on WhatsApp';
-      case 'telegram':
-        return 'Join our Telegram';
-      case 'website':
-        return 'Visit our Website';
-      default:
-        return 'Visit Link';
+      case 'facebook': return 'Follow us on Facebook';
+      case 'instagram': return 'Follow us on Instagram';
+      case 'twitter': return 'Follow us on Twitter';
+      case 'linkedin': return 'Connect on LinkedIn';
+      case 'youtube': return 'Subscribe on YouTube';
+      case 'whatsapp': return 'Chat on WhatsApp';
+      case 'telegram': return 'Join our Telegram';
+      case 'website': return 'Visit our Website';
+      case 'tiktok': return 'Follow us on TikTok';
+      case 'location': return 'Find our Location';
+      case 'other': return 'Visit Link';
+      default: return 'Visit Link';
+    }
+  };
+
+  const getPlatformIcon = (type: Link['type']) => {
+    switch (type) {
+      case 'facebook': return <Facebook className="h-4 w-4" />;
+      case 'instagram': return <Instagram className="h-4 w-4" />;
+      case 'twitter': return <Twitter className="h-4 w-4" />;
+      case 'linkedin': return <Linkedin className="h-4 w-4" />;
+      case 'youtube': return <Youtube className="h-4 w-4" />;
+      case 'whatsapp': return <MessageCircle className="h-4 w-4" />;
+      case 'telegram': return <Send className="h-4 w-4" />;
+      case 'website': return <Globe className="h-4 w-4" />;
+      case 'tiktok': return <Globe className="h-4 w-4" />;
+      case 'location': return <MapPin className="h-4 w-4" />;
+      default: return <Globe className="h-4 w-4" />;
     }
   };
 
@@ -782,27 +792,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     const updatedMenu = { ...menuCategories[categoryIndex] };
     updatedMenu.items[itemIndex].availability[day] = checked;
     setMenuCategories(prev => prev.map((category, index) => index === categoryIndex ? updatedMenu : category));
-  };
-
-  const getLinkIcon = (type?: string) => {
-    switch (type) {
-      case 'facebook':
-        return <Facebook className="h-4 w-4 mr-2" />;
-      case 'instagram':
-        return <Instagram className="h-4 w-4 mr-2" />;
-      case 'twitter':
-        return <Twitter className="h-4 w-4 mr-2" />;
-      case 'linkedin':
-        return <Linkedin className="h-4 w-4 mr-2" />;
-      case 'youtube':
-        return <Youtube className="h-4 w-4 mr-2" />;
-      case 'whatsapp':
-        return <MessageCircle className="h-4 w-4 mr-2" />;
-      case 'telegram':
-        return <Send className="h-4 w-4 mr-2" />;
-      default:
-        return <Globe className="h-4 w-4 mr-2" />;
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -1128,6 +1117,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
                               <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
                               <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                              <SelectItem value="location">{translations[menuLanguage].location}</SelectItem>
                               <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
                             </SelectContent>
                           </Select>
@@ -1353,6 +1343,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                     <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
                                     <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
                                     <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
+                                    <SelectItem value="location">{translations[menuLanguage].location}</SelectItem>
                                     <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
                                   </SelectContent>
                                 </Select>
