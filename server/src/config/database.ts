@@ -21,7 +21,7 @@ export const AppDataSource = new DataSource({
   migrationsTransactionMode: "all",
   subscribers: [],
   // Performance optimizations
-  maxQueryExecutionTime: 1000, // Log slow queries
+  maxQueryExecutionTime: 1000, // Log slow queries 1
   poolSize: 20, // Increased pool size for better concurrency
   extra: {
     // Connection pool settings
