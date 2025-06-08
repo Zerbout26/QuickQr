@@ -1049,6 +1049,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   <div className="flex gap-2">
                     <Button
                       type="button"
+                      variant={type === 'direct' ? 'default' : 'outline'}
+                      onClick={() => setType('direct')}
+                      className="flex-1"
+                    >
+                      {translations[menuLanguage].directLink}
+                    </Button>
+                    <Button
+                      type="button"
                       variant={type === 'url' ? 'default' : 'outline'}
                       onClick={() => setType('url')}
                       className="flex-1"
@@ -1057,27 +1065,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     </Button>
                     <Button
                       type="button"
-                      variant={type === 'menu' ? 'default' : 'outline'}
-                      onClick={() => setType('menu')}
-                      className="flex-1"
-                    >
-                      {translations[menuLanguage].menu}
-                    </Button>
-                    <Button
-                      type="button"
                       variant={type === 'both' ? 'default' : 'outline'}
                       onClick={() => setType('both')}
                       className="flex-1"
                     >
                       {translations[menuLanguage].both}
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={type === 'direct' ? 'default' : 'outline'}
-                      onClick={() => setType('direct')}
-                      className="flex-1"
-                    >
-                      {translations[menuLanguage].directLink}
                     </Button>
                     <Button
                       type="button"
