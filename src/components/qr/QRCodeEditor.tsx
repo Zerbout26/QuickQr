@@ -648,8 +648,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     if (file instanceof File) {
                         const [section, index] = key.split('-');
                         const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
-                        // Use menuItemImages field name to match backend expectation
-                        formData.append('menuItemImages', file, uniqueFilename);
+                        // Use vitrineImages field name to match backend expectation
+                        formData.append('vitrineImages', file, uniqueFilename);
                     }
                 }
             }
