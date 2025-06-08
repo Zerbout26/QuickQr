@@ -290,6 +290,8 @@ export const getQRCode = async (req: AuthRequest, res: Response) => {
         foregroundColor: true,
         backgroundColor: true,
         menu: true,
+        vitrine: true,
+        links: true,
         scanCount: true,
         createdAt: true,
         updatedAt: true
