@@ -87,7 +87,9 @@ const translations = {
     fileTooLarge: "File too large",
     imageMustBeLess: "Image must be less than 2MB",
     url: "URL",
-    tiktok: "TikTok"
+    tiktok: "TikTok",
+    qrCodeUpdated: "QR code updated successfully",
+    updateFailed: "Failed to update QR code"
   },
   ar: {
     basic: "أساسي",
@@ -121,7 +123,9 @@ const translations = {
     fileTooLarge: "الملف كبير جداً",
     imageMustBeLess: "يجب أن يكون حجم الصورة أقل من 2 ميجابايت",
     url: "رابط",
-    tiktok: "تيكتوك"
+    tiktok: "تيكتوك",
+    qrCodeUpdated: "تم تحديث رمز QR بنجاح",
+    updateFailed: "فشل تحديث رمز QR"
   }
 };
 
@@ -155,10 +159,11 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     hero: {
       businessName: '',
       tagline: '',
-      cta: {
+      ctas: [{
         text: '',
-        link: ''
-      }
+        link: '',
+        type: 'primary'
+      }]
     },
     about: {
       description: '',
@@ -170,13 +175,28 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     contact: {
       phone: '',
       email: '',
-      socialMedia: {}
+      address: '',
+      socialMedia: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        youtube: '',
+        tiktok: ''
+      }
     },
     footer: {
       copyright: '',
       businessName: '',
       quickLinks: [],
-      socialIcons: {}
+      socialIcons: {
+        facebook: '',
+        instagram: '',
+        twitter: '',
+        linkedin: '',
+        youtube: '',
+        tiktok: ''
+      }
     }
   });
 
@@ -513,14 +533,17 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       }
 
       if (type === 'vitrine') {
-        formData.append('vitrine', JSON.stringify(vitrine));
+        // Only append vitrine data if it's not empty
+        if (vitrine && Object.keys(vitrine).length > 0) {
+          formData.append('vitrine', JSON.stringify(vitrine));
 
-        // Handle vitrine images
-        for (const [key, file] of Object.entries(tempImages)) {
-          if (file instanceof File) {
-            const [section, index] = key.split('-');
-            const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
-            formData.append('vitrineImages', file, uniqueFilename);
+          // Handle vitrine images
+          for (const [key, file] of Object.entries(tempImages)) {
+            if (file instanceof File) {
+              const [section, index] = key.split('-');
+              const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
+              formData.append('vitrineImages', file, uniqueFilename);
+            }
           }
         }
       }
@@ -547,19 +570,63 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       onUpdated(updatedQRCode);
       toast({
         title: translations[menuLanguage].success,
-        description: "QR code updated successfully",
+        description: translations[menuLanguage].qrCodeUpdated,
       });
     } catch (error) {
       console.error('Error updating QR code:', error);
       toast({
         variant: "destructive",
         title: translations[menuLanguage].error,
-        description: error instanceof Error ? error.message : 'Failed to update QR code',
+        description: error instanceof Error ? error.message : translations[menuLanguage].updateFailed,
       });
     } finally {
       setIsLoading(false);
     }
   };
+
+  const renderHeroSection = () => (
+    <div className="space-y-4 border p-4 rounded-lg">
+      <h3 className="text-lg font-medium">Hero Section</h3>
+      <div className="space-y-2">
+        <Label>Business Name</Label>
+        <Input
+          value={vitrine.hero.businessName}
+          onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, businessName: e.target.value })}
+          placeholder="Enter business name"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>Tagline</Label>
+        <Input
+          value={vitrine.hero.tagline}
+          onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, tagline: e.target.value })}
+          placeholder="Enter tagline"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>CTA Text</Label>
+        <Input
+          value={vitrine.hero.ctas[0]?.text || ''}
+          onChange={(e) => updateVitrineSection('hero', {
+            ...vitrine.hero,
+            ctas: [{ ...vitrine.hero.ctas[0], text: e.target.value }]
+          })}
+          placeholder="Enter CTA text"
+        />
+      </div>
+      <div className="space-y-2">
+        <Label>CTA Link</Label>
+        <Input
+          value={vitrine.hero.ctas[0]?.link || ''}
+          onChange={(e) => updateVitrineSection('hero', {
+            ...vitrine.hero,
+            ctas: [{ ...vitrine.hero.ctas[0], link: e.target.value }]
+          })}
+          placeholder="Enter CTA link"
+        />
+      </div>
+    </div>
+  );
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
@@ -820,42 +887,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
             {type === 'vitrine' && (
               <div className="space-y-6">
-                {/* Hero Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <h3 className="text-lg font-medium">Hero Section</h3>
-                  <div className="space-y-2">
-                    <Label>Business Name</Label>
-                    <Input
-                      value={vitrine.hero.businessName}
-                      onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, businessName: e.target.value })}
-                      placeholder="Enter business name"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Tagline</Label>
-                    <Input
-                      value={vitrine.hero.tagline}
-                      onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, tagline: e.target.value })}
-                      placeholder="Enter tagline"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>CTA Text</Label>
-                    <Input
-                      value={vitrine.hero.cta.text}
-                      onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, cta: { ...vitrine.hero.cta, text: e.target.value } })}
-                      placeholder="Enter CTA text"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>CTA Link</Label>
-                    <Input
-                      value={vitrine.hero.cta.link}
-                      onChange={(e) => updateVitrineSection('hero', { ...vitrine.hero, cta: { ...vitrine.hero.cta, link: e.target.value } })}
-                      placeholder="Enter CTA link"
-                    />
-                  </div>
-                </div>
+                {renderHeroSection()}
 
                 {/* About Section */}
                 <div className="space-y-4 border p-4 rounded-lg">
