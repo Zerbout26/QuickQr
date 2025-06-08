@@ -564,7 +564,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       ...prev,
       hero: {
         ...prev.hero,
-        ctas: [...prev.hero.ctas, { text: '', link: '', type: 'primary' }]
+        ctas: [...prev.hero.ctas, { text: '', link: '', type: 'website' }]
       }
     }));
   };
@@ -726,23 +726,34 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
               onChange={(e) => updateCTA(index, 'text', e.target.value)}
               placeholder="Enter CTA text"
             />
-            <Input
-              value={cta.link}
-              onChange={(e) => updateCTA(index, 'link', e.target.value)}
-              placeholder="Enter CTA link"
-            />
-            <Select
-              value={cta.type}
-              onValueChange={(value) => updateCTA(index, 'type', value)}
-            >
-              <SelectTrigger>
-                <SelectValue placeholder="Select button type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="primary">Primary</SelectItem>
-                <SelectItem value="secondary">Secondary</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="flex gap-2">
+              <Select
+                value={cta.type || 'website'}
+                onValueChange={(value) => updateCTA(index, 'type', value)}
+              >
+                <SelectTrigger className="w-[180px]">
+                  <SelectValue placeholder="Select platform" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="website">Website</SelectItem>
+                  <SelectItem value="facebook">Facebook</SelectItem>
+                  <SelectItem value="instagram">Instagram</SelectItem>
+                  <SelectItem value="twitter">Twitter</SelectItem>
+                  <SelectItem value="linkedin">LinkedIn</SelectItem>
+                  <SelectItem value="youtube">YouTube</SelectItem>
+                  <SelectItem value="tiktok">TikTok</SelectItem>
+                  <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                  <SelectItem value="telegram">Telegram</SelectItem>
+                  <SelectItem value="location">Location</SelectItem>
+                  <SelectItem value="other">Other</SelectItem>
+                </SelectContent>
+              </Select>
+              <Input
+                value={cta.link}
+                onChange={(e) => updateCTA(index, 'link', e.target.value)}
+                placeholder="Enter CTA link"
+              />
+            </div>
           </div>
         ))}
       </div>
