@@ -98,11 +98,12 @@ export const updateProfile = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const { name, email } = req.body;
+    const { name, email, phone } = req.body;
     const user = req.user;
 
     if (name) user.name = name;
     if (email) user.email = email;
+    if (phone) user.phone = phone;
 
     await userRepository.save(user);
 
