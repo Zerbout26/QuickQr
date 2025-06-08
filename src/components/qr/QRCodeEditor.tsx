@@ -626,15 +626,17 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         if (type === 'vitrine') {
             // Only append vitrine data if it's not empty
             if (vitrine && Object.keys(vitrine).length > 0) {
-                // Filter out any blob URLs before sending to server
+                // Create a copy of vitrine data
                 const cleanedVitrine = {
                     ...vitrine,
                     services: vitrine.services.map(service => ({
                         ...service,
+                        // Keep existing Cloudinary URLs, only clear blob URLs
                         imageUrl: service.imageUrl?.startsWith('blob:') ? '' : service.imageUrl
                     })),
                     gallery: vitrine.gallery.map(item => ({
                         ...item,
+                        // Keep existing Cloudinary URLs, only clear blob URLs
                         imageUrl: item.imageUrl?.startsWith('blob:') ? '' : item.imageUrl
                     }))
                 };
@@ -646,7 +648,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     if (file instanceof File) {
                         const [section, index] = key.split('-');
                         const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
-                        formData.append('vitrineImages', file, uniqueFilename);
+                        // Use menuItemImages field name to match backend expectation
+                        formData.append('menuItemImages', file, uniqueFilename);
                     }
                 }
             }
