@@ -11,6 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { adminApi } from '@/lib/api';
+import { Eye } from 'lucide-react';
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
@@ -259,13 +260,14 @@ const Admin = () => {
                         <TableHead>Trial Status</TableHead>
                         <TableHead>Days Left</TableHead>
                         <TableHead>Account Status</TableHead>
+                        <TableHead>Total Visits</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={6} className="text-center py-8">
+                          <TableCell colSpan={7} className="text-center py-8">
                             No users match your filters
                           </TableCell>
                         </TableRow>
@@ -299,6 +301,12 @@ const Admin = () => {
                               >
                                 {user.isActive ? 'Active' : 'Inactive'}
                               </Badge>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
+                                <Eye className="w-4 h-4 text-gray-500" />
+                                <span>{user.totalVisits || 0}</span>
+                              </div>
                             </TableCell>
                             <TableCell>
                               {user.role !== 'admin' && (

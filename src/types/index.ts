@@ -11,6 +11,7 @@ export interface User {
   hasActiveSubscription: boolean;
   createdAt: Date;
   updatedAt: Date;
+  totalVisits?: number;
 }
 
 export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';
