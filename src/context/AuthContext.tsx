@@ -1,4 +1,3 @@
-
 import React, { createContext, useContext, useState, useEffect, useCallback } from 'react';
 import { User, AuthContextType } from '../types';
 import { toast } from '../components/ui/use-toast';
@@ -102,10 +101,10 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
     }
   };
 
-  const signUp = async (email: string, password: string): Promise<User> => {
+  const signUp = async (email: string, phone: string, password: string): Promise<User> => {
     setLoading(true);
     try {
-      const { user, token } = await authApi.register({ email, password });
+      const { user, token } = await authApi.register({ email, phone, password });
       localStorage.setItem('qr-generator-token', token);
       setUser(user);
       toast({

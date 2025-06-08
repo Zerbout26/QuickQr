@@ -8,7 +8,7 @@ const userRepository = AppDataSource.getRepository(User);
 
 export const register = async (req: Request, res: Response) => {
   try {
-    const { email, password, name } = req.body;
+    const { email, password, name, phone } = req.body;
 
     // Check if user already exists
     const existingUser = await userRepository.findOne({ where: { email } });
@@ -29,6 +29,7 @@ export const register = async (req: Request, res: Response) => {
       email,
       password: hashedPassword,
       name,
+      phone,
       trialStartDate,
       trialEndDate,
       role: 'user',

@@ -4,6 +4,7 @@ export interface User {
   id: string;
   email: string;
   name?: string;
+  phone?: string;
   role: 'user' | 'admin';
   trialStartDate: Date;
   trialEndDate: Date;
@@ -151,10 +152,10 @@ export interface AuthContextType {
   user: User | null;
   loading: boolean;
   signIn: (email: string, password: string) => Promise<User>;
-  signUp: (email: string, password: string) => Promise<User>;
+  signUp: (email: string, phone: string, password: string) => Promise<User>;
   signOut: () => void;
   login: (email: string, password: string) => Promise<User>;
-  register: (email: string, password: string) => Promise<User>;
+  register: (email: string, phone: string, password: string) => Promise<User>;
   logout: () => void;
   isAdmin: () => boolean;
   isTrialActive: () => boolean;

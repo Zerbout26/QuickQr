@@ -14,6 +14,8 @@ const translations = {
     signUpTrial: "Sign up and start your 14-day free trial",
     email: "Email",
     emailPlaceholder: "your@email.com",
+    phone: "Phone Number",
+    phonePlaceholder: "+1234567890",
     password: "Password",
     confirmPassword: "Confirm Password",
     passwordsDoNotMatch: "Passwords do not match",
@@ -32,6 +34,8 @@ const translations = {
     signUpTrial: "سجل وابدأ تجربتك المجانية لمدة 14 يومًا",
     email: "البريد الإلكتروني",
     emailPlaceholder: "بريدك@الإلكتروني.com",
+    phone: "رقم الهاتف",
+    phonePlaceholder: "+1234567890",
     password: "كلمة المرور",
     confirmPassword: "تأكيد كلمة المرور",
     passwordsDoNotMatch: "كلمات المرور غير متطابقة",
@@ -49,6 +53,7 @@ const translations = {
 
 const SignUpForm = () => {
   const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
   const [password, setPassword] = useState('');
   const [confirmPassword, setConfirmPassword] = useState('');
   const [isLoading, setIsLoading] = useState(false);
@@ -74,7 +79,7 @@ const SignUpForm = () => {
     setIsLoading(true);
 
     try {
-      await signUp(email, password);
+      await signUp(email, phone, password);
       navigate('/dashboard');
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
@@ -112,6 +117,18 @@ const SignUpForm = () => {
               placeholder={translations[language].emailPlaceholder}
               value={email} 
               onChange={(e) => setEmail(e.target.value)}
+              required
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label htmlFor="phone">{translations[language].phone}</Label>
+            <Input 
+              id="phone"
+              type="tel" 
+              placeholder={translations[language].phonePlaceholder}
+              value={phone} 
+              onChange={(e) => setPhone(e.target.value)}
               required
               dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
