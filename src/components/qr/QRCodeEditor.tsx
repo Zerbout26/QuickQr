@@ -317,43 +317,20 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
     // Create a temporary URL for preview
     const tempUrl = URL.createObjectURL(file);
-    
-    // Update the item with the temporary URL for preview
     updateVitrineItem(section, index, 'imageUrl', tempUrl);
+  };
+
+  const removeVitrineImage = (section: 'services' | 'gallery', index: number) => {
+    updateVitrineItem(section, index, 'imageUrl', '');
     
-    // Upload to Cloudinary
-    try {
-        const formData = new FormData();
-        formData.append('file', file);
-        formData.append('upload_preset', 'quickqr'); // Make sure this matches your Cloudinary upload preset
-
-        const response = await fetch('https://api.cloudinary.com/v1_1/your-cloud-name/image/upload', {
-            method: 'POST',
-            body: formData,
-        });
-
-        if (!response.ok) {
-            throw new Error('Failed to upload image to Cloudinary');
-        }
-
-        const data = await response.json();
-        
-        // Update the item with the Cloudinary URL
-        updateVitrineItem(section, index, 'imageUrl', data.secure_url);
-        
-        toast({
-            title: translations[menuLanguage].success,
-            description: translations[menuLanguage].imageUploaded,
-        });
-    } catch (error) {
-        console.error('Error uploading image:', error);
-        toast({
-            variant: "destructive",
-            title: translations[menuLanguage].error,
-            description: translations[menuLanguage].failedToUpload,
-        });
-    }
-};
+    // Remove from temp images if exists
+    const key = `vitrine-${section}-${index}`;
+    setTempImages(prev => {
+        const newTempImages = { ...prev };
+        delete newTempImages[key];
+        return newTempImages;
+    });
+  };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -1119,7 +1096,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             type="button"
                             variant="outline"
                             size="icon"
-                            onClick={() => removeVitrineItem('services', index)}
+                            onClick={() => removeVitrineImage('services', index)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
@@ -1179,7 +1156,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             type="button"
                             variant="outline"
                             size="icon"
-                            onClick={() => removeVitrineItem('gallery', index)}
+                            onClick={() => removeVitrineImage('gallery', index)}
                           >
                             <Trash2 className="h-4 w-4" />
                           </Button>
