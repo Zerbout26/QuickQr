@@ -155,49 +155,105 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
 
   // Vitrine state
-  const [vitrine, setVitrine] = useState(qrCode.vitrine || {
-    hero: {
-      businessName: '',
-      tagline: '',
-      ctas: [{
-        text: '',
-        link: '',
-        type: 'primary'
-      }]
-    },
-    about: {
-      description: '',
-      city: ''
-    },
-    services: [],
-    gallery: [],
-    testimonials: [],
-    contact: {
-      phone: '',
-      email: '',
-      address: '',
-      socialMedia: {
-        facebook: '',
-        instagram: '',
-        twitter: '',
-        linkedin: '',
-        youtube: '',
-        tiktok: ''
-      }
-    },
-    footer: {
-      copyright: '',
-      businessName: '',
-      quickLinks: [],
-      socialIcons: {
-        facebook: '',
-        instagram: '',
-        twitter: '',
-        linkedin: '',
-        youtube: '',
-        tiktok: ''
-      }
+  const [vitrine, setVitrine] = useState(() => {
+    if (qrCode.vitrine) {
+      // Convert old format to new format if needed
+      const existingVitrine = qrCode.vitrine;
+      const oldFormatHero = existingVitrine.hero as any; // Type assertion for old format
+      return {
+        hero: {
+          businessName: existingVitrine.hero?.businessName || '',
+          tagline: existingVitrine.hero?.tagline || '',
+          ctas: existingVitrine.hero?.ctas || 
+                (oldFormatHero?.cta ? [{
+                  text: oldFormatHero.cta.text || '',
+                  link: oldFormatHero.cta.link || '',
+                  type: 'primary'
+                }] : [{
+                  text: '',
+                  link: '',
+                  type: 'primary'
+                }])
+        },
+        about: {
+          description: existingVitrine.about?.description || '',
+          city: existingVitrine.about?.city || ''
+        },
+        services: existingVitrine.services || [],
+        gallery: existingVitrine.gallery || [],
+        testimonials: existingVitrine.testimonials || [],
+        contact: {
+          phone: existingVitrine.contact?.phone || '',
+          email: existingVitrine.contact?.email || '',
+          address: existingVitrine.contact?.address || '',
+          socialMedia: {
+            facebook: existingVitrine.contact?.socialMedia?.facebook || '',
+            instagram: existingVitrine.contact?.socialMedia?.instagram || '',
+            twitter: existingVitrine.contact?.socialMedia?.twitter || '',
+            linkedin: existingVitrine.contact?.socialMedia?.linkedin || '',
+            youtube: existingVitrine.contact?.socialMedia?.youtube || '',
+            tiktok: existingVitrine.contact?.socialMedia?.tiktok || ''
+          }
+        },
+        footer: {
+          copyright: existingVitrine.footer?.copyright || '',
+          businessName: existingVitrine.footer?.businessName || '',
+          quickLinks: existingVitrine.footer?.quickLinks || [],
+          socialIcons: {
+            facebook: existingVitrine.footer?.socialIcons?.facebook || '',
+            instagram: existingVitrine.footer?.socialIcons?.instagram || '',
+            twitter: existingVitrine.footer?.socialIcons?.twitter || '',
+            linkedin: existingVitrine.footer?.socialIcons?.linkedin || '',
+            youtube: existingVitrine.footer?.socialIcons?.youtube || '',
+            tiktok: existingVitrine.footer?.socialIcons?.tiktok || ''
+          }
+        }
+      };
     }
+    return {
+      hero: {
+        businessName: '',
+        tagline: '',
+        ctas: [{
+          text: '',
+          link: '',
+          type: 'primary'
+        }]
+      },
+      about: {
+        description: '',
+        city: ''
+      },
+      services: [],
+      gallery: [],
+      testimonials: [],
+      contact: {
+        phone: '',
+        email: '',
+        address: '',
+        socialMedia: {
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          linkedin: '',
+          youtube: '',
+          tiktok: ''
+        }
+      },
+      footer: {
+        copyright: '',
+        businessName: '',
+        quickLinks: [],
+        socialIcons: {
+          facebook: '',
+          instagram: '',
+          twitter: '',
+          linkedin: '',
+          youtube: '',
+          tiktok: ''
+        }
+      }
+    };
   });
 
   // Vitrine handlers
@@ -502,6 +558,41 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setMenuCategories(newCategories);
   };
 
+  // Add CTA handler
+  const addCTA = () => {
+    setVitrine(prev => ({
+      ...prev,
+      hero: {
+        ...prev.hero,
+        ctas: [...prev.hero.ctas, { text: '', link: '', type: 'primary' }]
+      }
+    }));
+  };
+
+  // Remove CTA handler
+  const removeCTA = (index: number) => {
+    setVitrine(prev => ({
+      ...prev,
+      hero: {
+        ...prev.hero,
+        ctas: prev.hero.ctas.filter((_, i) => i !== index)
+      }
+    }));
+  };
+
+  // Update CTA handler
+  const updateCTA = (index: number, field: 'text' | 'link' | 'type', value: string) => {
+    setVitrine(prev => ({
+      ...prev,
+      hero: {
+        ...prev.hero,
+        ctas: prev.hero.ctas.map((cta, i) => 
+          i === index ? { ...cta, [field]: value } : cta
+        )
+      }
+    }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -603,27 +694,57 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
           placeholder="Enter tagline"
         />
       </div>
-      <div className="space-y-2">
-        <Label>CTA Text</Label>
-        <Input
-          value={vitrine.hero.ctas[0]?.text || ''}
-          onChange={(e) => updateVitrineSection('hero', {
-            ...vitrine.hero,
-            ctas: [{ ...vitrine.hero.ctas[0], text: e.target.value }]
-          })}
-          placeholder="Enter CTA text"
-        />
-      </div>
-      <div className="space-y-2">
-        <Label>CTA Link</Label>
-        <Input
-          value={vitrine.hero.ctas[0]?.link || ''}
-          onChange={(e) => updateVitrineSection('hero', {
-            ...vitrine.hero,
-            ctas: [{ ...vitrine.hero.ctas[0], link: e.target.value }]
-          })}
-          placeholder="Enter CTA link"
-        />
+      <div className="space-y-4">
+        <div className="flex justify-between items-center">
+          <Label>Call to Action Buttons</Label>
+          <Button
+            type="button"
+            variant="outline"
+            size="sm"
+            onClick={addCTA}
+          >
+            <Plus className="h-4 w-4 mr-2" />
+            Add CTA
+          </Button>
+        </div>
+        {vitrine.hero.ctas.map((cta, index) => (
+          <div key={index} className="space-y-2 border p-4 rounded">
+            <div className="flex justify-between items-center mb-2">
+              <Label>CTA {index + 1}</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="icon"
+                onClick={() => removeCTA(index)}
+                disabled={vitrine.hero.ctas.length === 1}
+              >
+                <Trash2 className="h-4 w-4" />
+              </Button>
+            </div>
+            <Input
+              value={cta.text}
+              onChange={(e) => updateCTA(index, 'text', e.target.value)}
+              placeholder="Enter CTA text"
+            />
+            <Input
+              value={cta.link}
+              onChange={(e) => updateCTA(index, 'link', e.target.value)}
+              placeholder="Enter CTA link"
+            />
+            <Select
+              value={cta.type}
+              onValueChange={(value) => updateCTA(index, 'type', value)}
+            >
+              <SelectTrigger>
+                <SelectValue placeholder="Select button type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="primary">Primary</SelectItem>
+                <SelectItem value="secondary">Secondary</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+        ))}
       </div>
     </div>
   );
