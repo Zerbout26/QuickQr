@@ -90,11 +90,11 @@ const LandingPage = () => {
       case 'telegram':
         return { label: platformLabels.telegram, icon: Send, bgColor: '#0088CC', hoverBgColor: '#0077B5' };
       case 'website':
-        return { label: platformLabels.website, icon: Globe, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+        return { label: platformLabels.website, icon: Globe, bgColor: '#6366F1', hoverBgColor: '#4F46E5' };
       case 'location':
         return { label: platformLabels.location, icon: MapPin, bgColor: '#FF4B4B', hoverBgColor: '#E63E3E' };
       default:
-        return { label: platformLabels.other, icon: ExternalLink, bgColor: 'var(--primary)', hoverBgColor: 'var(--primary-dark)' };
+        return { label: platformLabels.other, icon: ExternalLink, bgColor: '#6366F1', hoverBgColor: '#4F46E5' };
     }
   };
 
