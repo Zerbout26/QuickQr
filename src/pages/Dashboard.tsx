@@ -20,7 +20,6 @@ import {
   Plus, Calendar, CheckCircle, AlertCircle, Globe
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import ProfileSettings from '@/components/profile/ProfileSettings';
 
 // Translations object
 const translations = {
@@ -695,11 +694,6 @@ const Dashboard = () => {
                 }}
               />
             </div>
-          </div>
-          
-          {/* Profile Settings */}
-          <div className="mt-8">
-            <ProfileSettings />
           </div>
           
           {/* Subscription status badges */}

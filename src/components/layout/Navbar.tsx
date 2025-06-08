@@ -29,6 +29,7 @@ import {
   AlertCircle,
   Lock,
   Globe,
+  UserCircle,
 } from "lucide-react";
 
 // Translations object
@@ -47,7 +48,8 @@ const translations = {
     trialExpired: "Trial expired",
     activeSubscription: "Active Subscription",
     language: "العربية",
-    home: "Home"
+    home: "Home",
+    profileSettings: "Profile Settings",
   },
   ar: {
     signIn: "تسجيل الدخول",
@@ -63,7 +65,8 @@ const translations = {
     trialExpired: "انتهت الفترة التجريبية",
     activeSubscription: "اشتراك نشط",
     language: "English",
-    home: "الرئيسية"
+    home: "الرئيسية",
+    profileSettings: "إعدادات الملف الشخصي",
   }
 };
 
@@ -143,6 +146,11 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="flex items-center cursor-pointer">
                       <LayoutDashboard className="w-4 h-4 mr-2" /> {translations[language].dashboard}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/profile" className="flex items-center cursor-pointer">
+                      <UserCircle className="w-4 h-4 mr-2" /> {translations[language].profileSettings}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>

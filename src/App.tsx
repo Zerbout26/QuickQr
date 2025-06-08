@@ -18,6 +18,7 @@ import EditQRCodePage from '@/pages/EditQRCodePage';
 import PrivateRoute from '@/components/PrivateRoute';
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
+import Profile from '@/pages/Profile';
 
 const queryClient = new QueryClient();
 
@@ -75,6 +76,7 @@ const App = () => (
                   <ResetPasswordForm />
                 </PrivateRoute>
               } />
+              <Route path="/profile" element={<Profile />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
