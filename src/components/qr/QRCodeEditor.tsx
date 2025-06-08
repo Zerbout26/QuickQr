@@ -293,22 +293,22 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
     // Check file type
     if (!file.type.startsWith('image/')) {
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].invalidFileType,
-        description: translations[menuLanguage].pleaseUploadImage,
-      });
-      return;
+        toast({
+            variant: "destructive",
+            title: translations[menuLanguage].invalidFileType,
+            description: translations[menuLanguage].pleaseUploadImage,
+        });
+        return;
     }
 
     // Check file size (max 2MB)
     if (file.size > 2 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].fileTooLarge,
-        description: translations[menuLanguage].imageMustBeLess,
-      });
-      return;
+        toast({
+            variant: "destructive",
+            title: translations[menuLanguage].fileTooLarge,
+            description: translations[menuLanguage].imageMustBeLess,
+        });
+        return;
     }
 
     // Store the file temporarily with a unique key
@@ -317,20 +317,43 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
     // Create a temporary URL for preview
     const tempUrl = URL.createObjectURL(file);
-    updateVitrineItem(section, index, 'imageUrl', tempUrl);
-  };
-
-  const removeVitrineImage = (section: 'services' | 'gallery', index: number) => {
-    updateVitrineItem(section, index, 'imageUrl', '');
     
-    // Remove from temp images if exists
-    const key = `vitrine-${section}-${index}`;
-    setTempImages(prev => {
-      const newTempImages = { ...prev };
-      delete newTempImages[key];
-      return newTempImages;
-    });
-  };
+    // Update the item with the temporary URL for preview
+    updateVitrineItem(section, index, 'imageUrl', tempUrl);
+    
+    // Upload to Cloudinary
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('upload_preset', 'quickqr'); // Make sure this matches your Cloudinary upload preset
+
+        const response = await fetch('https://api.cloudinary.com/v1_1/your-cloud-name/image/upload', {
+            method: 'POST',
+            body: formData,
+        });
+
+        if (!response.ok) {
+            throw new Error('Failed to upload image to Cloudinary');
+        }
+
+        const data = await response.json();
+        
+        // Update the item with the Cloudinary URL
+        updateVitrineItem(section, index, 'imageUrl', data.secure_url);
+        
+        toast({
+            title: translations[menuLanguage].success,
+            description: translations[menuLanguage].imageUploaded,
+        });
+    } catch (error) {
+        console.error('Error uploading image:', error);
+        toast({
+            variant: "destructive",
+            title: translations[menuLanguage].error,
+            description: translations[menuLanguage].failedToUpload,
+        });
+    }
+};
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
     const file = event.target.files?.[0];
@@ -598,82 +621,95 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setIsLoading(true);
 
     try {
-      const formData = new FormData();
-      formData.append('name', name);
-      formData.append('type', type);
-      formData.append('foregroundColor', foregroundColor);
-      formData.append('backgroundColor', backgroundColor);
+        const formData = new FormData();
+        formData.append('name', name);
+        formData.append('type', type);
+        formData.append('foregroundColor', foregroundColor);
+        formData.append('backgroundColor', backgroundColor);
 
-      if (type === 'url' || type === 'both') {
-        formData.append('links', JSON.stringify(links));
-      }
-
-      if (type === 'menu' || type === 'both') {
-        formData.append('menu', JSON.stringify({
-          categories: menuCategories
-        }));
-
-        // Handle menu item images
-        for (const [key, file] of Object.entries(tempImages)) {
-          if (file instanceof File) {
-            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
-            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
-            formData.append('menuItemImages', file, uniqueFilename);
-          }
+        if (type === 'url' || type === 'both') {
+            formData.append('links', JSON.stringify(links));
         }
-      }
 
-      if (type === 'vitrine') {
-        // Only append vitrine data if it's not empty
-        if (vitrine && Object.keys(vitrine).length > 0) {
-          formData.append('vitrine', JSON.stringify(vitrine));
+        if (type === 'menu' || type === 'both') {
+            formData.append('menu', JSON.stringify({
+                categories: menuCategories
+            }));
 
-          // Handle vitrine images
-          for (const [key, file] of Object.entries(tempImages)) {
-            if (file instanceof File) {
-              const [section, index] = key.split('-');
-              const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
-              formData.append('vitrineImages', file, uniqueFilename);
+            // Handle menu item images
+            for (const [key, file] of Object.entries(tempImages)) {
+                if (file instanceof File) {
+                    const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
+                    const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+                    formData.append('menuItemImages', file, uniqueFilename);
+                }
             }
-          }
         }
-      }
 
-      if (logoFile) {
-        formData.append('logo', logoFile);
-      }
+        if (type === 'vitrine') {
+            // Only append vitrine data if it's not empty
+            if (vitrine && Object.keys(vitrine).length > 0) {
+                // Filter out any blob URLs before sending to server
+                const cleanedVitrine = {
+                    ...vitrine,
+                    services: vitrine.services.map(service => ({
+                        ...service,
+                        imageUrl: service.imageUrl?.startsWith('blob:') ? '' : service.imageUrl
+                    })),
+                    gallery: vitrine.gallery.map(item => ({
+                        ...item,
+                        imageUrl: item.imageUrl?.startsWith('blob:') ? '' : item.imageUrl
+                    }))
+                };
+                
+                formData.append('vitrine', JSON.stringify(cleanedVitrine));
 
-      // Use fetch directly for file upload
-      const response = await fetch(`${API_BASE_URL}/qrcodes/${qrCode.id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
-        },
-        body: formData,
-      });
+                // Handle vitrine images
+                for (const [key, file] of Object.entries(tempImages)) {
+                    if (file instanceof File) {
+                        const [section, index] = key.split('-');
+                        const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
+                        formData.append('vitrineImages', file, uniqueFilename);
+                    }
+                }
+            }
+        }
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        throw new Error(errorData.error || 'Failed to update QR code');
-      }
+        if (logoFile) {
+            formData.append('logo', logoFile);
+        }
 
-      const updatedQRCode = await response.json();
-      onUpdated(updatedQRCode);
-      toast({
-        title: translations[menuLanguage].success,
-        description: translations[menuLanguage].qrCodeUpdated,
-      });
+        // Use fetch directly for file upload
+        const response = await fetch(`${API_BASE_URL}/qrcodes/${qrCode.id}`, {
+            method: 'PUT',
+            headers: {
+                'Authorization': `Bearer ${localStorage.getItem('qr-generator-token')}`,
+            },
+            body: formData,
+        });
+
+        if (!response.ok) {
+            const errorData = await response.json();
+            throw new Error(errorData.error || 'Failed to update QR code');
+        }
+
+        const updatedQRCode = await response.json();
+        onUpdated(updatedQRCode);
+        toast({
+            title: translations[menuLanguage].success,
+            description: translations[menuLanguage].qrCodeUpdated,
+        });
     } catch (error) {
-      console.error('Error updating QR code:', error);
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].error,
-        description: error instanceof Error ? error.message : translations[menuLanguage].updateFailed,
-      });
+        console.error('Error updating QR code:', error);
+        toast({
+            variant: "destructive",
+            title: translations[menuLanguage].error,
+            description: error instanceof Error ? error.message : translations[menuLanguage].updateFailed,
+        });
     } finally {
-      setIsLoading(false);
+        setIsLoading(false);
     }
-  };
+};
 
   const renderHeroSection = () => (
     <div className="space-y-4 border p-4 rounded-lg">
