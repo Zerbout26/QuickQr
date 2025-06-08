@@ -256,6 +256,7 @@ const Admin = () => {
                     <TableHeader>
                       <TableRow>
                         <TableHead>Email</TableHead>
+                        <TableHead>Phone</TableHead>
                         <TableHead>Role</TableHead>
                         <TableHead>Trial Status</TableHead>
                         <TableHead>Days Left</TableHead>
@@ -267,7 +268,7 @@ const Admin = () => {
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={7} className="text-center py-8">
+                          <TableCell colSpan={8} className="text-center py-8">
                             No users match your filters
                           </TableCell>
                         </TableRow>
@@ -275,6 +276,7 @@ const Admin = () => {
                         filteredUsers.map((user) => (
                           <TableRow key={user.id}>
                             <TableCell>{user.email}</TableCell>
+                            <TableCell>{user.phone || '-'}</TableCell>
                             <TableCell>
                               <Badge variant={user.role === 'admin' ? 'outline' : 'default'}>
                                 {user.role}

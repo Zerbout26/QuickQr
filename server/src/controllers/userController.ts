@@ -124,6 +124,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response) => {
         id: true,
         email: true,
         name: true,
+        phone: true,
         role: true,
         trialStartDate: true,
         trialEndDate: true,
