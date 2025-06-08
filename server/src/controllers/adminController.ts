@@ -7,10 +7,11 @@ import { AuthRequest } from '../middleware/auth';
 const userRepository = AppDataSource.getRepository(User);
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 
-export const getAllUsers = async (req: AuthRequest, res: Response) => {
+export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void> => {
   try {
     if (!req.user) {
-      return res.status(401).json({ error: 'Not authenticated' });
+      res.status(401).json({ error: 'Not authenticated' });
+      return;
     }
 
     const users = await userRepository.find({

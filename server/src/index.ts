@@ -8,6 +8,7 @@ import { AppDataSource } from './config/database';
 import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
+import adminRoutes from './routes/adminRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
 import axios from 'axios';
@@ -184,6 +185,7 @@ app.get('/api/health', (req, res) => {
 // Mount API routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
+app.use('/api/admin', adminRoutes);
 app.use('/landing', landingRoutes);
 
 // Function to create admin user

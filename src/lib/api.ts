@@ -421,7 +421,7 @@ const getAuthHeaders = () => {
 // Admin API functions
 export const adminApi = {
   getAllUsers: async (): Promise<User[]> => {
-    const response = await api.get('/users/admin/users');
+    const response = await api.get('/admin/users');
     return response.data;
   },
 
