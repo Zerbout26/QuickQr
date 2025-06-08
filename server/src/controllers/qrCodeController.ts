@@ -221,9 +221,16 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.user = req.user;
 
       if (type === 'direct' && url) {
-        const serverUrl = `${req.protocol}://${req.get('host')}`;
-        qrCode.url = `${serverUrl}/api/qrcodes/redirect/${encodeURIComponent(url)}`;
-        qrCode.originalUrl = url;
+        const tempId = crypto.randomUUID();
+        const tempUrl = `${frontendDomain}/landing/${tempId}`;
+        qrCode.url = tempUrl;
+        qrCode.originalUrl = url;  // Store the original URL for redirection
+        qrCode.type = 'direct';    // Ensure type is set to direct
+
+        const savedQRCode = await qrCodeRepository.save(qrCode);
+        savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
+        const finalQRCode = await qrCodeRepository.save(savedQRCode);
+        return res.status(201).json(finalQRCode);
       } else {
         const tempId = crypto.randomUUID();
         const tempUrl = `${frontendDomain}/landing/${tempId}`;
@@ -236,9 +243,6 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
         return res.status(201).json(finalQRCode);
       }
-
-      const savedQRCode = await qrCodeRepository.save(qrCode);
-      res.status(201).json(savedQRCode);
 
     } catch (error) {
       console.error('Error creating QR code:', error);

@@ -156,6 +156,12 @@ const LandingPage = () => {
         const data = await qrCodeApi.getPublicQRCode(id);
         setQRCode(data);
         
+        // Handle direct URL type - redirect to original URL
+        if (data.type === 'direct' && data.originalUrl) {
+          window.location.href = data.originalUrl;
+          return;
+        }
+        
         // Automatically detect and set menu language
         if (data.menu) {
           const detectedLanguage = detectMenuLanguage(data.menu);
