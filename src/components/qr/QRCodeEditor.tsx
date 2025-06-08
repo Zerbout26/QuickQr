@@ -311,8 +311,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         return;
     }
 
-    // Store the file temporarily with a unique key
-    const key = `vitrine-${section}-${index}-${Date.now()}`;
+    // Store the file temporarily with the correct key format
+    const key = `${section}-${index}-${Date.now()}-${file.name}`;
     setTempImages(prev => ({ ...prev, [key]: file }));
 
     // Create a temporary URL for preview
@@ -324,7 +324,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     updateVitrineItem(section, index, 'imageUrl', '');
     
     // Remove from temp images if exists
-    const key = `vitrine-${section}-${index}`;
+    const key = `${section}-${index}`;
     setTempImages(prev => {
         const newTempImages = { ...prev };
         delete newTempImages[key];
@@ -643,13 +643,10 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 
                 formData.append('vitrine', JSON.stringify(cleanedVitrine));
 
-                // Handle vitrine images
+                // Handle vitrine images with correct key format
                 for (const [key, file] of Object.entries(tempImages)) {
                     if (file instanceof File) {
-                        const [section, index] = key.split('-');
-                        const uniqueFilename = `${section}-${index}-${Date.now()}-${file.name}`;
-                        // Use vitrineImages field name to match backend expectation
-                        formData.append('vitrineImages', file, uniqueFilename);
+                        formData.append('vitrineImages', file, key);
                     }
                 }
             }
