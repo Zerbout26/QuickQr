@@ -394,7 +394,14 @@ export const qrCodeApi = {
   },
 
   getPublicQRCode: async (id: string) => {
-    const response = await api.get(`/qrcodes/public/${id}`);
+    const response = await api.get(`/qrcodes/public/${id}`, {
+      headers: {
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      },
+      // Add timeout to prevent hanging requests
+      timeout: 5000
+    });
     return response.data;
   },
 
@@ -404,7 +411,16 @@ export const qrCodeApi = {
   },
 
   incrementScanCount: async (id: string) => {
-    const response = await api.post(`/qrcodes/${id}/scan`);
+    // Use a more efficient method for scan count increment
+    const response = await api.post(`/qrcodes/${id}/scan`, null, {
+      headers: {
+        'Content-Type': 'application/json',
+        'Cache-Control': 'no-cache',
+        'Pragma': 'no-cache'
+      },
+      // Add timeout to prevent hanging requests
+      timeout: 3000
+    });
     return response.data;
   }
 };

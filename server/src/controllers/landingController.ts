@@ -27,7 +27,7 @@ async function processBatchUpdates() {
       scanHistory: stats.history
     }));
 
-    // Batch update using TypeORM
+    // Batch update using TypeORM with optimized query
     await qrCodeRepository
       .createQueryBuilder()
       .update(QRCode)
@@ -77,23 +77,16 @@ setInterval(cleanupCache, 30 * 1000); // Every 30 seconds
 const cloudinaryUrlCache = new Map<string, string>();
 const CLOUDINARY_CACHE_DURATION = 24 * 60 * 60 * 1000; // 24 hours
 
-function getOptimizedCloudinaryUrl(logoUrl: string): string {
-  const cached = cloudinaryUrlCache.get(logoUrl);
-  if (cached) return cached;
-
-  const optimizedUrl = getOptimizedUrl(logoUrl, {
-    width: 150,
-    height: 80,
-    crop: 'fill',
-    quality: 'auto',
-    format: 'webp',
-    fetch_format: 'auto',
-    dpr: 'auto',
-    responsive: true
-  });
-
-  cloudinaryUrlCache.set(logoUrl, optimizedUrl);
-  return optimizedUrl;
+function getOptimizedCloudinaryUrl(url: string): string {
+  if (!url.includes('cloudinary.com')) return url;
+  
+  const cloudinaryUrl = new URL(url);
+  cloudinaryUrl.searchParams.set('q_auto', 'good');
+  cloudinaryUrl.searchParams.set('f_auto', 'webp');
+  cloudinaryUrl.searchParams.set('w_auto', '300');
+  cloudinaryUrl.searchParams.set('c_scale', 'auto');
+  
+  return cloudinaryUrl.toString();
 }
 
 // Preload critical assets with preconnect
@@ -199,6 +192,11 @@ export const getLandingPage = async (req: Request, res: Response) => {
         }]
       });
 
+      // Set optimized cache headers
+      res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+      res.setHeader('ETag', `"${cachedQRCode.data.id}-${cachedQRCode.data.updatedAt.getTime()}"`);
+      res.setHeader('Vary', 'Accept-Encoding');
+
       return serveLandingPage(res, cachedQRCode.data, req);
     }
 
@@ -211,7 +209,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
         'qr.logoUrl',
         'qr.foregroundColor',
         'qr.backgroundColor',
-        'qr.buttons',
+        'qr.links',
         'qr.menu',
         'qr.type',
         'qr.originalUrl',
@@ -223,11 +221,15 @@ export const getLandingPage = async (req: Request, res: Response) => {
       .getOne();
 
     if (!qrCode) {
-      return res.status(404).send(generateHTML({
+      const notFoundQRCode: Partial<QRCode> = {
         name: 'QR Code Not Found',
-        buttons: [],
-        menu: null
-      } as QRCode, '', criticalCSS));
+        links: [],
+        menu: {
+          restaurantName: '',
+          categories: []
+        }
+      };
+      return res.status(404).send(generateHTML(notFoundQRCode as QRCode, '', criticalCSS));
     }
 
     // Check if user is active
@@ -257,6 +259,11 @@ export const getLandingPage = async (req: Request, res: Response) => {
       qrCodeCache.delete(oldestKey);
     }
 
+    // Set optimized cache headers
+    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
+    res.setHeader('ETag', `"${qrCode.id}-${qrCode.updatedAt.getTime()}"`);
+    res.setHeader('Vary', 'Accept-Encoding');
+
     // Serve the landing page
     return serveLandingPage(res, qrCode, req);
   } catch (error) {
@@ -268,11 +275,6 @@ export const getLandingPage = async (req: Request, res: Response) => {
 function serveLandingPage(res: Response, qrCode: QRCode, req: Request) {
   // Get optimized logo URL with caching
   const logoUrl = qrCode.logoUrl ? getOptimizedCloudinaryUrl(qrCode.logoUrl) : '';
-
-  // Set optimized cache headers
-  res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
-  res.setHeader('ETag', `"${qrCode.id}-${qrCode.updatedAt.getTime()}"`);
-  res.setHeader('Vary', 'Accept-Encoding');
 
   // Generate custom CSS with dynamic colors
   const customCSS = `
