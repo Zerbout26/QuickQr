@@ -182,6 +182,35 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// Track last activity time
+let lastActivityTime = Date.now();
+
+// Update last activity time on each request
+app.use((req, res, next) => {
+  lastActivityTime = Date.now();
+  next();
+});
+
+// Self-ping mechanism
+const checkAndPing = async () => {
+  const currentTime = Date.now();
+  const inactiveTime = currentTime - lastActivityTime;
+  
+  // If inactive for more than 5 minutes
+  if (inactiveTime > 5 * 60 * 1000) {
+    try {
+      const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
+      const response = await axios.get(`${serverUrl}/api/health`);
+      console.log('Self-ping successful after', Math.round(inactiveTime / 1000 / 60), 'minutes of inactivity');
+    } catch (error) {
+      console.error('Self-ping failed:', error.message);
+    }
+  }
+};
+
+// Check every minute
+setInterval(checkAndPing, 60 * 1000);
+
 // Mount API routes
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
