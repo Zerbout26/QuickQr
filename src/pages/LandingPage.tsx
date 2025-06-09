@@ -152,10 +152,15 @@ const LandingPage = () => {
           return;
         }
 
-        // First, increment the scan count
-        await qrCodeApi.incrementScanCount(id);
-        // Then fetch the updated QR code using the public endpoint
-        const data = await qrCodeApi.getPublicQRCode(id);
+        // Start loading state
+        setLoading(true);
+
+        // Fetch QR code data and increment scan count in parallel
+        const [data] = await Promise.all([
+          qrCodeApi.getPublicQRCode(id),
+          qrCodeApi.incrementScanCount(id)
+        ]);
+
         setQRCode(data);
         
         // Handle direct URL type - redirect to original URL
@@ -206,12 +211,12 @@ const LandingPage = () => {
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
-        <div className="text-center space-y-6">
-          <div className="relative">
-            <div className="w-20 h-20 border-4 border-primary/20 rounded-full"></div>
-            <div className="w-20 h-20 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+        <div className="text-center space-y-4">
+          <div className="relative w-16 h-16">
+            <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
+            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
           </div>
-          <p className="text-xl text-gray-700 font-medium tracking-tight animate-pulse">{translations[menuLanguage].loading}</p>
+          <p className="text-lg text-gray-700 font-medium">{translations[menuLanguage].loading}</p>
         </div>
       </div>
     );

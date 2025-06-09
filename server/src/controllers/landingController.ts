@@ -46,7 +46,7 @@ async function processBatchUpdates() {
   }
 }
 
-// Run batch updates periodically
+// Start batch update interval
 setInterval(processBatchUpdates, BATCH_UPDATE_INTERVAL);
 
 // Enhanced cache cleanup function with memory optimization
@@ -104,45 +104,23 @@ const preloadAssets = (logoUrl: string) => `
   <link rel="preload" href="${logoUrl}" as="image" fetchpriority="high">
 `;
 
-// Inline critical CSS with optimized selectors
+// Optimized critical CSS with only essential styles
 const criticalCSS = `
-  :root {
-    --primary-color: #4A90E2;
-    --secondary-color: #F4D03F;
-    --accent-color: #00BCD4;
-    --background-color: #FAFAFA;
-    --text-color: #2C3E50;
-    --text-light: #6b7280;
-    --border-color: #e5e7eb;
-    --border-radius: 0.75rem;
-  }
-  
-  body {
-    font-family: 'Cairo', system-ui, -apple-system, sans-serif;
-    margin: 0;
-    padding: 0;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    background: var(--background-color);
-    color: var(--text-color);
-    line-height: 1.5;
-    text-rendering: optimizeSpeed;
-  }
-  
-  .container {
-    width: 100%;
-    max-width: 600px;
-    padding: 2rem;
-    background: white;
-    border-radius: var(--border-radius);
-    box-shadow: 0 10px 25px -5px rgba(0,0,0,0.1);
-    margin: 1rem;
-    border-left: 4px solid var(--primary-color);
-    will-change: transform;
-  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: system-ui, -apple-system, sans-serif; line-height: 1.5; }
+  .container { max-width: 100%; padding: 1rem; margin: 0 auto; }
+  .logo { max-width: 150px; height: auto; margin-bottom: 1rem; }
+  .title { font-size: 1.5rem; font-weight: 700; margin-bottom: 1rem; }
+  .buttons { display: flex; flex-direction: column; gap: 0.5rem; }
+  .button { display: inline-block; padding: 0.75rem 1rem; text-decoration: none; border-radius: 0.5rem; }
+  .menu-section { margin-top: 1rem; }
+  .menu-header { font-size: 1.25rem; margin-bottom: 0.5rem; }
+  .menu-categories { display: flex; flex-direction: column; gap: 1rem; }
+  .category { background: #f9fafb; border-radius: 0.5rem; overflow: hidden; }
+  .category-name { padding: 0.5rem; font-weight: 600; }
+  .category-items { padding: 0.5rem; }
+  .item { background: white; padding: 0.5rem; border-radius: 0.25rem; }
+  @media (min-width: 480px) { .category-items { grid-template-columns: repeat(2, 1fr); } }
 `;
 
 // Optimized HTML template with minimal DOM
@@ -154,7 +132,7 @@ const generateHTML = (qrCode: QRCode, logoUrl: string, customCSS: string) => `
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="${qrCode.name} - QR Code Landing Page">
     <title>${qrCode.name}</title>
-    ${logoUrl ? preloadAssets(logoUrl) : ''}
+    ${logoUrl ? `<link rel="preload" href="${logoUrl}" as="image">` : ''}
     <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;500;600;700&display=swap" media="print" onload="this.media='all'">
     <style>
       ${criticalCSS}
@@ -165,13 +143,15 @@ const generateHTML = (qrCode: QRCode, logoUrl: string, customCSS: string) => `
     <div class="container">
       ${logoUrl ? `<img src="${logoUrl}" alt="Logo" class="logo" loading="eager" fetchpriority="high" width="150" height="80">` : ''}
       <h1 class="title">${qrCode.name}</h1>
-      <div class="buttons">
-        ${qrCode.buttons?.map(button => `
-          <a href="${button.url}" class="button" target="_blank" rel="noopener">
-            ${button.text}
-          </a>
-        `).join('') || ''}
-      </div>
+      ${qrCode.links?.length ? `
+        <div class="buttons">
+          ${qrCode.links.map(link => `
+            <a href="${link.url}" class="button" target="_blank" rel="noopener">
+              ${link.label}
+            </a>
+          `).join('')}
+        </div>
+      ` : ''}
       ${qrCode.menu ? `
         <div class="menu-section">
           <h2 class="menu-header">Menu</h2>
@@ -194,13 +174,6 @@ const generateHTML = (qrCode: QRCode, logoUrl: string, customCSS: string) => `
         </div>
       ` : ''}
     </div>
-    <script>
-      // Defer non-critical operations
-      window.addEventListener('load', function() {
-        // Add any deferred functionality here
-        document.body.classList.add('loaded');
-      });
-    </script>
   </body>
 </html>
 `;
@@ -212,7 +185,20 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Check cache first
     const cachedQRCode = qrCodeCache.get(id);
     if (cachedQRCode && Date.now() - cachedQRCode.timestamp < CACHE_DURATION) {
+      // Update timestamp to keep cache fresh
       cachedQRCode.timestamp = Date.now();
+      
+      // Queue scan stats update
+      const currentStats = scanStatsQueue.get(id) || { count: 0, history: [] };
+      scanStatsQueue.set(id, {
+        count: currentStats.count + 1,
+        history: [...currentStats.history, {
+          timestamp: new Date(),
+          userAgent: req.headers['user-agent'] || 'Unknown',
+          ipAddress: req.ip || 'Unknown'
+        }]
+      });
+
       return serveLandingPage(res, cachedQRCode.data, req);
     }
 
@@ -227,6 +213,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
         'qr.backgroundColor',
         'qr.buttons',
         'qr.menu',
+        'qr.type',
+        'qr.originalUrl',
         'qr.updatedAt'
       ])
       .leftJoinAndSelect('qr.user', 'user', 'user.isActive = :isActive', { isActive: true })
@@ -261,6 +249,13 @@ export const getLandingPage = async (req: Request, res: Response) => {
 
     // Cache the QR code
     qrCodeCache.set(id, { data: qrCode, timestamp: Date.now() });
+
+    // Clean up cache if it gets too large
+    if (qrCodeCache.size > MAX_CACHE_SIZE) {
+      const oldestKey = Array.from(qrCodeCache.entries())
+        .sort(([, a], [, b]) => a.timestamp - b.timestamp)[0][0];
+      qrCodeCache.delete(oldestKey);
+    }
 
     // Serve the landing page
     return serveLandingPage(res, qrCode, req);
@@ -399,7 +394,7 @@ function serveLandingPage(res: Response, qrCode: QRCode, req: Request) {
     }
   `;
 
-  // Send optimized HTML
+  // Generate and send optimized HTML
   res.send(generateHTML(qrCode, logoUrl, customCSS));
 }
 
