@@ -20,18 +20,9 @@ export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';
 export interface MenuItem {
   name: string;
   description?: string;
-  price: number;
-  category: string;
+  price: string;
   imageUrl?: string;
-  availability: {
-    sunday: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-  };
+  availability?: Record<string, boolean>;
 }
 
 export interface MenuCategory {
@@ -126,26 +117,66 @@ export interface QRCodeLink {
 export interface QRCode {
   id: string;
   name: string;
-  type: QRCodeType;
-  url: string;
-  originalUrl: string;
-  links: QRCodeLink[];
-  menu?: Menu;
-  vitrine?: VitrineSection;
+  type: 'direct' | 'menu' | 'vitrine';
   logoUrl?: string;
-  foregroundColor: string;
-  backgroundColor: string;
-  textAbove?: string;
-  textBelow?: string;
-  scanCount: number;
-  scanHistory: {
-    timestamp: Date;
-    userAgent: string;
-    ipAddress: string;
-  }[];
-  user: User;
-  createdAt: Date;
-  updatedAt: Date;
+  backgroundColor?: string;
+  originalUrl?: string;
+  links?: Array<{
+    type: string;
+    url: string;
+  }>;
+  menu?: {
+    categories: Array<{
+      name: string;
+      items: MenuItem[];
+    }>;
+    currency?: string;
+  };
+  vitrine?: {
+    hero: {
+      businessName: string;
+      tagline?: string;
+      ctas: Array<{
+        type: string;
+        link: string;
+      }>;
+    };
+    about: {
+      description?: string;
+      city?: string;
+    };
+    services: Array<{
+      name: string;
+      description?: string;
+      title?: string;
+      imageUrl?: string;
+      imageDescription?: string;
+    }>;
+    gallery: Array<{
+      imageUrl: string;
+      title?: string;
+      description?: string;
+    }>;
+    testimonials: Array<{
+      text: string;
+      author: string;
+      city?: string;
+    }>;
+    contact: {
+      address?: string;
+      phone?: string;
+      email?: string;
+      socialMedia: Record<string, string>;
+    };
+    footer: {
+      copyright: string;
+      businessName: string;
+      quickLinks: Array<{
+        label: string;
+        url: string;
+      }>;
+    };
+  };
 }
 
 export interface AuthContextType {
