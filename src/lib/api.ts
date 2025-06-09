@@ -394,15 +394,19 @@ export const qrCodeApi = {
   },
 
   getPublicQRCode: async (id: string) => {
-    const response = await api.get(`/qrcodes/public/${id}`, {
-      headers: {
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      },
-      // Add timeout to prevent hanging requests
-      timeout: 5000
-    });
-    return response.data;
+    try {
+      const response = await axios.get(`${API_BASE_URL}/qrcodes/public/${id}`, {
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+        timeout: 5000
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching QR code:', error);
+      throw error;
+    }
   },
 
   delete: async (id: string) => {
@@ -411,17 +415,19 @@ export const qrCodeApi = {
   },
 
   incrementScanCount: async (id: string) => {
-    // Use a more efficient method for scan count increment
-    const response = await api.post(`/qrcodes/${id}/scan`, null, {
-      headers: {
-        'Content-Type': 'application/json',
-        'Cache-Control': 'no-cache',
-        'Pragma': 'no-cache'
-      },
-      // Add timeout to prevent hanging requests
-      timeout: 3000
-    });
-    return response.data;
+    try {
+      const response = await axios.post(`${API_BASE_URL}/qrcodes/${id}/scan`, {}, {
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+        timeout: 3000
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error incrementing scan count:', error);
+      throw error;
+    }
   }
 };
 
