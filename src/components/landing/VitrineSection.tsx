@@ -359,19 +359,20 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
               })}
               {/* CTA Links */}
               {vitrine.hero.ctas.map((cta, index) => {
-                const { icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
+                const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
                 return (
                   <motion.a
                     key={`cta-${index}`}
                     href={cta.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="p-3 rounded-full text-white transition-all duration-300 hover:scale-110"
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white transition-all duration-300 hover:scale-110"
                     style={{ backgroundColor: bgColor }}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
                     <Icon className="h-5 w-5" />
+                    <span className="text-sm font-medium">{label}</span>
                   </motion.a>
                 );
               })}
