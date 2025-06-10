@@ -267,23 +267,23 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
+    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/10 via-white to-[#ec4899]/10">
       <div className="min-h-screen">
         <header className="relative py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-0 bg-black/10 -z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 -z-10"></div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col items-center text-center">
               {qrCode.logoUrl && (
                 <motion.div
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5 }}
+                  transition={{ duration: 0.5, ease: "easeOut" }}
                   className="mb-6 sm:mb-12"
                 >
                   <img
                     src={qrCode.logoUrl}
                     alt="Logo"
-                    className="h-16 w-16 sm:h-24 sm:w-24 object-contain rounded-2xl shadow-lg bg-white/10 backdrop-blur-sm"
+                    className="h-16 w-16 sm:h-24 sm:w-24 object-contain rounded-2xl shadow-lg bg-white/5 backdrop-blur-sm"
                   />
                 </motion.div>
               )}
@@ -297,10 +297,10 @@ const LandingPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
@@ -315,16 +315,16 @@ const LandingPage = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/10 backdrop-blur-sm"
+                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/5 backdrop-blur-sm"
                         style={{ 
                           background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.05)',
                         }}
                         whileHover={{ y: -4, scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                        transition={{ duration: 0.3, delay: index * 0.1, ease: "easeOut" }}
                       >
                         <Icon className="w-8 h-8 text-white" />
                         <span className="text-lg font-medium text-white">{label}</span>
@@ -339,10 +339,10 @@ const LandingPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'قائمة الطعام' : 'Menu'}
@@ -368,10 +368,10 @@ const LandingPage = () => {
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5 }}
+                transition={{ duration: 0.5, ease: "easeOut" }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8b5cf6] border-t-transparent"></div>
