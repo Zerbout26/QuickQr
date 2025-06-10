@@ -390,11 +390,6 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
-                <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-100">
-                    {menuLanguage === 'ar' ? 'معرضنا' : 'Our Gallery'}
-                  </h2>
-                </div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-100 border-t-transparent"></div>
