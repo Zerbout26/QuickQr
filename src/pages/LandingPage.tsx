@@ -217,13 +217,16 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-primary/5">
-        <div className="text-center space-y-4">
-          <div className="relative w-16 h-16">
-            <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
-            <div className="w-16 h-16 border-4 border-primary border-t-transparent rounded-full animate-spin absolute top-0 left-0"></div>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="min-h-screen flex items-center justify-center">
+          <div className="text-center">
+            <div className="relative w-24 h-24 mx-auto mb-8">
+              <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+            </div>
+            <h2 className="text-2xl font-bold text-primary mb-4">Loading...</h2>
+            <p className="text-gray-600">Please wait while we prepare your experience</p>
           </div>
-          <p className="text-lg text-gray-700 font-medium">{translations[menuLanguage].loading}</p>
         </div>
       </div>
     );
@@ -231,21 +234,23 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-primary/5">
-        <div className="text-center space-y-6 max-w-sm mx-auto px-4">
-          <div className="w-24 h-24 mx-auto bg-red-50 rounded-full flex items-center justify-center">
-            <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+        <div className="min-h-screen flex items-center justify-center p-4">
+          <div className="text-center max-w-md">
+            <div className="w-20 h-20 mx-auto mb-6 text-red-500">
+              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <h2 className="text-2xl font-bold text-gray-900 mb-4">Oops! Something went wrong</h2>
+            <p className="text-gray-600 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
+            <button
+              onClick={() => window.location.reload()}
+              className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors duration-200 shadow-lg hover:shadow-xl"
+            >
+              Try Again
+            </button>
           </div>
-          <h1 className="text-3xl sm:text-4xl font-extrabold text-gray-900 tracking-tight">{translations[menuLanguage].error}</h1>
-          <p className="text-lg text-gray-600">{error || translations[menuLanguage].qrCodeNotFound}</p>
-          <Button
-            className="px-6 py-3 text-lg font-medium rounded-full bg-primary text-white hover:bg-primary/90 hover:scale-105 transition-all duration-300 focus:ring-2 focus:ring-offset-2 focus:ring-primary shadow-lg hover:shadow-xl"
-            onClick={() => navigate('/')}
-          >
-            {translations[menuLanguage].returnHome}
-          </Button>
         </div>
       </div>
     );
@@ -262,99 +267,146 @@ const LandingPage = () => {
   };
 
   return (
-    <div
-      className="min-h-screen py-4 sm:py-8 px-0 sm:px-4 font-sans"
-      style={{
-        background: getBackgroundGradient(),
-      }}
-    >
-      <div className="w-full sm:max-w-2xl lg:max-w-7xl mx-auto">
-        <Card className="overflow-hidden rounded-none sm:rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-xl transition-all duration-300 hover:shadow-3xl">
-          {qrCode.logoUrl && (
-            <div className="flex justify-center pt-8 sm:pt-12">
-              <motion.img
-                src={qrCode.logoUrl}
-                alt="Logo"
-                className="h-24 sm:h-36 w-auto object-contain transition-all duration-300 hover:scale-105"
-                loading="eager"
-                fetchPriority="high"
-                initial={{ opacity: 0, y: -20 }}
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="min-h-screen">
+        <header className="relative py-8 px-4 sm:px-6 lg:px-8">
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
+          <div className="max-w-7xl mx-auto">
+            <div className="flex flex-col items-center text-center">
+              {qrCode.logoUrl && (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ duration: 0.5 }}
+                  className="mb-6"
+                >
+                  <img
+                    src={qrCode.logoUrl}
+                    alt="Logo"
+                    className="h-24 w-24 object-contain rounded-2xl shadow-lg"
+                  />
+                </motion.div>
+              )}
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5, delay: 0.2 }}
+                className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
+              >
+                {qrCode.name}
+              </motion.h1>
+              {qrCode.description && (
+                <motion.p
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 0.3 }}
+                  className="mt-4 text-lg sm:text-xl text-gray-600 max-w-3xl"
+                >
+                  {qrCode.description}
+                </motion.p>
+              )}
+            </div>
+          </div>
+        </header>
+
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+          <div className="space-y-16">
+            {hasUrls && (
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-              />
-            </div>
-          )}
-
-          <CardContent className="p-4 sm:p-8 md:p-12">
-            <motion.h1
-              className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 sm:mb-10 tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
-              dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.5, delay: 0.2 }}
-            >
-              {qrCode.name}
-            </motion.h1>
-
-            {hasUrls && (
-              <Suspense fallback={
-                <div className="h-32 flex items-center justify-center">
-                  <div className="animate-pulse space-y-4 w-full">
-                    <div className="h-12 bg-gray-200 rounded-2xl"></div>
-                    <div className="h-12 bg-gray-200 rounded-2xl"></div>
-                  </div>
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-primary">
+                    {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
+                  </h2>
                 </div>
-              }>
-                <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
-              </Suspense>
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {qrCode.links.map((link, index) => {
+                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.platform);
+                    return (
+                      <motion.a
+                        key={index}
+                        href={link.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
+                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                        }}
+                        whileHover={{ y: -4, scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.3, delay: index * 0.1 }}
+                      >
+                        <Icon className="w-8 h-8" />
+                        <span className="text-lg font-medium">{label}</span>
+                      </motion.a>
+                    );
+                  })}
+                </div>
+              </motion.div>
             )}
 
             {hasMenu && (
-              <Suspense fallback={
-                <div className="h-32 flex items-center justify-center">
-                  <div className="animate-pulse space-y-4 w-full">
-                    <div className="h-8 bg-gray-200 rounded-full w-1/3 mx-auto"></div>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      <div className="h-32 bg-gray-200 rounded-2xl"></div>
-                      <div className="h-32 bg-gray-200 rounded-2xl"></div>
-                    </div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <Suspense fallback={
+                  <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+                    <p className="mt-4 text-gray-600">Loading menu...</p>
                   </div>
-                </div>
-              }>
-                <MenuSection
-                  menu={qrCode.menu}
-                  menuLanguage={menuLanguage}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                />
-              </Suspense>
+                }>
+                  <MenuSection
+                    menu={qrCode.menu}
+                    menuLanguage={menuLanguage}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                  />
+                </Suspense>
+              </motion.div>
             )}
 
             {hasVitrine && (
-              <Suspense fallback={
-                <div className="h-32 flex items-center justify-center">
-                  <div className="animate-pulse space-y-4 w-full">
-                    <div className="h-8 bg-gray-200 rounded-full w-1/3 mx-auto"></div>
-                    <div className="h-64 bg-gray-200 rounded-2xl"></div>
+              <motion.div
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+                className="relative"
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <Suspense fallback={
+                  <div className="text-center py-12">
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
+                    <p className="mt-4 text-gray-600">Loading vitrine...</p>
                   </div>
-                </div>
-              }>
-                <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
-              </Suspense>
+                }>
+                  <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
+                </Suspense>
+              </motion.div>
             )}
+          </div>
+        </main>
 
-            <motion.div 
-              className="mt-12 text-center"
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ duration: 0.5, delay: 0.4 }}
-            >
-              <p className="text-sm text-gray-500">
-                {translations[menuLanguage].poweredBy} <span className="font-medium text-primary">QuickQR</span>
+        <footer className="bg-gradient-to-br from-gray-50 to-white py-12 mt-16">
+          <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="text-center">
+              <p className="text-gray-600">
+                Powered by <span className="text-primary font-medium">QuickQR</span>
               </p>
-            </motion.div>
-          </CardContent>
-        </Card>
+            </div>
+          </div>
+        </footer>
       </div>
     </div>
   );
