@@ -55,61 +55,61 @@ const getPlatformInfo = (type: string) => {
     facebook: {
       label: 'Facebook',
       icon: Facebook,
-      bgColor: 'linear-gradient(135deg, #1877F2 0%, #0D6EFD 100%)',
+      bgColor: '#1877F2',
       hoverBgColor: '#0D6EFD',
     },
     instagram: {
       label: 'Instagram',
       icon: Instagram,
-      bgColor: 'linear-gradient(135deg, #E4405F 0%, #C13584 100%)',
+      bgColor: '#E4405F',
       hoverBgColor: '#C13584',
     },
     twitter: {
       label: 'Twitter',
       icon: Twitter,
-      bgColor: 'linear-gradient(135deg, #1DA1F2 0%, #0D8ECF 100%)',
+      bgColor: '#1DA1F2',
       hoverBgColor: '#0D8ECF',
     },
     linkedin: {
       label: 'LinkedIn',
       icon: Linkedin,
-      bgColor: 'linear-gradient(135deg, #0A66C2 0%, #004182 100%)',
+      bgColor: '#0A66C2',
       hoverBgColor: '#004182',
     },
     youtube: {
       label: 'YouTube',
       icon: Youtube,
-      bgColor: 'linear-gradient(135deg, #FF0000 0%, #CC0000 100%)',
+      bgColor: '#FF0000',
       hoverBgColor: '#CC0000',
     },
     spotify: {
       label: 'Spotify',
       icon: Music,
-      bgColor: 'linear-gradient(135deg, #1DB954 0%, #1AA34A 100%)',
+      bgColor: '#1DB954',
       hoverBgColor: '#1AA34A',
     },
     whatsapp: {
       label: 'WhatsApp',
       icon: MessageCircle,
-      bgColor: 'linear-gradient(135deg, #25D366 0%, #128C7E 100%)',
+      bgColor: '#25D366',
       hoverBgColor: '#128C7E',
     },
     telegram: {
       label: 'Telegram',
       icon: Send,
-      bgColor: 'linear-gradient(135deg, #0088CC 0%, #006699 100%)',
+      bgColor: '#0088CC',
       hoverBgColor: '#006699',
     },
     website: {
       label: 'Website',
       icon: Globe,
-      bgColor: 'linear-gradient(135deg, #4A90E2 0%, #357ABD 100%)',
+      bgColor: '#4A90E2',
       hoverBgColor: '#357ABD',
     },
     other: {
       label: 'Link',
       icon: ExternalLink,
-      bgColor: 'linear-gradient(135deg, #6B7280 0%, #4B5563 100%)',
+      bgColor: '#6B7280',
       hoverBgColor: '#4B5563',
     },
   };
@@ -348,8 +348,11 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white transition-all duration-300 hover:scale-110"
-                    style={{ backgroundColor: bgColor }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                    style={{ 
+                      backgroundColor: bgColor,
+                      '--hover-bg': hoverBgColor,
+                    } as any}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -367,8 +370,11 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     href={cta.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white transition-all duration-300 hover:scale-110"
-                    style={{ backgroundColor: bgColor }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                    style={{ 
+                      backgroundColor: bgColor,
+                      '--hover-bg': hoverBgColor,
+                    } as any}
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                   >
