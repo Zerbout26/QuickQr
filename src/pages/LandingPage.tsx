@@ -217,7 +217,7 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-primary/5">
         <div className="text-center space-y-4">
           <div className="relative w-16 h-16">
             <div className="w-16 h-16 border-4 border-primary/20 rounded-full"></div>
@@ -231,7 +231,7 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-white to-gray-50">
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-primary/5 via-white to-primary/5">
         <div className="text-center space-y-6 max-w-sm mx-auto px-4">
           <div className="w-24 h-24 mx-auto bg-red-50 rounded-full flex items-center justify-center">
             <svg className="w-12 h-12 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -255,43 +255,72 @@ const LandingPage = () => {
   const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
   const hasVitrine = qrCode.type === 'vitrine' && qrCode.vitrine;
 
+  // Generate a dynamic gradient based on the QR code's background color
+  const getBackgroundGradient = () => {
+    const baseColor = qrCode.backgroundColor || '#f9fafb';
+    return `radial-gradient(circle at top, ${baseColor} 0%, ${adjustColor(baseColor, -30)} 100%)`;
+  };
+
   return (
     <div
       className="min-h-screen py-4 sm:py-8 px-0 sm:px-4 font-sans"
       style={{
-        background: `radial-gradient(circle at top, ${qrCode.backgroundColor || '#f9fafb'} 0%, ${qrCode.backgroundColor ? adjustColor(qrCode.backgroundColor, -30) : '#e5e7eb'} 100%)`,
+        background: getBackgroundGradient(),
       }}
     >
       <div className="w-full sm:max-w-2xl lg:max-w-7xl mx-auto">
         <Card className="overflow-hidden rounded-none sm:rounded-3xl shadow-2xl border-none bg-white/95 backdrop-blur-xl transition-all duration-300 hover:shadow-3xl">
           {qrCode.logoUrl && (
             <div className="flex justify-center pt-8 sm:pt-12">
-              <img
+              <motion.img
                 src={qrCode.logoUrl}
                 alt="Logo"
                 className="h-24 sm:h-36 w-auto object-contain transition-all duration-300 hover:scale-105"
                 loading="eager"
                 fetchPriority="high"
+                initial={{ opacity: 0, y: -20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
               />
             </div>
           )}
 
           <CardContent className="p-4 sm:p-8 md:p-12">
-            <h1
+            <motion.h1
               className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-center mb-8 sm:mb-10 tracking-tight bg-gradient-to-r from-primary to-primary/80 bg-clip-text text-transparent"
               dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
             >
               {qrCode.name}
-            </h1>
+            </motion.h1>
 
             {hasUrls && (
-              <Suspense fallback={<div className="h-32 flex items-center justify-center">Loading social links...</div>}>
+              <Suspense fallback={
+                <div className="h-32 flex items-center justify-center">
+                  <div className="animate-pulse space-y-4 w-full">
+                    <div className="h-12 bg-gray-200 rounded-2xl"></div>
+                    <div className="h-12 bg-gray-200 rounded-2xl"></div>
+                  </div>
+                </div>
+              }>
                 <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
               </Suspense>
             )}
 
             {hasMenu && (
-              <Suspense fallback={<div className="h-32 flex items-center justify-center">Loading menu...</div>}>
+              <Suspense fallback={
+                <div className="h-32 flex items-center justify-center">
+                  <div className="animate-pulse space-y-4 w-full">
+                    <div className="h-8 bg-gray-200 rounded-full w-1/3 mx-auto"></div>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="h-32 bg-gray-200 rounded-2xl"></div>
+                      <div className="h-32 bg-gray-200 rounded-2xl"></div>
+                    </div>
+                  </div>
+                </div>
+              }>
                 <MenuSection
                   menu={qrCode.menu}
                   menuLanguage={menuLanguage}
@@ -302,16 +331,28 @@ const LandingPage = () => {
             )}
 
             {hasVitrine && (
-              <Suspense fallback={<div className="h-32 flex items-center justify-center">Loading vitrine...</div>}>
+              <Suspense fallback={
+                <div className="h-32 flex items-center justify-center">
+                  <div className="animate-pulse space-y-4 w-full">
+                    <div className="h-8 bg-gray-200 rounded-full w-1/3 mx-auto"></div>
+                    <div className="h-64 bg-gray-200 rounded-2xl"></div>
+                  </div>
+                </div>
+              }>
                 <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
               </Suspense>
             )}
 
-            <div className="mt-12 text-center">
+            <motion.div 
+              className="mt-12 text-center"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.5, delay: 0.4 }}
+            >
               <p className="text-sm text-gray-500">
-                {translations[menuLanguage].poweredBy} <span className="font-medium">QuickQR</span>
+                {translations[menuLanguage].poweredBy} <span className="font-medium text-primary">QuickQR</span>
               </p>
-            </div>
+            </motion.div>
           </CardContent>
         </Card>
       </div>
