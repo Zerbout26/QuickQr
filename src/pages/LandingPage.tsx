@@ -217,7 +217,7 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="relative w-24 h-24 mx-auto mb-8">
@@ -234,7 +234,7 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
             <div className="w-20 h-20 mx-auto mb-6 text-red-500">
@@ -267,10 +267,10 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-gray-50 via-white to-gray-50">
+    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
       <div className="min-h-screen">
         <header className="relative py-8 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10"></div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col items-center text-center">
               {qrCode.logoUrl && (
@@ -318,7 +318,7 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
                   <h2 className="text-3xl font-bold text-primary">
                     {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
@@ -360,7 +360,7 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
@@ -384,7 +384,7 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
@@ -398,7 +398,7 @@ const LandingPage = () => {
           </div>
         </main>
 
-        <footer className="bg-gradient-to-br from-gray-50 to-white py-12 mt-16">
+        <footer className="bg-gradient-to-br from-primary/20 via-white to-primary/20 py-12 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
               <p className="text-gray-600">

@@ -124,7 +124,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
     <div className="space-y-16 mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
       <div className="text-center mb-12 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10 rounded-3xl"></div>
+        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10 rounded-3xl"></div>
         <motion.h2 
           className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent mb-6"
           initial={{ opacity: 0, y: 20 }}
@@ -179,7 +179,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10 rounded-3xl"></div>
+          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10 rounded-3xl"></div>
           <h3 className="text-3xl sm:text-4xl font-bold text-primary mb-6">
             {menuLanguage === 'ar' ? 'من نحن' : 'About Us'}
           </h3>
@@ -213,12 +213,13 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             {vitrine.services.map((service, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
                 {service.imageUrl && (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
@@ -234,7 +235,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     />
                   </div>
                 )}
-                <div className="p-6 bg-gradient-to-br from-white to-gray-50">
+                <div className="p-6 bg-gradient-to-br from-white to-primary/5">
                   <h4 className="text-2xl font-bold text-primary mb-3">{service.name}</h4>
                   {service.description && (
                     <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
@@ -271,12 +272,13 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             {vitrine.gallery.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group"
+                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <img
                     src={item.imageUrl}
@@ -285,7 +287,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     loading="lazy"
                   />
                 </div>
-                <div className="p-6 bg-gradient-to-br from-white to-gray-50">
+                <div className="p-6 bg-gradient-to-br from-white to-primary/5">
                   {item.title && (
                     <h4 className="text-2xl font-bold text-primary mb-3">{item.title}</h4>
                   )}
@@ -320,7 +322,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl -z-10"></div>
+                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
                 <div className="absolute top-4 left-4 text-6xl text-primary/10 font-serif">"</div>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
                 <div className="flex items-center justify-between">
@@ -347,12 +349,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
         </motion.h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg"
+            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl -z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
             {vitrine.contact.address && (
               <div>
                 <h4 className="font-bold text-primary text-lg mb-2">
@@ -379,12 +381,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             )}
           </motion.div>
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg"
+            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-2xl -z-10"></div>
+            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
             <h4 className="font-bold text-primary text-lg mb-4">
               {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
             </h4>

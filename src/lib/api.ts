@@ -402,7 +402,7 @@ export const qrCodeApi = {
         },
         timeout: 5000
       });
-      return response.data;
+    return response.data;
     } catch (error) {
       console.error('Error fetching QR code:', error);
       throw error;
@@ -423,7 +423,7 @@ export const qrCodeApi = {
         },
         timeout: 3000
       });
-      return response.data;
+    return response.data;
     } catch (error) {
       console.error('Error incrementing scan count:', error);
       throw error;
