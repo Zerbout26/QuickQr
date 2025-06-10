@@ -269,7 +269,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/10 via-white to-[#ec4899]/10">
       <div className="min-h-screen">
-        <header className="relative py-6 sm:py-12 px-4 sm:px-6 lg:px-8">
+        <header className="relative py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 -z-10"></div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col items-center text-center">
@@ -278,7 +278,7 @@ const LandingPage = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="mb-6 sm:mb-12"
+                  className="mb-4 sm:mb-6"
                 >
                   <img
                     src={qrCode.logoUrl}
@@ -291,7 +291,7 @@ const LandingPage = () => {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4">
           <div className="space-y-8 sm:space-y-12">
             {hasUrls && (
               <motion.div
