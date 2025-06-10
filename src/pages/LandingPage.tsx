@@ -217,15 +217,15 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
+      <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="relative w-24 h-24 mx-auto mb-8">
-              <div className="absolute inset-0 rounded-full border-4 border-primary/20"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
+              <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
             </div>
-            <h2 className="text-2xl font-bold text-primary mb-4">Loading...</h2>
-            <p className="text-gray-600">Please wait while we prepare your experience</p>
+            <h2 className="text-2xl font-bold text-white mb-4">Loading...</h2>
+            <p className="text-white/80">Please wait while we prepare your experience</p>
           </div>
         </div>
       </div>
@@ -234,19 +234,19 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
+      <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
-            <div className="w-20 h-20 mx-auto mb-6 text-red-500">
+            <div className="w-20 h-20 mx-auto mb-6 text-white">
               <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
               </svg>
             </div>
-            <h2 className="text-2xl font-bold text-gray-900 mb-4">Oops! Something went wrong</h2>
-            <p className="text-gray-600 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
+            <h2 className="text-2xl font-bold text-white mb-4">Oops! Something went wrong</h2>
+            <p className="text-white/80 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
             <button
               onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-primary text-white rounded-full font-medium hover:bg-primary/90 transition-colors duration-200 shadow-lg hover:shadow-xl"
+              className="px-6 py-3 bg-[#22c55e] text-white rounded-full font-medium hover:bg-[#16a34a] transition-colors duration-200 shadow-lg hover:shadow-xl"
             >
               Try Again
             </button>
@@ -267,10 +267,10 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/20 via-white to-primary/20">
+    <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
       <div className="min-h-screen">
         <header className="relative py-8 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10"></div>
+          <div className="absolute inset-0 bg-black/10 -z-10"></div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col items-center text-center">
               {qrCode.logoUrl && (
@@ -283,7 +283,7 @@ const LandingPage = () => {
                   <img
                     src={qrCode.logoUrl}
                     alt="Logo"
-                    className="h-24 w-24 object-contain rounded-2xl shadow-lg"
+                    className="h-24 w-24 object-contain rounded-2xl shadow-lg bg-white/10 backdrop-blur-sm"
                   />
                 </motion.div>
               )}
@@ -291,7 +291,7 @@ const LandingPage = () => {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: 0.2 }}
-                className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent"
+                className="text-4xl sm:text-5xl font-bold tracking-tight text-white"
               >
                 {qrCode.name}
               </motion.h1>
@@ -300,7 +300,7 @@ const LandingPage = () => {
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   transition={{ duration: 0.5, delay: 0.3 }}
-                  className="mt-4 text-lg sm:text-xl text-gray-600 max-w-3xl"
+                  className="mt-4 text-lg sm:text-xl text-white/90 max-w-3xl"
                 >
                   {qrCode.description}
                 </motion.p>
@@ -318,9 +318,9 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-primary">
+                  <h2 className="text-3xl font-bold text-white">
                     {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
                   </h2>
                 </div>
@@ -333,7 +333,7 @@ const LandingPage = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98]"
+                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/10 backdrop-blur-sm"
                         style={{ 
                           background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                           boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
@@ -360,11 +360,11 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                    <p className="mt-4 text-gray-600">Loading menu...</p>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+                    <p className="mt-4 text-white/80">Loading menu...</p>
                   </div>
                 }>
                   <MenuSection
@@ -384,11 +384,11 @@ const LandingPage = () => {
                 transition={{ duration: 0.5 }}
                 className="relative"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 rounded-3xl -z-10"></div>
+                <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-primary border-t-transparent"></div>
-                    <p className="mt-4 text-gray-600">Loading vitrine...</p>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
+                    <p className="mt-4 text-white/80">Loading vitrine...</p>
                   </div>
                 }>
                   <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
@@ -398,11 +398,11 @@ const LandingPage = () => {
           </div>
         </main>
 
-        <footer className="bg-gradient-to-br from-primary/20 via-white to-primary/20 py-12 mt-16">
+        <footer className="py-12 mt-16">
           <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
             <div className="text-center">
-              <p className="text-gray-600">
-                Powered by <span className="text-primary font-medium">QuickQR</span>
+              <p className="text-white/80">
+                Powered by <span className="text-white font-medium">QuickQR</span>
               </p>
             </div>
           </div>

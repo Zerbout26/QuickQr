@@ -124,9 +124,9 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
     <div className="space-y-16 mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
       <div className="text-center mb-12 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10 rounded-3xl"></div>
+        <div className="absolute inset-0 bg-black/10 -z-10 rounded-3xl"></div>
         <motion.h2 
-          className="text-4xl sm:text-5xl font-bold tracking-tight bg-gradient-to-r from-primary via-primary/80 to-primary/60 bg-clip-text text-transparent mb-6"
+          className="text-4xl sm:text-5xl font-bold tracking-tight text-white mb-6"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -135,7 +135,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
         </motion.h2>
         {vitrine.hero.tagline && (
           <motion.p 
-            className="text-gray-600 mt-4 text-lg sm:text-xl max-w-3xl mx-auto px-4 leading-relaxed"
+            className="text-white/90 mt-4 text-lg sm:text-xl max-w-3xl mx-auto px-4 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -145,18 +145,14 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
         )}
         <div className="flex flex-wrap justify-center gap-4 mt-8">
           {vitrine.hero.ctas.map((cta, index) => {
-            const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
+            const { label, icon: Icon } = getPlatformInfo(cta.type);
             return (
               <motion.a
                 key={index}
                 href={cta.link}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap"
-                style={{ 
-                  background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
-                }}
+                className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap bg-[#22c55e] hover:bg-[#16a34a]"
                 whileHover={{ y: -2, scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
                 initial={{ opacity: 0, y: 20 }}
@@ -179,15 +175,15 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-primary/30 via-primary/20 to-primary/10 -z-10 rounded-3xl"></div>
-          <h3 className="text-3xl sm:text-4xl font-bold text-primary mb-6">
+          <div className="absolute inset-0 bg-black/10 -z-10 rounded-3xl"></div>
+          <h3 className="text-3xl sm:text-4xl font-bold text-white mb-6">
             {menuLanguage === 'ar' ? 'من نحن' : 'About Us'}
           </h3>
-          <p className="text-gray-600 text-lg sm:text-xl leading-relaxed">
+          <p className="text-white/90 text-lg sm:text-xl leading-relaxed">
             {vitrine.about.description}
           </p>
           {vitrine.about.city && (
-            <p className="text-primary/80 mt-4 text-lg font-medium">
+            <p className="text-white/80 mt-4 text-lg font-medium">
               {vitrine.about.city}
             </p>
           )}
@@ -198,7 +194,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.services.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-white text-center mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -213,13 +209,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             {vitrine.services.map((service, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
+                className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
                 {service.imageUrl && (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <img
@@ -235,16 +230,16 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     />
                   </div>
                 )}
-                <div className="p-6 bg-gradient-to-br from-white to-primary/5">
-                  <h4 className="text-2xl font-bold text-primary mb-3">{service.name}</h4>
+                <div className="p-6">
+                  <h4 className="text-2xl font-bold text-white mb-3">{service.name}</h4>
                   {service.description && (
-                    <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
+                    <p className="text-white/90 mb-4 text-base leading-relaxed">{service.description}</p>
                   )}
                   {service.title && (
-                    <p className="text-primary/80 font-medium">{service.title}</p>
+                    <p className="text-white/80 font-medium">{service.title}</p>
                   )}
                   {service.imageDescription && (
-                    <p className="text-gray-500 mt-2 text-sm">{service.imageDescription}</p>
+                    <p className="text-white/70 mt-2 text-sm">{service.imageDescription}</p>
                   )}
                 </div>
               </motion.div>
@@ -257,7 +252,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.gallery.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-white text-center mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -272,13 +267,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             {vitrine.gallery.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
+                className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/10 via-primary/5 to-transparent -z-10"></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <img
                     src={item.imageUrl}
@@ -287,12 +281,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     loading="lazy"
                   />
                 </div>
-                <div className="p-6 bg-gradient-to-br from-white to-primary/5">
+                <div className="p-6">
                   {item.title && (
-                    <h4 className="text-2xl font-bold text-primary mb-3">{item.title}</h4>
+                    <h4 className="text-2xl font-bold text-white mb-3">{item.title}</h4>
                   )}
                   {item.description && (
-                    <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
+                    <p className="text-white/90 text-base leading-relaxed">{item.description}</p>
                   )}
                 </div>
               </motion.div>
@@ -305,7 +299,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.testimonials.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-white text-center mb-8"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -316,19 +310,18 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             {vitrine.testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 relative"
+                className="bg-white/10 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
-                <div className="absolute top-4 left-4 text-6xl text-primary/10 font-serif">"</div>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
+                <div className="absolute top-4 left-4 text-6xl text-white/10 font-serif">"</div>
+                <p className="text-white/90 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-primary text-lg">{testimonial.author}</span>
+                  <span className="font-bold text-white text-lg">{testimonial.author}</span>
                   {testimonial.city && (
-                    <span className="text-primary/80 text-base">{testimonial.city}</span>
+                    <span className="text-white/80 text-base">{testimonial.city}</span>
                   )}
                 </div>
               </motion.div>
@@ -340,7 +333,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {/* Contact Section */}
       <div className="space-y-10 px-4">
         <motion.h3 
-          className="text-3xl sm:text-4xl font-bold text-primary text-center mb-8"
+          className="text-3xl sm:text-4xl font-bold text-white text-center mb-8"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -349,63 +342,57 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
         </motion.h3>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
+            className="space-y-6 bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-lg relative"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
             {vitrine.contact.address && (
               <div>
-                <h4 className="font-bold text-primary text-lg mb-2">
+                <h4 className="font-bold text-white text-lg mb-2">
                   {menuLanguage === 'ar' ? 'العنوان' : 'Address'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.address}</p>
+                <p className="text-white/90 text-base">{vitrine.contact.address}</p>
               </div>
             )}
             {vitrine.contact.phone && (
               <div>
-                <h4 className="font-bold text-primary text-lg mb-2">
+                <h4 className="font-bold text-white text-lg mb-2">
                   {menuLanguage === 'ar' ? 'الهاتف' : 'Phone'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.phone}</p>
+                <p className="text-white/90 text-base">{vitrine.contact.phone}</p>
               </div>
             )}
             {vitrine.contact.email && (
               <div>
-                <h4 className="font-bold text-primary text-lg mb-2">
+                <h4 className="font-bold text-white text-lg mb-2">
                   {menuLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.email}</p>
+                <p className="text-white/90 text-base">{vitrine.contact.email}</p>
               </div>
             )}
           </motion.div>
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
+            className="space-y-6 bg-white/10 backdrop-blur-sm rounded-2xl p-8 shadow-lg relative"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-primary/20 via-primary/10 to-transparent rounded-2xl -z-10"></div>
-            <h4 className="font-bold text-primary text-lg mb-4">
+            <h4 className="font-bold text-white text-lg mb-4">
               {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
             </h4>
             <div className="flex flex-wrap justify-center gap-4">
               {/* Social Media Links */}
               {Object.entries(vitrine.contact.socialMedia).map(([platform, url]) => {
                 if (!url) return null;
-                const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
+                const { label, icon: Icon } = getPlatformInfo(platform);
                 return (
                   <motion.a
                     key={platform}
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
-                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 bg-[#22c55e] hover:bg-[#16a34a]"
                     whileHover={{ y: -2, scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -416,18 +403,14 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
               })}
               {/* CTA Links */}
               {vitrine.hero.ctas.map((cta, index) => {
-                const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
+                const { label, icon: Icon } = getPlatformInfo(cta.type);
                 return (
                   <motion.a
                     key={`cta-${index}`}
                     href={cta.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
-                    style={{ 
-                      background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                      boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
-                    }}
+                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 bg-[#22c55e] hover:bg-[#16a34a]"
                     whileHover={{ y: -2, scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
                   >
@@ -443,14 +426,14 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
 
       {/* Footer Section */}
       <motion.div 
-        className="border-t border-gray-200 pt-12 mt-16 px-4"
+        className="border-t border-white/10 pt-12 mt-16 px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="text-center">
-          <p className="text-gray-600 text-base">
-            {vitrine.footer.copyright} <span className="text-primary font-medium">{vitrine.footer.businessName}</span>
+          <p className="text-white/80 text-base">
+            {vitrine.footer.copyright} <span className="text-white font-medium">{vitrine.footer.businessName}</span>
           </p>
           {vitrine.footer.quickLinks.length > 0 && (
             <div className="flex flex-wrap justify-center gap-6 mt-6">
@@ -460,7 +443,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                   href={link.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="text-primary hover:text-primary/80 transition-colors duration-200 text-base font-medium"
+                  className="text-white hover:text-white/80 transition-colors duration-200 text-base font-medium"
                   whileHover={{ scale: 1.05 }}
                   whileTap={{ scale: 0.95 }}
                 >
