@@ -326,7 +326,7 @@ const LandingPage = () => {
                 </div>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
                   {qrCode.links.map((link, index) => {
-                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.platform);
+                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'website');
                     return (
                       <motion.a
                         key={index}
