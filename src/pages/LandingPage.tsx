@@ -344,8 +344,8 @@ const LandingPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
                       >
-                        <Icon className="w-8 h-8" />
-                        <span className="text-lg font-medium">{label}</span>
+                        <Icon className="w-8 h-8 text-white" />
+                        <span className="text-lg font-medium text-white">{label}</span>
                       </motion.a>
                     );
                   })}
@@ -361,6 +361,11 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-white">
+                    {menuLanguage === 'ar' ? 'قائمة الطعام' : 'Menu'}
+                  </h2>
+                </div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
@@ -385,6 +390,11 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
+                <div className="text-center mb-8">
+                  <h2 className="text-3xl font-bold text-white">
+                    {menuLanguage === 'ar' ? 'معرضنا' : 'Our Gallery'}
+                  </h2>
+                </div>
                 <Suspense fallback={
                   <div className="text-center py-12">
                     <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
