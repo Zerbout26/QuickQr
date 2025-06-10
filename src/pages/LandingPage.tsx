@@ -217,7 +217,7 @@ const LandingPage = () => {
 
   if (loading) {
     return (
-      <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
+      <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
         <div className="min-h-screen flex items-center justify-center">
           <div className="text-center">
             <div className="relative w-24 h-24 mx-auto mb-8">
@@ -234,7 +234,7 @@ const LandingPage = () => {
 
   if (error || !qrCode) {
     return (
-      <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
+      <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
         <div className="min-h-screen flex items-center justify-center p-4">
           <div className="text-center max-w-md">
             <div className="w-20 h-20 mx-auto mb-6 text-white">
@@ -267,7 +267,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen" style={{ background: 'linear-gradient(to right, #8b5cf6, #ec4899)' }}>
+    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="min-h-screen">
         <header className="relative py-8 px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-0 bg-black/10 -z-10"></div>
