@@ -269,7 +269,7 @@ const LandingPage = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/10 via-white to-[#ec4899]/10">
       <div className="min-h-screen">
-        <header className="relative py-6 sm:py-8 px-4 sm:px-6 lg:px-8">
+        <header className="relative py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 -z-10"></div>
           <div className="max-w-7xl mx-auto">
             <div className="flex flex-col items-center text-center">
@@ -278,7 +278,7 @@ const LandingPage = () => {
                   initial={{ opacity: 0, scale: 0.8 }}
                   animate={{ opacity: 1, scale: 1 }}
                   transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="mb-4 sm:mb-6"
+                  className="mb-2 sm:mb-4"
                 >
                   <img
                     src={qrCode.logoUrl}
@@ -291,8 +291,8 @@ const LandingPage = () => {
           </div>
         </header>
 
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-4">
-          <div className="space-y-8 sm:space-y-12">
+        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
+          <div className="space-y-6 sm:space-y-8">
             {hasUrls && (
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
@@ -301,7 +301,7 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
                   </h2>
@@ -343,7 +343,7 @@ const LandingPage = () => {
                 className="relative"
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
-                <div className="text-center mb-8">
+                <div className="text-center mb-6">
                   <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'قائمة الطعام' : 'Menu'}
                   </h2>
