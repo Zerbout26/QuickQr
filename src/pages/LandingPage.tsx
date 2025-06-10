@@ -302,7 +302,7 @@ const LandingPage = () => {
               >
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-100">
+                  <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
                   </h2>
                 </div>
@@ -315,7 +315,7 @@ const LandingPage = () => {
                         href={link.url}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-gray-100 transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/10 backdrop-blur-sm"
+                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/10 backdrop-blur-sm"
                         style={{ 
                           background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                           boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
@@ -326,8 +326,8 @@ const LandingPage = () => {
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ duration: 0.3, delay: index * 0.1 }}
                       >
-                        <Icon className="w-8 h-8 text-gray-100" />
-                        <span className="text-lg font-medium text-gray-100">{label}</span>
+                        <Icon className="w-8 h-8 text-white" />
+                        <span className="text-lg font-medium text-white">{label}</span>
                       </motion.a>
                     );
                   })}
@@ -344,14 +344,14 @@ const LandingPage = () => {
               >
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <div className="text-center mb-8">
-                  <h2 className="text-3xl font-bold text-gray-100">
+                  <h2 className="text-3xl font-bold text-[#8b5cf6]">
                     {menuLanguage === 'ar' ? 'قائمة الطعام' : 'Menu'}
                   </h2>
                 </div>
                 <Suspense fallback={
                   <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-100 border-t-transparent"></div>
-                    <p className="mt-4 text-gray-100/80">Loading menu...</p>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8b5cf6] border-t-transparent"></div>
+                    <p className="mt-4 text-[#8b5cf6]/80">Loading menu...</p>
                   </div>
                 }>
                   <MenuSection
@@ -374,8 +374,8 @@ const LandingPage = () => {
                 <div className="absolute inset-0 bg-black/10 rounded-3xl -z-10"></div>
                 <Suspense fallback={
                   <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-gray-100 border-t-transparent"></div>
-                    <p className="mt-4 text-gray-100/80">Loading vitrine...</p>
+                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8b5cf6] border-t-transparent"></div>
+                    <p className="mt-4 text-[#8b5cf6]/80">Loading vitrine...</p>
                   </div>
                 }>
                   <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
