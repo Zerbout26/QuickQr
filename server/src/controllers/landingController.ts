@@ -6,11 +6,26 @@ import { getCache, setCache } from '../config/redis';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-const CACHE_DURATION = 300; // 5 minutes in seconds
+const CACHE_DURATION = 3600; // Increased to 1 hour
+const CACHE_PREFIX = 'qr:landing:';
+
+// In-memory cache for frequently accessed QR codes
+const memoryCache = new Map<string, { data: any, timestamp: number }>();
+const MEMORY_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Batch update queue for scan stats
 const scanStatsQueue = new Map<string, { count: number, history: any[] }>();
 const BATCH_UPDATE_INTERVAL = 30 * 1000; // 30 seconds
+
+// Clean up old entries from memory cache
+setInterval(() => {
+  const now = Date.now();
+  for (const [key, value] of memoryCache.entries()) {
+    if (now - value.timestamp > MEMORY_CACHE_DURATION) {
+      memoryCache.delete(key);
+    }
+  }
+}, 60 * 1000); // Clean up every minute
 
 // Process batch updates
 async function processBatchUpdates() {
@@ -45,35 +60,65 @@ async function processBatchUpdates() {
 // Start batch update interval
 setInterval(processBatchUpdates, BATCH_UPDATE_INTERVAL);
 
+// Helper function to queue scan stats
+function queueScanStats(id: string, req: Request) {
+  const currentStats = scanStatsQueue.get(id) || { count: 0, history: [] };
+  scanStatsQueue.set(id, {
+    count: currentStats.count + 1,
+    history: [...currentStats.history, {
+      timestamp: new Date(),
+      userAgent: req.headers['user-agent'] || 'Unknown',
+      ipAddress: req.ip || 'Unknown'
+    }]
+  });
+}
+
+// Helper function to set aggressive cache headers
+function setAggressiveCacheHeaders(res: Response, data: any) {
+  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=300');
+  res.setHeader('ETag', `"${data.id}-${data.updatedAt}"`);
+  res.setHeader('Vary', 'Accept-Encoding');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+}
+
 export const getLandingPage = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
+    const cacheKey = `${CACHE_PREFIX}${id}`;
     
-    // Check Redis cache first
-    const cacheKey = `qr:${id}`;
+    // 1. Check memory cache first (fastest)
+    const memoryCached = memoryCache.get(cacheKey);
+    if (memoryCached && Date.now() - memoryCached.timestamp < MEMORY_CACHE_DURATION) {
+      // Queue scan stats update asynchronously
+      queueScanStats(id, req);
+      
+      // Set aggressive cache headers
+      setAggressiveCacheHeaders(res, memoryCached.data);
+      
+      return res.json(memoryCached.data);
+    }
+    
+    // 2. Check Redis cache
     const cachedQRCode = await getCache(cacheKey);
-    
     if (cachedQRCode) {
-      // Queue scan stats update
-      const currentStats = scanStatsQueue.get(id) || { count: 0, history: [] };
-      scanStatsQueue.set(id, {
-        count: currentStats.count + 1,
-        history: [...currentStats.history, {
-          timestamp: new Date(),
-          userAgent: req.headers['user-agent'] || 'Unknown',
-          ipAddress: req.ip || 'Unknown'
-        }]
+      // Update memory cache
+      memoryCache.set(cacheKey, {
+        data: cachedQRCode,
+        timestamp: Date.now()
       });
-
-      // Set optimized cache headers
-      res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
-      res.setHeader('ETag', `"${cachedQRCode.id}-${cachedQRCode.updatedAt}"`);
-      res.setHeader('Vary', 'Accept-Encoding');
-
+      
+      // Queue scan stats update asynchronously
+      queueScanStats(id, req);
+      
+      // Set aggressive cache headers
+      setAggressiveCacheHeaders(res, cachedQRCode);
+      
       return res.json(cachedQRCode);
     }
 
-    // Optimized database query with specific fields and relations
+    // 3. Database query with optimized fields
     const qrCode = await qrCodeRepository
       .createQueryBuilder('qr')
       .select([
@@ -104,24 +149,20 @@ export const getLandingPage = async (req: Request, res: Response) => {
       return res.redirect(`${frontendDomain}/payment-instructions`);
     }
 
-    // Queue scan stats update
-    const currentStats = scanStatsQueue.get(id) || { count: 0, history: [] };
-    scanStatsQueue.set(id, {
-      count: currentStats.count + 1,
-      history: [...currentStats.history, {
-        timestamp: new Date(),
-        userAgent: req.headers['user-agent'] || 'Unknown',
-        ipAddress: req.ip || 'Unknown'
-      }]
-    });
+    // Queue scan stats update asynchronously
+    queueScanStats(id, req);
 
-    // Cache the QR code in Redis
-    await setCache(cacheKey, qrCode, CACHE_DURATION);
+    // Update both caches asynchronously
+    Promise.all([
+      setCache(cacheKey, qrCode, CACHE_DURATION),
+      memoryCache.set(cacheKey, {
+        data: qrCode,
+        timestamp: Date.now()
+      })
+    ]).catch(console.error);
 
-    // Set optimized cache headers
-    res.setHeader('Cache-Control', 'public, max-age=300, stale-while-revalidate=60');
-    res.setHeader('ETag', `"${qrCode.id}-${qrCode.updatedAt}"`);
-    res.setHeader('Vary', 'Accept-Encoding');
+    // Set aggressive cache headers
+    setAggressiveCacheHeaders(res, qrCode);
 
     // Return the QR code data
     return res.json(qrCode);
