@@ -70,7 +70,7 @@ const itemsDir = path.join(uploadsDir, 'items');
 app.use(cors({
   origin: function(origin, callback) {
     const allowedOrigins = [
-      'https://warm-pithivier-90ecdb.netlify.app',
+      'https://qrme.netlify.app',
       'http://localhost:8080',
       'http://localhost:5173'
     ];
