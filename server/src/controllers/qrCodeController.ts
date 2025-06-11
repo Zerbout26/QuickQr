@@ -323,7 +323,7 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       const { id } = req.params;
-      const { name, foregroundColor, backgroundColor, links, type, menu, vitrine } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu, vitrine, url } = req.body;
       let logoUrl = '';
 
       const qrCode = await qrCodeRepository.findOne({
@@ -361,7 +361,17 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       if (foregroundColor !== undefined) qrCode.foregroundColor = foregroundColor;
       if (backgroundColor !== undefined) qrCode.backgroundColor = backgroundColor;
       if (type !== undefined) qrCode.type = type as QRCodeType;
-      
+
+      // Handle URL update for landing page redirect
+      if (url !== undefined) {
+        // For all QR code types, update the URL that redirects to the landing page
+        qrCode.url = url;
+        // Also update originalUrl for direct type QR codes
+        if (qrCode.type === 'direct') {
+          qrCode.originalUrl = url;
+        }
+      }
+
       // Handle links
       if (links !== undefined) {
         try {
