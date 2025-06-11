@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy, useMemo, useCallback } from 'react';
+import React, { useEffect, useState, Suspense, lazy, useMemo, useCallback, useTransition } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
@@ -6,12 +6,51 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { Separator } from '@/components/ui/separator';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Utensils } from 'lucide-react';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 
 // Lazy load components with prefetch
 const MenuSection = lazy(() => import('@/components/landing/MenuSection'));
 const VitrineSection = lazy(() => import('@/components/landing/VitrineSection'));
 const SocialLinks = lazy(() => import('@/components/landing/SocialLinks'));
+
+// Error boundary component
+class ErrorBoundary extends React.Component<
+  { children: React.ReactNode; fallback: React.ReactNode },
+  { hasError: boolean }
+> {
+  constructor(props: { children: React.ReactNode; fallback: React.ReactNode }) {
+    super(props);
+    this.state = { hasError: false };
+  }
+
+  static getDerivedStateFromError() {
+    return { hasError: true };
+  }
+
+  render() {
+    if (this.state.hasError) {
+      return this.props.fallback;
+    }
+    return this.props.children;
+  }
+}
+
+// Loading skeleton component
+const LoadingSkeleton = () => (
+  <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
+    <div className="container mx-auto px-4 py-8">
+      <div className="animate-pulse space-y-8">
+        <div className="h-12 bg-gray-200 rounded-lg w-3/4 mx-auto"></div>
+        <div className="h-4 bg-gray-200 rounded w-1/2 mx-auto"></div>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {[1, 2, 3, 4].map((i) => (
+            <div key={i} className="h-48 bg-gray-200 rounded-lg"></div>
+          ))}
+        </div>
+      </div>
+    </div>
+  </div>
+);
 
 // Preload critical components
 const preloadComponents = () => {
@@ -21,6 +60,31 @@ const preloadComponents = () => {
     () => import('@/components/landing/SocialLinks')
   ];
   components.forEach(component => component());
+};
+
+// Prefetch data for a QR code
+const prefetchQRCodeData = async (id: string) => {
+  try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    
+    const response = await fetch(`${import.meta.env.VITE_API_URL}/api/qrcodes/public/${id}`, {
+      signal: controller.signal,
+      headers: {
+        'Accept-Encoding': 'gzip',
+        'Accept': 'application/json'
+      }
+    });
+    
+    clearTimeout(timeoutId);
+    if (!response.ok) throw new Error('Failed to prefetch data');
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error('Error prefetching QR code data:', error);
+    return null;
+  }
 };
 
 // Memoized translations
@@ -76,13 +140,14 @@ const translations = {
 } as const;
 
 const LandingPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [qrCode, setQRCode] = useState<QRCode | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [isPending, startTransition] = useTransition();
 
   // Memoized platform info
   const getPlatformInfo = useCallback((type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
@@ -160,7 +225,7 @@ const LandingPage = () => {
     }
   }, [qrCode?.logoUrl]);
 
-  // Fetch QR code data
+  // Fetch QR code data with optimizations
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
@@ -173,28 +238,29 @@ const LandingPage = () => {
         // Start loading state
         setLoading(true);
 
-        // Preload components while fetching data
-        preloadComponents();
-
-        // Fetch QR code data and increment scan count in parallel
+        // Preload components and prefetch data in parallel
         const [data] = await Promise.all([
           qrCodeApi.getPublicQRCode(id),
-          qrCodeApi.incrementScanCount(id)
+          qrCodeApi.incrementScanCount(id),
+          preloadComponents(),
+          prefetchQRCodeData(id) // Prefetch for potential future use
         ]);
 
-        setQRCode(data);
-        
-        // Handle direct URL type - redirect to original URL
-        if (data.type === 'direct' && data.originalUrl) {
-          window.location.href = data.originalUrl;
-          return;
-        }
-        
-        // Automatically detect and set menu language
-        if (data.menu) {
-          const detectedLanguage = detectMenuLanguage(data.menu);
-          setMenuLanguage(detectedLanguage);
-        }
+        startTransition(() => {
+          setQRCode(data);
+          
+          // Handle direct URL type - redirect to original URL
+          if (data.type === 'direct' && data.originalUrl) {
+            window.location.href = data.originalUrl;
+            return;
+          }
+          
+          // Automatically detect and set menu language
+          if (data.menu) {
+            const detectedLanguage = detectMenuLanguage(data.menu);
+            setMenuLanguage(detectedLanguage);
+          }
+        });
         
         setLoading(false);
       } catch (err: any) {
@@ -246,156 +312,77 @@ const LandingPage = () => {
   // Memoized error component
   const ErrorComponent = useMemo(() => (
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
-      <div className="min-h-screen flex items-center justify-center p-4">
-        <div className="text-center max-w-md">
-          <div className="w-20 h-20 mx-auto mb-6 text-white">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-            </svg>
-          </div>
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="text-6xl mb-4">⚠️</div>
           <h2 className="text-2xl font-bold text-white mb-4">Oops! Something went wrong</h2>
-          <p className="text-white/80 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
-          <button
+          <p className="text-white/80 mb-8">{error}</p>
+          <Button
             onClick={() => window.location.reload()}
-            className="px-6 py-3 bg-[#22c55e] text-white rounded-full font-medium hover:bg-[#16a34a] transition-colors duration-200 shadow-lg hover:shadow-xl"
+            className="bg-white text-[#8b5cf6] hover:bg-white/90"
           >
-            {translations[menuLanguage].returnHome}
-          </button>
+            Try Again
+          </Button>
         </div>
       </div>
     </div>
-  ), [error, menuLanguage]);
+  ), [error]);
 
   if (loading) return LoadingComponent;
-  if (error || !qrCode) return ErrorComponent;
+  if (error) return ErrorComponent;
+  if (!qrCode) return null;
 
-  const hasUrls = qrCode.links && qrCode.links.length > 0;
-  const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
-  const hasVitrine = qrCode.type === 'vitrine' && qrCode.vitrine;
-
-  // Generate a dynamic gradient based on the QR code's background color
-  const getBackgroundGradient = () => {
-    const baseColor = qrCode.backgroundColor || '#f9fafb';
-    return `radial-gradient(circle at top, ${baseColor} 0%, ${adjustColor(baseColor, -30)} 100%)`;
-  };
+  const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
+  const hasLinks = qrCode.links && qrCode.links.length > 0;
+  const hasVitrine = qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0;
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
-      <div className="min-h-screen">
-        <header className="relative py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
-          <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 -z-10"></div>
-          <div className="max-w-7xl mx-auto">
-            <div className="flex flex-col items-center text-center">
-              {qrCode.logoUrl && (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.5, ease: "easeOut" }}
-                  className="mb-2 sm:mb-4"
-                >
-                  <img
-                    src={qrCode.logoUrl}
-                    alt="Logo"
-                    className="h-16 w-16 sm:h-24 sm:w-24 object-contain rounded-2xl shadow-lg bg-white/5 backdrop-blur-sm"
-                  />
-                </motion.div>
-              )}
-            </div>
-          </div>
-        </header>
-
-        <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 -mt-6">
-          <div className="space-y-6 sm:space-y-8">
-            {hasUrls && (
+      <div className="container mx-auto px-4 py-8">
+        <main className="space-y-8">
+          <AnimatePresence mode="wait">
+            {isPending ? (
+              <LoadingSkeleton key="loading" />
+            ) : (
               <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="relative"
+                key="content"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-8"
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
-                <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold text-[#8b5cf6]">
-                    {menuLanguage === 'ar' ? 'تواصل معنا' : 'Connect With Us'}
-                  </h2>
-                </div>
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-                  {qrCode.links.map((link, index) => {
-                    const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type || 'website');
-                    return (
-                      <motion.a
-                        key={index}
-                        href={link.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="flex items-center justify-center gap-4 p-6 rounded-2xl text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] bg-white/5 backdrop-blur-sm"
-                        style={{ 
-                          background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                          boxShadow: '0 4px 14px rgba(0, 0, 0, 0.05)',
-                        }}
-                        whileHover={{ y: -4, scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ duration: 0.3, delay: index * 0.1, ease: "easeOut" }}
-                      >
-                        <Icon className="w-8 h-8 text-white" />
-                        <span className="text-lg font-medium text-white">{label}</span>
-                      </motion.a>
-                    );
-                  })}
-                </div>
+                {hasMenu && (
+                  <ErrorBoundary fallback={<div>Error loading menu</div>}>
+                    <Suspense fallback={<LoadingSkeleton />}>
+                      <MenuSection
+                        menu={qrCode.menu}
+                        menuLanguage={menuLanguage}
+                        selectedCategory={selectedCategory}
+                        setSelectedCategory={setSelectedCategory}
+                      />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
+
+                {hasLinks && (
+                  <ErrorBoundary fallback={<div>Error loading links</div>}>
+                    <Suspense fallback={<LoadingSkeleton />}>
+                      <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
+
+                {hasVitrine && (
+                  <ErrorBoundary fallback={<div>Error loading vitrine</div>}>
+                    <Suspense fallback={<LoadingSkeleton />}>
+                      <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
+                    </Suspense>
+                  </ErrorBoundary>
+                )}
               </motion.div>
             )}
-
-            {hasMenu && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
-                <div className="text-center mb-6">
-                  <h2 className="text-3xl font-bold text-[#8b5cf6]">
-                    {menuLanguage === 'ar' ? 'قائمة الطعام' : 'Menu'}
-                  </h2>
-                </div>
-                <Suspense fallback={
-                  <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8b5cf6] border-t-transparent"></div>
-                    <p className="mt-4 text-[#8b5cf6]/80">Loading menu...</p>
-                  </div>
-                }>
-                  <MenuSection
-                    menu={qrCode.menu}
-                    menuLanguage={menuLanguage}
-                    selectedCategory={selectedCategory}
-                    setSelectedCategory={setSelectedCategory}
-                  />
-                </Suspense>
-              </motion.div>
-            )}
-
-            {hasVitrine && (
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, ease: "easeOut" }}
-                className="relative"
-              >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 rounded-3xl -z-10"></div>
-                <Suspense fallback={
-                  <div className="text-center py-12">
-                    <div className="inline-block animate-spin rounded-full h-12 w-12 border-4 border-[#8b5cf6] border-t-transparent"></div>
-                    <p className="mt-4 text-[#8b5cf6]/80">Loading vitrine...</p>
-                  </div>
-                }>
-                  <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
-                </Suspense>
-              </motion.div>
-            )}
-          </div>
+          </AnimatePresence>
         </main>
       </div>
     </div>

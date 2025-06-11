@@ -10,9 +10,10 @@ import { pipeline } from 'stream/promises';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
-const CACHE_DURATION = 3600; // 1 hour
+const CACHE_DURATION = 7200; // 2 hours
 const CACHE_PREFIX = 'qr:landing:';
-const PREWARM_BATCH_SIZE = 50; // Number of QR codes to prewarm at once
+const PREWARM_BATCH_SIZE = 100; // Increased from 50 to 100
+const MEMORY_CACHE_DURATION = 15 * 60 * 1000; // 15 minutes (increased from 5)
 
 // In-memory cache for frequently accessed QR codes with LRU eviction
 class LRUCache {
@@ -52,13 +53,12 @@ class LRUCache {
   }
 }
 
-// Initialize LRU cache with 1000 items capacity
-const memoryCache = new LRUCache(1000);
-const MEMORY_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+// Initialize LRU cache with 2000 items capacity (increased from 1000)
+const memoryCache = new LRUCache(2000);
 
 // Track most accessed QR codes for prewarming
 const accessCounter = new Map<string, number>();
-const TOP_ACCESSED_SIZE = 100;
+const TOP_ACCESSED_SIZE = 200; // Increased from 100
 
 // Batch update queue for scan stats
 const scanStatsQueue = new Map<string, { count: number, history: any[] }>();
@@ -181,22 +181,26 @@ function queueScanStats(id: string, req: Request) {
 
 // Helper function to set aggressive cache headers
 function setAggressiveCacheHeaders(res: Response, data: any) {
-  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=300');
+  res.setHeader('Cache-Control', 'public, max-age=7200, stale-while-revalidate=600');
   res.setHeader('ETag', `"${data.id}-${data.updatedAt}"`);
   res.setHeader('Vary', 'Accept-Encoding');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
   res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Surrogate-Control', 'max-age=3600');
+  res.setHeader('Surrogate-Control', 'max-age=7200');
   res.setHeader('Surrogate-Key', `qr-${data.id}`);
   res.setHeader('Connection', 'keep-alive');
   res.setHeader('Keep-Alive', 'timeout=5');
 }
 
-// Helper function to compress response
+// Helper function to compress response with maximum compression
 function compressResponse(data: any): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    zlib.gzip(JSON.stringify(data), { level: 9 }, (err, result) => {
+    zlib.gzip(JSON.stringify(data), { 
+      level: 9, // Maximum compression
+      memLevel: 9, // Maximum memory for compression
+      windowBits: 15 // Maximum window size
+    }, (err, result) => {
       if (err) reject(err);
       else resolve(result);
     });
@@ -230,7 +234,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
       // Set aggressive cache headers
       setAggressiveCacheHeaders(res, memoryCached.data);
       
-      // Stream response
+      // Stream response with compression
       return streamResponse(res, memoryCached.data, acceptsGzip);
     }
     
@@ -249,7 +253,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
       // Set aggressive cache headers
       setAggressiveCacheHeaders(res, cachedQRCode);
       
-      // Stream response
+      // Stream response with compression
       return streamResponse(res, cachedQRCode, acceptsGzip);
     }
 
@@ -299,7 +303,7 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Set aggressive cache headers
     setAggressiveCacheHeaders(res, qrCode);
 
-    // Stream response
+    // Stream response with compression
     return streamResponse(res, qrCode, acceptsGzip);
   } catch (error) {
     console.error('Error serving landing page:', error);

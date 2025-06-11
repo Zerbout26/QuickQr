@@ -1,5 +1,6 @@
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
+import { useState } from 'react';
 
 interface VitrineSectionProps {
   vitrine: {
@@ -117,6 +118,56 @@ const getPlatformInfo = (type: string) => {
   return platforms[type] || platforms.other;
 };
 
+// Add image optimization helper
+const getOptimizedImageUrl = (url: string, width: number = 800) => {
+  if (!url) return '';
+  // If using Cloudinary
+  if (url.includes('cloudinary')) {
+    return url.replace('/upload/', `/upload/w_${width},c_scale,f_auto,q_auto/`);
+  }
+  return url;
+};
+
+// Add blur placeholder component
+const BlurImage = ({ src, alt, className }: { src: string; alt: string; className?: string }) => {
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState(false);
+  
+  const optimizedSrc = getOptimizedImageUrl(src);
+  const blurSrc = getOptimizedImageUrl(src, 20); // Tiny version for blur
+
+  return (
+    <div className={`relative overflow-hidden ${className}`}>
+      <AnimatePresence>
+        {!isLoaded && !error && (
+          <motion.div
+            initial={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="absolute inset-0 bg-gray-200 animate-pulse"
+          />
+        )}
+      </AnimatePresence>
+      <img
+        src={blurSrc}
+        alt={alt}
+        className={`absolute inset-0 w-full h-full object-cover blur-xl scale-110 transition-opacity duration-300 ${
+          isLoaded ? 'opacity-0' : 'opacity-100'
+        }`}
+      />
+      <img
+        src={optimizedSrc}
+        alt={alt}
+        className={`w-full h-full object-cover transition-opacity duration-300 ${
+          isLoaded ? 'opacity-100' : 'opacity-0'
+        } ${className}`}
+        onLoad={() => setIsLoaded(true)}
+        onError={() => setError(true)}
+        loading="lazy"
+      />
+    </div>
+  );
+};
+
 const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
   if (!vitrine) return null;
 
@@ -222,16 +273,10 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 via-[#ec4899]/5 to-transparent -z-10"></div>
                 {service.imageUrl && (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                    <img
+                    <BlurImage
                       src={service.imageUrl}
                       alt={service.name}
-                      className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                      loading="lazy"
-                      onError={(e) => {
-                        const target = e.target as HTMLImageElement;
-                        target.onerror = null;
-                        target.src = 'https://via.placeholder.com/144?text=No+Image';
-                      }}
+                      className="transition-transform duration-500 group-hover:scale-110"
                     />
                   </div>
                 )}
@@ -280,11 +325,10 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
               >
                 <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 via-[#ec4899]/5 to-transparent -z-10"></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                  <img
+                  <BlurImage
                     src={item.imageUrl}
                     alt={item.title || `Gallery image ${index + 1}`}
-                    className="w-full h-48 object-cover transition-transform duration-500 group-hover:scale-110"
-                    loading="lazy"
+                    className="transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
                 <div className="p-6 bg-gradient-to-br from-white to-[#8b5cf6]/5">
