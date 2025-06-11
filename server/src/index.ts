@@ -205,34 +205,40 @@ const startKeepAliveWorker = () => {
     // Function to ping the server
     const pingServer = async () => {
       try {
-        const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
-        console.log('Background job: Attempting to ping server');
+        // Use the actual server URL from environment
+        const serverUrl = process.env.SERVER_URL || 'https://quickqr-heyg.onrender.com';
+        console.log('Background job: Attempting to ping server at', serverUrl);
         
-        // Make multiple requests to ensure the server stays awake
-        await Promise.all([
-          axios.get(\`\${serverUrl}/api/health\`),
-          axios.get(\`\${serverUrl}/api/health\`),
-          axios.get(\`\${serverUrl}/api/health\`)
-        ]);
+        // Make a single health check request
+        const response = await axios.get(\`\${serverUrl}/api/health\`, {
+          timeout: 5000, // 5 second timeout
+          headers: {
+            'User-Agent': 'QuickQR-KeepAlive/1.0'
+          }
+        });
         
-        console.log('Background job: Ping successful');
+        if (response.status === 200) {
+          console.log('Background job: Ping successful');
+        } else {
+          throw new Error(\`Unexpected status code: \${response.status}\`);
+        }
       } catch (error) {
         console.error('Background job: Ping failed:', error.message);
-        // If ping fails, try again immediately
-        setTimeout(pingServer, 10000);
+        // If ping fails, try again after a delay
+        setTimeout(pingServer, 30000); // Retry after 30 seconds
       }
     };
 
-    // Check every 2 minutes
+    // Check every 5 minutes
     const interval = setInterval(() => {
       if (!isRunning) {
         clearInterval(interval);
         return;
       }
       pingServer();
-    }, 2 * 60 * 1000);
+    }, 5 * 60 * 1000);
 
-    // Initial ping
+    // Initial ping after 10 seconds
     setTimeout(pingServer, 10000);
 
     // Handle messages from main thread
