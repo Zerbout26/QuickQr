@@ -1,4 +1,4 @@
-import { useEffect, useState, Suspense, lazy } from 'react';
+import { useEffect, useState, Suspense, lazy, useMemo, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
@@ -8,10 +8,72 @@ import { Separator } from '@/components/ui/separator';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Utensils } from 'lucide-react';
 import { motion } from 'framer-motion';
 
-// Lazy load components
+// Lazy load components with prefetch
 const MenuSection = lazy(() => import('@/components/landing/MenuSection'));
 const VitrineSection = lazy(() => import('@/components/landing/VitrineSection'));
 const SocialLinks = lazy(() => import('@/components/landing/SocialLinks'));
+
+// Preload critical components
+const preloadComponents = () => {
+  const components = [
+    () => import('@/components/landing/MenuSection'),
+    () => import('@/components/landing/VitrineSection'),
+    () => import('@/components/landing/SocialLinks')
+  ];
+  components.forEach(component => component());
+};
+
+// Memoized translations
+const translations = {
+  en: {
+    price: 'Price',
+    available: 'Available',
+    notAvailable: 'Not Available',
+    poweredBy: 'Powered by',
+    loading: 'Loading...',
+    error: 'Error',
+    returnHome: 'Return to Home',
+    qrCodeNotFound: 'QR code not found',
+    failedToLoad: 'Failed to load QR code',
+    followUs: {
+      facebook: 'Follow us on Facebook',
+      instagram: 'Follow us on Instagram',
+      twitter: 'Follow us on Twitter',
+      linkedin: 'Connect on LinkedIn',
+      youtube: 'Subscribe on YouTube',
+      tiktok: 'Follow us on TikTok',
+      whatsapp: 'Chat on WhatsApp',
+      telegram: 'Join our Telegram',
+      website: 'Visit our Website',
+      location: 'Find our Location',
+      other: 'Visit Link'
+    }
+  },
+  ar: {
+    price: 'السعر',
+    available: 'متوفر',
+    notAvailable: 'غير متوفر',
+    poweredBy: 'مدعوم بواسطة',
+    loading: 'جاري التحميل...',
+    error: 'خطأ',
+    returnHome: 'العودة للرئيسية',
+    qrCodeNotFound: 'رمز QR غير موجود',
+    failedToLoad: 'فشل تحميل رمز QR',
+    followUs: {
+      facebook: 'تابعنا على فيسبوك',
+      instagram: 'تابعنا على انستغرام',
+      twitter: 'تابعنا على تويتر',
+      linkedin: 'تواصل معنا على لينكد إن',
+      youtube: 'اشترك في قناتنا على يوتيوب',
+      tiktok: 'تابعنا على تيك توك',
+      whatsapp: 'تواصل معنا على واتساب',
+      telegram: 'انضم إلى قناتنا على تيليجرام',
+      website: 'زر موقعنا',
+      location: 'اعثر على موقعنا',
+      other: 'زيارة الرابط'
+    }
+  }
+} as const;
 
 const LandingPage = () => {
   const { id } = useParams();
@@ -22,68 +84,8 @@ const LandingPage = () => {
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Preload critical assets
-  useEffect(() => {
-    if (qrCode?.logoUrl) {
-      const img = new Image();
-      img.src = qrCode.logoUrl;
-    }
-  }, [qrCode?.logoUrl]);
-
-  // Translations for menu display
-  const translations = {
-    en: {
-      price: 'Price',
-      available: 'Available',
-      notAvailable: 'Not Available',
-      poweredBy: 'Powered by',
-      loading: 'Loading...',
-      error: 'Error',
-      returnHome: 'Return to Home',
-      qrCodeNotFound: 'QR code not found',
-      failedToLoad: 'Failed to load QR code',
-      followUs: {
-        facebook: 'Follow us on Facebook',
-        instagram: 'Follow us on Instagram',
-        twitter: 'Follow us on Twitter',
-        linkedin: 'Connect on LinkedIn',
-        youtube: 'Subscribe on YouTube',
-        tiktok: 'Follow us on TikTok',
-        whatsapp: 'Chat on WhatsApp',
-        telegram: 'Join our Telegram',
-        website: 'Visit our Website',
-        location: 'Find our Location',
-        other: 'Visit Link'
-      }
-    },
-    ar: {
-      price: 'السعر',
-      available: 'متوفر',
-      notAvailable: 'غير متوفر',
-      poweredBy: 'مدعوم بواسطة',
-      loading: 'جاري التحميل...',
-      error: 'خطأ',
-      returnHome: 'العودة للرئيسية',
-      qrCodeNotFound: 'رمز QR غير موجود',
-      failedToLoad: 'فشل تحميل رمز QR',
-      followUs: {
-        facebook: 'تابعنا على فيسبوك',
-        instagram: 'تابعنا على انستغرام',
-        twitter: 'تابعنا على تويتر',
-        linkedin: 'تواصل معنا على لينكد إن',
-        youtube: 'اشترك في قناتنا على يوتيوب',
-        tiktok: 'تابعنا على تيك توك',
-        whatsapp: 'تواصل معنا على واتساب',
-        telegram: 'انضم إلى قناتنا على تيليجرام',
-        website: 'زر موقعنا',
-        location: 'اعثر على موقعنا',
-        other: 'زيارة الرابط'
-      }
-    }
-  };
-
-  // Function to map platform type to label, icon, and colors
-  const getPlatformInfo = (type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
+  // Memoized platform info
+  const getPlatformInfo = useCallback((type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
     const platformLabels = translations[menuLanguage].followUs;
     switch (type) {
       case 'facebook':
@@ -109,17 +111,17 @@ const LandingPage = () => {
       default:
         return { label: platformLabels.other, icon: ExternalLink, bgColor: '#6366F1', hoverBgColor: '#4F46E5' };
     }
-  };
+  }, [menuLanguage]);
 
-  // Update the isItemAvailableToday function
-  const isItemAvailableToday = (item: MenuItem): boolean => {
+  // Memoized availability check
+  const isItemAvailableToday = useCallback((item: MenuItem): boolean => {
     const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
     const today = days[new Date().getDay()];
     return item.availability?.[today] ?? true;
-  };
+  }, []);
 
-  // Function to detect menu language
-  const detectMenuLanguage = (menu: any): 'en' | 'ar' => {
+  // Memoized language detection
+  const detectMenuLanguage = useCallback((menu: any): 'en' | 'ar' => {
     if (!menu) return 'en';
     
     // Check restaurant name
@@ -148,8 +150,17 @@ const LandingPage = () => {
     }
 
     return 'en';
-  };
+  }, []);
 
+  // Preload critical assets
+  useEffect(() => {
+    if (qrCode?.logoUrl) {
+      const img = new Image();
+      img.src = qrCode.logoUrl;
+    }
+  }, [qrCode?.logoUrl]);
+
+  // Fetch QR code data
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
@@ -161,6 +172,9 @@ const LandingPage = () => {
 
         // Start loading state
         setLoading(true);
+
+        // Preload components while fetching data
+        preloadComponents();
 
         // Fetch QR code data and increment scan count in parallel
         const [data] = await Promise.all([
@@ -203,58 +217,57 @@ const LandingPage = () => {
     };
 
     fetchQRCode();
-  }, [id, navigate]);
+  }, [id, navigate, detectMenuLanguage]);
 
+  // Add smooth scrolling behavior
   useEffect(() => {
-    // Add smooth scrolling behavior
     document.documentElement.style.scrollBehavior = 'smooth';
-    
-    // Cleanup
     return () => {
       document.documentElement.style.scrollBehavior = '';
     };
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
-        <div className="min-h-screen flex items-center justify-center">
-          <div className="text-center">
-            <div className="relative w-24 h-24 mx-auto mb-8">
-              <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
-              <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Loading...</h2>
-            <p className="text-white/80">Please wait while we prepare your experience</p>
+  // Memoized loading component
+  const LoadingComponent = useMemo(() => (
+    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center">
+          <div className="relative w-24 h-24 mx-auto mb-8">
+            <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
           </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Loading...</h2>
+          <p className="text-white/80">Please wait while we prepare your experience</p>
         </div>
       </div>
-    );
-  }
+    </div>
+  ), []);
 
-  if (error || !qrCode) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
-        <div className="min-h-screen flex items-center justify-center p-4">
-          <div className="text-center max-w-md">
-            <div className="w-20 h-20 mx-auto mb-6 text-white">
-              <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
-              </svg>
-            </div>
-            <h2 className="text-2xl font-bold text-white mb-4">Oops! Something went wrong</h2>
-            <p className="text-white/80 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
-            <button
-              onClick={() => window.location.reload()}
-              className="px-6 py-3 bg-[#22c55e] text-white rounded-full font-medium hover:bg-[#16a34a] transition-colors duration-200 shadow-lg hover:shadow-xl"
-            >
-              Try Again
-            </button>
+  // Memoized error component
+  const ErrorComponent = useMemo(() => (
+    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
+      <div className="min-h-screen flex items-center justify-center p-4">
+        <div className="text-center max-w-md">
+          <div className="w-20 h-20 mx-auto mb-6 text-white">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
           </div>
+          <h2 className="text-2xl font-bold text-white mb-4">Oops! Something went wrong</h2>
+          <p className="text-white/80 mb-8">{error || translations[menuLanguage].qrCodeNotFound}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-6 py-3 bg-[#22c55e] text-white rounded-full font-medium hover:bg-[#16a34a] transition-colors duration-200 shadow-lg hover:shadow-xl"
+          >
+            {translations[menuLanguage].returnHome}
+          </button>
         </div>
       </div>
-    );
-  }
+    </div>
+  ), [error, menuLanguage]);
+
+  if (loading) return LoadingComponent;
+  if (error || !qrCode) return ErrorComponent;
 
   const hasUrls = qrCode.links && qrCode.links.length > 0;
   const hasMenu = qrCode.menu && qrCode.menu.categories && qrCode.menu.categories.length > 0;
@@ -267,7 +280,7 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/10 via-white to-[#ec4899]/10">
+    <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="min-h-screen">
         <header className="relative py-4 sm:py-6 px-4 sm:px-6 lg:px-8">
           <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/5 via-white/5 to-[#ec4899]/5 -z-10"></div>
@@ -403,7 +416,7 @@ function adjustColor(color: string, amount: number): string {
 
 // Function to detect if text is in Arabic
 function isArabicText(text: string): boolean {
-  const arabicPattern = /[\u0600-\u06FF\u0750-\u077F\u08A0-\u08FF\uFB50-\uFDFF\uFE70-\uFEFF]/;
+  const arabicPattern = /[\u0600-\u06FF]/;
   return arabicPattern.test(text);
 }
 

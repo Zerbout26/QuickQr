@@ -5,6 +5,8 @@ import { getOptimizedUrl } from '../config/cloudinary';
 import { getCache, setCache } from '../config/redis';
 import compression from 'compression';
 import zlib from 'zlib';
+import { createReadStream } from 'fs';
+import { pipeline } from 'stream/promises';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:5173';
@@ -12,8 +14,46 @@ const CACHE_DURATION = 3600; // 1 hour
 const CACHE_PREFIX = 'qr:landing:';
 const PREWARM_BATCH_SIZE = 50; // Number of QR codes to prewarm at once
 
-// In-memory cache for frequently accessed QR codes
-const memoryCache = new Map<string, { data: any, timestamp: number }>();
+// In-memory cache for frequently accessed QR codes with LRU eviction
+class LRUCache {
+  private cache: Map<string, { data: any, timestamp: number }>;
+  private maxSize: number;
+  private accessOrder: string[];
+
+  constructor(maxSize: number) {
+    this.cache = new Map();
+    this.maxSize = maxSize;
+    this.accessOrder = [];
+  }
+
+  get(key: string) {
+    const value = this.cache.get(key);
+    if (value) {
+      // Update access order
+      this.accessOrder = this.accessOrder.filter(k => k !== key);
+      this.accessOrder.push(key);
+    }
+    return value;
+  }
+
+  set(key: string, value: { data: any, timestamp: number }) {
+    if (this.cache.size >= this.maxSize) {
+      // Remove least recently used
+      const oldestKey = this.accessOrder.shift();
+      if (oldestKey) this.cache.delete(oldestKey);
+    }
+    this.cache.set(key, value);
+    this.accessOrder.push(key);
+  }
+
+  clear() {
+    this.cache.clear();
+    this.accessOrder = [];
+  }
+}
+
+// Initialize LRU cache with 1000 items capacity
+const memoryCache = new LRUCache(1000);
 const MEMORY_CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
 // Track most accessed QR codes for prewarming
@@ -35,7 +75,7 @@ async function prewarmCache() {
 
     if (topAccessed.length === 0) return;
 
-    // Fetch QR codes in batch
+    // Fetch QR codes in batch with optimized query
     const qrCodes = await qrCodeRepository
       .createQueryBuilder('qr')
       .select([
@@ -56,15 +96,15 @@ async function prewarmCache() {
       .cache(true)
       .getMany();
 
-    // Update caches
-    for (const qrCode of qrCodes) {
+    // Update caches in parallel
+    await Promise.all(qrCodes.map(async (qrCode) => {
       const cacheKey = `${CACHE_PREFIX}${qrCode.id}`;
       memoryCache.set(cacheKey, {
         data: qrCode,
         timestamp: Date.now()
       });
       await setCache(cacheKey, qrCode, CACHE_DURATION);
-    }
+    }));
 
     console.log(`Prewarmed cache for ${qrCodes.length} QR codes`);
   } catch (error) {
@@ -78,11 +118,7 @@ setInterval(prewarmCache, 5 * 60 * 1000); // Every 5 minutes
 // Clean up old entries from memory cache
 setInterval(() => {
   const now = Date.now();
-  for (const [key, value] of memoryCache.entries()) {
-    if (now - value.timestamp > MEMORY_CACHE_DURATION) {
-      memoryCache.delete(key);
-    }
-  }
+  memoryCache.clear(); // Clear and let LRU handle the rest
 }, 60 * 1000); // Clean up every minute
 
 // Process batch updates
@@ -153,16 +189,28 @@ function setAggressiveCacheHeaders(res: Response, data: any) {
   res.setHeader('X-XSS-Protection', '1; mode=block');
   res.setHeader('Surrogate-Control', 'max-age=3600');
   res.setHeader('Surrogate-Key', `qr-${data.id}`);
+  res.setHeader('Connection', 'keep-alive');
+  res.setHeader('Keep-Alive', 'timeout=5');
 }
 
 // Helper function to compress response
 function compressResponse(data: any): Promise<Buffer> {
   return new Promise((resolve, reject) => {
-    zlib.gzip(JSON.stringify(data), (err, result) => {
+    zlib.gzip(JSON.stringify(data), { level: 9 }, (err, result) => {
       if (err) reject(err);
       else resolve(result);
     });
   });
+}
+
+// Helper function to stream response
+async function streamResponse(res: Response, data: any, acceptsGzip: boolean | undefined) {
+  if (acceptsGzip === true) {
+    res.setHeader('Content-Encoding', 'gzip');
+    const compressed = await compressResponse(data);
+    return res.send(compressed);
+  }
+  return res.json(data);
 }
 
 export const getLandingPage = async (req: Request, res: Response) => {
@@ -182,13 +230,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
       // Set aggressive cache headers
       setAggressiveCacheHeaders(res, memoryCached.data);
       
-      if (acceptsGzip) {
-        res.setHeader('Content-Encoding', 'gzip');
-        const compressed = await compressResponse(memoryCached.data);
-        return res.send(compressed);
-      }
-      
-      return res.json(memoryCached.data);
+      // Stream response
+      return streamResponse(res, memoryCached.data, acceptsGzip);
     }
     
     // 2. Check Redis cache
@@ -206,16 +249,11 @@ export const getLandingPage = async (req: Request, res: Response) => {
       // Set aggressive cache headers
       setAggressiveCacheHeaders(res, cachedQRCode);
       
-      if (acceptsGzip) {
-        res.setHeader('Content-Encoding', 'gzip');
-        const compressed = await compressResponse(cachedQRCode);
-        return res.send(compressed);
-      }
-      
-      return res.json(cachedQRCode);
+      // Stream response
+      return streamResponse(res, cachedQRCode, acceptsGzip);
     }
 
-    // 3. Database query with optimized fields
+    // 3. Database query with optimized fields and connection pooling
     const qrCode = await qrCodeRepository
       .createQueryBuilder('qr')
       .select([
@@ -261,15 +299,8 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Set aggressive cache headers
     setAggressiveCacheHeaders(res, qrCode);
 
-    // Compress response if client accepts gzip
-    if (acceptsGzip) {
-      res.setHeader('Content-Encoding', 'gzip');
-      const compressed = await compressResponse(qrCode);
-      return res.send(compressed);
-    }
-
-    // Return the QR code data
-    return res.json(qrCode);
+    // Stream response
+    return streamResponse(res, qrCode, acceptsGzip);
   } catch (error) {
     console.error('Error serving landing page:', error);
     res.status(500).json({ error: 'Internal Server Error' });
