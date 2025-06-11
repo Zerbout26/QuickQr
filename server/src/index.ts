@@ -14,6 +14,7 @@ import { AuthRequest } from './middleware/auth';
 import axios from 'axios';
 import { User } from './models/User';
 import bcrypt from 'bcryptjs';
+import { Worker } from 'worker_threads';
 
 const app = express();
 
@@ -192,34 +193,100 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// Track last activity time
-let lastActivityTime = Date.now();
+// Background job worker for keeping the server alive
+const startKeepAliveWorker = () => {
+  const worker = new Worker(`
+    const { parentPort } = require('worker_threads');
+    const axios = require('axios');
 
-// Update last activity time on each request
+    let lastActivityTime = Date.now();
+    let isRunning = true;
+
+    // Function to ping the server
+    const pingServer = async () => {
+      try {
+        const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
+        console.log('Background job: Attempting to ping server');
+        
+        // Make multiple requests to ensure the server stays awake
+        await Promise.all([
+          axios.get(\`\${serverUrl}/api/health\`),
+          axios.get(\`\${serverUrl}/api/health\`),
+          axios.get(\`\${serverUrl}/api/health\`)
+        ]);
+        
+        console.log('Background job: Ping successful');
+      } catch (error) {
+        console.error('Background job: Ping failed:', error.message);
+        // If ping fails, try again immediately
+        setTimeout(pingServer, 10000);
+      }
+    };
+
+    // Check every 2 minutes
+    const interval = setInterval(() => {
+      if (!isRunning) {
+        clearInterval(interval);
+        return;
+      }
+      pingServer();
+    }, 2 * 60 * 1000);
+
+    // Initial ping
+    setTimeout(pingServer, 10000);
+
+    // Handle messages from main thread
+    parentPort.on('message', (message) => {
+      if (message === 'stop') {
+        isRunning = false;
+        clearInterval(interval);
+        parentPort.postMessage('stopped');
+      } else if (message === 'updateActivity') {
+        lastActivityTime = Date.now();
+      }
+    });
+
+    // Handle worker termination
+    process.on('SIGTERM', () => {
+      isRunning = false;
+      clearInterval(interval);
+      process.exit(0);
+    });
+  `, { eval: true });
+
+  worker.on('error', (error) => {
+    console.error('Background job worker error:', error);
+    // Restart the worker if it crashes
+    setTimeout(startKeepAliveWorker, 5000);
+  });
+
+  worker.on('exit', (code) => {
+    if (code !== 0) {
+      console.error(`Background job worker stopped with exit code ${code}`);
+      // Restart the worker if it exits unexpectedly
+      setTimeout(startKeepAliveWorker, 5000);
+    }
+  });
+
+  return worker;
+};
+
+// Start the background worker
+const keepAliveWorker = startKeepAliveWorker();
+
+// Update last activity time on each request and notify the worker
 app.use((req, res, next) => {
-  lastActivityTime = Date.now();
+  keepAliveWorker.postMessage('updateActivity');
   next();
 });
 
-// Self-ping mechanism
-const checkAndPing = async () => {
-  const currentTime = Date.now();
-  const inactiveTime = currentTime - lastActivityTime;
-  
-  // If inactive for more than 5 minutes
-  if (inactiveTime > 5 * 60 * 1000) {
-    try {
-      const serverUrl = process.env.SERVER_URL || 'https://your-render-app-url.onrender.com';
-      const response = await axios.get(`${serverUrl}/api/health`);
-      console.log('Self-ping successful after', Math.round(inactiveTime / 1000 / 60), 'minutes of inactivity');
-    } catch (error) {
-      console.error('Self-ping failed:', error.message);
-    }
-  }
+// Cleanup on server shutdown
+const shutdown = async () => {
+  console.log('Shutting down server...');
+  keepAliveWorker.postMessage('stop');
+  await AppDataSource.destroy();
+  process.exit(0);
 };
-
-// Check every minute
-setInterval(checkAndPing, 60 * 1000);
 
 // Mount API routes
 app.use('/api/users', userRoutes);
@@ -317,26 +384,6 @@ const startServer = async () => {
     });
 
     // Enhanced server shutdown handling
-    const shutdown = async () => {
-      console.log('Shutdown signal received');
-      
-      server.close(async () => {
-        console.log('HTTP server closed');
-        
-        if (AppDataSource.isInitialized) {
-          await AppDataSource.destroy();
-          console.log('Database connection closed');
-        }
-        
-        process.exit(0);
-      });
-      
-      setTimeout(() => {
-        console.error('Could not close connections in time, forcefully shutting down');
-        process.exit(1);
-      }, 5000);
-    };
-
     process.on('SIGTERM', shutdown);
     process.on('SIGINT', shutdown);
   } catch (error) {
