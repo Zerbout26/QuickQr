@@ -425,14 +425,27 @@ const Dashboard = () => {
     const downloadWithLogo = async () => {
       let svgElement: HTMLDivElement | null = null;
       let container: HTMLDivElement | null = null;
-
+    
       try {
+        // Modern design configuration
+        const design = {
+          width: 800,
+          height: 1000,
+          qrSize: 500,
+          logoSize: 100,
+          bgGradient: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          frameColor: 'rgba(255, 255, 255, 0.2)',
+          frameWidth: 20,
+          cornerSize: 50,
+          textColor: '#ffffff',
+          shadow: '0 20px 25px -5px rgba(0, 0, 0, 0.2), 0 10px 10px -5px rgba(0, 0, 0, 0.1)'
+        };
+    
         if (format === 'svg') {
-          // Create a new SVG element
           svgElement = document.createElement('div');
           document.body.appendChild(svgElement);
           
-          // Preload logo if exists
+          // Preload logo
           let logoImage: HTMLImageElement | undefined;
           if (qr.logoUrl) {
             try {
@@ -442,75 +455,96 @@ const Dashboard = () => {
             }
           }
           
-          // Render QR code using React
+          // Render modern SVG QR code
           const root = ReactDOM.createRoot(svgElement);
           root.render(
-            <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-sm" style={{ width: '1000px', height: '1200px' }}>
-              {qr.textAbove && (
-                <div className="text-center mb-8 font-medium text-gray-700" style={{ fontSize: '48px' }}>
-                  {qr.textAbove}
-                </div>
-              )}
+            <div style={{
+              width: `${design.width}px`,
+              height: `${design.height}px`,
+              background: design.bgGradient,
+              display: 'flex',
+              flexDirection: 'column',
+              alignItems: 'center',
+              justifyContent: 'center',
+              borderRadius: '24px',
+              boxShadow: design.shadow,
+              position: 'relative',
+              overflow: 'hidden'
+            }}>
+              {/* Camera frame effect */}
+              <div style={{
+                position: 'absolute',
+                width: `${design.qrSize + design.frameWidth * 2}px`,
+                height: `${design.qrSize + design.frameWidth * 2}px`,
+                border: `${design.frameWidth}px solid ${design.frameColor}`,
+                borderRadius: '16px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* Frame corners */}
+                {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
+                  <div key={corner} style={{
+                    position: 'absolute',
+                    width: `${design.cornerSize}px`,
+                    height: `${design.cornerSize}px`,
+                    border: `4px solid white`,
+                    [corner.split('-')[0]]: 0,
+                    [corner.split('-')[1]]: 0,
+                    [`border-${corner.split('-')[0]}`]: 'none',
+                    [`border-${corner.split('-')[1]}`]: 'none'
+                  }} />
+                ))}
+              </div>
+    
               <QRCodeSVG
                 value={qr.url}
-                size={600}
-                bgColor={qr.backgroundColor}
-                fgColor={qr.foregroundColor}
+                size={design.qrSize}
+                bgColor={qr.backgroundColor || 'transparent'}
+                fgColor={qr.foregroundColor || '#ffffff'}
                 level="H"
                 includeMargin={false}
                 imageSettings={logoImage ? {
                   src: logoImage.src,
-                  height: 150,
-                  width: 150,
+                  height: design.logoSize,
+                  width: design.logoSize,
                   excavate: true,
                 } : undefined}
               />
-              {qr.textBelow && (
-                <div className="text-center mt-8 font-medium text-gray-700" style={{ fontSize: '48px' }}>
-                  {qr.textBelow}
-                </div>
-              )}
-              <div className="text-center mt-8 text-gray-500" style={{ fontSize: '24px' }}>
-                Created with www.qrcreator.xyz
-              </div>
             </div>
           );
-
-          // Wait for SVG to render
+    
+          // Download SVG
           await new Promise<void>((resolve) => {
             setTimeout(() => {
               const container = svgElement?.querySelector('div');
-              if (!container) {
-                resolve();
-                return;
+              if (container) {
+                const svgData = new XMLSerializer().serializeToString(container);
+                const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+                const svgUrl = URL.createObjectURL(svgBlob);
+                
+                const downloadLink = document.createElement('a');
+                downloadLink.href = svgUrl;
+                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(svgUrl);
               }
-
-              // Create a new SVG element with the same content
-              const svgData = new XMLSerializer().serializeToString(container);
-              const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
-              const svgUrl = URL.createObjectURL(svgBlob);
-
-              // Create download link
-              const downloadLink = document.createElement('a');
-              downloadLink.href = svgUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}.svg`;
-              document.body.appendChild(downloadLink);
-              downloadLink.click();
-              document.body.removeChild(downloadLink);
-              URL.revokeObjectURL(svgUrl);
               resolve();
             }, 100);
           });
+    
         } else {
-          // For PNG, create a temporary container
+          // PNG format
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
-          container.style.width = '1000px';
-          container.style.height = '1200px';
+          container.style.width = `${design.width}px`;
+          container.style.height = `${design.height}px`;
           document.body.appendChild(container);
-
-          // Preload logo if exists
+    
+          // Preload logo
           let logoImage: HTMLImageElement | undefined;
           if (qr.logoUrl) {
             try {
@@ -519,104 +553,97 @@ const Dashboard = () => {
               console.warn('Failed to preload logo:', error);
             }
           }
-
-          // Create QR code using QRCodeCanvas component
+    
+          // Render QR code to canvas
           const qrContainer = document.createElement('div');
           container.appendChild(qrContainer);
           
-          // Render QR code using React
           const root = ReactDOM.createRoot(qrContainer);
           root.render(
-            <div className="flex flex-col items-center bg-white p-8 rounded-lg shadow-sm" style={{ width: '1000px', height: '1200px' }}>
-              {qr.textAbove && (
-                <div className="text-center mb-8 font-medium text-gray-700" style={{ fontSize: '48px' }}>
-                  {qr.textAbove}
-                </div>
-              )}
-              <QRCodeCanvas
-                value={qr.url}
-                size={600}
-                bgColor={qr.backgroundColor}
-                fgColor={qr.foregroundColor}
-                level="H"
-                includeMargin={false}
-                imageSettings={logoImage ? {
-                  src: logoImage.src,
-                  height: 150,
-                  width: 150,
-                  excavate: true,
-                } : undefined}
-              />
-              {qr.textBelow && (
-                <div className="text-center mt-8 font-medium text-gray-700" style={{ fontSize: '48px' }}>
-                  {qr.textBelow}
-                </div>
-              )}
-            </div>
+            <QRCodeCanvas
+              value={qr.url}
+              size={design.qrSize}
+              bgColor={'transparent'}
+              fgColor={'#ffffff'}
+              level="H"
+              includeMargin={false}
+              imageSettings={logoImage ? {
+                src: logoImage.src,
+                height: design.logoSize,
+                width: design.logoSize,
+                excavate: true,
+              } : undefined}
+            />
           );
-
-          // Wait for QR code to render
-          await new Promise<void>((resolve, reject) => {
+    
+          // Create final canvas with all elements
+          await new Promise<void>((resolve) => {
             setTimeout(() => {
-              try {
-                // Use html2canvas to capture the entire container including text
-                const container = qrContainer.querySelector('div');
-                if (!container) {
-                  reject(new Error('Container not found'));
-                  return;
-                }
-
-                // Create a canvas with the same dimensions
-                const canvas = document.createElement('canvas');
-                canvas.width = 1000;
-                canvas.height = 1200;
-                const ctx = canvas.getContext('2d');
-                if (!ctx) {
-                  reject(new Error('Could not get canvas context'));
-                  return;
-                }
-
-                // Fill white background
-                ctx.fillStyle = '#FFFFFF';
+              const canvas = document.createElement('canvas');
+              canvas.width = design.width;
+              canvas.height = design.height;
+              const ctx = canvas.getContext('2d');
+              
+              if (ctx) {
+                // Draw gradient background
+                const gradient = ctx.createLinearGradient(0, 0, canvas.width, canvas.height);
+                gradient.addColorStop(0, '#667eea');
+                gradient.addColorStop(1, '#764ba2');
+                ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-                // Draw text above
-                if (qr.textAbove) {
-                  ctx.fillStyle = '#374151';
-                  ctx.font = 'bold 48px Arial';
-                  ctx.textAlign = 'center';
-                  ctx.fillText(qr.textAbove, canvas.width / 2, 100);
-                }
-
+    
                 // Draw QR code
-                const qrCanvas = container.querySelector('canvas');
+                const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrSize = 600;
-                  const qrX = (canvas.width - qrSize) / 2;
-                  const qrY = qr.textAbove ? 200 : 100;
-                  ctx.drawImage(qrCanvas, qrX, qrY, qrSize, qrSize);
+                  const qrX = (canvas.width - design.qrSize) / 2;
+                  const qrY = (canvas.height - design.qrSize) / 2;
+                  
+                  // Draw camera frame
+                  ctx.strokeStyle = design.frameColor;
+                  ctx.lineWidth = design.frameWidth;
+                  ctx.strokeRect(
+                    qrX - design.frameWidth,
+                    qrY - design.frameWidth,
+                    design.qrSize + design.frameWidth * 2,
+                    design.qrSize + design.frameWidth * 2
+                  );
+                  
+                  // Draw frame corners
+                  ctx.strokeStyle = '#ffffff';
+                  ctx.lineWidth = 4;
+                  
+                  // Top-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.frameWidth, qrY + design.cornerSize);
+                  ctx.lineTo(qrX - design.frameWidth, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.cornerSize, qrY - design.frameWidth);
+                  ctx.stroke();
+                  
+                  // Top-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.cornerSize);
+                  ctx.stroke();
+                  
+                  // Bottom-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
+                  ctx.lineTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.cornerSize, qrY + design.qrSize + design.frameWidth);
+                  ctx.stroke();
+                  
+                  // Bottom-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
+                  ctx.stroke();
+    
+                  // Draw QR code
+                  ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
-
-                // Draw text below
-                if (qr.textBelow) {
-                  ctx.fillStyle = '#374151';
-                  ctx.font = 'bold 48px Arial';
-                  ctx.textAlign = 'center';
-                  const textY = qr.textAbove ? 900 : 800;
-                  ctx.fillText(qr.textBelow, canvas.width / 2, textY);
-                }
-
-                // Add website attribution
-                ctx.fillStyle = '#6B7280';
-                ctx.font = '24px Arial';
-                ctx.textAlign = 'center';
-                ctx.fillText('Created with www.qrcreator.xyz', canvas.width / 2, canvas.height - 40);
-
-                // Add border
-                ctx.strokeStyle = '#E5E7EB';
-                ctx.lineWidth = 4;
-                ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
+    
                 // Convert to PNG and download
                 const pngUrl = canvas.toDataURL('image/png');
                 const downloadLink = document.createElement('a');
@@ -625,14 +652,12 @@ const Dashboard = () => {
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
-                resolve();
-              } catch (error) {
-                reject(error);
               }
+              resolve();
             }, 200);
           });
         }
-
+    
         toast({
           title: `QR Code Downloaded`,
           description: `Your QR code has been downloaded as ${format.toUpperCase()}`,
@@ -645,16 +670,12 @@ const Dashboard = () => {
           description: "There was a problem downloading your QR code.",
         });
       } finally {
-        // Clean up temporary elements
-        if (svgElement && svgElement.parentNode) {
-          svgElement.parentNode.removeChild(svgElement);
-        }
-        if (container && container.parentNode) {
-          container.parentNode.removeChild(container);
-        }
+        // Clean up
+        if (svgElement?.parentNode) svgElement.parentNode.removeChild(svgElement);
+        if (container?.parentNode) container.parentNode.removeChild(container);
       }
     };
-
+    
     downloadWithLogo();
   };
 
