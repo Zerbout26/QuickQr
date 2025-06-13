@@ -426,34 +426,35 @@ const Dashboard = () => {
       let container: HTMLDivElement | null = null;
     
       try {
-        // Premium design configuration
+        // Premium+ design configuration
         const design = {
           width: 1000,
-          height: 1300, // Slightly taller for better proportions
+          height: 1400, // Taller to accommodate button-style CTAs
           qrSize: 600,
-          logoSize: 140, // Slightly larger logo
-          // Premium color palette
-          bgGradient: ['#f9fafb', '#f3f4f6'], // Subtle gradient
-          frameColor: '#4f46e5', // Vibrant indigo
-          frameAccentColor: '#818cf8', // Lighter indigo
+          logoSize: 150, // Larger logo for better visibility
+          // Vibrant color palette
+          bgGradient: ['#f8f9fa', '#e9ecef'], // Clean light gradient
+          primaryColor: '#4361ee', // Vibrant blue
+          secondaryColor: '#3a0ca3', // Deep blue
+          accentColor: '#f72585', // Pink accent
           qrBgColor: '#ffffff',
-          qrFgColor: '#111827', // Deep gray
-          textColor: '#111827',
-          watermarkColor: 'rgba(17, 24, 39, 0.5)',
+          qrFgColor: '#1a1a1a', // Darker for better contrast
+          textColor: '#2b2d42',
           // Typography
           arabicFont: "'Tajawal', sans-serif",
           englishFont: "'Inter', sans-serif",
           // Spacing & effects
           padding: 80,
-          textMargin: 50,
-          cornerSize: 60,
+          textMargin: 60,
+          cornerSize: 70,
           frameWidth: 20,
-          cameraFrameSize: 70,
-          shadow: '0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04)',
+          buttonPadding: '20px 40px',
+          buttonRadius: '50px',
+          shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
           borderRadii: {
-            outer: '24px',
-            inner: '16px',
-            corners: '12px'
+            outer: '30px',
+            inner: '20px',
+            corners: '15px'
           }
         };
     
@@ -470,13 +471,13 @@ const Dashboard = () => {
             }
           }
           
-          // Render premium SVG
+          // Render premium+ SVG
           const root = ReactDOM.createRoot(svgElement);
           root.render(
             <div style={{
               width: `${design.width}px`,
               height: `${design.height}px`,
-              background: `linear-gradient(to bottom, ${design.bgGradient.join(', ')})`,
+              background: `linear-gradient(135deg, ${design.bgGradient.join(', ')})`,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -492,60 +493,77 @@ const Dashboard = () => {
                 top: 0,
                 left: 0,
                 right: 0,
-                height: '8px',
-                background: `linear-gradient(to right, ${design.frameColor}, ${design.frameAccentColor})`,
+                height: '10px',
+                background: `linear-gradient(to right, ${design.primaryColor}, ${design.accentColor})`,
               }
             }}>
               {/* Decorative elements */}
               <div style={{
                 position: 'absolute',
-                top: '40%',
-                left: '-100px',
-                width: '300px',
-                height: '300px',
+                top: '20%',
+                left: '-150px',
+                width: '400px',
+                height: '400px',
                 borderRadius: '50%',
-                background: `radial-gradient(circle, ${design.frameAccentColor}20 0%, transparent 70%)`,
-                filter: 'blur(20px)',
-                opacity: 0.6,
+                background: `radial-gradient(circle, ${design.primaryColor}10 0%, transparent 70%)`,
+                filter: 'blur(30px)',
+                opacity: 0.7,
               }} />
               
               <div style={{
                 position: 'absolute',
-                bottom: '10%',
-                right: '-100px',
-                width: '300px',
-                height: '300px',
+                bottom: '15%',
+                right: '-150px',
+                width: '400px',
+                height: '400px',
                 borderRadius: '50%',
-                background: `radial-gradient(circle, ${design.frameColor}20 0%, transparent 70%)`,
-                filter: 'blur(20px)',
-                opacity: 0.6,
+                background: `radial-gradient(circle, ${design.accentColor}10 0%, transparent 70%)`,
+                filter: 'blur(30px)',
+                opacity: 0.7,
               }} />
     
-              {/* Arabic text with decorative underline */}
+              {/* Arabic CTA - Button Style */}
               <div style={{
                 position: 'relative',
-                fontSize: '40px',
-                color: design.textColor,
+                fontSize: '38px',
+                color: 'white',
                 fontFamily: design.arabicFont,
                 marginBottom: `${design.textMargin}px`,
-                fontWeight: 700,
+                fontWeight: 800, // Extra bold
                 direction: 'rtl',
                 textAlign: 'center',
-                width: '100%',
-                lineHeight: '1.6',
-                paddingBottom: '20px',
+                width: '80%',
+                lineHeight: '1.5',
+                padding: design.buttonPadding,
+                backgroundColor: design.primaryColor,
+                borderRadius: design.buttonRadius,
+                boxShadow: `0 8px 20px ${design.primaryColor}40`,
+                transition: 'all 0.3s ease',
                 '::after': {
                   content: '""',
                   position: 'absolute',
-                  bottom: 0,
-                  left: '25%',
-                  right: '25%',
+                  bottom: '-10px',
+                  left: '20%',
+                  right: '20%',
                   height: '4px',
-                  background: `linear-gradient(to right, transparent, ${design.frameColor}, transparent)`,
+                  background: `linear-gradient(to right, transparent, ${design.accentColor}, transparent)`,
                   borderRadius: '2px',
+                  filter: 'blur(2px)',
+                  opacity: 0.7
+                },
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: `0 12px 25px ${design.primaryColor}60`
                 }
               }}>
-                امسح رمز الاستجابة السريعة للوصول إلى المحتوى
+                امسح الكود الآن 👆
+                <span style={{
+                  position: 'absolute',
+                  left: '30px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '44px'
+                }}>👍</span>
               </div>
     
               {/* QR Code Container with elegant frame */}
@@ -554,12 +572,12 @@ const Dashboard = () => {
                 padding: `${design.frameWidth}px`,
                 backgroundColor: design.qrBgColor,
                 borderRadius: design.borderRadii.inner,
-                boxShadow: `0 10px 15px -3px ${design.frameColor}20`,
-                border: `2px solid ${design.frameColor}30`,
-                transition: 'transform 0.3s ease, box-shadow 0.3s ease',
+                boxShadow: `0 15px 30px ${design.primaryColor}20`,
+                border: `2px solid ${design.primaryColor}20`,
+                transition: 'all 0.3s ease',
                 ':hover': {
                   transform: 'translateY(-5px)',
-                  boxShadow: `0 20px 25px -5px ${design.frameColor}30`,
+                  boxShadow: `0 20px 40px ${design.primaryColor}30`,
                 }
               }}>
                 {/* Animated scanning effect */}
@@ -569,12 +587,12 @@ const Dashboard = () => {
                   left: 0,
                   right: 0,
                   height: '4px',
-                  background: `linear-gradient(to right, transparent, ${design.frameAccentColor}, transparent)`,
+                  background: `linear-gradient(to right, transparent, ${design.accentColor}, transparent)`,
                   transform: 'translateY(-50%)',
                   animation: 'scan 2s infinite ease-in-out',
                   zIndex: 10,
                   borderRadius: '2px',
-                  boxShadow: `0 0 10px ${design.frameAccentColor}`,
+                  boxShadow: `0 0 15px ${design.accentColor}`,
                 }} />
                 
                 {/* Frame corners - premium style */}
@@ -583,7 +601,7 @@ const Dashboard = () => {
                     position: 'absolute',
                     width: `${design.cornerSize}px`,
                     height: `${design.cornerSize}px`,
-                    border: `4px solid ${design.frameColor}`,
+                    border: `5px solid ${design.secondaryColor}`,
                     [corner.split('-')[0]]: 0,
                     [corner.split('-')[1]]: 0,
                     [`border-${corner.split('-')[0]}`]: 'none',
@@ -608,35 +626,47 @@ const Dashboard = () => {
                 />
               </div>
     
-              {/* English text with decorative elements */}
+              {/* English CTA - Button Style */}
               <div style={{
                 fontSize: '36px',
-                color: design.textColor,
+                color: 'white',
                 fontFamily: design.englishFont,
                 marginTop: `${design.textMargin}px`,
-                fontWeight: 600,
+                fontWeight: 800, // Extra bold
                 textAlign: 'center',
-                width: '100%',
+                width: '80%',
                 lineHeight: '1.5',
+                padding: design.buttonPadding,
+                backgroundColor: design.secondaryColor,
+                borderRadius: design.buttonRadius,
+                boxShadow: `0 8px 20px ${design.secondaryColor}40`,
+                transition: 'all 0.3s ease',
                 position: 'relative',
-                padding: '20px 0',
-                '::before, ::after': {
-                  content: '"✻"',
-                  position: 'absolute',
-                  top: '50%',
-                  transform: 'translateY(-50%)',
-                  color: design.frameColor,
-                  fontSize: '24px',
-                  opacity: 0.7,
-                },
                 '::before': {
-                  left: '100px',
+                  content: '""',
+                  position: 'absolute',
+                  top: '-10px',
+                  left: '20%',
+                  right: '20%',
+                  height: '4px',
+                  background: `linear-gradient(to right, transparent, ${design.accentColor}, transparent)`,
+                  borderRadius: '2px',
+                  filter: 'blur(2px)',
+                  opacity: 0.7
                 },
-                '::after': {
-                  right: '100px',
+                ':hover': {
+                  transform: 'translateY(-3px)',
+                  boxShadow: `0 12px 25px ${design.secondaryColor}60`
                 }
               }}>
-                Scan QR Code to Access Content
+                <span style={{
+                  position: 'absolute',
+                  right: '30px',
+                  top: '50%',
+                  transform: 'translateY(-50%)',
+                  fontSize: '44px'
+                }}>👍</span>
+                SCAN HERE 👆
               </div>
     
               {/* Premium watermark with logo */}
@@ -645,28 +675,29 @@ const Dashboard = () => {
                 bottom: `${design.padding}px`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '12px',
-                padding: '12px 24px',
-                backgroundColor: `${design.frameColor}10`,
-                borderRadius: '999px',
-                backdropFilter: 'blur(4px)',
-                border: `1px solid ${design.frameColor}20`,
+                gap: '15px',
+                padding: '15px 30px',
+                backgroundColor: `${design.primaryColor}15`,
+                borderRadius: '50px',
+                backdropFilter: 'blur(6px)',
+                border: `1px solid ${design.primaryColor}30`,
+                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.05)'
               }}>
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={design.watermarkColor} strokeWidth="2"/>
-                  <path d="M12 6V12L16 14" stroke={design.watermarkColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M12 22V18" stroke={design.watermarkColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M18 12H22" stroke={design.watermarkColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M2 12H6" stroke={design.watermarkColor} strokeWidth="2" strokeLinecap="round"/>
+                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={design.textColor} strokeWidth="2"/>
+                  <path d="M12 6V12L16 14" stroke={design.textColor} strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M12 22V18" stroke={design.textColor} strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M7 3L5 5" stroke={design.accentColor} strokeWidth="2" strokeLinecap="round"/>
+                  <path d="M19 5L17 3" stroke={design.accentColor} strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <span style={{
-                  fontSize: '18px',
-                  color: design.watermarkColor,
+                  fontSize: '20px',
+                  color: design.textColor,
                   fontFamily: design.englishFont,
                   letterSpacing: '0.5px',
-                  fontWeight: 500,
+                  fontWeight: 600,
                 }}>
-                  Generated by qrcreator.xyz
+                  Generated by <strong style={{color: design.primaryColor}}>qrcreator.xyz</strong>
                 </span>
               </div>
     
@@ -674,8 +705,8 @@ const Dashboard = () => {
               <style>{`
                 @keyframes scan {
                   0% { transform: translateY(-50%) translateX(-100%); opacity: 0; }
-                  20% { opacity: 1; }
-                  80% { opacity: 1; }
+                  15% { opacity: 1; }
+                  85% { opacity: 1; }
                   100% { transform: translateY(-50%) translateX(100%); opacity: 0; }
                 }
               `}</style>
@@ -686,7 +717,7 @@ const Dashboard = () => {
           // ... (keep the existing download code)
     
         } else {
-          // PNG format (premium version)
+          // PNG format (premium+ version)
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -725,7 +756,7 @@ const Dashboard = () => {
             />
           );
     
-          // Create final premium canvas
+          // Create final premium+ canvas
           await new Promise<void>((resolve) => {
             setTimeout(async () => {
               const canvas = document.createElement('canvas');
@@ -743,55 +774,85 @@ const Dashboard = () => {
     
                 // Draw decorative elements
                 ctx.beginPath();
-                ctx.arc(-100, canvas.height * 0.4, 150, 0, Math.PI * 2);
-                ctx.fillStyle = `${design.frameAccentColor}20`;
-                ctx.filter = 'blur(20px)';
+                ctx.arc(-150, canvas.height * 0.2, 200, 0, Math.PI * 2);
+                ctx.fillStyle = `${design.primaryColor}10`;
+                ctx.filter = 'blur(30px)';
                 ctx.fill();
-                ctx.filter = 'none';
-    
+                
                 ctx.beginPath();
-                ctx.arc(canvas.width + 100, canvas.height * 0.6, 150, 0, Math.PI * 2);
-                ctx.fillStyle = `${design.frameColor}20`;
-                ctx.filter = 'blur(20px)';
+                ctx.arc(canvas.width + 150, canvas.height * 0.7, 200, 0, Math.PI * 2);
+                ctx.fillStyle = `${design.accentColor}10`;
                 ctx.fill();
                 ctx.filter = 'none';
     
                 // Draw top accent bar
-                ctx.fillStyle = design.frameColor;
-                ctx.fillRect(0, 0, canvas.width, 8);
+                const topBarGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                topBarGradient.addColorStop(0, design.primaryColor);
+                topBarGradient.addColorStop(1, design.accentColor);
+                ctx.fillStyle = topBarGradient;
+                ctx.fillRect(0, 0, canvas.width, 10);
     
-                // Draw Arabic text with underline
-                ctx.font = `700 40px ${design.arabicFont}`;
-                ctx.fillStyle = design.textColor;
+                // Draw Arabic CTA button
+                const arabicButton = {
+                  x: canvas.width / 2,
+                  y: design.padding + 60,
+                  width: canvas.width * 0.8,
+                  height: 100
+                };
+                
+                // Button background
+                ctx.beginPath();
+                ctx.roundRect(
+                  arabicButton.x - arabicButton.width/2,
+                  arabicButton.y - arabicButton.height/2,
+                  arabicButton.width,
+                  arabicButton.height,
+                  [50, 50, 50, 50]
+                );
+                ctx.fillStyle = design.primaryColor;
+                ctx.shadowColor = `${design.primaryColor}80`;
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetY = 8;
+                ctx.fill();
+                ctx.shadowColor = 'transparent';
+                
+                // Button text (Arabic)
+                ctx.font = `800 38px ${design.arabicFont}`;
+                ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
-                ctx.textBaseline = 'top';
+                ctx.textBaseline = 'middle';
                 
                 // Arabic text needs RTL handling
-                const arabicText = 'امسح رمز الاستجابة السريعة للوصول إلى المحتوى';
+                const arabicText = 'امسح الكود الآن 👆';
                 ctx.save();
                 ctx.textAlign = 'right'; // For RTL
-                const arabicX = canvas.width / 2;
-                const arabicY = design.padding;
-                ctx.fillText(arabicText, arabicX, arabicY);
+                ctx.fillText(arabicText, arabicButton.x + arabicButton.width/2 - 80, arabicButton.y);
+                ctx.restore();
                 
-                // Draw underline
+                // Thumbs up emoji
+                ctx.font = '44px serif';
+                ctx.fillText('👍', arabicButton.x - arabicButton.width/2 + 70, arabicButton.y);
+                
+                // Button underline effect
                 ctx.beginPath();
-                ctx.moveTo(canvas.width * 0.25, arabicY + 80);
-                ctx.lineTo(canvas.width * 0.75, arabicY + 80);
-                const lineGradient = ctx.createLinearGradient(canvas.width * 0.25, 0, canvas.width * 0.75, 0);
+                ctx.moveTo(arabicButton.x - arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
+                ctx.lineTo(arabicButton.x + arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
+                const lineGradient = ctx.createLinearGradient(
+                  arabicButton.x - arabicButton.width * 0.3, 0, 
+                  arabicButton.x + arabicButton.width * 0.3, 0
+                );
                 lineGradient.addColorStop(0, 'transparent');
-                lineGradient.addColorStop(0.5, design.frameColor);
+                lineGradient.addColorStop(0.5, design.accentColor);
                 lineGradient.addColorStop(1, 'transparent');
                 ctx.strokeStyle = lineGradient;
                 ctx.lineWidth = 4;
                 ctx.stroke();
-                ctx.restore();
     
                 // Draw QR code with premium frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
                   const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = design.padding + 120;
+                  const qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
                   
                   // Draw frame with rounded corners
                   ctx.beginPath();
@@ -800,31 +861,31 @@ const Dashboard = () => {
                     qrY - design.frameWidth,
                     design.qrSize + design.frameWidth * 2,
                     design.qrSize + design.frameWidth * 2,
-                    [16, 16, 16, 16]
+                    [20, 20, 20, 20]
                   );
                   ctx.fillStyle = design.qrBgColor;
+                  ctx.shadowColor = `${design.primaryColor}30`;
+                  ctx.shadowBlur = 30;
+                  ctx.shadowOffsetY = 15;
                   ctx.fill();
+                  ctx.shadowColor = 'transparent';
                   
-                  // Frame shadow
-                  ctx.shadowColor = `${design.frameColor}30`;
-                  ctx.shadowBlur = 20;
-                  ctx.shadowOffsetY = 10;
-                  ctx.strokeStyle = `${design.frameColor}30`;
+                  // Frame border
+                  ctx.strokeStyle = `${design.primaryColor}30`;
                   ctx.lineWidth = 2;
                   ctx.stroke();
-                  ctx.shadowColor = 'transparent';
                   
                   // Draw animated scan line (static position for PNG)
                   ctx.beginPath();
                   ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize/2);
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize/2);
-                  ctx.strokeStyle = design.frameAccentColor;
+                  ctx.strokeStyle = design.accentColor;
                   ctx.lineWidth = 4;
                   ctx.stroke();
                   
                   // Draw frame corners
-                  ctx.strokeStyle = design.frameColor;
-                  ctx.lineWidth = 4;
+                  ctx.strokeStyle = design.secondaryColor;
+                  ctx.lineWidth = 5;
                   
                   // Top-left corner
                   ctx.beginPath();
@@ -858,72 +919,114 @@ const Dashboard = () => {
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
     
-                // Draw English text with decorations
-                ctx.font = `600 36px ${design.englishFont}`;
-                ctx.fillStyle = design.textColor;
+                // Draw English CTA button
+                const englishButton = {
+                  x: canvas.width / 2,
+                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
+                  width: canvas.width * 0.8,
+                  height: 100
+                };
+                
+                // Button background
+                ctx.beginPath();
+                ctx.roundRect(
+                  englishButton.x - englishButton.width/2,
+                  englishButton.y - englishButton.height/2,
+                  englishButton.width,
+                  englishButton.height,
+                  [50, 50, 50, 50]
+                );
+                ctx.fillStyle = design.secondaryColor;
+                ctx.shadowColor = `${design.secondaryColor}80`;
+                ctx.shadowBlur = 20;
+                ctx.shadowOffsetY = 8;
+                ctx.fill();
+                ctx.shadowColor = 'transparent';
+                
+                // Button text
+                ctx.font = `800 36px ${design.englishFont}`;
+                ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('SCAN HERE 👆', englishButton.x, englishButton.y);
                 
-                // Draw decorative stars
-                ctx.font = '24px serif';
-                ctx.fillText('✻', canvas.width/2 - 150, design.padding + 120 + design.qrSize + design.textMargin + 25);
-                ctx.fillText('✻', canvas.width/2 + 150, design.padding + 120 + design.qrSize + design.textMargin + 25);
+                // Thumbs up emoji
+                ctx.font = '44px serif';
+                ctx.fillText('👍', englishButton.x + englishButton.width/2 - 70, englishButton.y);
                 
-                // Draw main text
-                ctx.font = `600 36px ${design.englishFont}`;
-                ctx.fillText('Scan QR Code to Access Content', canvas.width/2, design.padding + 120 + design.qrSize + design.textMargin);
+                // Button underline effect
+                ctx.beginPath();
+                ctx.moveTo(englishButton.x - englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
+                ctx.lineTo(englishButton.x + englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
+                const topLineGradient = ctx.createLinearGradient(
+                  englishButton.x - englishButton.width * 0.3, 0, 
+                  englishButton.x + englishButton.width * 0.3, 0
+                );
+                topLineGradient.addColorStop(0, 'transparent');
+                topLineGradient.addColorStop(0.5, design.accentColor);
+                topLineGradient.addColorStop(1, 'transparent');
+                ctx.strokeStyle = topLineGradient;
+                ctx.lineWidth = 4;
+                ctx.stroke();
     
                 // Draw premium watermark
-                const watermarkX = canvas.width/2;
-                const watermarkY = canvas.height - design.padding;
+                const watermark = {
+                  x: canvas.width / 2,
+                  y: canvas.height - design.padding,
+                  width: 380,
+                  height: 60
+                };
                 
                 // Watermark background
                 ctx.beginPath();
                 ctx.roundRect(
-                  watermarkX - 150,
-                  watermarkY - 30,
-                  300,
-                  48,
-                  24
+                  watermark.x - watermark.width/2,
+                  watermark.y - watermark.height/2,
+                  watermark.width,
+                  watermark.height,
+                  [30, 30, 30, 30]
                 );
-                ctx.fillStyle = `${design.frameColor}10`;
-                ctx.fill();
-                ctx.strokeStyle = `${design.frameColor}20`;
+                ctx.fillStyle = `${design.primaryColor}15`;
+                ctx.strokeStyle = `${design.primaryColor}30`;
                 ctx.lineWidth = 1;
+                ctx.fill();
                 ctx.stroke();
                 
                 // Draw watermark icon
                 ctx.beginPath();
-                ctx.arc(watermarkX - 90, watermarkY - 6, 10, 0, Math.PI * 2);
-                ctx.strokeStyle = design.watermarkColor;
+                ctx.arc(watermark.x - watermark.width/2 + 50, watermark.y, 12, 0, Math.PI * 2);
+                ctx.strokeStyle = design.textColor;
                 ctx.lineWidth = 2;
                 ctx.stroke();
                 
                 ctx.beginPath();
-                ctx.moveTo(watermarkX - 90, watermarkY - 6);
-                ctx.lineTo(watermarkX - 90, watermarkY + 6);
+                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 12);
+                ctx.lineTo(watermark.x - watermark.width/2 + 50, watermark.y + 12);
                 ctx.stroke();
                 
                 ctx.beginPath();
-                ctx.moveTo(watermarkX - 90, watermarkY - 6);
-                ctx.lineTo(watermarkX - 80, watermarkY - 2);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermarkX - 90, watermarkY + 10);
-                ctx.lineTo(watermarkX - 90, watermarkY + 14);
+                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 12);
+                ctx.lineTo(watermark.x - watermark.width/2 + 60, watermark.y - 6);
                 ctx.stroke();
                 
                 // Draw watermark text
-                ctx.font = `500 18px ${design.englishFont}`;
-                ctx.fillStyle = design.watermarkColor;
-                ctx.fillText('Generated by qrcreator.xyz', watermarkX, watermarkY);
+                ctx.font = `600 20px ${design.englishFont}`;
+                ctx.fillStyle = design.textColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('Generated by ', watermark.x - 30, watermark.y);
+                
+                // Accent part of watermark
+                ctx.fillStyle = design.primaryColor;
+                ctx.font = `700 20px ${design.englishFont}`;
+                ctx.fillText('qrcreator.xyz', watermark.x + 80, watermark.y);
               }
               
               // Convert to PNG and download
               const pngUrl = canvas.toDataURL('image/png', 1.0);
               const downloadLink = document.createElement('a');
               downloadLink.href = pngUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_premium.png`;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_premium-plus.png`;
               document.body.appendChild(downloadLink);
               downloadLink.click();
               document.body.removeChild(downloadLink);
@@ -933,8 +1036,8 @@ const Dashboard = () => {
         }
     
         toast({
-          title: `Premium QR Code Downloaded`,
-          description: `Your stylish QR code has been downloaded as high-quality ${format.toUpperCase()}`,
+          title: `Premium+ QR Code Downloaded`,
+          description: `Your attractive QR code has been downloaded as high-quality ${format.toUpperCase()}`,
         });
       } catch (error) {
         console.error('Download failed:', error);
