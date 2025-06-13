@@ -52,7 +52,7 @@ const translations = {
     all: "All",
     url: "URL",
     menu: "Menu",
-    both: "Both",
+    both: "Menu",
     direct: "Direct Link",
     sortBy: "Sort by",
     newest: "Newest",
