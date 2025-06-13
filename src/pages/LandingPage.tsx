@@ -62,18 +62,20 @@ const preloadComponents = () => {
   components.forEach(component => component());
 };
 
-// Prefetch data for a QR code
+// Prefetch data for a QR code with aggressive caching
 const prefetchQRCodeData = async (id: string) => {
   try {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000); // 5s timeout
+    const timeoutId = setTimeout(() => controller.abort(), 3000); // Reduced timeout to 3s
     
     const response = await fetch(`${import.meta.env.VITE_API_URL}/api/qrcodes/public/${id}`, {
       signal: controller.signal,
       headers: {
         'Accept-Encoding': 'gzip',
-        'Accept': 'application/json'
-      }
+        'Accept': 'application/json',
+        'Cache-Control': 'max-age=3600'
+      },
+      cache: 'force-cache' // Force browser cache
     });
     
     clearTimeout(timeoutId);
@@ -148,6 +150,7 @@ const LandingPage = () => {
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
+  const [initialLoadComplete, setInitialLoadComplete] = useState(false);
 
   // Memoized platform info
   const getPlatformInfo = useCallback((type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
@@ -217,13 +220,25 @@ const LandingPage = () => {
     return 'en';
   }, []);
 
-  // Preload critical assets
+  // Preload critical assets immediately
   useEffect(() => {
-    if (qrCode?.logoUrl) {
-      const img = new Image();
-      img.src = qrCode.logoUrl;
+    if (id) {
+      // Start prefetching immediately
+      const prefetchPromise = prefetchQRCodeData(id);
+      preloadComponents();
+
+      // Set a timeout for initial load
+      const timeoutId = setTimeout(() => {
+        if (!initialLoadComplete) {
+          setLoading(false);
+        }
+      }, 800); // Show content after 800ms max
+
+      return () => {
+        clearTimeout(timeoutId);
+      };
     }
-  }, [qrCode?.logoUrl]);
+  }, [id]);
 
   // Optimized data fetching with caching
   useEffect(() => {
@@ -235,30 +250,26 @@ const LandingPage = () => {
           return;
         }
 
-        // Start loading state
-        setLoading(true);
-
         // Create AbortController for request cancellation
         const controller = new AbortController();
         const signal = controller.signal;
 
-        // Parallel data fetching with timeout
+        // Parallel data fetching with reduced timeout
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 5000)
+          setTimeout(() => reject(new Error('Request timeout')), 3000)
         );
 
         const fetchPromise = Promise.all([
           qrCodeApi.getPublicQRCode(id),
-          qrCodeApi.incrementScanCount(id),
-          preloadComponents(),
-          prefetchQRCodeData(id)
+          qrCodeApi.incrementScanCount(id)
         ]);
 
-        const [data] = await Promise.race([fetchPromise, timeoutPromise]) as [QRCode, any, any, any];
+        const [data] = await Promise.race([fetchPromise, timeoutPromise]) as [QRCode, any];
 
         // Use startTransition for non-urgent state updates
         startTransition(() => {
           setQRCode(data);
+          setInitialLoadComplete(true);
           
           // Handle direct URL type - redirect to original URL
           if (data.type === 'direct' && data.originalUrl) {
@@ -309,12 +320,11 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
-          <div className="relative w-24 h-24 mx-auto mb-8">
+          <div className="relative w-16 h-16 mx-auto mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
             <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
           </div>
-          <h2 className="text-2xl font-bold text-white mb-4">Loading...</h2>
-          <p className="text-white/80">Please wait while we prepare your experience</p>
+          <h2 className="text-xl font-bold text-white mb-2">Loading...</h2>
         </div>
       </div>
     </div>
@@ -360,7 +370,7 @@ const LandingPage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.3 }}
+                transition={{ duration: 0.2 }} // Reduced animation duration
                 className="space-y-8"
               >
                 {hasMenu && (

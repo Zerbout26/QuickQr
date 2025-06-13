@@ -179,19 +179,22 @@ function queueScanStats(id: string, req: Request) {
   });
 }
 
-// Optimized cache headers
+// Optimized cache headers with shorter max-age
 function setAggressiveCacheHeaders(res: Response, data: any) {
-  // Set cache control headers
-  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  // Set cache control headers with shorter max-age for faster updates
+  res.setHeader('Cache-Control', 'public, max-age=1800, stale-while-revalidate=3600');
   res.setHeader('ETag', `"${Buffer.from(JSON.stringify(data)).toString('base64')}"`);
   res.setHeader('Vary', 'Accept-Encoding');
 }
 
-// Optimized response streaming
+// Optimized response streaming with faster compression
 function streamResponse(res: Response, data: any, acceptsGzip: boolean | undefined) {
   if (acceptsGzip === true) {
     res.setHeader('Content-Encoding', 'gzip');
-    const gzip = zlib.createGzip();
+    const gzip = zlib.createGzip({
+      level: 1, // Faster compression
+      memLevel: 4 // Lower memory usage
+    });
     gzip.pipe(res);
     gzip.write(JSON.stringify(data));
     gzip.end();
