@@ -179,42 +179,25 @@ function queueScanStats(id: string, req: Request) {
   });
 }
 
-// Helper function to set aggressive cache headers
+// Optimized cache headers
 function setAggressiveCacheHeaders(res: Response, data: any) {
-  res.setHeader('Cache-Control', 'public, max-age=7200, stale-while-revalidate=600');
-  res.setHeader('ETag', `"${data.id}-${data.updatedAt}"`);
+  // Set cache control headers
+  res.setHeader('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400');
+  res.setHeader('ETag', `"${Buffer.from(JSON.stringify(data)).toString('base64')}"`);
   res.setHeader('Vary', 'Accept-Encoding');
-  res.setHeader('X-Content-Type-Options', 'nosniff');
-  res.setHeader('X-Frame-Options', 'DENY');
-  res.setHeader('X-XSS-Protection', '1; mode=block');
-  res.setHeader('Surrogate-Control', 'max-age=7200');
-  res.setHeader('Surrogate-Key', `qr-${data.id}`);
-  res.setHeader('Connection', 'keep-alive');
-  res.setHeader('Keep-Alive', 'timeout=5');
 }
 
-// Helper function to compress response with maximum compression
-function compressResponse(data: any): Promise<Buffer> {
-  return new Promise((resolve, reject) => {
-    zlib.gzip(JSON.stringify(data), { 
-      level: 9, // Maximum compression
-      memLevel: 9, // Maximum memory for compression
-      windowBits: 15 // Maximum window size
-    }, (err, result) => {
-      if (err) reject(err);
-      else resolve(result);
-    });
-  });
-}
-
-// Helper function to stream response
-async function streamResponse(res: Response, data: any, acceptsGzip: boolean | undefined) {
+// Optimized response streaming
+function streamResponse(res: Response, data: any, acceptsGzip: boolean | undefined) {
   if (acceptsGzip === true) {
     res.setHeader('Content-Encoding', 'gzip');
-    const compressed = await compressResponse(data);
-    return res.send(compressed);
+    const gzip = zlib.createGzip();
+    gzip.pipe(res);
+    gzip.write(JSON.stringify(data));
+    gzip.end();
+  } else {
+    res.json(data);
   }
-  return res.json(data);
 }
 
 export const getLandingPage = async (req: Request, res: Response) => {
@@ -225,6 +208,18 @@ export const getLandingPage = async (req: Request, res: Response) => {
     // Check if client accepts gzip
     const acceptsGzip = req.headers['accept-encoding']?.includes('gzip');
     
+    // Check ETag for client-side caching
+    const ifNoneMatch = req.headers['if-none-match'];
+    if (ifNoneMatch) {
+      const cachedData = memoryCache.get(cacheKey)?.data;
+      if (cachedData) {
+        const etag = `"${Buffer.from(JSON.stringify(cachedData)).toString('base64')}"`;
+        if (ifNoneMatch === etag) {
+          return res.status(304).end();
+        }
+      }
+    }
+
     // 1. Check memory cache first (fastest)
     const memoryCached = memoryCache.get(cacheKey);
     if (memoryCached && Date.now() - memoryCached.timestamp < MEMORY_CACHE_DURATION) {

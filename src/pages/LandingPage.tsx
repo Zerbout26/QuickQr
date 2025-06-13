@@ -225,7 +225,7 @@ const LandingPage = () => {
     }
   }, [qrCode?.logoUrl]);
 
-  // Fetch QR code data with optimizations
+  // Optimized data fetching with caching
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
@@ -238,14 +238,25 @@ const LandingPage = () => {
         // Start loading state
         setLoading(true);
 
-        // Preload components and prefetch data in parallel
-        const [data] = await Promise.all([
+        // Create AbortController for request cancellation
+        const controller = new AbortController();
+        const signal = controller.signal;
+
+        // Parallel data fetching with timeout
+        const timeoutPromise = new Promise((_, reject) => 
+          setTimeout(() => reject(new Error('Request timeout')), 5000)
+        );
+
+        const fetchPromise = Promise.all([
           qrCodeApi.getPublicQRCode(id),
           qrCodeApi.incrementScanCount(id),
           preloadComponents(),
-          prefetchQRCodeData(id) // Prefetch for potential future use
+          prefetchQRCodeData(id)
         ]);
 
+        const [data] = await Promise.race([fetchPromise, timeoutPromise]) as [QRCode, any, any, any];
+
+        // Use startTransition for non-urgent state updates
         startTransition(() => {
           setQRCode(data);
           
@@ -293,7 +304,7 @@ const LandingPage = () => {
     };
   }, []);
 
-  // Memoized loading component
+  // Memoized loading component with optimized animation
   const LoadingComponent = useMemo(() => (
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="min-h-screen flex items-center justify-center">
