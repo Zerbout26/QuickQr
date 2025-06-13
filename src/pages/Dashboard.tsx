@@ -426,19 +426,19 @@ const Dashboard = () => {
       let container: HTMLDivElement | null = null;
     
       try {
-        // Print-ready design configuration
+        // Modern design configuration
         const design = {
           width: 1000, // Optimal for printing
           height: 1200,
           qrSize: 600,
           logoSize: 120,
-          // Professional color palette
-          bgColor: '#ffffff', // Pure white for print
-          frameColor: '#e5e7eb', // Light gray frame
+          // Modern color palette
+          bgColor: '#f8fafc', // Soft white background
+          frameColor: '#3b82f6', // Blue frame for camera effect
           qrBgColor: '#ffffff', // White QR background
-          qrFgColor: '#1f2937', // Dark gray for QR dots
-          textColor: '#1f2937', // Dark text
-          watermarkColor: '#9ca3af', // Subtle watermark
+          qrFgColor: '#1e293b', // Dark slate for QR dots
+          textColor: '#1e293b', // Dark text for contrast
+          watermarkColor: 'rgba(30, 41, 59, 0.4)', // Subtle translucent watermark
           // Typography
           arabicFont: "'Tajawal', sans-serif",
           englishFont: "'Inter', sans-serif",
@@ -446,7 +446,9 @@ const Dashboard = () => {
           padding: 60,
           textMargin: 40,
           cornerSize: 50,
-          frameWidth: 15
+          frameWidth: 15,
+          cameraFrameSize: 80, // Size of the camera frame effect
+          cameraFrameColor: '#93c5fd', // Lighter blue for camera effect
         };
     
         if (format === 'svg') {
@@ -462,7 +464,7 @@ const Dashboard = () => {
             }
           }
           
-          // Render print-ready SVG
+          // Render modern SVG
           const root = ReactDOM.createRoot(svgElement);
           root.render(
             <div style={{
@@ -474,7 +476,9 @@ const Dashboard = () => {
               alignItems: 'center',
               justifyContent: 'center',
               padding: `${design.padding}px`,
-              position: 'relative'
+              position: 'relative',
+              boxShadow: '0 10px 15px -3px rgba(0, 0, 0, 0.1)',
+              borderRadius: '12px',
             }}>
               {/* Arabic call-to-action (top) */}
               <div style={{
@@ -485,20 +489,36 @@ const Dashboard = () => {
                 fontWeight: 600,
                 direction: 'rtl',
                 textAlign: 'center',
-                width: '100%'
+                width: '100%',
+                lineHeight: '1.5',
               }}>
                 امسح رمز الاستجابة السريعة للوصول إلى المحتوى
               </div>
     
-              {/* QR Code with print-optimized frame */}
+              {/* QR Code with modern camera frame effect */}
               <div style={{
                 position: 'relative',
                 padding: `${design.frameWidth}px`,
                 backgroundColor: design.qrBgColor,
-                border: `1px solid ${design.frameColor}`,
-                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)'
+                borderRadius: '12px',
+                boxShadow: '0 4px 6px rgba(0, 0, 0, 0.05)',
+                border: `2px solid ${design.frameColor}`,
               }}>
-                {/* Frame corners */}
+                {/* Camera frame effect */}
+                <div style={{
+                  position: 'absolute',
+                  top: '50%',
+                  left: '50%',
+                  transform: 'translate(-50%, -50%)',
+                  width: `${design.cameraFrameSize}%`,
+                  height: `${design.cameraFrameSize}%`,
+                  border: `2px dashed ${design.cameraFrameColor}`,
+                  borderRadius: '8px',
+                  pointerEvents: 'none',
+                  opacity: 0.6,
+                }} />
+                
+                {/* Frame corners - modern style */}
                 {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
                   <div key={corner} style={{
                     position: 'absolute',
@@ -508,7 +528,8 @@ const Dashboard = () => {
                     [corner.split('-')[0]]: 0,
                     [corner.split('-')[1]]: 0,
                     [`border-${corner.split('-')[0]}`]: 'none',
-                    [`border-${corner.split('-')[1]}`]: 'none'
+                    [`border-${corner.split('-')[1]}`]: 'none',
+                    borderRadius: corner.includes('left') ? '8px 0 0 0' : '0 8px 0 0',
                   }} />
                 ))}
                 
@@ -536,20 +557,28 @@ const Dashboard = () => {
                 marginTop: `${design.textMargin}px`,
                 fontWeight: 500,
                 textAlign: 'center',
-                width: '100%'
+                width: '100%',
+                lineHeight: '1.4',
               }}>
                 Scan QR Code to Access Content
               </div>
     
-              {/* Subtle watermark */}
+              {/* Modern watermark */}
               <div style={{
                 position: 'absolute',
                 bottom: `${design.padding}px`,
-                fontSize: '20px',
+                fontSize: '18px',
                 color: design.watermarkColor,
                 fontFamily: design.englishFont,
-                letterSpacing: '0.5px'
+                letterSpacing: '0.5px',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
               }}>
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke="currentColor" strokeWidth="2"/>
+                  <path d="M12 8V12L15 15" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/>
+                </svg>
                 Generated by qrcreator.xyz
               </div>
             </div>
@@ -566,7 +595,7 @@ const Dashboard = () => {
                 
                 const downloadLink = document.createElement('a');
                 downloadLink.href = svgUrl;
-                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_print-ready.svg`;
+                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_modern.svg`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
@@ -577,7 +606,7 @@ const Dashboard = () => {
           });
     
         } else {
-          // PNG format (print optimized)
+          // PNG format (modern optimized)
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -616,7 +645,7 @@ const Dashboard = () => {
             />
           );
     
-          // Create final print-optimized canvas
+          // Create final modern canvas
           await new Promise<void>((resolve) => {
             setTimeout(() => {
               const canvas = document.createElement('canvas');
@@ -625,8 +654,11 @@ const Dashboard = () => {
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Draw white background (optimal for printing)
-                ctx.fillStyle = design.bgColor;
+                // Draw modern background with subtle gradient
+                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
+                gradient.addColorStop(0, '#f8fafc');
+                gradient.addColorStop(1, '#f1f5f9');
+                ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
                 // Draw Arabic text
@@ -636,30 +668,43 @@ const Dashboard = () => {
                 ctx.textBaseline = 'top';
                 ctx.fillText('امسح رمز الاستجابة السريعة للوصول إلى المحتوى', canvas.width / 2, design.padding);
     
-                // Draw QR code with print-optimized frame
+                // Draw QR code with modern frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
                   const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = design.padding + 80; // Below Arabic text
+                  const qrY = design.padding + 80;
                   
-                  // Draw frame background
-                  ctx.fillStyle = design.qrBgColor;
-                  ctx.fillRect(
+                  // Draw frame background with rounded corners
+                  ctx.beginPath();
+                  ctx.roundRect(
                     qrX - design.frameWidth,
                     qrY - design.frameWidth,
                     design.qrSize + design.frameWidth * 2,
-                    design.qrSize + design.frameWidth * 2
+                    design.qrSize + design.frameWidth * 2,
+                    12
                   );
+                  ctx.fillStyle = design.qrBgColor;
+                  ctx.fill();
                   
                   // Draw frame border
                   ctx.strokeStyle = design.frameColor;
-                  ctx.lineWidth = 1;
-                  ctx.strokeRect(
-                    qrX - design.frameWidth,
-                    qrY - design.frameWidth,
-                    design.qrSize + design.frameWidth * 2,
-                    design.qrSize + design.frameWidth * 2
+                  ctx.lineWidth = 2;
+                  ctx.stroke();
+                  
+                  // Draw camera frame effect (dashed rectangle)
+                  ctx.beginPath();
+                  ctx.setLineDash([10, 5]);
+                  ctx.strokeStyle = design.cameraFrameColor;
+                  ctx.lineWidth = 2;
+                  ctx.roundRect(
+                    qrX + (design.qrSize * (1 - design.cameraFrameSize/100)/2),
+                    qrY + (design.qrSize * (1 - design.cameraFrameSize/100)/2),
+                    design.qrSize * design.cameraFrameSize/100,
+                    design.qrSize * design.cameraFrameSize/100,
+                    8
                   );
+                  ctx.stroke();
+                  ctx.setLineDash([]);
                   
                   // Draw frame corners
                   ctx.strokeStyle = design.frameColor;
@@ -702,27 +747,46 @@ const Dashboard = () => {
                 ctx.fillStyle = design.textColor;
                 ctx.fillText('Scan QR Code to Access Content', canvas.width / 2, design.padding + 80 + design.qrSize + design.textMargin);
     
-                // Draw watermark
-                ctx.font = `20px ${design.englishFont}`;
+                // Draw modern watermark with icon
+                ctx.font = `18px ${design.englishFont}`;
                 ctx.fillStyle = design.watermarkColor;
+                
+                // Draw icon
+                ctx.beginPath();
+                ctx.arc(canvas.width / 2 - 50, canvas.height - design.padding - 10, 8, 0, Math.PI * 2);
+                ctx.strokeStyle = design.watermarkColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2 - 50, canvas.height - design.padding - 10);
+                ctx.lineTo(canvas.width / 2 - 50, canvas.height - design.padding - 2);
+                ctx.stroke();
+                
+                ctx.beginPath();
+                ctx.moveTo(canvas.width / 2 - 50, canvas.height - design.padding - 10);
+                ctx.lineTo(canvas.width / 2 - 42, canvas.height - design.padding - 6);
+                ctx.stroke();
+                
+                // Draw text
                 ctx.fillText('Generated by qrcreator.xyz', canvas.width / 2, canvas.height - design.padding);
-    
-                // Convert to PNG and download
-                const pngUrl = canvas.toDataURL('image/png', 1.0); // Highest quality
-                const downloadLink = document.createElement('a');
-                downloadLink.href = pngUrl;
-                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_print-ready.png`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
               }
+              
+              // Convert to PNG and download
+              const pngUrl = canvas.toDataURL('image/png', 1.0);
+              const downloadLink = document.createElement('a');
+              downloadLink.href = pngUrl;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_modern.png`;
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
               resolve();
             }, 200);
           });
         }
     
         toast({
-          title: `Print-Ready QR Code Downloaded`,
+          title: `Modern QR Code Downloaded`,
           description: `Your QR code has been downloaded as high-quality ${format.toUpperCase()}`,
         });
       } catch (error) {
@@ -730,7 +794,7 @@ const Dashboard = () => {
         toast({
           variant: "destructive",
           title: "Download Failed",
-          description: "There was a problem generating your print-ready QR code.",
+          description: "There was a problem generating your modern QR code.",
         });
       } finally {
         // Clean up
