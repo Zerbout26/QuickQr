@@ -848,11 +848,15 @@ const Dashboard = () => {
                 ctx.lineWidth = 4;
                 ctx.stroke();
     
+                // Initialize QR code position variables
+                let qrX = 0;
+                let qrY = 0;
+
                 // Draw QR code with premium frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
+                  qrX = (canvas.width - design.qrSize) / 2;
+                  qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
                   
                   // Draw frame with rounded corners
                   ctx.beginPath();
@@ -914,7 +918,7 @@ const Dashboard = () => {
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
                   ctx.stroke();
-    
+
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
