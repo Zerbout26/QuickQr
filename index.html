@@ -3,22 +3,61 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>quickqr-easy-access</title>
-    <meta name="description" content="Lovable Generated Project" />
+    <title>QrCreator</title>
+    <meta name="description" content="One Scan. Full Access. Total Impression." />
     <meta name="author" content="Lovable" />
 
-    <meta property="og:title" content="QeCreator" />
+    <!-- Favicon and app icons -->
+    <link rel="icon" type="image/png" href="/Logo QrCreator sur fond blanc (1).png" />
+    <link rel="apple-touch-icon" href="/Logo QrCreator sur fond blanc (1).png" />
+    
+    <!-- Preload critical assets -->
+    <link rel="preload" href="/Logo QrCreator sur fond blanc (1).png" as="image" type="image/png" />
+    
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="QrCreator" />
     <meta property="og:description" content="One Scan. Full Access. Total Impression." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="/ChatGPT Image May 23, 2025, 12_08_02 AM.png" />
-
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@lovable_dev" />
-    <meta name="twitter:image" content="/ChatGPT Image May 23, 2025, 12_08_02 AM.png" />
+    <meta property="og:image" content="/Logo QrCreator sur fond blanc (1).png" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#8b5cf6" />
+    
+    <!-- Prevent Flash of Unstyled Content -->
+    <style>
+      #root {
+        min-height: 100vh;
+        background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+      }
+      .loading-logo {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 128px;
+        height: 128px;
+        animation: pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+      }
+      @keyframes pulse {
+        0%, 100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.5;
+        }
+      }
+    </style>
   </head>
 
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <!-- Initial loading state -->
+      <img 
+        src="/Logo QrCreator sur fond blanc (1).png" 
+        alt="QrCreator Logo" 
+        class="loading-logo"
+      />
+    </div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR link THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
     <script type="module" src="/src/main.tsx"></script>

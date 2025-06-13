@@ -320,6 +320,14 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="min-h-screen flex items-center justify-center">
         <div className="text-center">
+          <div className="relative w-32 h-32 mx-auto mb-4">
+            <img 
+              src="/Logo QrCreator sur fond blanc (1).png" 
+              alt="QR Creator Logo"
+              className="w-full h-full object-contain animate-pulse"
+              loading="eager"
+            />
+          </div>
           <div className="relative w-16 h-16 mx-auto mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
             <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
