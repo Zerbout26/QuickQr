@@ -2088,7 +2088,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 <div className="mt-4">
                   <QRPreview 
-                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://www.qrcreator.xyz/landing/${id}` : ''}
+                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://qrcreator.xyz/landing/${id}` : ''}
                     color={foregroundColor}
                     bgColor={backgroundColor}
                     logoUrl={logoPreview || undefined}
