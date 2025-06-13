@@ -71,6 +71,7 @@ app.use(cors({
   origin: function(origin, callback) {
     const allowedOrigins = [
       'https://qrme.netlify.app',
+      'https://www.qrcreator.xyz',
       'http://localhost:8080',
       'http://localhost:5173'
     ];
