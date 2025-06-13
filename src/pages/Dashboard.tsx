@@ -800,7 +800,16 @@ const Dashboard = () => {
                   height: 100
                 };
                 
-                // Button background
+                // Button background with enhanced gradient
+                const arabicButtonGradient = ctx.createLinearGradient(
+                  arabicButton.x - arabicButton.width/2,
+                  arabicButton.y - arabicButton.height/2,
+                  arabicButton.x + arabicButton.width/2,
+                  arabicButton.y + arabicButton.height/2
+                );
+                arabicButtonGradient.addColorStop(0, design.primaryColor);
+                arabicButtonGradient.addColorStop(1, design.secondaryColor);
+                
                 ctx.beginPath();
                 ctx.roundRect(
                   arabicButton.x - arabicButton.width/2,
@@ -809,31 +818,27 @@ const Dashboard = () => {
                   arabicButton.height,
                   [50, 50, 50, 50]
                 );
-                ctx.fillStyle = design.primaryColor;
+                ctx.fillStyle = arabicButtonGradient;
                 ctx.shadowColor = `${design.primaryColor}80`;
                 ctx.shadowBlur = 20;
                 ctx.shadowOffsetY = 8;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
                 
-                // Button text (Arabic)
-                ctx.font = `800 38px ${design.arabicFont}`;
+                // Button text (Arabic) with enhanced styling
+                ctx.font = `800 42px ${design.arabicFont}`;
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
                 // Arabic text needs RTL handling
-                const arabicText = 'امسح الكود الآن 👆';
+                const arabicText = 'امسح الكود للوصول إلى المحتوى المميز ✨';
                 ctx.save();
                 ctx.textAlign = 'right'; // For RTL
                 ctx.fillText(arabicText, arabicButton.x + arabicButton.width/2 - 80, arabicButton.y);
                 ctx.restore();
                 
-                // Thumbs up emoji
-                ctx.font = '44px serif';
-                ctx.fillText('👍', arabicButton.x - arabicButton.width/2 + 70, arabicButton.y);
-                
-                // Button underline effect
+                // Decorative elements for Arabic button
                 ctx.beginPath();
                 ctx.moveTo(arabicButton.x - arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
                 ctx.lineTo(arabicButton.x + arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
@@ -847,7 +852,7 @@ const Dashboard = () => {
                 ctx.strokeStyle = lineGradient;
                 ctx.lineWidth = 4;
                 ctx.stroke();
-    
+
                 // Initialize QR code position variables
                 let qrX = 0;
                 let qrY = 0;
@@ -858,7 +863,16 @@ const Dashboard = () => {
                   qrX = (canvas.width - design.qrSize) / 2;
                   qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
                   
-                  // Draw frame with rounded corners
+                  // Enhanced QR frame with gradient
+                  const frameGradient = ctx.createLinearGradient(
+                    qrX - design.frameWidth,
+                    qrY - design.frameWidth,
+                    qrX + design.qrSize + design.frameWidth,
+                    qrY + design.qrSize + design.frameWidth
+                  );
+                  frameGradient.addColorStop(0, design.primaryColor);
+                  frameGradient.addColorStop(1, design.secondaryColor);
+                  
                   ctx.beginPath();
                   ctx.roundRect(
                     qrX - design.frameWidth,
@@ -874,9 +888,9 @@ const Dashboard = () => {
                   ctx.fill();
                   ctx.shadowColor = 'transparent';
                   
-                  // Frame border
-                  ctx.strokeStyle = `${design.primaryColor}30`;
-                  ctx.lineWidth = 2;
+                  // Enhanced frame border
+                  ctx.strokeStyle = frameGradient;
+                  ctx.lineWidth = 3;
                   ctx.stroke();
                   
                   // Draw animated scan line (static position for PNG)
@@ -887,43 +901,11 @@ const Dashboard = () => {
                   ctx.lineWidth = 4;
                   ctx.stroke();
                   
-                  // Draw frame corners
-                  ctx.strokeStyle = design.secondaryColor;
-                  ctx.lineWidth = 5;
-                  
-                  // Top-left corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX - design.frameWidth, qrY + design.cornerSize);
-                  ctx.lineTo(qrX - design.frameWidth, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.cornerSize, qrY - design.frameWidth);
-                  ctx.stroke();
-                  
-                  // Top-right corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.cornerSize);
-                  ctx.stroke();
-                  
-                  // Bottom-left corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
-                  ctx.lineTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.cornerSize, qrY + design.qrSize + design.frameWidth);
-                  ctx.stroke();
-                  
-                  // Bottom-right corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
-                  ctx.stroke();
-
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
     
-                // Draw English CTA button
+                // Draw English CTA button with enhanced design
                 const englishButton = {
                   x: canvas.width / 2,
                   y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
@@ -931,7 +913,16 @@ const Dashboard = () => {
                   height: 100
                 };
                 
-                // Button background
+                // Enhanced English button gradient
+                const englishButtonGradient = ctx.createLinearGradient(
+                  englishButton.x - englishButton.width/2,
+                  englishButton.y - englishButton.height/2,
+                  englishButton.x + englishButton.width/2,
+                  englishButton.y + englishButton.height/2
+                );
+                englishButtonGradient.addColorStop(0, design.secondaryColor);
+                englishButtonGradient.addColorStop(1, design.primaryColor);
+                
                 ctx.beginPath();
                 ctx.roundRect(
                   englishButton.x - englishButton.width/2,
@@ -940,25 +931,21 @@ const Dashboard = () => {
                   englishButton.height,
                   [50, 50, 50, 50]
                 );
-                ctx.fillStyle = design.secondaryColor;
+                ctx.fillStyle = englishButtonGradient;
                 ctx.shadowColor = `${design.secondaryColor}80`;
                 ctx.shadowBlur = 20;
                 ctx.shadowOffsetY = 8;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
                 
-                // Button text
+                // Enhanced English button text
                 ctx.font = `800 36px ${design.englishFont}`;
                 ctx.fillStyle = 'white';
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('SCAN HERE 👆', englishButton.x, englishButton.y);
+                ctx.fillText('SCAN TO ACCESS PREMIUM CONTENT ✨', englishButton.x, englishButton.y);
                 
-                // Thumbs up emoji
-                ctx.font = '44px serif';
-                ctx.fillText('👍', englishButton.x + englishButton.width/2 - 70, englishButton.y);
-                
-                // Button underline effect
+                // Decorative elements for English button
                 ctx.beginPath();
                 ctx.moveTo(englishButton.x - englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
                 ctx.lineTo(englishButton.x + englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
