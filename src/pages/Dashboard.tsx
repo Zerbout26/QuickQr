@@ -52,7 +52,7 @@ const translations = {
     all: "All",
     url: "URL",
     menu: "Menu",
-    both: "Menu",
+    both: "Qr Menu",
     direct: "Direct Link",
     sortBy: "Sort by",
     newest: "Newest",
@@ -166,7 +166,7 @@ const translations = {
     all: "الكل",
     url: "رابط",
     menu: "قائمة",
-    both: "كلاهما",
+    both: "رمز قائمة",
     direct: "رابط مباشر",
     sortBy: "ترتيب حسب",
     newest: "الأحدث",
@@ -470,6 +470,9 @@ const Dashboard = () => {
                   {qr.textBelow}
                 </div>
               )}
+              <div className="text-center mt-8 text-gray-500" style={{ fontSize: '24px' }}>
+                Created with www.qrcreator.xyz
+              </div>
             </div>
           );
 
@@ -602,6 +605,12 @@ const Dashboard = () => {
                   const textY = qr.textAbove ? 900 : 800;
                   ctx.fillText(qr.textBelow, canvas.width / 2, textY);
                 }
+
+                // Add website attribution
+                ctx.fillStyle = '#6B7280';
+                ctx.font = '24px Arial';
+                ctx.textAlign = 'center';
+                ctx.fillText('Created with www.qrcreator.xyz', canvas.width / 2, canvas.height - 40);
 
                 // Add border
                 ctx.strokeStyle = '#E5E7EB';
