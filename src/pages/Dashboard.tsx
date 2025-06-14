@@ -462,12 +462,110 @@ const Dashboard = () => {
           // Scanner effect settings
           scannerColor: 'rgba(59, 130, 246, 0.5)',
           scannerHeight: 20,
-          scannerSpeed: 2
+          scannerSpeed: 2,
+          scannerBorderColor: '#3b82f6',
+          scannerBorderWidth: 8
         };
     
         if (format === 'svg') {
-          // QR code only PNG download (unchanged)
-          // ... [previous implementation] ...
+          // QR code only download
+          container = document.createElement('div');
+          container.style.position = 'absolute';
+          container.style.left = '-9999px';
+          container.style.width = `${design.qrSize}px`;
+          container.style.height = `${design.qrSize}px`;
+          document.body.appendChild(container);
+    
+          let logoImage: HTMLImageElement | undefined;
+          if (qr.logoUrl) {
+            try {
+              logoImage = await preloadLogo(qr.logoUrl);
+            } catch (error) {
+              console.warn('Failed to preload logo:', error);
+            }
+          }
+    
+          // Render QR code to canvas
+          const qrContainer = document.createElement('div');
+          container.appendChild(qrContainer);
+          
+          const root = ReactDOM.createRoot(qrContainer);
+          root.render(
+            <QRCodeCanvas
+              value={qr.url}
+              size={design.qrSize}
+              bgColor={design.qrBgColor}
+              fgColor={design.qrFgColor}
+              level="H"
+              includeMargin={false}
+              imageSettings={logoImage ? {
+                src: logoImage.src,
+                height: design.logoSize,
+                width: design.logoSize,
+                excavate: true,
+              } : undefined}
+            />
+          );
+    
+          // Create QR-only canvas
+          await new Promise<void>((resolve) => {
+            setTimeout(async () => {
+              const canvas = document.createElement('canvas');
+              canvas.width = design.qrSize + design.scannerBorderWidth * 2;
+              canvas.height = design.qrSize + design.scannerBorderWidth * 2;
+              const ctx = canvas.getContext('2d');
+              
+              if (ctx) {
+                // Draw scanner border
+                ctx.fillStyle = design.scannerBorderColor;
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Draw QR code
+                const qrCanvas = qrContainer.querySelector('canvas');
+                if (qrCanvas) {
+                  ctx.drawImage(
+                    qrCanvas, 
+                    design.scannerBorderWidth, 
+                    design.scannerBorderWidth, 
+                    design.qrSize, 
+                    design.qrSize
+                  );
+                  
+                  // Add scanner animation effect
+                  const scannerY = design.scannerBorderWidth + 
+                    (Date.now() / 100 * design.scannerSpeed) % design.qrSize;
+                  
+                  // Scanner line
+                  ctx.beginPath();
+                  ctx.moveTo(design.scannerBorderWidth, scannerY);
+                  ctx.lineTo(design.scannerBorderWidth + design.qrSize, scannerY);
+                  ctx.strokeStyle = design.scannerColor;
+                  ctx.lineWidth = design.scannerHeight;
+                  ctx.stroke();
+    
+                  // Scanner start/end caps
+                  ctx.beginPath();
+                  ctx.arc(design.scannerBorderWidth, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
+                  ctx.fillStyle = design.scannerColor;
+                  ctx.fill();
+    
+                  ctx.beginPath();
+                  ctx.arc(design.scannerBorderWidth + design.qrSize, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
+                  ctx.fill();
+                }
+              }
+              
+              // Convert to PNG and download
+              const pngUrl = canvas.toDataURL('image/png', 1.0);
+              const downloadLink = document.createElement('a');
+              downloadLink.href = pngUrl;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+              document.body.appendChild(downloadLink);
+              downloadLink.click();
+              document.body.removeChild(downloadLink);
+              resolve();
+            }, 200);
+          });
         } else {
           // Full design PNG download
           container = document.createElement('div');
@@ -643,34 +741,25 @@ const Dashboard = () => {
                 ctx.restore();
                 ctx.restore();
     
-                // Draw QR code with framed container
+                // Draw QR code with scanner border
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
                   // Update QR code position variables
                   qrX = (canvas.width - design.qrSize) / 2;
                   qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
                   
-                  // Frame with shadow
+                  // Draw scanner border background
+                  ctx.fillStyle = design.scannerBorderColor;
                   ctx.beginPath();
                   ctx.roundRect(
-                    qrX - design.frameWidth,
-                    qrY - design.frameWidth,
-                    design.qrSize + design.frameWidth * 2,
-                    design.qrSize + design.frameWidth * 2,
+                    qrX - design.scannerBorderWidth,
+                    qrY - design.scannerBorderWidth,
+                    design.qrSize + design.scannerBorderWidth * 2,
+                    design.qrSize + design.scannerBorderWidth * 2,
                     [design.borderRadii.inner]
                   );
-                  ctx.fillStyle = design.qrBgColor;
-                  ctx.shadowColor = `rgba(0, 0, 0, 0.1)`;
-                  ctx.shadowBlur = 15;
-                  ctx.shadowOffsetY = 5;
                   ctx.fill();
-                  ctx.shadowColor = 'transparent';
                   
-                  // Frame border
-                  ctx.strokeStyle = design.borderColor;
-                  ctx.lineWidth = 2;
-                  ctx.stroke();
-    
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
     
@@ -699,7 +788,7 @@ const Dashboard = () => {
                 // Draw English CTA with matching Arabic frame style
                 const englishCTA = {
                   x: canvas.width / 2,
-                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
+                  y: qrY + design.qrSize + design.scannerBorderWidth * 2 + design.textMargin + 60,
                   width: canvas.width * 0.8,
                   height: 140
                 };
@@ -810,7 +899,7 @@ const Dashboard = () => {
     
         toast({
           title: 'QR Code Downloaded',
-          description: 'Your attractive QR code has been downloaded',
+          description: 'Your QR code has been downloaded successfully',
         });
       } catch (error) {
         console.error('Download failed:', error);
