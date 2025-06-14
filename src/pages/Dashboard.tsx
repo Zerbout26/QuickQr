@@ -517,7 +517,7 @@ const Dashboard = () => {
                 backdropFilter: 'blur(5px)',
                 border: '1px solid rgba(255, 255, 255, 0.2)'
               }}>
-                اضغط لمسح الكود والوصول إلى المحتوى المميز
+                ✨ امسح الكود الآن واكتشف المحتوى الحصري ✨
               </div>
     
               {/* QR Code Container with elegant frame */}
@@ -610,7 +610,7 @@ const Dashboard = () => {
                   transform: 'translateY(-50%)',
                   fontSize: '44px'
                 }}>👆</span>
-                SCAN FOR EXCLUSIVE CONTENT
+                ✨ Scan now to explore exclusive content ✨
               </div>
     
               {/* Modern watermark */}
@@ -639,7 +639,7 @@ const Dashboard = () => {
                   letterSpacing: '0.5px',
                   fontWeight: 600,
                 }}>
-                  Powered by <strong style={{color: design.secondaryColor}}>qrcreator.xyz</strong>
+                  Powered by <strong style={{color: design.secondaryColor}}>www.qrcreator.xyz</strong>
                 </span>
               </div>
     
@@ -677,285 +677,113 @@ const Dashboard = () => {
           });
     
         } else {
-          // PNG format (gradient version)
-          container = document.createElement('div');
-          container.style.position = 'absolute';
-          container.style.left = '-9999px';
-          container.style.width = `${design.width}px`;
-          container.style.height = `${design.height}px`;
-          document.body.appendChild(container);
-    
-          let logoImage: HTMLImageElement | undefined;
-          if (qr.logoUrl) {
-            try {
-              logoImage = await preloadLogo(qr.logoUrl);
-            } catch (error) {
-              console.warn('Failed to preload logo:', error);
-            }
-          }
-    
-          // Render QR code to canvas
-          const qrContainer = document.createElement('div');
-          container.appendChild(qrContainer);
-          
-          const root = ReactDOM.createRoot(qrContainer);
-          root.render(
-            <QRCodeCanvas
-              value={qr.url}
-              size={design.qrSize}
-              bgColor={design.qrBgColor}
-              fgColor={design.qrFgColor}
-              level="H"
-              includeMargin={false}
-              imageSettings={logoImage ? {
-                src: logoImage.src,
-                height: design.logoSize,
-                width: design.logoSize,
-                excavate: true,
-              } : undefined}
-            />
-          );
-    
-          // Create final gradient canvas
-          await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = design.width;
-              canvas.height = design.height;
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Draw gradient background
-                const gradient = ctx.createLinearGradient(
-                  canvas.width * 0.7, 0,
-                  canvas.width * 0.3, canvas.height
-                );
-                gradient.addColorStop(0, design.bgGradient[0]);
-                gradient.addColorStop(1, design.bgGradient[1]);
-                ctx.fillStyle = gradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-                // Draw radial accent
-                const radialGradient = ctx.createRadialGradient(
-                  canvas.width * 0.2, canvas.height * 0.5, 0,
-                  canvas.width * 0.2, canvas.height * 0.5, canvas.width * 0.8
-                );
-                radialGradient.addColorStop(0, `${design.accentColor}20`);
-                radialGradient.addColorStop(1, 'transparent');
-                ctx.fillStyle = radialGradient;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
-                // Initialize QR code position variables
-                let qrX = 0;
-                let qrY = 0;
+          // Create SVG container
+          const svgElement = document.createElement('div');
+          svgElement.style.position = 'absolute';
+          svgElement.style.left = '-9999px';
+          document.body.appendChild(svgElement);
 
-                // Draw Arabic CTA
-                const arabicCTA = {
-                  x: canvas.width / 2,
-                  y: design.padding + 60,
-                  width: canvas.width * 0.9,
-                  height: 120
-                };
+          // Create QR code container
+          const qrContainer = document.createElement('div');
+          qrContainer.style.width = `${design.qrSize}px`;
+          qrContainer.style.height = `${design.qrSize}px`;
+          qrContainer.style.position = 'relative';
+          qrContainer.style.backgroundColor = design.qrBgColor;
+          qrContainer.style.borderRadius = design.borderRadii.inner;
+          qrContainer.style.padding = `${design.frameWidth}px`;
+          qrContainer.style.boxShadow = `0 15px 35px ${design.primaryColor}30`;
+          qrContainer.style.border = `2px solid ${design.primaryColor}50`;
+          document.body.appendChild(qrContainer);
+
+          // Generate QR code
+          const qrCode = new QRCode(qrContainer, {
+            text: qr.url,
+            width: design.qrSize,
+            height: design.qrSize,
+            colorDark: design.qrFgColor,
+            colorLight: design.qrBgColor,
+            correctLevel: QRCode.CorrectLevel.H
+          });
+
+          // Wait for QR code to render
+          await new Promise<void>((resolve) => {
+            setTimeout(() => {
+              const qrCanvas = qrContainer.querySelector('canvas');
+              if (qrCanvas) {
+                // Create a new canvas for the QR code section
+                const qrSectionCanvas = document.createElement('canvas');
+                const qrSectionCtx = qrSectionCanvas.getContext('2d');
                 
-                // CTA background
-                ctx.beginPath();
-                ctx.roundRect(
-                  arabicCTA.x - arabicCTA.width/2,
-                  arabicCTA.y - arabicCTA.height/2,
-                  arabicCTA.width,
-                  arabicCTA.height,
-                  [20, 20, 20, 20]
-                );
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.lineWidth = 1;
-                ctx.fill();
-                ctx.stroke();
+                // Set canvas size to include frame
+                const totalSize = design.qrSize + (design.frameWidth * 2);
+                qrSectionCanvas.width = totalSize;
+                qrSectionCanvas.height = totalSize;
                 
-                // Arabic text
-                ctx.font = `700 42px ${design.arabicFont}`;
-                ctx.fillStyle = design.textColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                
-                // Arabic text needs RTL handling
-                const arabicText = 'اضغط لمسح الكود والوصول إلى المحتوى المميز';
-                ctx.save();
-                ctx.textAlign = 'center'; // Centered Arabic text
-                ctx.direction = 'rtl';
-                ctx.fillText(arabicText, arabicCTA.x, arabicCTA.y);
-                ctx.restore();
-    
-                // Draw QR code with modern frame
-                const qrCanvas = qrContainer.querySelector('canvas');
-                if (qrCanvas) {
-                  qrX = (canvas.width - design.qrSize) / 2;
-                  qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
+                if (qrSectionCtx) {
+                  // Draw white background
+                  qrSectionCtx.fillStyle = design.qrBgColor;
+                  qrSectionCtx.fillRect(0, 0, totalSize, totalSize);
                   
-                  // Draw frame with rounded corners
-                  ctx.beginPath();
-                  ctx.roundRect(
-                    qrX - design.frameWidth,
-                    qrY - design.frameWidth,
-                    design.qrSize + design.frameWidth * 2,
-                    design.qrSize + design.frameWidth * 2,
-                    [20, 20, 20, 20]
-                  );
-                  ctx.fillStyle = design.qrBgColor;
-                  ctx.shadowColor = `${design.primaryColor}30`;
-                  ctx.shadowBlur = 30;
-                  ctx.shadowOffsetY = 15;
-                  ctx.fill();
-                  ctx.shadowColor = 'transparent';
-                  
-                  // Frame border
-                  ctx.strokeStyle = `${design.primaryColor}50`;
-                  ctx.lineWidth = 2;
-                  ctx.stroke();
-                  
-                  // Draw scan line
-                  ctx.beginPath();
-                  ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize/2);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize/2);
-                  ctx.strokeStyle = design.secondaryColor;
-                  ctx.lineWidth = 4;
-                  ctx.stroke();
+                  // Draw QR code
+                  qrSectionCtx.drawImage(qrCanvas, design.frameWidth, design.frameWidth, design.qrSize, design.qrSize);
                   
                   // Draw frame corners
-                  ctx.strokeStyle = design.secondaryColor;
-                  ctx.lineWidth = 5;
+                  qrSectionCtx.strokeStyle = design.secondaryColor;
+                  qrSectionCtx.lineWidth = 5;
                   
                   // Top-left corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX - design.frameWidth, qrY + design.cornerSize);
-                  ctx.lineTo(qrX - design.frameWidth, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.cornerSize, qrY - design.frameWidth);
-                  ctx.stroke();
+                  qrSectionCtx.beginPath();
+                  qrSectionCtx.moveTo(design.frameWidth, design.frameWidth + design.cornerSize);
+                  qrSectionCtx.lineTo(design.frameWidth, design.frameWidth);
+                  qrSectionCtx.lineTo(design.frameWidth + design.cornerSize, design.frameWidth);
+                  qrSectionCtx.stroke();
                   
                   // Top-right corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY - design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.cornerSize);
-                  ctx.stroke();
+                  qrSectionCtx.beginPath();
+                  qrSectionCtx.moveTo(totalSize - design.frameWidth - design.cornerSize, design.frameWidth);
+                  qrSectionCtx.lineTo(totalSize - design.frameWidth, design.frameWidth);
+                  qrSectionCtx.lineTo(totalSize - design.frameWidth, design.frameWidth + design.cornerSize);
+                  qrSectionCtx.stroke();
                   
                   // Bottom-left corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
-                  ctx.lineTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.cornerSize, qrY + design.qrSize + design.frameWidth);
-                  ctx.stroke();
+                  qrSectionCtx.beginPath();
+                  qrSectionCtx.moveTo(design.frameWidth, totalSize - design.frameWidth - design.cornerSize);
+                  qrSectionCtx.lineTo(design.frameWidth, totalSize - design.frameWidth);
+                  qrSectionCtx.lineTo(design.frameWidth + design.cornerSize, totalSize - design.frameWidth);
+                  qrSectionCtx.stroke();
                   
                   // Bottom-right corner
-                  ctx.beginPath();
-                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
-                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
-                  ctx.stroke();
-    
-                  // Draw QR code
-                  ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
+                  qrSectionCtx.beginPath();
+                  qrSectionCtx.moveTo(totalSize - design.frameWidth - design.cornerSize, totalSize - design.frameWidth);
+                  qrSectionCtx.lineTo(totalSize - design.frameWidth, totalSize - design.frameWidth);
+                  qrSectionCtx.lineTo(totalSize - design.frameWidth, totalSize - design.frameWidth - design.cornerSize);
+                  qrSectionCtx.stroke();
+                  
+                  // Draw scan line
+                  qrSectionCtx.beginPath();
+                  qrSectionCtx.moveTo(design.frameWidth, totalSize / 2);
+                  qrSectionCtx.lineTo(totalSize - design.frameWidth, totalSize / 2);
+                  qrSectionCtx.strokeStyle = design.secondaryColor;
+                  qrSectionCtx.lineWidth = 4;
+                  qrSectionCtx.stroke();
+                  
+                  // Convert to PNG and download
+                  const pngUrl = qrSectionCanvas.toDataURL('image/png', 1.0);
+                  const downloadLink = document.createElement('a');
+                  downloadLink.href = pngUrl;
+                  downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+                  document.body.appendChild(downloadLink);
+                  downloadLink.click();
+                  document.body.removeChild(downloadLink);
                 }
-    
-                // Draw English CTA button
-                const englishButton = {
-                  x: canvas.width / 2,
-                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
-                  width: canvas.width * 0.8,
-                  height: 100
-                };
-                
-                // Button background
-                ctx.beginPath();
-                ctx.roundRect(
-                  englishButton.x - englishButton.width/2,
-                  englishButton.y - englishButton.height/2,
-                  englishButton.width,
-                  englishButton.height,
-                  [50, 50, 50, 50]
-                );
-                ctx.fillStyle = design.primaryColor;
-                ctx.shadowColor = `${design.primaryColor}80`;
-                ctx.shadowBlur = 20;
-                ctx.shadowOffsetY = 8;
-                ctx.fill();
-                ctx.shadowColor = 'transparent';
-                
-                // Button text
-                ctx.font = `700 38px ${design.englishFont}`;
-                ctx.fillStyle = design.buttonTextColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('SCAN FOR EXCLUSIVE CONTENT', englishButton.x, englishButton.y);
-                
-                // Point up emoji
-                ctx.font = '44px serif';
-                ctx.fillText('👆', englishButton.x + englishButton.width/2 - 70, englishButton.y);
-    
-                // Draw modern watermark
-                const watermark = {
-                  x: canvas.width / 2,
-                  y: canvas.height - design.padding,
-                  width: 380,
-                  height: 60
-                };
-                
-                // Watermark background
-                ctx.beginPath();
-                ctx.roundRect(
-                  watermark.x - watermark.width/2,
-                  watermark.y - watermark.height/2,
-                  watermark.width,
-                  watermark.height,
-                  [30, 30, 30, 30]
-                );
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.15)';
-                ctx.strokeStyle = 'rgba(255, 255, 255, 0.2)';
-                ctx.lineWidth = 1;
-                ctx.fill();
-                ctx.stroke();
-                
-                // Draw watermark icon
-                ctx.beginPath();
-                ctx.arc(watermark.x - watermark.width/2 + 50, watermark.y, 10, 0, Math.PI * 2);
-                ctx.strokeStyle = design.primaryColor;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 10);
-                ctx.lineTo(watermark.x - watermark.width/2 + 50, watermark.y + 10);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 10);
-                ctx.lineTo(watermark.x - watermark.width/2 + 60, watermark.y - 2);
-                ctx.stroke();
-                
-                // Draw watermark text
-                ctx.font = `600 20px ${design.englishFont}`;
-                ctx.fillStyle = design.primaryColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('Powered by ', watermark.x - 30, watermark.y);
-                
-                // Accent part of watermark
-                ctx.fillStyle = design.secondaryColor;
-                ctx.font = `700 20px ${design.englishFont}`;
-                ctx.fillText('qrcreator.xyz', watermark.x + 80, watermark.y);
               }
-              
-              // Convert to PNG and download
-              const pngUrl = canvas.toDataURL('image/png', 1.0);
-              const downloadLink = document.createElement('a');
-              downloadLink.href = pngUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_gradient-style.png`;
-              document.body.appendChild(downloadLink);
-              downloadLink.click();
-              document.body.removeChild(downloadLink);
               resolve();
-            }, 200);
+            }, 100);
           });
+
+          // Clean up
+          document.body.removeChild(qrContainer);
+          document.body.removeChild(svgElement);
         }
     
         toast({
@@ -969,10 +797,6 @@ const Dashboard = () => {
           title: "Download Failed",
           description: "There was a problem generating your QR code.",
         });
-      } finally {
-        // Clean up
-        if (svgElement?.parentNode) svgElement.parentNode.removeChild(svgElement);
-        if (container?.parentNode) container.parentNode.removeChild(container);
       }
     };
     
