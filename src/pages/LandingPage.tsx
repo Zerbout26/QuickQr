@@ -151,6 +151,7 @@ const LandingPage = () => {
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [isPending, startTransition] = useTransition();
   const [initialLoadComplete, setInitialLoadComplete] = useState(false);
+  const [contentReady, setContentReady] = useState(false);
 
   // Memoized platform info
   const getPlatformInfo = useCallback((type: string): { label: string; icon: React.ElementType; bgColor: string; hoverBgColor: string } => {
@@ -232,7 +233,7 @@ const LandingPage = () => {
         if (!initialLoadComplete) {
           setLoading(false);
         }
-      }, 500); // Reduced from 800ms to 500ms for faster initial load
+      }, 500);
 
       return () => {
         clearTimeout(timeoutId);
@@ -256,7 +257,7 @@ const LandingPage = () => {
 
         // Parallel data fetching with reduced timeout
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 2000) // Reduced from 3000ms to 2000ms
+          setTimeout(() => reject(new Error('Request timeout')), 2000)
         );
 
         // Use Promise.all for parallel requests
@@ -268,21 +269,20 @@ const LandingPage = () => {
           timeoutPromise
         ]) as [QRCode, any];
 
+        // Prepare content before showing it
+        const detectedLanguage = data.menu ? detectMenuLanguage(data.menu) : 'en';
+        
         // Use startTransition for non-urgent state updates
         startTransition(() => {
           setQRCode(data);
+          setMenuLanguage(detectedLanguage);
+          setContentReady(true);
           setInitialLoadComplete(true);
           
           // Handle direct URL type - redirect to original URL
           if (data.type === 'direct' && data.originalUrl) {
             window.location.href = data.originalUrl;
             return;
-          }
-          
-          // Automatically detect and set menu language
-          if (data.menu) {
-            const detectedLanguage = detectMenuLanguage(data.menu);
-            setMenuLanguage(detectedLanguage);
           }
         });
         
@@ -362,7 +362,7 @@ const LandingPage = () => {
 
   if (loading) return LoadingComponent;
   if (error) return ErrorComponent;
-  if (!qrCode) return null;
+  if (!qrCode || !contentReady) return null;
 
   const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
   const hasLinks = qrCode.links && qrCode.links.length > 0;
@@ -372,49 +372,41 @@ const LandingPage = () => {
     <div className="min-h-screen bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20">
       <div className="container mx-auto px-4 py-8">
         <main className="space-y-8">
-          <AnimatePresence mode="wait">
-            {isPending ? (
-              <LoadingSkeleton key="loading" />
-            ) : (
-              <motion.div
-                key="content"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }}
-                className="space-y-8"
-              >
-                {hasMenu && (
-                  <ErrorBoundary fallback={<div>Error loading menu</div>}>
-                    <Suspense fallback={<LoadingSkeleton />}>
-                      <MenuSection
-                        menu={qrCode.menu}
-                        menuLanguage={menuLanguage}
-                        selectedCategory={selectedCategory}
-                        setSelectedCategory={setSelectedCategory}
-                      />
-                    </Suspense>
-                  </ErrorBoundary>
-                )}
-
-                {hasLinks && (
-                  <ErrorBoundary fallback={<div>Error loading links</div>}>
-                    <Suspense fallback={<LoadingSkeleton />}>
-                      <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
-                    </Suspense>
-                  </ErrorBoundary>
-                )}
-
-                {hasVitrine && (
-                  <ErrorBoundary fallback={<div>Error loading vitrine</div>}>
-                    <Suspense fallback={<LoadingSkeleton />}>
-                      <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
-                    </Suspense>
-                  </ErrorBoundary>
-                )}
-              </motion.div>
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.1 }} // Reduced from 0.2 to 0.1 for faster transition
+            className="space-y-8"
+          >
+            {hasMenu && (
+              <ErrorBoundary fallback={<div>Error loading menu</div>}>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <MenuSection
+                    menu={qrCode.menu}
+                    menuLanguage={menuLanguage}
+                    selectedCategory={selectedCategory}
+                    setSelectedCategory={setSelectedCategory}
+                  />
+                </Suspense>
+              </ErrorBoundary>
             )}
-          </AnimatePresence>
+
+            {hasLinks && (
+              <ErrorBoundary fallback={<div>Error loading links</div>}>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
+                </Suspense>
+              </ErrorBoundary>
+            )}
+
+            {hasVitrine && (
+              <ErrorBoundary fallback={<div>Error loading vitrine</div>}>
+                <Suspense fallback={<LoadingSkeleton />}>
+                  <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
+                </Suspense>
+              </ErrorBoundary>
+            )}
+          </motion.div>
         </main>
 
         {/* Watermark */}
