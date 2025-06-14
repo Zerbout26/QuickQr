@@ -632,10 +632,18 @@ const Dashboard = () => {
                 let qrX = 0;
                 let qrY = 0;
 
+                // Draw QR code name at the top
+                ctx.font = `700 48px ${design.englishFont}`;
+                ctx.fillStyle = design.textColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                const nameY = design.padding + 40;
+                ctx.fillText(qr.name, canvas.width / 2, nameY);
+
                 // Draw Arabic CTA
                 const arabicCTA = {
                   x: canvas.width / 2,
-                  y: design.padding + 60,
+                  y: nameY + 100, // Adjusted to account for the name
                   width: canvas.width * 0.9,
                   height: 120
                 };
@@ -803,17 +811,19 @@ const Dashboard = () => {
                 ctx.lineTo(watermark.x - watermark.width/2 + 74, watermark.y - 4);
                 ctx.stroke();
                 
-                // Draw watermark text
-                ctx.font = `600 ${design.watermarkSize} ${design.englishFont}`;
-                ctx.fillStyle = design.primaryColor;
+                // Draw "Powered by" text
+                ctx.font = `400 24px ${design.englishFont}`;
+                ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Powered by', watermark.x - 40, watermark.y);
-                
-                // URL part of watermark
-                ctx.fillStyle = design.secondaryColor;
-                ctx.font = `700 ${design.watermarkSize} ${design.englishFont}`;
-                ctx.fillText('www.qrcreator.xyz', watermark.x + 90, watermark.y);
+                ctx.fillText('Powered by', canvas.width / 2, canvas.height - 60);
+
+                // Draw URL
+                ctx.font = `700 28px ${design.englishFont}`;
+                ctx.fillStyle = design.textColor;
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText('quickqr.app', canvas.width / 2, canvas.height - 20);
               }
               
               // Convert to PNG and download
