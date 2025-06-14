@@ -577,6 +577,10 @@ const Dashboard = () => {
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+                // Initialize QR code position variables at the top level
+                let qrX = 0;
+                let qrY = 0;
+
                 // Draw QR code name
                 ctx.font = `700 42px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
@@ -608,8 +612,9 @@ const Dashboard = () => {
                 // Draw QR code with camera frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = arabicCTA.y + arabicCTA.height + design.textMargin;
+                  // Update QR code position variables
+                  qrX = (canvas.width - design.qrSize) / 2;
+                  qrY = arabicCTA.y + arabicCTA.height + design.textMargin;
                   
                   // Draw camera frame background
                   ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
