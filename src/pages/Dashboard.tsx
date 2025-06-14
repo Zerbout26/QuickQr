@@ -816,6 +816,10 @@ const Dashboard = () => {
                 ctx.fill();
                 ctx.globalAlpha = 1;
     
+                // Initialize QR code position variables
+                let qrX = 0;
+                let qrY = 0;
+
                 // Draw Arabic CTA button
                 const arabicButton = {
                   x: canvas.width / 2,
@@ -875,8 +879,8 @@ const Dashboard = () => {
                 // Draw QR code with summer frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
+                  qrX = (canvas.width - design.qrSize) / 2;
+                  qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
                   
                   // Draw frame with rounded corners
                   ctx.beginPath();
