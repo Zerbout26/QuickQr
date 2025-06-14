@@ -673,25 +673,6 @@ const Dashboard = () => {
     
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
-    
-                  // Add white camera effect
-                  const centerX = qrX + design.qrSize/2;
-                  const centerY = qrY + design.qrSize/2;
-                  
-                  // Camera frame
-                  ctx.beginPath();
-                  ctx.arc(centerX, centerY, design.cameraEffectSize/2, 0, Math.PI * 2);
-                  ctx.strokeStyle = design.cameraEffectColor;
-                  ctx.lineWidth = design.cameraEffectThickness;
-                  ctx.stroke();
-                  
-                  // Camera crosshair
-                  ctx.beginPath();
-                  ctx.moveTo(centerX - design.cameraEffectSize/3, centerY);
-                  ctx.lineTo(centerX + design.cameraEffectSize/3, centerY);
-                  ctx.moveTo(centerX, centerY - design.cameraEffectSize/3);
-                  ctx.lineTo(centerX, centerY + design.cameraEffectSize/3);
-                  ctx.stroke();
                 }
     
                 // Draw English CTA with enhanced decorative frame
