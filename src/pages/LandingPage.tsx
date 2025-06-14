@@ -378,7 +378,7 @@ const LandingPage = () => {
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                transition={{ duration: 0.2 }} // Reduced animation duration
+                transition={{ duration: 0.2 }}
                 className="space-y-8"
               >
                 {hasMenu && (
@@ -413,6 +413,19 @@ const LandingPage = () => {
             )}
           </AnimatePresence>
         </main>
+
+        {/* Watermark */}
+        <div className="mt-12 text-center text-gray-500 text-sm">
+          <p className="mb-1">{translations[menuLanguage].poweredBy}</p>
+          <a 
+            href="https://www.qrcreator.xyz" 
+            target="_blank" 
+            rel="noopener noreferrer"
+            className="text-[#8b5cf6] hover:text-[#7c3aed] transition-colors font-medium"
+          >
+            www.qrcreator.xyz
+          </a>
+        </div>
       </div>
     </div>
   );
