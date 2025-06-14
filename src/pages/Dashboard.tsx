@@ -446,7 +446,7 @@ const Dashboard = () => {
           englishFont: "'Inter', sans-serif",
           // Spacing & effects
           padding: 80,
-          textMargin: 60,
+          textMargin: 40,  // Reduced for better spacing
           cornerSize: 70,
           frameWidth: 20,
           buttonPadding: '20px 40px',
@@ -457,7 +457,7 @@ const Dashboard = () => {
             inner: '15px',
             corners: '10px'
           },
-          watermarkSize: '24px'  // Larger watermark
+          watermarkSize: '24px'
         };
     
         if (format === 'svg') {
@@ -631,7 +631,7 @@ const Dashboard = () => {
                 // Initialize QR code position variables
                 let qrX = 0;
                 let qrY = 0;
-
+    
                 // Draw QR code name at the top
                 ctx.font = `700 48px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
@@ -639,11 +639,11 @@ const Dashboard = () => {
                 ctx.textBaseline = 'middle';
                 const nameY = design.padding + 40;
                 ctx.fillText(qr.name, canvas.width / 2, nameY);
-
+    
                 // Draw Arabic CTA
                 const arabicCTA = {
                   x: canvas.width / 2,
-                  y: nameY + 100, // Adjusted to account for the name
+                  y: nameY + 100,
                   width: canvas.width * 0.9,
                   height: 120
                 };
@@ -663,18 +663,21 @@ const Dashboard = () => {
                 ctx.fill();
                 ctx.stroke();
                 
-                // Arabic text
+                // Arabic text with better line height
                 ctx.font = `700 42px ${design.arabicFont}`;
                 ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
-                // Arabic text needs RTL handling
-                const arabicText = '✨ امسح الكود الآن واكتشف المحتوى الحصري ✨';
+                // Split Arabic text into two lines
+                const arabicLine1 = '✨ امسح الكود الآن';
+                const arabicLine2 = 'واكتشف المحتوى الحصري ✨';
+                
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.direction = 'rtl';
-                ctx.fillText(arabicText, arabicCTA.x, arabicCTA.y);
+                ctx.fillText(arabicLine1, arabicCTA.x, arabicCTA.y - 20);
+                ctx.fillText(arabicLine2, arabicCTA.x, arabicCTA.y + 30);
                 ctx.restore();
     
                 // Draw QR code with modern frame
@@ -735,7 +738,7 @@ const Dashboard = () => {
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
                   ctx.stroke();
-
+    
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
@@ -743,7 +746,7 @@ const Dashboard = () => {
                 // Draw English CTA button
                 const englishButton = {
                   x: canvas.width / 2,
-                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
+                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 40, // Reduced margin
                   width: canvas.width * 0.8,
                   height: 100
                 };
@@ -764,66 +767,33 @@ const Dashboard = () => {
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
                 
-                // Button text
+                // Button text with better line height
                 ctx.font = `700 38px ${design.englishFont}`;
                 ctx.fillStyle = design.buttonTextColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('✨ Scan now to explore exclusive content ✨', englishButton.x, englishButton.y);
+                
+                // Split English text into two lines
+                const englishLine1 = '✨ Scan now to';
+                const englishLine2 = 'explore exclusive content ✨';
+                
+                ctx.fillText(englishLine1, englishButton.x, englishButton.y - 15);
+                ctx.fillText(englishLine2, englishButton.x, englishButton.y + 25);
     
-                // Draw watermark
-                const watermark = {
-                  x: canvas.width / 2,
-                  y: canvas.height - design.padding,
-                  width: 420,  // Wider for better fit
-                  height: 70   // Taller for bigger text
-                };
+                // Draw watermark - separated into two lines
+                const watermarkY = canvas.height - design.padding;
                 
-                // Watermark background
-                ctx.beginPath();
-                ctx.roundRect(
-                  watermark.x - watermark.width/2,
-                  watermark.y - watermark.height/2,
-                  watermark.width,
-                  watermark.height,
-                  [35, 35, 35, 35]
-                );
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.strokeStyle = 'rgba(0, 0, 0, 0.1)';
-                ctx.lineWidth = 1;
-                ctx.fill();
-                ctx.stroke();
-                
-                // Draw watermark icon
-                ctx.beginPath();
-                ctx.arc(watermark.x - watermark.width/2 + 60, watermark.y, 14, 0, Math.PI * 2);
-                ctx.strokeStyle = design.primaryColor;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 60, watermark.y - 14);
-                ctx.lineTo(watermark.x - watermark.width/2 + 60, watermark.y + 14);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 60, watermark.y - 14);
-                ctx.lineTo(watermark.x - watermark.width/2 + 74, watermark.y - 4);
-                ctx.stroke();
-                
-                // Draw "Powered by" text
+                // "Powered by" text
                 ctx.font = `400 24px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('Powered by', canvas.width / 2, canvas.height - 60);
-
-                // Draw URL
+                ctx.fillText('Powered by', canvas.width / 2, watermarkY - 10);
+    
+                // URL text
                 ctx.font = `700 28px ${design.englishFont}`;
-                ctx.fillStyle = design.textColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-                ctx.fillText('quickqr.app', canvas.width / 2, canvas.height - 20);
+                ctx.fillStyle = design.secondaryColor;
+                ctx.fillText('quickqr.app', canvas.width / 2, watermarkY + 30);
               }
               
               // Convert to PNG and download
