@@ -426,21 +426,21 @@ const Dashboard = () => {
       let container: HTMLDivElement | null = null;
     
       try {
-        // Enhanced attractive design configuration
+        // Design configuration
         const design = {
           width: 1000,
           height: 1400,
           qrSize: 600,
           logoSize: 140,
-          // Modern gradient color palette
-          bgGradient: ['#f8fafc', '#e2e8f0'],  // Light gray to medium gray
-          primaryColor: '#3b82f6',             // Vibrant blue
-          secondaryColor: '#1e40af',           // Dark blue
-          accentColor: '#93c5fd',              // Light blue
+          // Color palette
+          bgGradient: ['#f8fafc', '#e2e8f0'],
+          primaryColor: '#3b82f6',
+          secondaryColor: '#1e40af',
+          accentColor: '#93c5fd',
           qrBgColor: '#ffffff',
-          qrFgColor: '#1e3a8a',               // Dark blue for QR
-          textColor: '#1e293b',                // Dark gray for text (visible)
-          buttonTextColor: '#ffffff',          // White
+          qrFgColor: '#1e3a8a',
+          textColor: '#1e293b',
+          buttonTextColor: '#ffffff',
           // Typography
           arabicFont: "'Tajawal', sans-serif",
           englishFont: "'Inter', sans-serif",
@@ -449,26 +449,26 @@ const Dashboard = () => {
           textMargin: 40,
           cornerSize: 60,
           frameWidth: 15,
-          buttonPadding: '20px 40px',
           buttonRadius: '12px',
-          shadow: '0 5px 20px rgba(0, 0, 0, 0.1)',
           borderRadii: {
             outer: '20px',
-            inner: '15px',
-            corners: '10px'
+            inner: '15px'
           },
           watermarkSize: '22px',
-          borderColor: '#cbd5e1',
-          // Scanner effect settings
+          // Camera frame settings
+          cameraFrameColor: '#3b82f6',
+          cameraFrameWidth: 12,
+          cameraFrameRadius: 25,
+          cameraCornerLength: 40,
+          cameraCornerWidth: 6,
+          // Scanner effect
           scannerColor: 'rgba(59, 130, 246, 0.5)',
           scannerHeight: 20,
-          scannerSpeed: 2,
-          scannerBorderColor: '#3b82f6',
-          scannerBorderWidth: 8
+          scannerSpeed: 2
         };
     
         if (format === 'svg') {
-          // QR code only download
+          // Simple QR code only download (no effects)
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -485,7 +485,7 @@ const Dashboard = () => {
             }
           }
     
-          // Render QR code to canvas
+          // Render QR code
           const qrContainer = document.createElement('div');
           container.appendChild(qrContainer);
           
@@ -507,67 +507,23 @@ const Dashboard = () => {
             />
           );
     
-          // Create QR-only canvas
           await new Promise<void>((resolve) => {
-            setTimeout(async () => {
-              const canvas = document.createElement('canvas');
-              canvas.width = design.qrSize + design.scannerBorderWidth * 2;
-              canvas.height = design.qrSize + design.scannerBorderWidth * 2;
-              const ctx = canvas.getContext('2d');
-              
-              if (ctx) {
-                // Draw scanner border
-                ctx.fillStyle = design.scannerBorderColor;
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Draw QR code
-                const qrCanvas = qrContainer.querySelector('canvas');
-                if (qrCanvas) {
-                  ctx.drawImage(
-                    qrCanvas, 
-                    design.scannerBorderWidth, 
-                    design.scannerBorderWidth, 
-                    design.qrSize, 
-                    design.qrSize
-                  );
-                  
-                  // Add scanner animation effect
-                  const scannerY = design.scannerBorderWidth + 
-                    (Date.now() / 100 * design.scannerSpeed) % design.qrSize;
-                  
-                  // Scanner line
-                  ctx.beginPath();
-                  ctx.moveTo(design.scannerBorderWidth, scannerY);
-                  ctx.lineTo(design.scannerBorderWidth + design.qrSize, scannerY);
-                  ctx.strokeStyle = design.scannerColor;
-                  ctx.lineWidth = design.scannerHeight;
-                  ctx.stroke();
-    
-                  // Scanner start/end caps
-                  ctx.beginPath();
-                  ctx.arc(design.scannerBorderWidth, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
-                  ctx.fillStyle = design.scannerColor;
-                  ctx.fill();
-    
-                  ctx.beginPath();
-                  ctx.arc(design.scannerBorderWidth + design.qrSize, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
-                  ctx.fill();
-                }
+            setTimeout(() => {
+              const qrCanvas = qrContainer.querySelector('canvas');
+              if (qrCanvas) {
+                const pngUrl = qrCanvas.toDataURL('image/png', 1.0);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pngUrl;
+                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
               }
-              
-              // Convert to PNG and download
-              const pngUrl = canvas.toDataURL('image/png', 1.0);
-              const downloadLink = document.createElement('a');
-              downloadLink.href = pngUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
-              document.body.appendChild(downloadLink);
-              downloadLink.click();
-              document.body.removeChild(downloadLink);
               resolve();
             }, 200);
           });
         } else {
-          // Full design PNG download
+          // Full design with camera frame and effects
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -584,7 +540,7 @@ const Dashboard = () => {
             }
           }
     
-          // Render QR code to canvas
+          // Render QR code
           const qrContainer = document.createElement('div');
           container.appendChild(qrContainer);
           
@@ -606,7 +562,6 @@ const Dashboard = () => {
             />
           );
     
-          // Create final full design canvas
           await new Promise<void>((resolve) => {
             setTimeout(async () => {
               const canvas = document.createElement('canvas');
@@ -622,36 +577,15 @@ const Dashboard = () => {
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-                // Initialize QR code position variables at the top level
-                let qrX = 0;
-                let qrY = 0;
-    
-                // Draw QR code name at the top with frame
+                // Draw QR code name
                 ctx.font = `700 42px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 const nameY = design.padding + 60;
-                
-                // Name frame
-                ctx.beginPath();
-                ctx.roundRect(
-                  canvas.width/2 - 400, 
-                  nameY - 50,
-                  800,
-                  100,
-                  [design.borderRadii.inner]
-                );
-                ctx.strokeStyle = design.borderColor;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.fill();
-                
-                ctx.fillStyle = design.textColor;
                 ctx.fillText(qr.name, canvas.width / 2, nameY);
     
-                // Draw Arabic CTA with enhanced decorative frame
+                // Draw Arabic CTA
                 const arabicCTA = {
                   x: canvas.width / 2,
                   y: nameY + 120,
@@ -659,236 +593,110 @@ const Dashboard = () => {
                   height: 140
                 };
     
-                // Enhanced decorative frame for Arabic CTA
-                ctx.save();
-                ctx.beginPath();
-                ctx.roundRect(
-                  arabicCTA.x - arabicCTA.width/2,
-                  arabicCTA.y - arabicCTA.height/2,
-                  arabicCTA.width,
-                  arabicCTA.height,
-                  [design.borderRadii.inner]
-                );
-    
-                // Frame styling
-                const arabicFrameGradient = ctx.createLinearGradient(
-                  arabicCTA.x - arabicCTA.width/2, 
-                  arabicCTA.y - arabicCTA.height/2,
-                  arabicCTA.x + arabicCTA.width/2, 
-                  arabicCTA.y + arabicCTA.height/2
-                );
-                arabicFrameGradient.addColorStop(0, '#f0f9ff');
-                arabicFrameGradient.addColorStop(1, '#e0f2fe');
-                ctx.fillStyle = arabicFrameGradient;
-                ctx.fill();
-    
-                // Frame border with decorative style
-                ctx.strokeStyle = design.primaryColor;
-                ctx.lineWidth = 3;
-                ctx.stroke();
-    
-                // Add decorative corner elements
-                const cornerSize = 15;
-                const cornerColor = design.secondaryColor;
-    
-                // Top-left corner
-                ctx.beginPath();
-                ctx.moveTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2 + cornerSize);
-                ctx.lineTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x - arabicCTA.width/2 + cornerSize, arabicCTA.y - arabicCTA.height/2);
-                ctx.strokeStyle = cornerColor;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-    
-                // Top-right corner
-                ctx.beginPath();
-                ctx.moveTo(arabicCTA.x + arabicCTA.width/2 - cornerSize, arabicCTA.y - arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2 + cornerSize);
-                ctx.stroke();
-    
-                // Bottom-left corner
-                ctx.beginPath();
-                ctx.moveTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2 - cornerSize);
-                ctx.lineTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x - arabicCTA.width/2 + cornerSize, arabicCTA.y + arabicCTA.height/2);
-                ctx.stroke();
-    
-                // Bottom-right corner
-                ctx.beginPath();
-                ctx.moveTo(arabicCTA.x + arabicCTA.width/2 - cornerSize, arabicCTA.y + arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2);
-                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2 - cornerSize);
-                ctx.stroke();
-    
-                // Arabic text with shadow effect
                 ctx.font = `700 38px ${design.arabicFont}`;
                 ctx.fillStyle = design.textColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-    
                 const arabicLine1 = '✨ امسح الكود الآن';
                 const arabicLine2 = 'واكتشف المحتوى الحصري ✨';
     
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.direction = 'rtl';
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                ctx.shadowBlur = 5;
-                ctx.shadowOffsetY = 2;
                 ctx.fillText(arabicLine1, arabicCTA.x, arabicCTA.y - 20);
                 ctx.fillText(arabicLine2, arabicCTA.x, arabicCTA.y + 25);
                 ctx.restore();
-                ctx.restore();
     
-                // Draw QR code with scanner border
+                // Draw QR code with camera frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  // Update QR code position variables
-                  qrX = (canvas.width - design.qrSize) / 2;
-                  qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
+                  const qrX = (canvas.width - design.qrSize) / 2;
+                  const qrY = arabicCTA.y + arabicCTA.height + design.textMargin;
                   
-                  // Draw scanner border background
-                  ctx.fillStyle = design.scannerBorderColor;
+                  // Draw camera frame background
+                  ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
                   ctx.beginPath();
                   ctx.roundRect(
-                    qrX - design.scannerBorderWidth,
-                    qrY - design.scannerBorderWidth,
-                    design.qrSize + design.scannerBorderWidth * 2,
-                    design.qrSize + design.scannerBorderWidth * 2,
-                    [design.borderRadii.inner]
+                    qrX - design.cameraFrameWidth,
+                    qrY - design.cameraFrameWidth,
+                    design.qrSize + design.cameraFrameWidth * 2,
+                    design.qrSize + design.cameraFrameWidth * 2,
+                    [design.cameraFrameRadius]
                   );
                   ctx.fill();
                   
+                  // Draw camera frame border
+                  ctx.strokeStyle = design.cameraFrameColor;
+                  ctx.lineWidth = design.cameraFrameWidth;
+                  ctx.stroke();
+                  
+                  // Draw camera corners
+                  ctx.strokeStyle = design.primaryColor;
+                  ctx.lineWidth = design.cameraCornerWidth;
+                  
+                  // Top-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.cameraFrameWidth/2, qrY - design.cameraFrameWidth/2 + design.cameraCornerLength);
+                  ctx.lineTo(qrX - design.cameraFrameWidth/2, qrY - design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX - design.cameraFrameWidth/2 + design.cameraCornerLength, qrY - design.cameraFrameWidth/2);
+                  ctx.stroke();
+                  
+                  // Top-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.cameraFrameWidth/2 - design.cameraCornerLength, qrY - design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX + design.qrSize + design.cameraFrameWidth/2, qrY - design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX + design.qrSize + design.cameraFrameWidth/2, qrY - design.cameraFrameWidth/2 + design.cameraCornerLength);
+                  ctx.stroke();
+                  
+                  // Bottom-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.cameraFrameWidth/2, qrY + design.qrSize + design.cameraFrameWidth/2 - design.cameraCornerLength);
+                  ctx.lineTo(qrX - design.cameraFrameWidth/2, qrY + design.qrSize + design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX - design.cameraFrameWidth/2 + design.cameraCornerLength, qrY + design.qrSize + design.cameraFrameWidth/2);
+                  ctx.stroke();
+                  
+                  // Bottom-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.cameraFrameWidth/2 - design.cameraCornerLength, qrY + design.qrSize + design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX + design.qrSize + design.cameraFrameWidth/2, qrY + design.qrSize + design.cameraFrameWidth/2);
+                  ctx.lineTo(qrX + design.qrSize + design.cameraFrameWidth/2, qrY + design.qrSize + design.cameraFrameWidth/2 - design.cameraCornerLength);
+                  ctx.stroke();
+    
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
     
-                  // Add scanner animation effect
+                  // Add scanner animation
                   const scannerY = qrY + (Date.now() / 100 * design.scannerSpeed) % design.qrSize;
-                  
-                  // Scanner line
                   ctx.beginPath();
                   ctx.moveTo(qrX, scannerY);
                   ctx.lineTo(qrX + design.qrSize, scannerY);
                   ctx.strokeStyle = design.scannerColor;
                   ctx.lineWidth = design.scannerHeight;
                   ctx.stroke();
-    
-                  // Scanner start/end caps
-                  ctx.beginPath();
-                  ctx.arc(qrX, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
-                  ctx.fillStyle = design.scannerColor;
-                  ctx.fill();
-    
-                  ctx.beginPath();
-                  ctx.arc(qrX + design.qrSize, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
-                  ctx.fill();
                 }
     
-                // Draw English CTA with matching Arabic frame style
-                const englishCTA = {
-                  x: canvas.width / 2,
-                  y: qrY + design.qrSize + design.scannerBorderWidth * 2 + design.textMargin + 60,
-                  width: canvas.width * 0.8,
-                  height: 140
-                };
-    
-                // Enhanced decorative frame for English CTA (matching Arabic style)
-                ctx.save();
-                ctx.beginPath();
-                ctx.roundRect(
-                  englishCTA.x - englishCTA.width/2,
-                  englishCTA.y - englishCTA.height/2,
-                  englishCTA.width,
-                  englishCTA.height,
-                  [design.borderRadii.inner]
-                );
-    
-                // Frame styling (same as Arabic)
-                const englishFrameGradient = ctx.createLinearGradient(
-                  englishCTA.x - englishCTA.width/2, 
-                  englishCTA.y - englishCTA.height/2,
-                  englishCTA.x + englishCTA.width/2, 
-                  englishCTA.y + englishCTA.height/2
-                );
-                englishFrameGradient.addColorStop(0, '#f0f9ff');
-                englishFrameGradient.addColorStop(1, '#e0f2fe');
-                ctx.fillStyle = englishFrameGradient;
-                ctx.fill();
-    
-                // Frame border with decorative style
-                ctx.strokeStyle = design.primaryColor;
-                ctx.lineWidth = 3;
-                ctx.stroke();
-    
-                // Add decorative corner elements (same as Arabic)
-                // Top-left corner
-                ctx.beginPath();
-                ctx.moveTo(englishCTA.x - englishCTA.width/2, englishCTA.y - englishCTA.height/2 + cornerSize);
-                ctx.lineTo(englishCTA.x - englishCTA.width/2, englishCTA.y - englishCTA.height/2);
-                ctx.lineTo(englishCTA.x - englishCTA.width/2 + cornerSize, englishCTA.y - englishCTA.height/2);
-                ctx.strokeStyle = cornerColor;
-                ctx.lineWidth = 2;
-                ctx.stroke();
-    
-                // Top-right corner
-                ctx.beginPath();
-                ctx.moveTo(englishCTA.x + englishCTA.width/2 - cornerSize, englishCTA.y - englishCTA.height/2);
-                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y - englishCTA.height/2);
-                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y - englishCTA.height/2 + cornerSize);
-                ctx.stroke();
-    
-                // Bottom-left corner
-                ctx.beginPath();
-                ctx.moveTo(englishCTA.x - englishCTA.width/2, englishCTA.y + englishCTA.height/2 - cornerSize);
-                ctx.lineTo(englishCTA.x - englishCTA.width/2, englishCTA.y + englishCTA.height/2);
-                ctx.lineTo(englishCTA.x - englishCTA.width/2 + cornerSize, englishCTA.y + englishCTA.height/2);
-                ctx.stroke();
-    
-                // Bottom-right corner
-                ctx.beginPath();
-                ctx.moveTo(englishCTA.x + englishCTA.width/2 - cornerSize, englishCTA.y + englishCTA.height/2);
-                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y + englishCTA.height/2);
-                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y + englishCTA.height/2 - cornerSize);
-                ctx.stroke();
-    
-                // English text with shadow effect
+                // Draw English CTA
+                const englishY = qrY + design.qrSize + design.textMargin + 60;
                 ctx.font = `700 36px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
-    
                 const englishLine1 = '✨ Scan now to';
                 const englishLine2 = 'explore exclusive content ✨';
+                ctx.fillText(englishLine1, canvas.width / 2, englishY - 20);
+                ctx.fillText(englishLine2, canvas.width / 2, englishY + 25);
     
-                ctx.save();
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
-                ctx.shadowBlur = 5;
-                ctx.shadowOffsetY = 2;
-                ctx.fillText(englishLine1, englishCTA.x, englishCTA.y - 20);
-                ctx.fillText(englishLine2, englishCTA.x, englishCTA.y + 25);
-                ctx.restore();
-                ctx.restore();
-    
-                // Watermark area
+                // Watermark
                 const watermarkY = canvas.height - design.padding - 40;
-                
                 ctx.font = `400 ${design.watermarkSize} ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
-                ctx.textAlign = 'center';
-                ctx.textBaseline = 'middle';
                 ctx.fillText('Powered by', canvas.width / 2, watermarkY - 10);
-                
                 ctx.font = `600 ${design.watermarkSize} ${design.englishFont}`;
                 ctx.fillStyle = design.primaryColor;
                 ctx.fillText('www.qrcreator.xyz', canvas.width / 2, watermarkY + 25);
               }
               
-              // Convert to PNG and download
+              // Download
               const pngUrl = canvas.toDataURL('image/png', 1.0);
               const downloadLink = document.createElement('a');
               downloadLink.href = pngUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_attractive-qr.png`;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-design.png`;
               document.body.appendChild(downloadLink);
               downloadLink.click();
               document.body.removeChild(downloadLink);
@@ -909,7 +717,6 @@ const Dashboard = () => {
           description: "There was a problem generating your QR code.",
         });
       } finally {
-        // Clean up
         if (svgElement?.parentNode) svgElement.parentNode.removeChild(svgElement);
         if (container?.parentNode) container.parentNode.removeChild(container);
       }
