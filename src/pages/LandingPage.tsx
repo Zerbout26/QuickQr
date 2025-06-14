@@ -232,7 +232,7 @@ const LandingPage = () => {
         if (!initialLoadComplete) {
           setLoading(false);
         }
-      }, 800); // Show content after 800ms max
+      }, 500); // Reduced from 800ms to 500ms for faster initial load
 
       return () => {
         clearTimeout(timeoutId);
@@ -240,7 +240,7 @@ const LandingPage = () => {
     }
   }, [id]);
 
-  // Optimized data fetching with caching
+  // Optimized data fetching with caching and parallel requests
   useEffect(() => {
     const fetchQRCode = async () => {
       try {
@@ -256,15 +256,17 @@ const LandingPage = () => {
 
         // Parallel data fetching with reduced timeout
         const timeoutPromise = new Promise((_, reject) => 
-          setTimeout(() => reject(new Error('Request timeout')), 3000)
+          setTimeout(() => reject(new Error('Request timeout')), 2000) // Reduced from 3000ms to 2000ms
         );
 
-        const fetchPromise = Promise.all([
-          qrCodeApi.getPublicQRCode(id),
-          qrCodeApi.incrementScanCount(id)
-        ]);
-
-        const [data] = await Promise.race([fetchPromise, timeoutPromise]) as [QRCode, any];
+        // Use Promise.all for parallel requests
+        const [data] = await Promise.race([
+          Promise.all([
+            qrCodeApi.getPublicQRCode(id),
+            qrCodeApi.incrementScanCount(id)
+          ]),
+          timeoutPromise
+        ]) as [QRCode, any];
 
         // Use startTransition for non-urgent state updates
         startTransition(() => {
@@ -330,9 +332,10 @@ const LandingPage = () => {
           </div>
           <div className="relative w-16 h-16 mx-auto mb-4">
             <div className="absolute inset-0 rounded-full border-4 border-white/20"></div>
-            <div className="absolute inset-0 rounded-full border-4 border-white border-t-transparent animate-spin"></div>
+            <div className="absolute inset-0 rounded-full border-4 border-[#8b5cf6] border-t-transparent animate-spin"></div>
           </div>
-          <h2 className="text-xl font-bold text-white mb-2">Loading...</h2>
+          <h2 className="text-xl font-bold text-[#8b5cf6] mb-2">Loading...</h2>
+          <p className="text-gray-500 text-sm">Please wait while we prepare your content</p>
         </div>
       </div>
     </div>
