@@ -773,13 +773,13 @@ const Dashboard = () => {
     
                 // Button text with improved styling
                 ctx.font = `700 36px ${design.englishFont}`;
-                ctx.fillStyle = design.buttonTextColor;
+                ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-    
+                
                 const englishLine1 = '✨ Scan now to';
                 const englishLine2 = 'explore exclusive content ✨';
-    
+                
                 // Text shadow for better readability
                 ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
                 ctx.shadowBlur = 3;
