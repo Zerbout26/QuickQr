@@ -628,6 +628,10 @@ const Dashboard = () => {
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+                // Initialize QR code position variables
+                let qrX = 0;
+                let qrY = 0;
+
                 // Draw Arabic CTA
                 const arabicCTA = {
                   x: canvas.width / 2,
@@ -668,8 +672,8 @@ const Dashboard = () => {
                 // Draw QR code with modern frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
+                  qrX = (canvas.width - design.qrSize) / 2;
+                  qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
                   
                   // Draw frame with rounded corners
                   ctx.beginPath();
@@ -723,7 +727,7 @@ const Dashboard = () => {
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
                   ctx.stroke();
-    
+
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
