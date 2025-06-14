@@ -597,6 +597,10 @@ const Dashboard = () => {
                 ctx.fillStyle = gradient;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
+                // Initialize QR code position variables at the top level
+                let qrX = 0;
+                let qrY = 0;
+
                 // Draw QR code name at the top with frame
                 ctx.font = `700 42px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
@@ -665,8 +669,9 @@ const Dashboard = () => {
                 // Draw QR code with framed container
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  const qrX = (canvas.width - design.qrSize) / 2;
-                  const qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
+                  // Update QR code position variables
+                  qrX = (canvas.width - design.qrSize) / 2;
+                  qrY = arabicCTA.y + arabicCTA.height/2 + design.textMargin;
                   
                   // Frame with subtle shadow
                   ctx.beginPath();
