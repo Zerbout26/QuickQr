@@ -459,10 +459,10 @@ const Dashboard = () => {
           },
           watermarkSize: '22px',
           borderColor: '#cbd5e1',
-          // Camera effect settings
-          cameraEffectColor: 'rgba(255, 255, 255, 0.7)', // Visible white effect
-          cameraEffectSize: 120,
-          cameraEffectThickness: 8
+          // Scanner effect settings
+          scannerColor: 'rgba(59, 130, 246, 0.5)',
+          scannerHeight: 20,
+          scannerSpeed: 2
         };
     
         if (format === 'svg') {
@@ -673,100 +673,112 @@ const Dashboard = () => {
     
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
+    
+                  // Add scanner animation effect
+                  const scannerY = qrY + (Date.now() / 100 * design.scannerSpeed) % design.qrSize;
+                  
+                  // Scanner line
+                  ctx.beginPath();
+                  ctx.moveTo(qrX, scannerY);
+                  ctx.lineTo(qrX + design.qrSize, scannerY);
+                  ctx.strokeStyle = design.scannerColor;
+                  ctx.lineWidth = design.scannerHeight;
+                  ctx.stroke();
+    
+                  // Scanner start/end caps
+                  ctx.beginPath();
+                  ctx.arc(qrX, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
+                  ctx.fillStyle = design.scannerColor;
+                  ctx.fill();
+    
+                  ctx.beginPath();
+                  ctx.arc(qrX + design.qrSize, scannerY, design.scannerHeight/2, 0, Math.PI * 2);
+                  ctx.fill();
                 }
     
-                // Draw English CTA with enhanced decorative frame
-                const englishButton = {
+                // Draw English CTA with matching Arabic frame style
+                const englishCTA = {
                   x: canvas.width / 2,
                   y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
                   width: canvas.width * 0.8,
-                  height: 120
+                  height: 140
                 };
     
-                // Enhanced decorative frame for English CTA
+                // Enhanced decorative frame for English CTA (matching Arabic style)
                 ctx.save();
                 ctx.beginPath();
                 ctx.roundRect(
-                  englishButton.x - englishButton.width/2,
-                  englishButton.y - englishButton.height/2,
-                  englishButton.width,
-                  englishButton.height,
+                  englishCTA.x - englishCTA.width/2,
+                  englishCTA.y - englishCTA.height/2,
+                  englishCTA.width,
+                  englishCTA.height,
                   [design.borderRadii.inner]
                 );
     
-                // Frame styling with gradient
+                // Frame styling (same as Arabic)
                 const englishFrameGradient = ctx.createLinearGradient(
-                  englishButton.x - englishButton.width/2, 
-                  englishButton.y - englishButton.height/2,
-                  englishButton.x + englishButton.width/2, 
-                  englishButton.y + englishButton.height/2
+                  englishCTA.x - englishCTA.width/2, 
+                  englishCTA.y - englishCTA.height/2,
+                  englishCTA.x + englishCTA.width/2, 
+                  englishCTA.y + englishCTA.height/2
                 );
-                englishFrameGradient.addColorStop(0, design.primaryColor);
-                englishFrameGradient.addColorStop(1, design.secondaryColor);
+                englishFrameGradient.addColorStop(0, '#f0f9ff');
+                englishFrameGradient.addColorStop(1, '#e0f2fe');
                 ctx.fillStyle = englishFrameGradient;
                 ctx.fill();
     
-                // Decorative frame border
-                ctx.strokeStyle = design.accentColor;
+                // Frame border with decorative style
+                ctx.strokeStyle = design.primaryColor;
                 ctx.lineWidth = 3;
                 ctx.stroke();
     
-                // Add decorative dots at corners
-                const dotRadius = 4;
-                const dotColor = design.buttonTextColor;
-    
-                // Top-left dot
+                // Add decorative corner elements (same as Arabic)
+                // Top-left corner
                 ctx.beginPath();
-                ctx.arc(
-                  englishButton.x - englishButton.width/2 + 10,
-                  englishButton.y - englishButton.height/2 + 10,
-                  dotRadius, 0, Math.PI * 2
-                );
-                ctx.fillStyle = dotColor;
-                ctx.fill();
+                ctx.moveTo(englishCTA.x - englishCTA.width/2, englishCTA.y - englishCTA.height/2 + cornerSize);
+                ctx.lineTo(englishCTA.x - englishCTA.width/2, englishCTA.y - englishCTA.height/2);
+                ctx.lineTo(englishCTA.x - englishCTA.width/2 + cornerSize, englishCTA.y - englishCTA.height/2);
+                ctx.strokeStyle = cornerColor;
+                ctx.lineWidth = 2;
+                ctx.stroke();
     
-                // Top-right dot
+                // Top-right corner
                 ctx.beginPath();
-                ctx.arc(
-                  englishButton.x + englishButton.width/2 - 10,
-                  englishButton.y - englishButton.height/2 + 10,
-                  dotRadius, 0, Math.PI * 2
-                );
-                ctx.fill();
+                ctx.moveTo(englishCTA.x + englishCTA.width/2 - cornerSize, englishCTA.y - englishCTA.height/2);
+                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y - englishCTA.height/2);
+                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y - englishCTA.height/2 + cornerSize);
+                ctx.stroke();
     
-                // Bottom-left dot
+                // Bottom-left corner
                 ctx.beginPath();
-                ctx.arc(
-                  englishButton.x - englishButton.width/2 + 10,
-                  englishButton.y + englishButton.height/2 - 10,
-                  dotRadius, 0, Math.PI * 2
-                );
-                ctx.fill();
+                ctx.moveTo(englishCTA.x - englishCTA.width/2, englishCTA.y + englishCTA.height/2 - cornerSize);
+                ctx.lineTo(englishCTA.x - englishCTA.width/2, englishCTA.y + englishCTA.height/2);
+                ctx.lineTo(englishCTA.x - englishCTA.width/2 + cornerSize, englishCTA.y + englishCTA.height/2);
+                ctx.stroke();
     
-                // Bottom-right dot
+                // Bottom-right corner
                 ctx.beginPath();
-                ctx.arc(
-                  englishButton.x + englishButton.width/2 - 10,
-                  englishButton.y + englishButton.height/2 - 10,
-                  dotRadius, 0, Math.PI * 2
-                );
-                ctx.fill();
+                ctx.moveTo(englishCTA.x + englishCTA.width/2 - cornerSize, englishCTA.y + englishCTA.height/2);
+                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y + englishCTA.height/2);
+                ctx.lineTo(englishCTA.x + englishCTA.width/2, englishCTA.y + englishCTA.height/2 - cornerSize);
+                ctx.stroke();
     
-                // Button text with improved styling
+                // English text with shadow effect
                 ctx.font = `700 36px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                
+    
                 const englishLine1 = '✨ Scan now to';
                 const englishLine2 = 'explore exclusive content ✨';
-                
-                // Text shadow for better readability
-                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
-                ctx.shadowBlur = 3;
+    
+                ctx.save();
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                ctx.shadowBlur = 5;
                 ctx.shadowOffsetY = 2;
-                ctx.fillText(englishLine1, englishButton.x, englishButton.y - 20);
-                ctx.fillText(englishLine2, englishButton.x, englishButton.y + 25);
+                ctx.fillText(englishLine1, englishCTA.x, englishCTA.y - 20);
+                ctx.fillText(englishLine2, englishCTA.x, englishCTA.y + 25);
+                ctx.restore();
                 ctx.restore();
     
                 // Watermark area
@@ -813,7 +825,6 @@ const Dashboard = () => {
         if (container?.parentNode) container.parentNode.removeChild(container);
       }
     };
-    
     downloadWithLogo();
   };
 
