@@ -426,20 +426,21 @@ const Dashboard = () => {
       let container: HTMLDivElement | null = null;
     
       try {
-        // Premium+ design configuration
+        // Summer-inspired design configuration
         const design = {
           width: 1000,
-          height: 1400, // Taller to accommodate button-style CTAs
+          height: 1400,
           qrSize: 600,
-          logoSize: 150, // Larger logo for better visibility
-          // Vibrant color palette
-          bgGradient: ['#f8f9fa', '#e9ecef'], // Clean light gradient
-          primaryColor: '#4361ee', // Vibrant blue
-          secondaryColor: '#3a0ca3', // Deep blue
-          accentColor: '#f72585', // Pink accent
-          qrBgColor: '#ffffff',
-          qrFgColor: '#1a1a1a', // Darker for better contrast
-          textColor: '#2b2d42',
+          logoSize: 140,
+          // Summer color palette (print-friendly)
+          bgColor: '#fef6e4',         // Soft warm white (like sand)
+          primaryColor: '#f3d2c1',     // Peach (main frame color)
+          secondaryColor: '#8bd3dd',   // Sky blue
+          accentColor: '#f582ae',      // Coral pink
+          qrBgColor: '#fffffe',        // Pure white
+          qrFgColor: '#172c66',        // Navy blue (high contrast)
+          textColor: '#001858',        // Dark blue (for readability)
+          buttonTextColor: '#001858',  // Dark blue
           // Typography
           arabicFont: "'Tajawal', sans-serif",
           englishFont: "'Inter', sans-serif",
@@ -450,12 +451,15 @@ const Dashboard = () => {
           frameWidth: 20,
           buttonPadding: '20px 40px',
           buttonRadius: '50px',
-          shadow: '0 25px 50px -12px rgba(0, 0, 0, 0.15)',
+          shadow: '0 10px 30px rgba(0, 0, 0, 0.08)',
           borderRadii: {
             outer: '30px',
             inner: '20px',
             corners: '15px'
-          }
+          },
+          // Summer decorative elements
+          waveHeight: 30,
+          sunSize: 120
         };
     
         if (format === 'svg') {
@@ -471,13 +475,13 @@ const Dashboard = () => {
             }
           }
           
-          // Render premium+ SVG
+          // Render summer-style SVG
           const root = ReactDOM.createRoot(svgElement);
           root.render(
             <div style={{
               width: `${design.width}px`,
               height: `${design.height}px`,
-              background: `linear-gradient(135deg, ${design.bgGradient.join(', ')})`,
+              backgroundColor: design.bgColor,
               display: 'flex',
               flexDirection: 'column',
               alignItems: 'center',
@@ -487,58 +491,62 @@ const Dashboard = () => {
               boxShadow: design.shadow,
               borderRadius: design.borderRadii.outer,
               overflow: 'hidden',
-              '::before': {
-                content: '""',
-                position: 'absolute',
-                top: 0,
-                left: 0,
-                right: 0,
-                height: '10px',
-                background: `linear-gradient(to right, ${design.primaryColor}, ${design.accentColor})`,
-              }
             }}>
-              {/* Decorative elements */}
+              {/* Summer decorative elements */}
+              {/* Sun */}
               <div style={{
                 position: 'absolute',
-                top: '20%',
-                left: '-150px',
-                width: '400px',
-                height: '400px',
+                top: '50px',
+                right: '50px',
+                width: `${design.sunSize}px`,
+                height: `${design.sunSize}px`,
                 borderRadius: '50%',
-                background: `radial-gradient(circle, ${design.primaryColor}10 0%, transparent 70%)`,
-                filter: 'blur(30px)',
-                opacity: 0.7,
+                background: `radial-gradient(circle, #fef6e4 30%, #f3d2c1 100%)`,
+                boxShadow: `0 0 0 10px ${design.primaryColor}30`,
+                zIndex: 1
               }} />
               
+              {/* Waves */}
               <div style={{
                 position: 'absolute',
-                bottom: '15%',
-                right: '-150px',
-                width: '400px',
-                height: '400px',
-                borderRadius: '50%',
-                background: `radial-gradient(circle, ${design.accentColor}10 0%, transparent 70%)`,
-                filter: 'blur(30px)',
-                opacity: 0.7,
+                bottom: 0,
+                left: 0,
+                right: 0,
+                height: `${design.waveHeight}px`,
+                background: `linear-gradient(90deg, ${design.secondaryColor} 0%, ${design.accentColor} 100%)`,
+                opacity: 0.8,
+                '::before': {
+                  content: '""',
+                  position: 'absolute',
+                  bottom: `${design.waveHeight}px`,
+                  left: 0,
+                  right: 0,
+                  height: `${design.waveHeight}px`,
+                  background: `linear-gradient(90deg, ${design.accentColor} 0%, ${design.primaryColor} 100%)`,
+                  opacity: 0.6,
+                  borderRadius: '50% 50% 0 0 / 100% 100% 0 0',
+                  transform: 'scaleX(1.5)'
+                }
               }} />
     
-              {/* Arabic CTA - Button Style */}
+              {/* Arabic CTA - Summer Button Style */}
               <div style={{
                 position: 'relative',
-                fontSize: '38px',
-                color: 'white',
+                fontSize: '36px',
+                color: design.buttonTextColor,
                 fontFamily: design.arabicFont,
                 marginBottom: `${design.textMargin}px`,
-                fontWeight: 800, // Extra bold
+                fontWeight: 800,
                 direction: 'rtl',
                 textAlign: 'center',
                 width: '80%',
                 lineHeight: '1.5',
                 padding: design.buttonPadding,
-                backgroundColor: design.primaryColor,
+                backgroundColor: `${design.secondaryColor}`,
                 borderRadius: design.buttonRadius,
-                boxShadow: `0 8px 20px ${design.primaryColor}40`,
+                boxShadow: `0 5px 15px ${design.secondaryColor}40`,
                 transition: 'all 0.3s ease',
+                zIndex: 2,
                 '::after': {
                   content: '""',
                   position: 'absolute',
@@ -553,7 +561,7 @@ const Dashboard = () => {
                 },
                 ':hover': {
                   transform: 'translateY(-3px)',
-                  boxShadow: `0 12px 25px ${design.primaryColor}60`
+                  boxShadow: `0 8px 20px ${design.secondaryColor}60`
                 }
               }}>
                 امسح الكود الآن 👆
@@ -562,22 +570,23 @@ const Dashboard = () => {
                   left: '30px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  fontSize: '44px'
-                }}>👍</span>
+                  fontSize: '40px'
+                }}>🌞</span> {/* Sun emoji */}
               </div>
     
-              {/* QR Code Container with elegant frame */}
+              {/* QR Code Container with summer frame */}
               <div style={{
                 position: 'relative',
                 padding: `${design.frameWidth}px`,
                 backgroundColor: design.qrBgColor,
                 borderRadius: design.borderRadii.inner,
-                boxShadow: `0 15px 30px ${design.primaryColor}20`,
-                border: `2px solid ${design.primaryColor}20`,
+                boxShadow: `0 10px 25px ${design.primaryColor}30`,
+                border: `2px solid ${design.primaryColor}50`,
                 transition: 'all 0.3s ease',
+                zIndex: 2,
                 ':hover': {
                   transform: 'translateY(-5px)',
-                  boxShadow: `0 20px 40px ${design.primaryColor}30`,
+                  boxShadow: `0 15px 35px ${design.primaryColor}40`,
                 }
               }}>
                 {/* Animated scanning effect */}
@@ -592,16 +601,16 @@ const Dashboard = () => {
                   animation: 'scan 2s infinite ease-in-out',
                   zIndex: 10,
                   borderRadius: '2px',
-                  boxShadow: `0 0 15px ${design.accentColor}`,
+                  boxShadow: `0 0 10px ${design.accentColor}`,
                 }} />
                 
-                {/* Frame corners - premium style */}
+                {/* Frame corners - summer style */}
                 {['top-left', 'top-right', 'bottom-left', 'bottom-right'].map((corner) => (
                   <div key={corner} style={{
                     position: 'absolute',
                     width: `${design.cornerSize}px`,
                     height: `${design.cornerSize}px`,
-                    border: `5px solid ${design.secondaryColor}`,
+                    border: `5px solid ${design.accentColor}`,
                     [corner.split('-')[0]]: 0,
                     [corner.split('-')[1]]: 0,
                     [`border-${corner.split('-')[0]}`]: 'none',
@@ -626,22 +635,23 @@ const Dashboard = () => {
                 />
               </div>
     
-              {/* English CTA - Button Style */}
+              {/* English CTA - Summer Button Style */}
               <div style={{
                 fontSize: '36px',
-                color: 'white',
+                color: design.buttonTextColor,
                 fontFamily: design.englishFont,
                 marginTop: `${design.textMargin}px`,
-                fontWeight: 800, // Extra bold
+                fontWeight: 800,
                 textAlign: 'center',
                 width: '80%',
                 lineHeight: '1.5',
                 padding: design.buttonPadding,
-                backgroundColor: design.secondaryColor,
+                backgroundColor: `${design.accentColor}`,
                 borderRadius: design.buttonRadius,
-                boxShadow: `0 8px 20px ${design.secondaryColor}40`,
+                boxShadow: `0 5px 15px ${design.accentColor}40`,
                 transition: 'all 0.3s ease',
                 position: 'relative',
+                zIndex: 2,
                 '::before': {
                   content: '""',
                   position: 'absolute',
@@ -649,14 +659,14 @@ const Dashboard = () => {
                   left: '20%',
                   right: '20%',
                   height: '4px',
-                  background: `linear-gradient(to right, transparent, ${design.accentColor}, transparent)`,
+                  background: `linear-gradient(to right, transparent, ${design.secondaryColor}, transparent)`,
                   borderRadius: '2px',
                   filter: 'blur(2px)',
                   opacity: 0.7
                 },
                 ':hover': {
                   transform: 'translateY(-3px)',
-                  boxShadow: `0 12px 25px ${design.secondaryColor}60`
+                  boxShadow: `0 8px 20px ${design.accentColor}60`
                 }
               }}>
                 <span style={{
@@ -664,31 +674,29 @@ const Dashboard = () => {
                   right: '30px',
                   top: '50%',
                   transform: 'translateY(-50%)',
-                  fontSize: '44px'
-                }}>👍</span>
+                  fontSize: '40px'
+                }}>🌴</span> {/* Palm tree emoji */}
                 SCAN HERE 👆
               </div>
     
-              {/* Premium watermark with logo */}
+              {/* Summer-style watermark */}
               <div style={{
                 position: 'absolute',
                 bottom: `${design.padding}px`,
                 display: 'flex',
                 alignItems: 'center',
-                gap: '15px',
-                padding: '15px 30px',
-                backgroundColor: `${design.primaryColor}15`,
+                gap: '12px',
+                padding: '12px 30px',
+                backgroundColor: 'rgba(255, 255, 255, 0.7)',
                 borderRadius: '50px',
                 backdropFilter: 'blur(6px)',
                 border: `1px solid ${design.primaryColor}30`,
-                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.05)'
+                boxShadow: '0 5px 15px rgba(0, 0, 0, 0.05)',
+                zIndex: 2
               }}>
-                <svg width="28" height="28" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                  <path d="M12 22C17.5228 22 22 17.5228 22 12C22 6.47715 17.5228 2 12 2C6.47715 2 2 6.47715 2 12C2 17.5228 6.47715 22 12 22Z" stroke={design.textColor} strokeWidth="2"/>
-                  <path d="M12 6V12L16 14" stroke={design.textColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M12 22V18" stroke={design.textColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M7 3L5 5" stroke={design.accentColor} strokeWidth="2" strokeLinecap="round"/>
-                  <path d="M19 5L17 3" stroke={design.accentColor} strokeWidth="2" strokeLinecap="round"/>
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2Z" stroke={design.accentColor} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                  <path d="M12 22V17.77" stroke={design.secondaryColor} strokeWidth="2" strokeLinecap="round"/>
                 </svg>
                 <span style={{
                   fontSize: '20px',
@@ -697,7 +705,7 @@ const Dashboard = () => {
                   letterSpacing: '0.5px',
                   fontWeight: 600,
                 }}>
-                  Generated by <strong style={{color: design.primaryColor}}>qrcreator.xyz</strong>
+                  Generated by <strong style={{color: design.accentColor}}>qrcreator.xyz</strong>
                 </span>
               </div>
     
@@ -717,7 +725,7 @@ const Dashboard = () => {
           // ... (keep the existing download code)
     
         } else {
-          // PNG format (premium+ version)
+          // PNG format (summer version)
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -756,7 +764,7 @@ const Dashboard = () => {
             />
           );
     
-          // Create final premium+ canvas
+          // Create final summer canvas
           await new Promise<void>((resolve) => {
             setTimeout(async () => {
               const canvas = document.createElement('canvas');
@@ -765,51 +773,58 @@ const Dashboard = () => {
               const ctx = canvas.getContext('2d');
               
               if (ctx) {
-                // Draw gradient background
-                const gradient = ctx.createLinearGradient(0, 0, 0, canvas.height);
-                gradient.addColorStop(0, design.bgGradient[0]);
-                gradient.addColorStop(1, design.bgGradient[1]);
-                ctx.fillStyle = gradient;
+                // Draw summer background
+                ctx.fillStyle = design.bgColor;
                 ctx.fillRect(0, 0, canvas.width, canvas.height);
     
-                // Draw decorative elements
+                // Draw sun
                 ctx.beginPath();
-                ctx.arc(-150, canvas.height * 0.2, 200, 0, Math.PI * 2);
-                ctx.fillStyle = `${design.primaryColor}10`;
-                ctx.filter = 'blur(30px)';
+                ctx.arc(canvas.width - 100, 100, design.sunSize/2, 0, Math.PI * 2);
+                const sunGradient = ctx.createRadialGradient(
+                  canvas.width - 100, 100, design.sunSize/6,
+                  canvas.width - 100, 100, design.sunSize/2
+                );
+                sunGradient.addColorStop(0, design.bgColor);
+                sunGradient.addColorStop(1, design.primaryColor);
+                ctx.fillStyle = sunGradient;
                 ctx.fill();
                 
+                // Sun glow
                 ctx.beginPath();
-                ctx.arc(canvas.width + 150, canvas.height * 0.7, 200, 0, Math.PI * 2);
-                ctx.fillStyle = `${design.accentColor}10`;
-                ctx.fill();
-                ctx.filter = 'none';
+                ctx.arc(canvas.width - 100, 100, design.sunSize/2 + 10, 0, Math.PI * 2);
+                ctx.strokeStyle = `${design.primaryColor}30`;
+                ctx.lineWidth = 10;
+                ctx.stroke();
     
-                // Draw top accent bar
-                const topBarGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
-                topBarGradient.addColorStop(0, design.primaryColor);
-                topBarGradient.addColorStop(1, design.accentColor);
-                ctx.fillStyle = topBarGradient;
-                ctx.fillRect(0, 0, canvas.width, 10);
+                // Draw waves
+                ctx.beginPath();
+                ctx.moveTo(0, canvas.height - design.waveHeight);
+                ctx.bezierCurveTo(
+                  canvas.width * 0.25, canvas.height - design.waveHeight - 10,
+                  canvas.width * 0.75, canvas.height - design.waveHeight + 10,
+                  canvas.width, canvas.height - design.waveHeight
+                );
+                ctx.lineTo(canvas.width, canvas.height);
+                ctx.lineTo(0, canvas.height);
+                ctx.closePath();
+                
+                const waveGradient = ctx.createLinearGradient(0, 0, canvas.width, 0);
+                waveGradient.addColorStop(0, design.secondaryColor);
+                waveGradient.addColorStop(1, design.accentColor);
+                ctx.fillStyle = waveGradient;
+                ctx.globalAlpha = 0.8;
+                ctx.fill();
+                ctx.globalAlpha = 1;
     
                 // Draw Arabic CTA button
                 const arabicButton = {
                   x: canvas.width / 2,
-                  y: design.padding + 60,
+                  y: design.padding + 80,
                   width: canvas.width * 0.8,
                   height: 100
                 };
                 
-                // Button background with enhanced gradient
-                const arabicButtonGradient = ctx.createLinearGradient(
-                  arabicButton.x - arabicButton.width/2,
-                  arabicButton.y - arabicButton.height/2,
-                  arabicButton.x + arabicButton.width/2,
-                  arabicButton.y + arabicButton.height/2
-                );
-                arabicButtonGradient.addColorStop(0, design.primaryColor);
-                arabicButtonGradient.addColorStop(1, design.secondaryColor);
-                
+                // Button background
                 ctx.beginPath();
                 ctx.roundRect(
                   arabicButton.x - arabicButton.width/2,
@@ -818,27 +833,31 @@ const Dashboard = () => {
                   arabicButton.height,
                   [50, 50, 50, 50]
                 );
-                ctx.fillStyle = arabicButtonGradient;
-                ctx.shadowColor = `${design.primaryColor}80`;
-                ctx.shadowBlur = 20;
-                ctx.shadowOffsetY = 8;
+                ctx.fillStyle = design.secondaryColor;
+                ctx.shadowColor = `${design.secondaryColor}80`;
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 5;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
                 
-                // Button text (Arabic) with enhanced styling
-                ctx.font = `800 42px ${design.arabicFont}`;
-                ctx.fillStyle = 'white';
+                // Button text (Arabic)
+                ctx.font = `800 36px ${design.arabicFont}`;
+                ctx.fillStyle = design.buttonTextColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
                 
                 // Arabic text needs RTL handling
-                const arabicText = 'امسح الكود للوصول إلى المحتوى المميز ✨';
+                const arabicText = 'امسح الكود الآن 👆';
                 ctx.save();
-                ctx.textAlign = 'right'; // For RTL
+                ctx.textAlign = 'right';
                 ctx.fillText(arabicText, arabicButton.x + arabicButton.width/2 - 80, arabicButton.y);
                 ctx.restore();
                 
-                // Decorative elements for Arabic button
+                // Sun emoji
+                ctx.font = '40px serif';
+                ctx.fillText('🌞', arabicButton.x - arabicButton.width/2 + 70, arabicButton.y);
+                
+                // Button underline effect
                 ctx.beginPath();
                 ctx.moveTo(arabicButton.x - arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
                 ctx.lineTo(arabicButton.x + arabicButton.width * 0.3, arabicButton.y + arabicButton.height/2 + 5);
@@ -852,27 +871,14 @@ const Dashboard = () => {
                 ctx.strokeStyle = lineGradient;
                 ctx.lineWidth = 4;
                 ctx.stroke();
-
-                // Initialize QR code position variables
-                let qrX = 0;
-                let qrY = 0;
-
-                // Draw QR code with premium frame
+    
+                // Draw QR code with summer frame
                 const qrCanvas = qrContainer.querySelector('canvas');
                 if (qrCanvas) {
-                  qrX = (canvas.width - design.qrSize) / 2;
-                  qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
+                  const qrX = (canvas.width - design.qrSize) / 2;
+                  const qrY = arabicButton.y + arabicButton.height/2 + design.textMargin;
                   
-                  // Enhanced QR frame with gradient
-                  const frameGradient = ctx.createLinearGradient(
-                    qrX - design.frameWidth,
-                    qrY - design.frameWidth,
-                    qrX + design.qrSize + design.frameWidth,
-                    qrY + design.qrSize + design.frameWidth
-                  );
-                  frameGradient.addColorStop(0, design.primaryColor);
-                  frameGradient.addColorStop(1, design.secondaryColor);
-                  
+                  // Draw frame with rounded corners
                   ctx.beginPath();
                   ctx.roundRect(
                     qrX - design.frameWidth,
@@ -883,17 +889,17 @@ const Dashboard = () => {
                   );
                   ctx.fillStyle = design.qrBgColor;
                   ctx.shadowColor = `${design.primaryColor}30`;
-                  ctx.shadowBlur = 30;
-                  ctx.shadowOffsetY = 15;
+                  ctx.shadowBlur = 25;
+                  ctx.shadowOffsetY = 10;
                   ctx.fill();
                   ctx.shadowColor = 'transparent';
                   
-                  // Enhanced frame border
-                  ctx.strokeStyle = frameGradient;
-                  ctx.lineWidth = 3;
+                  // Frame border
+                  ctx.strokeStyle = `${design.primaryColor}50`;
+                  ctx.lineWidth = 2;
                   ctx.stroke();
                   
-                  // Draw animated scan line (static position for PNG)
+                  // Draw scan line
                   ctx.beginPath();
                   ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize/2);
                   ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize/2);
@@ -901,11 +907,43 @@ const Dashboard = () => {
                   ctx.lineWidth = 4;
                   ctx.stroke();
                   
+                  // Draw frame corners
+                  ctx.strokeStyle = design.accentColor;
+                  ctx.lineWidth = 5;
+                  
+                  // Top-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.frameWidth, qrY + design.cornerSize);
+                  ctx.lineTo(qrX - design.frameWidth, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.cornerSize, qrY - design.frameWidth);
+                  ctx.stroke();
+                  
+                  // Top-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY - design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.cornerSize);
+                  ctx.stroke();
+                  
+                  // Bottom-left corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
+                  ctx.lineTo(qrX - design.frameWidth, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.cornerSize, qrY + design.qrSize + design.frameWidth);
+                  ctx.stroke();
+                  
+                  // Bottom-right corner
+                  ctx.beginPath();
+                  ctx.moveTo(qrX + design.qrSize + design.frameWidth - design.cornerSize, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth);
+                  ctx.lineTo(qrX + design.qrSize + design.frameWidth, qrY + design.qrSize + design.frameWidth - design.cornerSize);
+                  ctx.stroke();
+    
                   // Draw QR code
                   ctx.drawImage(qrCanvas, qrX, qrY, design.qrSize, design.qrSize);
                 }
     
-                // Draw English CTA button with enhanced design
+                // Draw English CTA button
                 const englishButton = {
                   x: canvas.width / 2,
                   y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
@@ -913,16 +951,7 @@ const Dashboard = () => {
                   height: 100
                 };
                 
-                // Enhanced English button gradient
-                const englishButtonGradient = ctx.createLinearGradient(
-                  englishButton.x - englishButton.width/2,
-                  englishButton.y - englishButton.height/2,
-                  englishButton.x + englishButton.width/2,
-                  englishButton.y + englishButton.height/2
-                );
-                englishButtonGradient.addColorStop(0, design.secondaryColor);
-                englishButtonGradient.addColorStop(1, design.primaryColor);
-                
+                // Button background
                 ctx.beginPath();
                 ctx.roundRect(
                   englishButton.x - englishButton.width/2,
@@ -931,21 +960,25 @@ const Dashboard = () => {
                   englishButton.height,
                   [50, 50, 50, 50]
                 );
-                ctx.fillStyle = englishButtonGradient;
-                ctx.shadowColor = `${design.secondaryColor}80`;
-                ctx.shadowBlur = 20;
-                ctx.shadowOffsetY = 8;
+                ctx.fillStyle = design.accentColor;
+                ctx.shadowColor = `${design.accentColor}80`;
+                ctx.shadowBlur = 15;
+                ctx.shadowOffsetY = 5;
                 ctx.fill();
                 ctx.shadowColor = 'transparent';
                 
-                // Enhanced English button text
+                // Button text
                 ctx.font = `800 36px ${design.englishFont}`;
-                ctx.fillStyle = 'white';
+                ctx.fillStyle = design.buttonTextColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                ctx.fillText('SCAN TO ACCESS PREMIUM CONTENT ✨', englishButton.x, englishButton.y);
+                ctx.fillText('SCAN HERE 👆', englishButton.x, englishButton.y);
                 
-                // Decorative elements for English button
+                // Palm tree emoji
+                ctx.font = '40px serif';
+                ctx.fillText('🌴', englishButton.x + englishButton.width/2 - 70, englishButton.y);
+                
+                // Button underline effect
                 ctx.beginPath();
                 ctx.moveTo(englishButton.x - englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
                 ctx.lineTo(englishButton.x + englishButton.width * 0.3, englishButton.y - englishButton.height/2 - 5);
@@ -954,13 +987,13 @@ const Dashboard = () => {
                   englishButton.x + englishButton.width * 0.3, 0
                 );
                 topLineGradient.addColorStop(0, 'transparent');
-                topLineGradient.addColorStop(0.5, design.accentColor);
+                topLineGradient.addColorStop(0.5, design.secondaryColor);
                 topLineGradient.addColorStop(1, 'transparent');
                 ctx.strokeStyle = topLineGradient;
                 ctx.lineWidth = 4;
                 ctx.stroke();
     
-                // Draw premium watermark
+                // Draw summer watermark
                 const watermark = {
                   x: canvas.width / 2,
                   y: canvas.height - design.padding,
@@ -977,27 +1010,17 @@ const Dashboard = () => {
                   watermark.height,
                   [30, 30, 30, 30]
                 );
-                ctx.fillStyle = `${design.primaryColor}15`;
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
                 ctx.strokeStyle = `${design.primaryColor}30`;
                 ctx.lineWidth = 1;
                 ctx.fill();
                 ctx.stroke();
                 
-                // Draw watermark icon
-                ctx.beginPath();
-                ctx.arc(watermark.x - watermark.width/2 + 50, watermark.y, 12, 0, Math.PI * 2);
-                ctx.strokeStyle = design.textColor;
+                // Draw star icon
+                ctx.fillStyle = design.accentColor;
+                drawStar(ctx, watermark.x - watermark.width/2 + 50, watermark.y, 5, 12, 6);
+                ctx.strokeStyle = design.secondaryColor;
                 ctx.lineWidth = 2;
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 12);
-                ctx.lineTo(watermark.x - watermark.width/2 + 50, watermark.y + 12);
-                ctx.stroke();
-                
-                ctx.beginPath();
-                ctx.moveTo(watermark.x - watermark.width/2 + 50, watermark.y - 12);
-                ctx.lineTo(watermark.x - watermark.width/2 + 60, watermark.y - 6);
                 ctx.stroke();
                 
                 // Draw watermark text
@@ -1008,16 +1031,40 @@ const Dashboard = () => {
                 ctx.fillText('Generated by ', watermark.x - 30, watermark.y);
                 
                 // Accent part of watermark
-                ctx.fillStyle = design.primaryColor;
+                ctx.fillStyle = design.accentColor;
                 ctx.font = `700 20px ${design.englishFont}`;
                 ctx.fillText('qrcreator.xyz', watermark.x + 80, watermark.y);
               }
               
+              // Helper function to draw a star
+              function drawStar(ctx: CanvasRenderingContext2D, cx: number, cy: number, spikes: number, outerRadius: number, innerRadius: number) {
+                let rot = Math.PI/2*3;
+                let x = cx;
+                let y = cy;
+                let step = Math.PI/spikes;
+    
+                ctx.beginPath();
+                ctx.moveTo(cx, cy - outerRadius);
+                for(let i = 0; i < spikes; i++) {
+                  x = cx + Math.cos(rot) * outerRadius;
+                  y = cy + Math.sin(rot) * outerRadius;
+                  ctx.lineTo(x, y);
+                  rot += step;
+    
+                  x = cx + Math.cos(rot) * innerRadius;
+                  y = cy + Math.sin(rot) * innerRadius;
+                  ctx.lineTo(x, y);
+                  rot += step;
+                }
+                ctx.lineTo(cx, cy - outerRadius);
+                ctx.closePath();
+              }
+    
               // Convert to PNG and download
               const pngUrl = canvas.toDataURL('image/png', 1.0);
               const downloadLink = document.createElement('a');
               downloadLink.href = pngUrl;
-              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_premium-plus.png`;
+              downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_summer-style.png`;
               document.body.appendChild(downloadLink);
               downloadLink.click();
               document.body.removeChild(downloadLink);
@@ -1027,15 +1074,15 @@ const Dashboard = () => {
         }
     
         toast({
-          title: `Premium+ QR Code Downloaded`,
-          description: `Your attractive QR code has been downloaded as high-quality ${format.toUpperCase()}`,
+          title: `Summer QR Code Downloaded`,
+          description: `Your summer-themed QR code has been downloaded as high-quality ${format.toUpperCase()}`,
         });
       } catch (error) {
         console.error('Download failed:', error);
         toast({
           variant: "destructive",
           title: "Download Failed",
-          description: "There was a problem generating your premium QR code.",
+          description: "There was a problem generating your summer QR code.",
         });
       } finally {
         // Clean up
