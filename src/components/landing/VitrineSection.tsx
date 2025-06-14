@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
 interface VitrineSectionProps {
@@ -100,6 +100,18 @@ const getPlatformInfo = (type: string) => {
       icon: Send,
       bgColor: '#0088CC',
       hoverBgColor: '#006699',
+    },
+    tiktok: {
+      label: 'TikTok',
+      icon: Music,
+      bgColor: '#000000',
+      hoverBgColor: '#25F4EE',
+    },
+    location: {
+      label: 'Location',
+      icon: MapPin,
+      bgColor: '#FF4B4B',
+      hoverBgColor: '#FF0000',
     },
     website: {
       label: 'Website',
