@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin } from 'lucide-react';
 
 interface Link {
   type: string;
@@ -60,6 +60,18 @@ const getPlatformInfo = (type: string) => {
       icon: Send,
       bgColor: 'linear-gradient(135deg, #0088CC 0%, #006699 100%)',
       hoverBgColor: '#006699',
+    },
+    tiktok: {
+      label: 'TikTok',
+      icon: Music,
+      bgColor: 'linear-gradient(135deg, #000000 0%, #25F4EE 100%)',
+      hoverBgColor: '#25F4EE',
+    },
+    location: {
+      label: 'Location',
+      icon: MapPin,
+      bgColor: 'linear-gradient(135deg, #FF4B4B 0%, #FF0000 100%)',
+      hoverBgColor: '#FF0000',
     },
     website: {
       label: 'Website',
