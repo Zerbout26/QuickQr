@@ -527,7 +527,7 @@ const Dashboard = () => {
                 // Initialize QR code position variables at the top level
                 let qrX = 0;
                 let qrY = 0;
-
+    
                 // Draw QR code name at the top with frame
                 ctx.font = `700 42px ${design.englishFont}`;
                 ctx.fillStyle = design.textColor;
@@ -553,15 +553,16 @@ const Dashboard = () => {
                 ctx.fillStyle = design.textColor;
                 ctx.fillText(qr.name, canvas.width / 2, nameY);
     
-                // Draw Arabic CTA with frame
+                // Draw Arabic CTA with enhanced decorative frame
                 const arabicCTA = {
                   x: canvas.width / 2,
                   y: nameY + 120,
                   width: canvas.width * 0.8,
-                  height: 120
+                  height: 140
                 };
-                
-                // CTA frame
+    
+                // Enhanced decorative frame for Arabic CTA
+                ctx.save();
                 ctx.beginPath();
                 ctx.roundRect(
                   arabicCTA.x - arabicCTA.width/2,
@@ -570,26 +571,76 @@ const Dashboard = () => {
                   arabicCTA.height,
                   [design.borderRadii.inner]
                 );
-                ctx.strokeStyle = design.borderColor;
+    
+                // Frame styling
+                const arabicFrameGradient = ctx.createLinearGradient(
+                  arabicCTA.x - arabicCTA.width/2, 
+                  arabicCTA.y - arabicCTA.height/2,
+                  arabicCTA.x + arabicCTA.width/2, 
+                  arabicCTA.y + arabicCTA.height/2
+                );
+                arabicFrameGradient.addColorStop(0, '#f0f9ff');
+                arabicFrameGradient.addColorStop(1, '#e0f2fe');
+                ctx.fillStyle = arabicFrameGradient;
+                ctx.fill();
+    
+                // Frame border with decorative style
+                ctx.strokeStyle = design.primaryColor;
+                ctx.lineWidth = 3;
+                ctx.stroke();
+    
+                // Add decorative corner elements
+                const cornerSize = 15;
+                const cornerColor = design.secondaryColor;
+    
+                // Top-left corner
+                ctx.beginPath();
+                ctx.moveTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2 + cornerSize);
+                ctx.lineTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x - arabicCTA.width/2 + cornerSize, arabicCTA.y - arabicCTA.height/2);
+                ctx.strokeStyle = cornerColor;
                 ctx.lineWidth = 2;
                 ctx.stroke();
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-                ctx.fill();
-                
-                // Arabic text
+    
+                // Top-right corner
+                ctx.beginPath();
+                ctx.moveTo(arabicCTA.x + arabicCTA.width/2 - cornerSize, arabicCTA.y - arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y - arabicCTA.height/2 + cornerSize);
+                ctx.stroke();
+    
+                // Bottom-left corner
+                ctx.beginPath();
+                ctx.moveTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2 - cornerSize);
+                ctx.lineTo(arabicCTA.x - arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x - arabicCTA.width/2 + cornerSize, arabicCTA.y + arabicCTA.height/2);
+                ctx.stroke();
+    
+                // Bottom-right corner
+                ctx.beginPath();
+                ctx.moveTo(arabicCTA.x + arabicCTA.width/2 - cornerSize, arabicCTA.y + arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2);
+                ctx.lineTo(arabicCTA.x + arabicCTA.width/2, arabicCTA.y + arabicCTA.height/2 - cornerSize);
+                ctx.stroke();
+    
+                // Arabic text with shadow effect
                 ctx.font = `700 38px ${design.arabicFont}`;
                 ctx.fillStyle = design.textColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                
+    
                 const arabicLine1 = '✨ امسح الكود الآن';
                 const arabicLine2 = 'واكتشف المحتوى الحصري ✨';
-                
+    
                 ctx.save();
                 ctx.textAlign = 'center';
                 ctx.direction = 'rtl';
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.1)';
+                ctx.shadowBlur = 5;
+                ctx.shadowOffsetY = 2;
                 ctx.fillText(arabicLine1, arabicCTA.x, arabicCTA.y - 20);
                 ctx.fillText(arabicLine2, arabicCTA.x, arabicCTA.y + 25);
+                ctx.restore();
                 ctx.restore();
     
                 // Draw QR code with framed container
@@ -643,49 +694,99 @@ const Dashboard = () => {
                   ctx.stroke();
                 }
     
-                // Draw English CTA button
+                // Draw English CTA with enhanced decorative frame
                 const englishButton = {
                   x: canvas.width / 2,
-                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 40,
+                  y: qrY + design.qrSize + design.frameWidth * 2 + design.textMargin + 60,
                   width: canvas.width * 0.8,
-                  height: 100
+                  height: 120
                 };
-                
-                // Button with gradient
-                const buttonGradient = ctx.createLinearGradient(
-                  englishButton.x - englishButton.width/2, 
-                  englishButton.y,
-                  englishButton.x + englishButton.width/2, 
-                  englishButton.y
-                );
-                buttonGradient.addColorStop(0, design.primaryColor);
-                buttonGradient.addColorStop(1, design.secondaryColor);
-                
+    
+                // Enhanced decorative frame for English CTA
+                ctx.save();
                 ctx.beginPath();
                 ctx.roundRect(
                   englishButton.x - englishButton.width/2,
                   englishButton.y - englishButton.height/2,
                   englishButton.width,
                   englishButton.height,
-                  [design.buttonRadius]
+                  [design.borderRadii.inner]
                 );
-                ctx.fillStyle = buttonGradient;
-                ctx.strokeStyle = design.accentColor;
-                ctx.lineWidth = 2;
+    
+                // Frame styling with gradient
+                const englishFrameGradient = ctx.createLinearGradient(
+                  englishButton.x - englishButton.width/2, 
+                  englishButton.y - englishButton.height/2,
+                  englishButton.x + englishButton.width/2, 
+                  englishButton.y + englishButton.height/2
+                );
+                englishFrameGradient.addColorStop(0, design.primaryColor);
+                englishFrameGradient.addColorStop(1, design.secondaryColor);
+                ctx.fillStyle = englishFrameGradient;
                 ctx.fill();
+    
+                // Decorative frame border
+                ctx.strokeStyle = design.accentColor;
+                ctx.lineWidth = 3;
                 ctx.stroke();
-                
-                // Button text (now visible)
+    
+                // Add decorative dots at corners
+                const dotRadius = 4;
+                const dotColor = design.buttonTextColor;
+    
+                // Top-left dot
+                ctx.beginPath();
+                ctx.arc(
+                  englishButton.x - englishButton.width/2 + 10,
+                  englishButton.y - englishButton.height/2 + 10,
+                  dotRadius, 0, Math.PI * 2
+                );
+                ctx.fillStyle = dotColor;
+                ctx.fill();
+    
+                // Top-right dot
+                ctx.beginPath();
+                ctx.arc(
+                  englishButton.x + englishButton.width/2 - 10,
+                  englishButton.y - englishButton.height/2 + 10,
+                  dotRadius, 0, Math.PI * 2
+                );
+                ctx.fill();
+    
+                // Bottom-left dot
+                ctx.beginPath();
+                ctx.arc(
+                  englishButton.x - englishButton.width/2 + 10,
+                  englishButton.y + englishButton.height/2 - 10,
+                  dotRadius, 0, Math.PI * 2
+                );
+                ctx.fill();
+    
+                // Bottom-right dot
+                ctx.beginPath();
+                ctx.arc(
+                  englishButton.x + englishButton.width/2 - 10,
+                  englishButton.y + englishButton.height/2 - 10,
+                  dotRadius, 0, Math.PI * 2
+                );
+                ctx.fill();
+    
+                // Button text with improved styling
                 ctx.font = `700 36px ${design.englishFont}`;
                 ctx.fillStyle = design.buttonTextColor;
                 ctx.textAlign = 'center';
                 ctx.textBaseline = 'middle';
-                
+    
                 const englishLine1 = '✨ Scan now to';
                 const englishLine2 = 'explore exclusive content ✨';
-                
-                ctx.fillText(englishLine1, englishButton.x, englishButton.y - 15);
+    
+                // Text shadow for better readability
+                ctx.shadowColor = 'rgba(0, 0, 0, 0.3)';
+                ctx.shadowBlur = 3;
+                ctx.shadowOffsetY = 2;
+                ctx.fillText(englishLine1, englishButton.x, englishButton.y - 20);
                 ctx.fillText(englishLine2, englishButton.x, englishButton.y + 25);
+                ctx.restore();
     
                 // Watermark area
                 const watermarkY = canvas.height - design.padding - 40;
