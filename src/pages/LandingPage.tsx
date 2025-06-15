@@ -1,12 +1,9 @@
-import React, { useEffect, useState, Suspense, lazy, useCallback } from 'react';
+import React, { useEffect, useState, Suspense, lazy } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { QRCode, MenuItem } from '@/types';
+import { QRCode } from '@/types';
 import { qrCodeApi } from '@/lib/api';
-import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 
-// Critical CSS with !important overrides to eliminate all white space
+// 1. Critical CSS Inlined (Loads Instantly)
 const CriticalCSS = () => (
   <style dangerouslySetInnerHTML={{
     __html: `
@@ -17,14 +14,14 @@ const CriticalCSS = () => (
         min-height: 100vh !important;
         overflow-x: hidden !important;
       }
-      .landing-container {
-        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
+      .landing-page {
         min-height: 100vh !important;
+        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
         display: flex !important;
         flex-direction: column !important;
       }
-      .content-wrapper {
-        flex: 1 0 auto !important; /* Changed to prevent shrinking */
+      .content-container {
+        flex: 1 !important;
         width: 100% !important;
         max-width: 1200px !important;
         margin: 0 auto !important;
@@ -38,12 +35,12 @@ const CriticalCSS = () => (
         height: 24px !important;
         animation: spin 1s linear infinite !important;
       }
-      @keyframes spin {
-        0% { transform: rotate(0deg) !important; }
-        100% { transform: rotate(360deg) !important; }
+      @keyframes spin { 
+        0% { transform: rotate(0deg) !important; } 
+        100% { transform: rotate(360deg) !important; } 
       }
-      /* Ensure all sections take full width */
-      .menu-section, .vitrine-section, .social-links {
+      /* Force all sections to full width */
+      section, .menu-section, .vitrine-section, .social-links {
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
@@ -52,215 +49,123 @@ const CriticalCSS = () => (
   }} />
 );
 
-// Lazy load all components with prefetch
+// 2. Lazy Load with Prefetch (Non-Blocking)
 const MenuSection = lazy(() => import(
   /* webpackPrefetch: true */
+  /* webpackChunkName: "menu" */
   '@/components/landing/MenuSection'
 ));
 const VitrineSection = lazy(() => import(
   /* webpackPrefetch: true */
+  /* webpackChunkName: "vitrine" */
   '@/components/landing/VitrineSection'
 ));
 const SocialLinks = lazy(() => import(
   /* webpackPrefetch: true */
+  /* webpackChunkName: "social" */
   '@/components/landing/SocialLinks'
 ));
 
-// Memoized translations
-const translations = {
-  en: {
-    price: 'Price',
-    available: 'Available',
-    notAvailable: 'Not Available',
-    poweredBy: 'Powered by',
-    loading: 'Loading...',
-    error: 'Error',
-    returnHome: 'Return to Home',
-    qrCodeNotFound: 'QR code not found',
-    failedToLoad: 'Failed to load QR code',
-    followUs: {
-      facebook: 'Follow us on Facebook',
-      instagram: 'Follow us on Instagram',
-      twitter: 'Follow us on Twitter',
-      linkedin: 'Connect on LinkedIn',
-      youtube: 'Subscribe on YouTube',
-      tiktok: 'Follow us on TikTok',
-      whatsapp: 'Chat on WhatsApp',
-      telegram: 'Join our Telegram',
-      website: 'Visit our Website',
-      location: 'Find our Location',
-      other: 'Visit Link'
-    }
-  },
-  ar: {
-    price: 'السعر',
-    available: 'متوفر',
-    notAvailable: 'غير متوفر',
-    poweredBy: 'مدعوم بواسطة',
-    loading: 'جاري التحميل...',
-    error: 'خطأ',
-    returnHome: 'العودة للرئيسية',
-    qrCodeNotFound: 'رمز QR غير موجود',
-    failedToLoad: 'فشل تحميل رمز QR',
-    followUs: {
-      facebook: 'تابعنا على فيسبوك',
-      instagram: 'تابعنا على انستغرام',
-      twitter: 'تابعنا على تويتر',
-      linkedin: 'تواصل معنا على لينكد إن',
-      youtube: 'اشترك في قناتنا على يوتيوب',
-      tiktok: 'تابعنا على تيك توك',
-      whatsapp: 'تواصل معنا على واتساب',
-      telegram: 'انضم إلى قناتنا على تيليجرام',
-      website: 'زر موقعنا',
-      location: 'اعثر على موقعنا',
-      other: 'زيارة الرابط'
-    }
-  }
-} as const;
-
 const LandingPage = () => {
-  const { id } = useParams<{ id: string }>();
+  const { id } = useParams();
   const navigate = useNavigate();
-  const [qrCode, setQRCode] = useState<QRCode | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
-  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [qrData, setQrData] = useState<QRCode | null>(null);
+  const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
 
-  // Check if text contains Arabic characters
-  const isArabicText = useCallback((text: string = '') => {
-    return /[\u0600-\u06FF]/.test(text);
-  }, []);
-
-  // Optimized data fetching with caching
+  // 3. Ultra-Fast Data Loading
   useEffect(() => {
-    let isMounted = true;
+    if (!id) {
+      setStatus('error');
+      return;
+    }
+
     const controller = new AbortController();
+    let timeout: NodeJS.Timeout;
 
-    const fetchData = async () => {
-      try {
-        if (!id) {
-          setError('No QR code ID provided');
-          setLoading(false);
-          return;
+    // 4. Immediate Cache Check
+    const cachedData = sessionStorage.getItem(`qr_${id}`);
+    if (cachedData) {
+      setQrData(JSON.parse(cachedData));
+      setStatus('ready');
+      return;
+    }
+
+    // 5. Fast Fallback (Show content after 300ms)
+    timeout = setTimeout(() => {
+      if (status === 'loading') setStatus('ready');
+    }, 300);
+
+    // 6. Race API vs Timeout (1.2s max)
+    Promise.race([
+      qrCodeApi.getPublicQRCode(id),
+      new Promise((_, reject) => setTimeout(() => reject('Timeout'), 1200))
+    ])
+      .then((res) => {
+        sessionStorage.setItem(`qr_${id}`, JSON.stringify(res));
+        setQrData(res as QRCode);
+        setStatus('ready');
+        if ((res as QRCode).type === 'direct') {
+          window.location.href = (res as QRCode).originalUrl || '';
         }
-
-        // Check cache first
-        const cachedData = sessionStorage.getItem(`qr_${id}`);
-        if (cachedData) {
-          const data = JSON.parse(cachedData);
-          if (isMounted) {
-            setQRCode(data);
-            setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
-            setLoading(false);
-          }
-          return;
-        }
-
-        // Fast timeout (500ms)
-        const timeout = setTimeout(() => {
-          if (isMounted) setLoading(false);
-        }, 500);
-
-        const [data] = await Promise.race([
-          Promise.all([
-            qrCodeApi.getPublicQRCode(id),
-            qrCodeApi.incrementScanCount(id)
-          ]),
-          new Promise((_, reject) => setTimeout(() => reject(new Error('Timeout')), 2000))
-        ]);
-
-        clearTimeout(timeout);
-
-        if (!isMounted) return;
-
-        sessionStorage.setItem(`qr_${id}`, JSON.stringify(data));
-        setQRCode(data);
-        setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
-
-        if (data.type === 'direct' && data.originalUrl) {
-          window.location.href = data.originalUrl;
-        }
-      } catch (err: any) {
-        if (!isMounted) return;
-        setError(err.message || 'Failed to load QR code');
-      } finally {
-        if (isMounted) setLoading(false);
-      }
-    };
-
-    fetchData();
+      })
+      .catch(() => setStatus('error'))
+      .finally(() => clearTimeout(timeout));
 
     return () => {
-      isMounted = false;
       controller.abort();
+      clearTimeout(timeout);
     };
-  }, [id, navigate, isArabicText]);
+  }, [id]);
 
-  // Memoized platform info
-  const getPlatformInfo = useCallback((type: string) => {
-    const platformLabels = translations[menuLanguage].followUs;
-    const platforms = {
-      facebook: { label: platformLabels.facebook, bgColor: '#1877F2' },
-      instagram: { label: platformLabels.instagram, bgColor: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
-      twitter: { label: platformLabels.twitter, bgColor: '#1DA1F2' },
-      linkedin: { label: platformLabels.linkedin, bgColor: '#0A66C2' },
-      youtube: { label: platformLabels.youtube, bgColor: '#FF0000' },
-      tiktok: { label: platformLabels.tiktok, bgColor: '#000000' },
-      whatsapp: { label: platformLabels.whatsapp, bgColor: '#25D366' },
-      telegram: { label: platformLabels.telegram, bgColor: '#0088CC' },
-      website: { label: platformLabels.website, bgColor: '#6366F1' },
-      location: { label: platformLabels.location, bgColor: '#FF4B4B' },
-      default: { label: platformLabels.other, bgColor: '#6366F1' }
-    };
-    return platforms[type as keyof typeof platforms] || platforms.default;
-  }, [menuLanguage]);
-
-  if (loading) return <><CriticalCSS /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
-  if (error) return <><CriticalCSS /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
-  if (!qrCode) return null;
-
-  const hasMenu = qrCode.menu?.categories?.length > 0;
-  const hasLinks = qrCode.links?.length > 0;
-  const hasVitrine = qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0;
+  if (status === 'error') return (
+    <div className="landing-page flex items-center justify-center p-4">
+      <div className="text-center">
+        <h2 className="text-xl font-bold mb-2">Error Loading Page</h2>
+        <button 
+          onClick={() => window.location.reload()}
+          className="px-4 py-2 bg-[#8b5cf6] text-white rounded hover:bg-[#7c3aed]"
+        >
+          Try Again
+        </button>
+      </div>
+    </div>
+  );
 
   return (
     <>
       <CriticalCSS />
-      <div className="landing-container">
-        <div className="content-wrapper">
-          {/* Main Content - Removed all extra spacing */}
-          <div className="w-full"> {/* Ensures full width */}
-            {hasMenu && (
-              <Suspense fallback={null}>
-                <MenuSection
-                  menu={qrCode.menu}
-                  menuLanguage={menuLanguage}
-                  selectedCategory={selectedCategory}
-                  setSelectedCategory={setSelectedCategory}
-                />
-              </Suspense>
-            )}
+      {status === 'loading' && (
+        <div className="fixed inset-0 flex items-center justify-center bg-white/80">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
+      
+      <div className="landing-page">
+        <div className="content-container">
+          {/* Menu Section */}
+          {qrData?.menu?.categories?.length > 0 && (
+            <Suspense fallback={null}>
+              <MenuSection menu={qrData.menu} />
+            </Suspense>
+          )}
 
-            {hasLinks && (
-              <Suspense fallback={null}>
-                <SocialLinks 
-                  links={qrCode.links} 
-                  getPlatformInfo={getPlatformInfo} 
-                />
-              </Suspense>
-            )}
+          {/* Social Links */}
+          {qrData?.links?.length > 0 && (
+            <Suspense fallback={null}>
+              <SocialLinks links={qrData.links} />
+            </Suspense>
+          )}
 
-            {hasVitrine && (
-              <Suspense fallback={null}>
-                <VitrineSection vitrine={qrCode.vitrine} />
-              </Suspense>
-            )}
-          </div>
+          {/* Vitrine Section */}
+          {qrData?.vitrine && Object.keys(qrData.vitrine).length > 0 && (
+            <Suspense fallback={null}>
+              <VitrineSection vitrine={qrData.vitrine} />
+            </Suspense>
+          )}
 
-          {/* Footer - Moved inside content-wrapper */}
-          <div className="text-center py-4 text-sm mt-auto"> {/* mt-auto pushes footer down */}
-            <p>{translations[menuLanguage].poweredBy} <a href="https://www.qrcreator.xyz" className="text-[#8b5cf6] hover:text-[#7c3aed]">qrcreator.xyz</a></p>
+          {/* Footer */}
+          <div className="text-center py-4 text-sm mt-auto">
+            Powered by <a href="https://qrcreator.xyz" className="text-[#8b5cf6] hover:underline">qrcreator.xyz</a>
           </div>
         </div>
       </div>
