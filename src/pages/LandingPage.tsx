@@ -183,6 +183,17 @@ const LandingPage = () => {
       
       <div className="landing-page">
         <div className="content-container">
+
+          {/* Social Links */}
+          {qrData?.links?.length > 0 && (
+            <Suspense fallback={null}>
+              <SocialLinks 
+                links={qrData.links} 
+                getPlatformInfo={getPlatformInfo} 
+              />
+            </Suspense>
+          )}
+
           {/* Full Menu Section */}
           {qrData?.menu?.categories?.length > 0 && (
             <Suspense fallback={null}>
@@ -195,15 +206,6 @@ const LandingPage = () => {
             </Suspense>
           )}
 
-          {/* Social Links */}
-          {qrData?.links?.length > 0 && (
-            <Suspense fallback={null}>
-              <SocialLinks 
-                links={qrData.links} 
-                getPlatformInfo={getPlatformInfo} 
-              />
-            </Suspense>
-          )}
 
           {/* Vitrine Section */}
           {qrData?.vitrine && Object.keys(qrData.vitrine).length > 0 && (
