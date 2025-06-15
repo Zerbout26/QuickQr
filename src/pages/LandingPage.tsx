@@ -3,45 +3,64 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
 
-// Critical CSS inlined at the top - removes white space while keeping all data
+// Critical CSS with !important overrides to eliminate all white space
 const CriticalCSS = () => (
   <style dangerouslySetInnerHTML={{
     __html: `
-      body { margin: 0; padding: 0; }
-      .landing-page { min-height: 100vh; background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920); }
-      .container { width: 100%; max-width: 1200px; margin: 0 auto; padding: 0 16px; }
-      .loading-spinner {
-        border: 3px solid rgba(139, 92, 246, 0.2);
-        border-top: 3px solid #8b5cf6;
-        border-radius: 50%;
-        width: 24px;
-        height: 24px;
-        animation: spin 1s linear infinite;
+      html, body, #root {
+        margin: 0 !important;
+        padding: 0 !important;
+        width: 100% !important;
+        min-height: 100vh !important;
+        overflow-x: hidden !important;
       }
-      @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+      .landing-container {
+        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
+        min-height: 100vh !important;
+        display: flex !important;
+        flex-direction: column !important;
+      }
+      .content-wrapper {
+        flex: 1 !important;
+        width: 100% !important;
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        padding: 0 16px !important;
+      }
+      .loading-spinner {
+        border: 3px solid rgba(139, 92, 246, 0.2) !important;
+        border-top: 3px solid #8b5cf6 !important;
+        border-radius: 50% !important;
+        width: 24px !important;
+        height: 24px !important;
+        animation: spin 1s linear infinite !important;
+      }
+      @keyframes spin {
+        0% { transform: rotate(0deg) !important; }
+        100% { transform: rotate(360deg) !important; }
+      }
     `
   }} />
 );
 
-// Lazy load components with prefetch - keeping all functionality
+// Lazy load all components with prefetch
 const MenuSection = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "menu-section" */
   '@/components/landing/MenuSection'
 ));
 const VitrineSection = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "vitrine-section" */
   '@/components/landing/VitrineSection'
 ));
 const SocialLinks = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "social-links" */
   '@/components/landing/SocialLinks'
 ));
 
-// Memoized translations - keeping all data
+// Memoized translations
 const translations = {
   en: {
     price: 'Price',
@@ -102,7 +121,12 @@ const LandingPage = () => {
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
-  // Fast data fetching with caching - keeping all data logic
+  // Check if text contains Arabic characters
+  const isArabicText = useCallback((text: string = '') => {
+    return /[\u0600-\u06FF]/.test(text);
+  }, []);
+
+  // Optimized data fetching with caching
   useEffect(() => {
     let isMounted = true;
     const controller = new AbortController();
@@ -115,20 +139,22 @@ const LandingPage = () => {
           return;
         }
 
-        // Check cache first for instant load
+        // Check cache first
         const cachedData = sessionStorage.getItem(`qr_${id}`);
         if (cachedData) {
           const data = JSON.parse(cachedData);
           if (isMounted) {
             setQRCode(data);
-            setMenuLanguage(/[\u0600-\u06FF]/.test(data.menu?.restaurantName || '') ? 'ar' : 'en');
+            setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
             setLoading(false);
           }
           return;
         }
 
-        // Set timeout for loading state (800ms)
-        const timeout = setTimeout(() => setLoading(false), 800);
+        // Fast timeout (500ms)
+        const timeout = setTimeout(() => {
+          if (isMounted) setLoading(false);
+        }, 500);
 
         const [data] = await Promise.race([
           Promise.all([
@@ -144,7 +170,7 @@ const LandingPage = () => {
 
         sessionStorage.setItem(`qr_${id}`, JSON.stringify(data));
         setQRCode(data);
-        setMenuLanguage(/[\u0600-\u06FF]/.test(data.menu?.restaurantName || '') ? 'ar' : 'en');
+        setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
 
         if (data.type === 'direct' && data.originalUrl) {
           window.location.href = data.originalUrl;
@@ -163,54 +189,70 @@ const LandingPage = () => {
       isMounted = false;
       controller.abort();
     };
-  }, [id, navigate]);
+  }, [id, navigate, isArabicText]);
 
-  // Memoized platform info - keeping all data
+  // Memoized platform info
   const getPlatformInfo = useCallback((type: string) => {
     const platformLabels = translations[menuLanguage].followUs;
-    switch (type) {
-      case 'facebook': return { label: platformLabels.facebook, bgColor: '#1877F2' };
-      case 'instagram': return { label: platformLabels.instagram, bgColor: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' };
-      case 'twitter': return { label: platformLabels.twitter, bgColor: '#1DA1F2' };
-      // ... keep all other cases ...
-      default: return { label: platformLabels.other, bgColor: '#6366F1' };
-    }
+    const platforms = {
+      facebook: { label: platformLabels.facebook, bgColor: '#1877F2' },
+      instagram: { label: platformLabels.instagram, bgColor: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
+      twitter: { label: platformLabels.twitter, bgColor: '#1DA1F2' },
+      linkedin: { label: platformLabels.linkedin, bgColor: '#0A66C2' },
+      youtube: { label: platformLabels.youtube, bgColor: '#FF0000' },
+      tiktok: { label: platformLabels.tiktok, bgColor: '#000000' },
+      whatsapp: { label: platformLabels.whatsapp, bgColor: '#25D366' },
+      telegram: { label: platformLabels.telegram, bgColor: '#0088CC' },
+      website: { label: platformLabels.website, bgColor: '#6366F1' },
+      location: { label: platformLabels.location, bgColor: '#FF4B4B' },
+      default: { label: platformLabels.other, bgColor: '#6366F1' }
+    };
+    return platforms[type as keyof typeof platforms] || platforms.default;
   }, [menuLanguage]);
 
-  if (loading) return <><CriticalCSS /><div className="landing-page flex items-center justify-center"><div className="loading-spinner"></div></div></>;
-  if (error) return <><CriticalCSS /><div className="landing-page flex items-center justify-center text-red-500">{error}</div></>;
+  if (loading) return <><CriticalCSS /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
+  if (error) return <><CriticalCSS /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
   if (!qrCode) return null;
+
+  const hasMenu = qrCode.menu?.categories?.length > 0;
+  const hasLinks = qrCode.links?.length > 0;
+  const hasVitrine = qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0;
 
   return (
     <>
       <CriticalCSS />
-      <div className="landing-page">
-        <div className="container mx-auto px-4 py-0"> {/* py-0 removes white space */}
-          {qrCode.menu?.categories?.length > 0 && (
-            <Suspense fallback={null}>
-              <MenuSection
-                menu={qrCode.menu}
-                menuLanguage={menuLanguage}
-                selectedCategory={selectedCategory}
-                setSelectedCategory={setSelectedCategory}
-              />
-            </Suspense>
-          )}
+      <div className="landing-container">
+        <div className="content-wrapper">
+          <main className="space-y-8 pt-0"> {/* pt-0 removes top padding */}
+            {hasMenu && (
+              <Suspense fallback={null}>
+                <MenuSection
+                  menu={qrCode.menu}
+                  menuLanguage={menuLanguage}
+                  selectedCategory={selectedCategory}
+                  setSelectedCategory={setSelectedCategory}
+                />
+              </Suspense>
+            )}
 
-          {qrCode.links?.length > 0 && (
-            <Suspense fallback={null}>
-              <SocialLinks links={qrCode.links} getPlatformInfo={getPlatformInfo} />
-            </Suspense>
-          )}
+            {hasLinks && (
+              <Suspense fallback={null}>
+                <SocialLinks 
+                  links={qrCode.links} 
+                  getPlatformInfo={getPlatformInfo} 
+                />
+              </Suspense>
+            )}
 
-          {qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0 && (
-            <Suspense fallback={null}>
-              <VitrineSection vitrine={qrCode.vitrine} />
-            </Suspense>
-          )}
+            {hasVitrine && (
+              <Suspense fallback={null}>
+                <VitrineSection vitrine={qrCode.vitrine} />
+              </Suspense>
+            )}
+          </main>
 
           <div className="mt-8 text-center text-sm pb-4">
-            <p>{translations[menuLanguage].poweredBy} <a href="https://www.qrcreator.xyz" className="text-[#8b5cf6]">qrcreator.xyz</a></p>
+            <p>{translations[menuLanguage].poweredBy} <a href="https://www.qrcreator.xyz" className="text-[#8b5cf6] hover:text-[#7c3aed]">qrcreator.xyz</a></p>
           </div>
         </div>
       </div>
