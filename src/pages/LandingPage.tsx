@@ -1,6 +1,6 @@
-import React, { useEffect, useState, Suspense, lazy } from 'react';
+import React, { useEffect, useState, Suspense, lazy, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
-import { QRCode } from '@/types';
+import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 
 // 1. Critical CSS Inlined (Loads Instantly)
@@ -39,11 +39,14 @@ const CriticalCSS = () => (
         0% { transform: rotate(0deg) !important; } 
         100% { transform: rotate(360deg) !important; } 
       }
-      /* Force all sections to full width */
-      section, .menu-section, .vitrine-section, .social-links {
+      /* Menu specific styles */
+      .menu-container {
         width: 100% !important;
         margin: 0 !important;
         padding: 0 !important;
+      }
+      .menu-category {
+        scroll-margin-top: 20px;
       }
     `
   }} />
@@ -71,6 +74,13 @@ const LandingPage = () => {
   const navigate = useNavigate();
   const [qrData, setQrData] = useState<QRCode | null>(null);
   const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
+  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
+  const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+
+  // Check if text contains Arabic characters
+  const isArabicText = useCallback((text: string = '') => {
+    return /[\u0600-\u06FF]/.test(text);
+  }, []);
 
   // 3. Ultra-Fast Data Loading
   useEffect(() => {
@@ -85,7 +95,9 @@ const LandingPage = () => {
     // 4. Immediate Cache Check
     const cachedData = sessionStorage.getItem(`qr_${id}`);
     if (cachedData) {
-      setQrData(JSON.parse(cachedData));
+      const data = JSON.parse(cachedData);
+      setQrData(data);
+      setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
       setStatus('ready');
       return;
     }
@@ -101,11 +113,13 @@ const LandingPage = () => {
       new Promise((_, reject) => setTimeout(() => reject('Timeout'), 1200))
     ])
       .then((res) => {
-        sessionStorage.setItem(`qr_${id}`, JSON.stringify(res));
-        setQrData(res as QRCode);
+        const data = res as QRCode;
+        sessionStorage.setItem(`qr_${id}`, JSON.stringify(data));
+        setQrData(data);
+        setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
         setStatus('ready');
-        if ((res as QRCode).type === 'direct') {
-          window.location.href = (res as QRCode).originalUrl || '';
+        if (data.type === 'direct' && data.originalUrl) {
+          window.location.href = data.originalUrl;
         }
       })
       .catch(() => setStatus('error'))
@@ -115,7 +129,34 @@ const LandingPage = () => {
       controller.abort();
       clearTimeout(timeout);
     };
-  }, [id]);
+  }, [id, isArabicText, status]);
+
+  // 7. Memoized platform info for social links
+  const getPlatformInfo = useCallback((type: string) => {
+    const platformLabels = {
+      en: {
+        facebook: 'Follow us on Facebook',
+        instagram: 'Follow us on Instagram',
+        // ... other platform labels
+      },
+      ar: {
+        facebook: 'تابعنا على فيسبوك',
+        instagram: 'تابعنا على انستغرام',
+        // ... other platform labels
+      }
+    }[menuLanguage];
+
+    const platforms = {
+      facebook: { label: platformLabels.facebook, bgColor: '#1877F2' },
+      instagram: { label: platformLabels.instagram, bgColor: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
+      // ... other platforms
+    };
+
+    return platforms[type as keyof typeof platforms] || { 
+      label: platformLabels.other, 
+      bgColor: '#6366F1' 
+    };
+  }, [menuLanguage]);
 
   if (status === 'error') return (
     <div className="landing-page flex items-center justify-center p-4">
@@ -142,17 +183,25 @@ const LandingPage = () => {
       
       <div className="landing-page">
         <div className="content-container">
-          {/* Menu Section */}
+          {/* Full Menu Section */}
           {qrData?.menu?.categories?.length > 0 && (
             <Suspense fallback={null}>
-              <MenuSection menu={qrData.menu} />
+              <MenuSection 
+                menu={qrData.menu}
+                menuLanguage={menuLanguage}
+                selectedCategory={selectedCategory}
+                setSelectedCategory={setSelectedCategory}
+              />
             </Suspense>
           )}
 
           {/* Social Links */}
           {qrData?.links?.length > 0 && (
             <Suspense fallback={null}>
-              <SocialLinks links={qrData.links} />
+              <SocialLinks 
+                links={qrData.links} 
+                getPlatformInfo={getPlatformInfo} 
+              />
             </Suspense>
           )}
 
