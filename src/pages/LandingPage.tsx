@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 
-// 1. Critical CSS Inlined (Loads Instantly)
+// 1. Absolute full-screen CSS with no white space
 const CriticalCSS = () => (
   <style dangerouslySetInnerHTML={{
     __html: `
@@ -12,36 +12,38 @@ const CriticalCSS = () => (
         padding: 0 !important;
         width: 100% !important;
         min-height: 100vh !important;
+        overflow-x: hidden !important;
       }
       .landing-page {
-        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920);
-        min-height: 100vh;
+        min-height: 100vh !important;
+        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
+        display: flex !important;
+        flex-direction: column !important;
       }
-      @keyframes spin {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
+      .content-container {
+        flex: 1 !important;
+        width: 100% !important;
+        max-width: 1200px !important;
+        margin: 0 auto !important;
+        padding: 0 16px !important;
+      }
+      .loading-spinner {
+        border: 3px solid rgba(139, 92, 246, 0.2) !important;
+        border-top: 3px solid #8b5cf6 !important;
+        border-radius: 50% !important;
+        width: 24px !important;
+        height: 24px !important;
+        animation: spin 1s linear infinite !important;
+      }
+      @keyframes spin { 
+        0% { transform: rotate(0deg) !important; } 
+        100% { transform: rotate(360deg) !important; } 
       }
     `
   }} />
 );
 
-// 2. Ultra-Light Loading Component (0.5KB)
-const LoadingSpinner = () => (
-  <div style={{
-    position: 'fixed',
-    top: '50%',
-    left: '50%',
-    transform: 'translate(-50%, -50%)',
-    width: '24px',
-    height: '24px',
-    border: '3px solid rgba(139, 92, 246, 0.2)',
-    borderTop: '3px solid #8b5cf6',
-    borderRadius: '50%',
-    animation: 'spin 1s linear infinite'
-  }} />
-);
-
-// 3. Lazy Load All Sections with Prefetch
+// 2. Lazy load all components with prefetch
 const MenuSection = lazy(() => import(
   /* webpackPrefetch: true */
   '@/components/landing/MenuSection'
@@ -61,7 +63,7 @@ const LandingPage = () => {
   const [qrData, setQrData] = useState<QRCode | null>(null);
   const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
 
-  // 4. Optimized Data Fetching with Cache
+  // 3. Ultra-fast data loading with cache
   useEffect(() => {
     if (!id) {
       setStatus('error');
@@ -79,12 +81,12 @@ const LandingPage = () => {
       return;
     }
 
-    // Fast fallback (show content after 500ms)
+    // Show content after 500ms even if still loading
     timeout = setTimeout(() => {
       if (status === 'loading') setStatus('ready');
     }, 500);
 
-    // Race API vs Timeout
+    // Fetch with timeout
     Promise.race([
       qrCodeApi.getPublicQRCode(id),
       new Promise((_, reject) => setTimeout(() => reject('Timeout'), 1500))
@@ -107,12 +109,12 @@ const LandingPage = () => {
   }, [id]);
 
   if (status === 'error') return (
-    <div className="landing-page flex items-center justify-center p-4">
-      <div className="text-center">
+    <div className="landing-page flex items-center justify-center">
+      <div className="text-center p-4">
         <h2 className="text-xl font-bold mb-2">Error Loading Page</h2>
         <button 
           onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-[#8b5cf6] text-white rounded"
+          className="px-4 py-2 bg-[#8b5cf6] text-white rounded hover:bg-[#7c3aed]"
         >
           Try Again
         </button>
@@ -123,38 +125,40 @@ const LandingPage = () => {
   return (
     <>
       <CriticalCSS />
-      {status === 'loading' && <LoadingSpinner />}
+      {status === 'loading' && (
+        <div className="fixed inset-0 flex items-center justify-center">
+          <div className="loading-spinner"></div>
+        </div>
+      )}
       
       <div className="landing-page">
-        {qrData && (
-          <>
-            {/* Menu Section */}
-            {qrData.menu?.categories?.length > 0 && (
-              <Suspense fallback={null}>
-                <MenuSection menu={qrData.menu} />
-              </Suspense>
-            )}
+        <div className="content-container">
+          {/* Menu Section - Now properly included */}
+          {qrData?.menu?.categories?.length > 0 && (
+            <Suspense fallback={null}>
+              <MenuSection menu={qrData.menu} />
+            </Suspense>
+          )}
 
-            {/* Social Links */}
-            {qrData.links?.length > 0 && (
-              <Suspense fallback={null}>
-                <SocialLinks links={qrData.links} />
-              </Suspense>
-            )}
+          {/* Social Links */}
+          {qrData?.links?.length > 0 && (
+            <Suspense fallback={null}>
+              <SocialLinks links={qrData.links} />
+            </Suspense>
+          )}
 
-            {/* Vitrine Section */}
-            {qrData.vitrine && Object.keys(qrData.vitrine).length > 0 && (
-              <Suspense fallback={null}>
-                <VitrineSection vitrine={qrData.vitrine} />
-              </Suspense>
-            )}
+          {/* Vitrine Section */}
+          {qrData?.vitrine && Object.keys(qrData.vitrine).length > 0 && (
+            <Suspense fallback={null}>
+              <VitrineSection vitrine={qrData.vitrine} />
+            </Suspense>
+          )}
 
-            {/* Footer */}
-            <div className="text-center py-4 text-sm">
-              Powered by <a href="https://qrcreator.xyz" className="text-[#8b5cf6]">qrcreator.xyz</a>
-            </div>
-          </>
-        )}
+          {/* Footer */}
+          <div className="text-center py-6 text-sm">
+            Powered by <a href="https://qrcreator.xyz" className="text-[#8b5cf6] hover:underline">qrcreator.xyz</a>
+          </div>
+        </div>
       </div>
     </>
   );
