@@ -243,6 +243,7 @@ const LandingPage = () => {
 
   // Optimized data fetching with caching and parallel requests
   useEffect(() => {
+    let isMounted = true;
     const fetchQRCode = async () => {
       try {
         if (!id) {
@@ -269,11 +270,15 @@ const LandingPage = () => {
           timeoutPromise
         ]) as [QRCode, any];
 
+        if (!isMounted) return;
+
         // Prepare content before showing it
         const detectedLanguage = data.menu ? detectMenuLanguage(data.menu) : 'en';
         
         // Use startTransition for non-urgent state updates
         startTransition(() => {
+          if (!isMounted) return;
+          
           setQRCode(data);
           setMenuLanguage(detectedLanguage);
           setContentReady(true);
@@ -286,8 +291,13 @@ const LandingPage = () => {
           }
         });
         
-        setLoading(false);
+        // Only set loading to false after all data is ready
+        if (isMounted) {
+          setLoading(false);
+        }
       } catch (err: any) {
+        if (!isMounted) return;
+        
         console.error('Error fetching QR code:', err);
         if (err.response) {
           if (err.response.status === 403) {
@@ -307,6 +317,11 @@ const LandingPage = () => {
     };
 
     fetchQRCode();
+
+    // Cleanup function
+    return () => {
+      isMounted = false;
+    };
   }, [id, navigate, detectMenuLanguage]);
 
   // Add smooth scrolling behavior
@@ -360,9 +375,10 @@ const LandingPage = () => {
     </div>
   ), [error]);
 
-  if (loading) return LoadingComponent;
+  // Show loading state until everything is ready
+  if (loading || !contentReady) return LoadingComponent;
   if (error) return ErrorComponent;
-  if (!qrCode || !contentReady) return null;
+  if (!qrCode) return null;
 
   const hasMenu = qrCode.menu && qrCode.menu.categories.length > 0;
   const hasLinks = qrCode.links && qrCode.links.length > 0;
