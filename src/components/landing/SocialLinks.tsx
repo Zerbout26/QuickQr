@@ -87,19 +87,9 @@ const getPlatformInfo = (type: string) => {
 const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
   if (!links || links.length === 0) return null;
 
-  // Calculate the wrapper class based on number of links
-  const wrapperClass = links.length === 1 
-    ? 'flex justify-center' 
-    : 'grid grid-cols-1 sm:grid-cols-2';
-
-  // Calculate the link width based on number of links
-  const linkWidthClass = links.length === 1 
-    ? 'w-full sm:w-1/2' 
-    : 'w-full';
-
   return (
     <motion.div 
-      className={`gap-4 mt-8 ${wrapperClass}`}
+      className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mt-8 w-full"
       dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
@@ -110,7 +100,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
         return (
           <motion.div
             key={index}
-            className={`${linkWidthClass} flex justify-center`}
+            className={`flex ${links.length === 1 ? 'justify-center' : ''}`}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3, delay: index * 0.1 }}
@@ -119,7 +109,11 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-              className={`flex items-center justify-center gap-3 p-4 rounded-2xl text-white font-medium transition-all duration-300 hover:shadow-lg ${linkWidthClass}`}
+              className={`
+                flex items-center justify-center gap-3 p-4 rounded-2xl text-white font-medium 
+                transition-all duration-300 hover:shadow-lg w-full
+                ${links.length === 1 ? 'sm:w-1/2' : ''}
+              `}
               style={{
                 background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                 boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
