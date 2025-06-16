@@ -110,7 +110,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
         transition={{ duration: 0.5 }}
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
-        <div className="flex flex-wrap justify-center gap-4">
+        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-1 sm:grid-cols-2'} gap-4`}>
           {links.map((link, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
             return (
@@ -119,7 +119,9 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 ${
+                  links.length === 1 ? 'w-full sm:w-1/2' : ''
+                }`}
                 style={{ 
                   background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                   boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
