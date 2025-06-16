@@ -165,6 +165,13 @@ const LandingPage = () => {
       <CriticalCSS />
       <div className="landing-container">
         <div className="content-wrapper">
+                    {/* Social Links */}
+          {hasLinks && (
+            <Suspense fallback={null}>
+              <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
+            </Suspense>
+          )}
+
           {/* Menu Section */}
           {hasMenu && (
             <Suspense fallback={null}>
@@ -177,12 +184,6 @@ const LandingPage = () => {
             </Suspense>
           )}
 
-          {/* Social Links */}
-          {hasLinks && (
-            <Suspense fallback={null}>
-              <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
-            </Suspense>
-          )}
 
           {/* Vitrine Section */}
           {hasVitrine && (
