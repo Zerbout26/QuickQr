@@ -112,7 +112,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
         
-        <div className={`flex flex-col ${links.length === 1 ? 'items-center' : ''} gap-4`}>
+        <div className={`grid grid-cols-2 gap-3 max-w-2xl mx-auto`}>
           {links.map((link, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
             return (
@@ -121,7 +121,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-white font-medium shadow-md transition-all duration-300 w-full sm:w-[220px]`}
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3`}
                 style={{ 
                   background: bgColor,
                   boxShadow: `0 4px 14px ${bgColor}40`,
@@ -134,8 +134,8 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 }}
                 whileTap={{ scale: 0.97 }}
               >
-                <Icon className="h-5 w-5" />
-                <span className="text-sm font-medium">{label}</span>
+                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <span className="font-medium truncate">{label}</span>
               </motion.a>
             );
           })}
