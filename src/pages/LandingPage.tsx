@@ -3,7 +3,7 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 
-// 1. Critical CSS Inlined (Loads Instantly)
+// Critical CSS with !important overrides to eliminate all white space
 const CriticalCSS = () => (
   <style dangerouslySetInnerHTML={{
     __html: `
@@ -14,13 +14,13 @@ const CriticalCSS = () => (
         min-height: 100vh !important;
         overflow-x: hidden !important;
       }
-      .landing-page {
-        min-height: 100vh !important;
+      .landing-container {
         background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
+        min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
       }
-      .content-container {
+      .content-wrapper {
         flex: 1 !important;
         width: 100% !important;
         max-width: 1200px !important;
@@ -35,45 +35,34 @@ const CriticalCSS = () => (
         height: 24px !important;
         animation: spin 1s linear infinite !important;
       }
-      @keyframes spin { 
-        0% { transform: rotate(0deg) !important; } 
-        100% { transform: rotate(360deg) !important; } 
-      }
-      /* Menu specific styles */
-      .menu-container {
-        width: 100% !important;
-        margin: 0 !important;
-        padding: 0 !important;
-      }
-      .menu-category {
-        scroll-margin-top: 20px;
+      @keyframes spin {
+        0% { transform: rotate(0deg) !important; }
+        100% { transform: rotate(360deg) !important; }
       }
     `
   }} />
 );
 
-// 2. Lazy Load with Prefetch (Non-Blocking)
+// Lazy load all components with prefetch
 const MenuSection = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "menu" */
   '@/components/landing/MenuSection'
 ));
 const VitrineSection = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "vitrine" */
   '@/components/landing/VitrineSection'
 ));
 const SocialLinks = lazy(() => import(
   /* webpackPrefetch: true */
-  /* webpackChunkName: "social" */
   '@/components/landing/SocialLinks'
 ));
 
 const LandingPage = () => {
-  const { id } = useParams();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
-  const [qrData, setQrData] = useState<QRCode | null>(null);
-  const [status, setStatus] = useState<'loading'|'ready'|'error'>('loading');
+  const [qrCode, setQRCode] = useState<QRCode | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
 
@@ -82,123 +71,105 @@ const LandingPage = () => {
     return /[\u0600-\u06FF]/.test(text);
   }, []);
 
-  // 3. Ultra-Fast Data Loading
+  // Optimized data fetching with caching and scan count
   useEffect(() => {
-    if (!id) {
-      setStatus('error');
-      return;
-    }
-
+    let isMounted = true;
     const controller = new AbortController();
-    let timeout: NodeJS.Timeout;
 
-    // 4. Immediate Cache Check
-    const cachedData = sessionStorage.getItem(`qr_${id}`);
-    if (cachedData) {
-      const data = JSON.parse(cachedData);
-      setQrData(data);
-      setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
-      setStatus('ready');
-      return;
-    }
+    const fetchData = async () => {
+      try {
+        if (!id) {
+          setError('No QR code ID provided');
+          setLoading(false);
+          return;
+        }
 
-    // 5. Fast Fallback (Show content after 300ms)
-    timeout = setTimeout(() => {
-      if (status === 'loading') setStatus('ready');
-    }, 300);
+        // Check cache first
+        const cachedData = sessionStorage.getItem(`qr_${id}`);
+        if (cachedData) {
+          const data = JSON.parse(cachedData);
+          if (isMounted) {
+            setQRCode(data);
+            setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
+            setLoading(false);
+          }
+          // Still increment scan count for cached visits
+          qrCodeApi.incrementScanCount(id).catch(console.error);
+          return;
+        }
 
-    // 6. Race API vs Timeout (1.2s max)
-    Promise.race([
-      qrCodeApi.getPublicQRCode(id),
-      new Promise((_, reject) => setTimeout(() => reject('Timeout'), 1200))
-    ])
-      .then((res) => {
-        const data = res as QRCode;
+        // Set timeout for initial loading state
+        const timeout = setTimeout(() => {
+          if (isMounted) setLoading(false);
+        }, 500);
+
+        // First fetch the QR code data
+        const data = await qrCodeApi.getPublicQRCode(id);
+        
+        // Then increment scan count (fire and forget)
+        qrCodeApi.incrementScanCount(id).catch(console.error);
+
+        clearTimeout(timeout);
+
+        if (!isMounted) return;
+
+        // Cache the response
         sessionStorage.setItem(`qr_${id}`, JSON.stringify(data));
-        setQrData(data);
+
+        setQRCode(data);
         setMenuLanguage(isArabicText(data.menu?.restaurantName) ? 'ar' : 'en');
-        setStatus('ready');
+        setLoading(false);
+
         if (data.type === 'direct' && data.originalUrl) {
           window.location.href = data.originalUrl;
         }
-      })
-      .catch(() => setStatus('error'))
-      .finally(() => clearTimeout(timeout));
+      } catch (err: any) {
+        if (!isMounted) return;
+        
+        console.error('Error fetching QR code:', err);
+        if (err.response) {
+          if (err.response.status === 403) {
+            navigate('/payment-instructions');
+            return;
+          }
+          if (err.response.status === 404) {
+            setError('QR code not found');
+          } else {
+            setError(err.response.data?.error || 'Failed to load QR code');
+          }
+        } else {
+          setError('Failed to load QR code');
+        }
+        setLoading(false);
+      }
+    };
+
+    fetchData();
 
     return () => {
+      isMounted = false;
       controller.abort();
-      clearTimeout(timeout);
     };
-  }, [id, isArabicText, status]);
+  }, [id, navigate, isArabicText]);
 
-  // 7. Memoized platform info for social links
-  const getPlatformInfo = useCallback((type: string) => {
-    const platformLabels = {
-      en: {
-        facebook: 'Follow us on Facebook',
-        instagram: 'Follow us on Instagram',
-        // ... other platform labels
-      },
-      ar: {
-        facebook: 'تابعنا على فيسبوك',
-        instagram: 'تابعنا على انستغرام',
-        // ... other platform labels
-      }
-    }[menuLanguage];
+  if (loading) return <><CriticalCSS /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
+  if (error) return <><CriticalCSS /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
+  if (!qrCode) return null;
 
-    const platforms = {
-      facebook: { label: platformLabels.facebook, bgColor: '#1877F2' },
-      instagram: { label: platformLabels.instagram, bgColor: 'linear-gradient(45deg, #f09433, #e6683c, #dc2743, #cc2366, #bc1888)' },
-      // ... other platforms
-    };
-
-    return platforms[type as keyof typeof platforms] || { 
-      label: platformLabels.other, 
-      bgColor: '#6366F1' 
-    };
-  }, [menuLanguage]);
-
-  if (status === 'error') return (
-    <div className="landing-page flex items-center justify-center p-4">
-      <div className="text-center">
-        <h2 className="text-xl font-bold mb-2">Error Loading Page</h2>
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-4 py-2 bg-[#8b5cf6] text-white rounded hover:bg-[#7c3aed]"
-        >
-          Try Again
-        </button>
-      </div>
-    </div>
-  );
+  const hasMenu = qrCode.menu?.categories?.length > 0;
+  const hasLinks = qrCode.links?.length > 0;
+  const hasVitrine = qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0;
 
   return (
     <>
       <CriticalCSS />
-      {status === 'loading' && (
-        <div className="fixed inset-0 flex items-center justify-center bg-white/80">
-          <div className="loading-spinner"></div>
-        </div>
-      )}
-      
-      <div className="landing-page">
-        <div className="content-container">
-
-          {/* Social Links */}
-          {qrData?.links?.length > 0 && (
+      <div className="landing-container">
+        <div className="content-wrapper">
+          {/* Menu Section */}
+          {hasMenu && (
             <Suspense fallback={null}>
-              <SocialLinks 
-                links={qrData.links} 
-                getPlatformInfo={getPlatformInfo} 
-              />
-            </Suspense>
-          )}
-
-          {/* Full Menu Section */}
-          {qrData?.menu?.categories?.length > 0 && (
-            <Suspense fallback={null}>
-              <MenuSection 
-                menu={qrData.menu}
+              <MenuSection
+                menu={qrCode.menu}
                 menuLanguage={menuLanguage}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
@@ -206,17 +177,31 @@ const LandingPage = () => {
             </Suspense>
           )}
 
+          {/* Social Links */}
+          {hasLinks && (
+            <Suspense fallback={null}>
+              <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
+            </Suspense>
+          )}
 
           {/* Vitrine Section */}
-          {qrData?.vitrine && Object.keys(qrData.vitrine).length > 0 && (
+          {hasVitrine && (
             <Suspense fallback={null}>
-              <VitrineSection vitrine={qrData.vitrine} />
+              <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
             </Suspense>
           )}
 
           {/* Footer */}
-          <div className="text-center py-4 text-sm mt-auto">
-            Powered by <a href="https://qrcreator.xyz" className="text-[#8b5cf6] hover:underline">qrcreator.xyz</a>
+          <div className="text-center py-4 text-sm">
+            <p className="mb-1">Powered by</p>
+            <a 
+              href="https://www.qrcreator.xyz" 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-[#8b5cf6] hover:text-[#7c3aed] transition-colors font-medium"
+            >
+              www.qrcreator.xyz
+            </a>
           </div>
         </div>
       </div>
