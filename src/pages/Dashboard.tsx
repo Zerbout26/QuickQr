@@ -511,18 +511,40 @@ const Dashboard = () => {
             setTimeout(() => {
               const qrSvg = qrContainer.querySelector('svg');
               if (qrSvg) {
-                const svgString = new XMLSerializer().serializeToString(qrSvg);
-                const blob = new Blob([svgString], { type: 'image/svg+xml' });
-                const url = URL.createObjectURL(blob);
-                const downloadLink = document.createElement('a');
-                downloadLink.href = url;
-                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.svg`;
-                document.body.appendChild(downloadLink);
-                downloadLink.click();
-                document.body.removeChild(downloadLink);
-                URL.revokeObjectURL(url);
+                // Convert SVG to PNG
+                const canvas = document.createElement('canvas');
+                canvas.width = design.qrSize;
+                canvas.height = design.qrSize;
+                const ctx = canvas.getContext('2d');
+                
+                if (ctx) {
+                  // Create a temporary image from the SVG
+                  const img = new Image();
+                  const svgString = new XMLSerializer().serializeToString(qrSvg);
+                  const svgBlob = new Blob([svgString], { type: 'image/svg+xml;charset=utf-8' });
+                  const url = URL.createObjectURL(svgBlob);
+                  
+                  img.onload = () => {
+                    // Draw the image on canvas
+                    ctx.fillStyle = design.qrBgColor;
+                    ctx.fillRect(0, 0, canvas.width, canvas.height);
+                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    
+                    // Convert to PNG and download
+                    const pngUrl = canvas.toDataURL('image/png', 1.0);
+                    const downloadLink = document.createElement('a');
+                    downloadLink.href = pngUrl;
+                    downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+                    document.body.appendChild(downloadLink);
+                    downloadLink.click();
+                    document.body.removeChild(downloadLink);
+                    URL.revokeObjectURL(url);
+                    resolve();
+                  };
+                  
+                  img.src = url;
+                }
               }
-              resolve();
             }, 200);
           });
         } else {
