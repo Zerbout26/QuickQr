@@ -18,10 +18,14 @@ const translations = {
   en: {
     available: 'Available',
     notAvailable: 'Not Available',
+    menu: 'Menu',
+    allItems: 'All Items'
   },
   ar: {
     available: 'متوفر',
     notAvailable: 'غير متوفر',
+    menu: 'القائمة',
+    allItems: 'جميع العناصر'
   },
 };
 
@@ -37,9 +41,24 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
   const categories = menu.categories.map(cat => cat.name);
 
   return (
-    <div className="space-y-8 mt-8" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="space-y-10 px-4" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      <motion.h3 
+        className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {translations[menuLanguage].menu}
+      </motion.h3>
+
       {/* Filter Menu */}
-      <div className="sticky top-0 z-10 bg-white/80 backdrop-blur-md py-4 -mx-4 px-4 sm:mx-0 sm:px-0">
+      <motion.div 
+        className="bg-white rounded-2xl p-6 shadow-lg relative max-w-4xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
         <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-hide">
           <motion.button
             whileHover={{ scale: 1.02 }}
@@ -47,11 +66,11 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
             onClick={() => setSelectedCategory(null)}
             className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
               selectedCategory === null
-                ? 'bg-primary text-white shadow-md'
+                ? 'bg-[#8b5cf6] text-white shadow-md'
                 : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
             }`}
           >
-            {menuLanguage === 'ar' ? 'جميع العناصر' : 'All Items'}
+            {translations[menuLanguage].allItems}
           </motion.button>
           {categories.map((category) => (
             <motion.button
@@ -61,7 +80,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-full text-sm font-medium whitespace-nowrap transition-all duration-200 ${
                 selectedCategory === category
-                  ? 'bg-primary text-white shadow-md'
+                  ? 'bg-[#8b5cf6] text-white shadow-md'
                   : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
               }`}
             >
@@ -69,10 +88,10 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
             </motion.button>
           ))}
         </div>
-      </div>
+      </motion.div>
 
       {/* Menu Categories */}
-      <div className="space-y-8">
+      <div className="space-y-8 max-w-4xl mx-auto">
         {menu.categories
           .filter(category => selectedCategory === null || category.name === selectedCategory)
           .map((category, categoryIndex) => (
@@ -83,55 +102,63 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: categoryIndex * 0.1 }}
             >
-              <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight bg-gradient-to-r from-gray-900 to-gray-700 bg-clip-text text-transparent">
-                {category.name}
-              </h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {category.items.map((item, itemIndex) => {
-                  const isAvailable = isItemAvailableToday(item);
-                  return (
-                    <motion.div
-                      key={itemIndex}
-                      className="group relative bg-white rounded-2xl p-6 shadow-sm hover:shadow-lg transition-all duration-300"
-                      whileHover={{ y: -4 }}
-                      initial={{ opacity: 0, y: 20 }}
-                      animate={{ opacity: 1, y: 0 }}
-                      transition={{ delay: itemIndex * 0.1 }}
-                    >
-                      <div className="flex justify-between items-start gap-4">
-                        <div className="flex-1">
-                          <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
-                          {item.description && (
-                            <p className="text-sm sm:text-base text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+              <motion.div 
+                className="bg-white rounded-2xl p-8 shadow-lg relative"
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.5 }}
+              >
+                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-[#8b5cf6] mb-6">
+                  {category.name}
+                </h2>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {category.items.map((item, itemIndex) => {
+                    const isAvailable = isItemAvailableToday(item);
+                    return (
+                      <motion.div
+                        key={itemIndex}
+                        className="group relative bg-white/50 backdrop-blur-sm rounded-xl p-4 hover:shadow-lg transition-all duration-300"
+                        whileHover={{ y: -4 }}
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: itemIndex * 0.1 }}
+                      >
+                        <div className="flex justify-between items-start gap-4">
+                          <div className="flex-1">
+                            <h3 className="text-lg sm:text-xl font-semibold text-gray-900 mb-2">{item.name}</h3>
+                            {item.description && (
+                              <p className="text-sm sm:text-base text-gray-600 mb-4 line-clamp-2">{item.description}</p>
+                            )}
+                            <div className="flex items-center justify-between">
+                              <span className="text-lg sm:text-xl font-bold text-[#8b5cf6]">
+                                {item.price} {menu.currency || '$'}
+                              </span>
+                              <span className={`px-3 py-1 rounded-full text-sm font-medium ${
+                                isAvailable
+                                  ? 'bg-green-100 text-green-800'
+                                  : 'bg-red-100 text-red-800'
+                              }`}>
+                                {isAvailable ? translations[menuLanguage].available : translations[menuLanguage].notAvailable}
+                              </span>
+                            </div>
+                          </div>
+                          {item.imageUrl && (
+                            <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden">
+                              <img
+                                src={item.imageUrl}
+                                alt={item.name}
+                                className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
+                                loading="lazy"
+                              />
+                            </div>
                           )}
-                          <div className="flex items-center justify-between">
-                            <span className="text-lg sm:text-xl font-bold text-primary">
-                              {item.price} {menu.currency || '$'}
-                            </span>
-                            <span className={`px-3 py-1 rounded-full text-sm font-medium ${
-                              isAvailable
-                                ? 'bg-green-100 text-green-800'
-                                : 'bg-red-100 text-red-800'
-                            }`}>
-                              {isAvailable ? translations[menuLanguage].available : translations[menuLanguage].notAvailable}
-                            </span>
-                          </div>
                         </div>
-                        {item.imageUrl && (
-                          <div className="w-24 h-24 sm:w-32 sm:h-32 rounded-xl overflow-hidden">
-                            <img
-                              src={item.imageUrl}
-                              alt={item.name}
-                              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-110"
-                              loading="lazy"
-                            />
-                          </div>
-                        )}
-                      </div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </motion.div>
           ))}
       </div>

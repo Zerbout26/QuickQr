@@ -89,44 +89,51 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
 
   return (
     <motion.div 
-      className="flex flex-col sm:grid sm:grid-cols-2 gap-4 mt-8 w-full"
+      className="space-y-10 px-4"
       dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      {links.map((link, index) => {
-        const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
-        return (
-          <motion.div
-            key={index}
-            className={`flex ${links.length === 1 ? 'justify-center' : ''}`}
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3, delay: index * 0.1 }}
-          >
-            <motion.a
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={`
-                flex items-center justify-center gap-3 p-4 rounded-2xl text-white font-medium 
-                transition-all duration-300 hover:shadow-lg w-full
-                ${links.length === 1 ? 'sm:w-1/2' : ''}
-              `}
-              style={{
-                background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
-              }}
-              whileHover={{ y: -4, scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-            >
-              <Icon className="w-6 h-6" />
-              <span className="text-base sm:text-lg">{label}</span>
-            </motion.a>
-          </motion.div>
-        );
-      })}
+      <motion.h3 
+        className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        {menuLanguage === 'ar' ? 'روابط التواصل' : 'Social Links'}
+      </motion.h3>
+      <motion.div 
+        className="bg-white rounded-2xl p-8 shadow-lg relative max-w-4xl mx-auto"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
+        <div className="flex flex-wrap justify-center gap-4">
+          {links.map((link, index) => {
+            const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
+            return (
+              <motion.a
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                style={{ 
+                  background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
+                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                }}
+                whileHover={{ y: -2, scale: 1.02 }}
+                whileTap={{ scale: 0.95 }}
+              >
+                <Icon className="h-5 w-5" />
+                <span className="text-sm font-medium">{label}</span>
+              </motion.a>
+            );
+          })}
+        </div>
+      </motion.div>
     </motion.div>
   );
 };
