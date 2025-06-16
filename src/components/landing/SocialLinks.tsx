@@ -121,7 +121,9 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full ${links.length === 1 ? 'max-w-[280px]' : ''}`}
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full ${
+                  links.length === 1 ? 'max-w-[280px]' : ''
+                }`}
                 style={{ 
                   background: bgColor,
                   boxShadow: `0 4px 14px ${bgColor}40`,
