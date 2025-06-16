@@ -112,7 +112,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
         
-        <div className={`flex ${links.length === 1 ? 'justify-center' : 'grid grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
+        <div className={`flex flex-wrap justify-center gap-3 max-w-2xl mx-auto`}>
           {links.map((link, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
             return (
@@ -122,7 +122,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 ${
-                  links.length === 1 ? 'w-[200px]' : ''
+                  links.length % 2 === 1 && index === links.length - 1 ? 'w-full sm:w-auto' : 'w-full sm:w-[calc(50%-0.75rem)]'
                 }`}
                 style={{ 
                   background: bgColor,
