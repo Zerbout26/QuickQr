@@ -89,28 +89,30 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
 
   return (
     <motion.div 
-      className="space-y-10 px-4"
+      className="w-full px-4 py-8"
       dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
       <motion.h3 
-        className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+        className="text-2xl sm:text-3xl font-bold text-[#8b5cf6] text-center mb-6"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.1 }}
       >
         {menuLanguage === 'ar' ? 'روابط التواصل' : 'Social Links'}
       </motion.h3>
+      
       <motion.div 
-        className="bg-white rounded-2xl p-8 shadow-lg relative max-w-4xl mx-auto"
+        className="bg-white rounded-xl p-6 shadow-md max-w-md sm:max-w-2xl mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
+        transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
-        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-1 sm:grid-cols-2'} gap-4`}>
+        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
+        
+        <div className={`flex flex-col sm:flex-row sm:flex-wrap ${links.length <= 2 ? 'justify-center' : ''} gap-3`}>
           {links.map((link, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
             return (
@@ -119,15 +121,20 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 ${
-                  links.length === 1 ? 'w-[200px]' : ''
+                className={`flex items-center justify-center gap-2 px-4 py-3 rounded-lg text-white font-medium shadow-md transition-all duration-300 min-w-[200px] sm:min-w-[220px] ${
+                  links.length === 1 ? 'w-full sm:w-[220px]' : 'flex-1 sm:flex-none'
                 }`}
                 style={{ 
-                  background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
-                  boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
+                  background: bgColor,
+                  boxShadow: `0 4px 14px ${bgColor}40`,
                 }}
-                whileHover={{ y: -2, scale: 1.02 }}
-                whileTap={{ scale: 0.95 }}
+                whileHover={{ 
+                  y: -3,
+                  scale: 1.03,
+                  backgroundColor: hoverBgColor,
+                  boxShadow: `0 6px 18px ${hoverBgColor}60`
+                }}
+                whileTap={{ scale: 0.97 }}
               >
                 <Icon className="h-5 w-5" />
                 <span className="text-sm font-medium">{label}</span>
