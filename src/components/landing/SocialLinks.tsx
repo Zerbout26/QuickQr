@@ -112,7 +112,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
       >
         <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
         
-        <div className={`grid ${links.length === 1 ? 'grid-cols-1' : 'grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
+        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
           {links.map((link, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
             return (
@@ -121,7 +121,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 href={link.url}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full`}
+                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full ${links.length === 1 ? 'max-w-[280px]' : ''}`}
                 style={{ 
                   background: bgColor,
                   boxShadow: `0 4px 14px ${bgColor}40`,
@@ -144,5 +144,6 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
     </motion.div>
   );
 };
+
 
 export default SocialLinks;
