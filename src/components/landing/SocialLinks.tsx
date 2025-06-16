@@ -120,7 +120,7 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                 target="_blank"
                 rel="noopener noreferrer"
                 className={`flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 ${
-                  links.length === 1 ? 'w-full sm:w-1/2' : ''
+                  links.length === 1 ? 'w-[200px]' : ''
                 }`}
                 style={{ 
                   background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
