@@ -497,7 +497,7 @@ const Dashboard = () => {
               bgColor={design.qrBgColor}
               fgColor={design.qrFgColor}
               level="H"
-              includeMargin={false}
+              includeMargin={true}
               imageSettings={logoImage ? {
                 src: logoImage.src,
                 height: design.logoSize,
@@ -513,11 +513,17 @@ const Dashboard = () => {
               if (qrSvg) {
                 // Convert SVG to PNG
                 const canvas = document.createElement('canvas');
-                canvas.width = design.qrSize;
-                canvas.height = design.qrSize;
+                // Add extra padding for borders
+                const padding = 40;
+                canvas.width = design.qrSize + (padding * 2);
+                canvas.height = design.qrSize + (padding * 2);
                 const ctx = canvas.getContext('2d');
                 
                 if (ctx) {
+                  // Fill background
+                  ctx.fillStyle = '#FFFFFF';
+                  ctx.fillRect(0, 0, canvas.width, canvas.height);
+
                   // Create a temporary image from the SVG
                   const img = new Image();
                   const svgString = new XMLSerializer().serializeToString(qrSvg);
@@ -525,10 +531,13 @@ const Dashboard = () => {
                   const url = URL.createObjectURL(svgBlob);
                   
                   img.onload = () => {
-                    // Draw the image on canvas
-                    ctx.fillStyle = design.qrBgColor;
-                    ctx.fillRect(0, 0, canvas.width, canvas.height);
-                    ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+                    // Draw the image on canvas with padding
+                    ctx.drawImage(img, padding, padding, design.qrSize, design.qrSize);
+                    
+                    // Add border
+                    ctx.strokeStyle = '#E5E7EB';
+                    ctx.lineWidth = 2;
+                    ctx.strokeRect(padding - 2, padding - 2, design.qrSize + 4, design.qrSize + 4);
                     
                     // Convert to PNG and download
                     const pngUrl = canvas.toDataURL('image/png', 1.0);
