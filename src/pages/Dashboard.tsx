@@ -468,7 +468,7 @@ const Dashboard = () => {
         };
     
         if (format === 'svg') {
-          // Simple QR code only download (no effects)
+          // Create SVG with QR code
           container = document.createElement('div');
           container.style.position = 'absolute';
           container.style.left = '-9999px';
@@ -491,7 +491,7 @@ const Dashboard = () => {
           
           const root = ReactDOM.createRoot(qrContainer);
           root.render(
-            <QRCodeCanvas
+            <QRCodeSVG
               value={qr.url}
               size={design.qrSize}
               bgColor={design.qrBgColor}
@@ -509,15 +509,18 @@ const Dashboard = () => {
     
           await new Promise<void>((resolve) => {
             setTimeout(() => {
-              const qrCanvas = qrContainer.querySelector('canvas');
-              if (qrCanvas) {
-                const pngUrl = qrCanvas.toDataURL('image/png', 1.0);
+              const qrSvg = qrContainer.querySelector('svg');
+              if (qrSvg) {
+                const svgString = new XMLSerializer().serializeToString(qrSvg);
+                const blob = new Blob([svgString], { type: 'image/svg+xml' });
+                const url = URL.createObjectURL(blob);
                 const downloadLink = document.createElement('a');
-                downloadLink.href = pngUrl;
-                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+                downloadLink.href = url;
+                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.svg`;
                 document.body.appendChild(downloadLink);
                 downloadLink.click();
                 document.body.removeChild(downloadLink);
+                URL.revokeObjectURL(url);
               }
               resolve();
             }, 200);
