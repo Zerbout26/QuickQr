@@ -184,7 +184,6 @@ const LandingPage = () => {
             </Suspense>
           )}
 
-
           {/* Vitrine Section */}
           {hasVitrine && (
             <Suspense fallback={null}>
