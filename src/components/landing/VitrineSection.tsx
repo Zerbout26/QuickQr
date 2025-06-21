@@ -37,15 +37,16 @@ interface VitrineSectionProps {
       address?: string;
       phone?: string;
       email?: string;
-      socialMedia: Record<string, string>;
+      socialMedia?: Record<string, string>;
     };
     footer: {
       copyright: string;
       businessName: string;
-      quickLinks: Array<{
+      quickLinks?: Array<{
         label: string;
         url: string;
       }>;
+      socialIcons?: Record<string, string>;
     };
   };
   menuLanguage: 'en' | 'ar';
@@ -448,7 +449,7 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             </h4>
             <div className="flex flex-wrap justify-center gap-4">
               {/* Social Media Links */}
-              {Object.entries(vitrine.contact.socialMedia).map(([platform, url]) => {
+              {vitrine.contact.socialMedia && Object.entries(vitrine.contact.socialMedia).map(([platform, url]) => {
                 if (!url) return null;
                 const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(platform);
                 return (
@@ -505,26 +506,51 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
         transition={{ duration: 0.5 }}
       >
         <div className="text-center">
-          <p className="text-gray-600 text-base">
-            {vitrine.footer.copyright} <span className="text-[#8b5cf6] font-medium">{vitrine.footer.businessName}</span>
-          </p>
-          {vitrine.footer.quickLinks.length > 0 && (
-            <div className="flex flex-wrap justify-center gap-6 mt-6">
-              {vitrine.footer.quickLinks.map((link, index) => (
-                <motion.a
-                  key={index}
-                  href={link.url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#8b5cf6] hover:text-[#7c3aed] transition-colors duration-200 text-base font-medium"
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                >
-                  {link.label}
-                </motion.a>
-              ))}
+          <div className="flex flex-wrap justify-between items-center gap-8">
+            <div className="flex-1 min-w-[200px]">
+              <p className="text-gray-400">&copy; {vitrine.footer.copyright} {vitrine.footer.businessName}</p>
             </div>
-          )}
+            {vitrine.footer.quickLinks && vitrine.footer.quickLinks.length > 0 && (
+              <div className="flex-1 min-w-[200px]">
+                <h4 className="font-semibold text-white mb-3">
+                  {menuLanguage === 'ar' ? 'روابط سريعة' : 'Quick Links'}
+                </h4>
+                <ul className="space-y-2">
+                  {vitrine.footer.quickLinks.map((link, index) => (
+                    <li key={index}>
+                      <a href={link.url} className="text-gray-400 hover:text-white transition">
+                        {link.label}
+                      </a>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+            {vitrine.footer.socialIcons && Object.keys(vitrine.footer.socialIcons).length > 0 && (
+              <div className="flex-1 min-w-[200px] text-center md:text-right">
+                <h4 className="font-semibold text-white mb-3">
+                  {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
+                </h4>
+                <div className="flex justify-center md:justify-end gap-4">
+                  {Object.entries(vitrine.footer.socialIcons).map(([platform, link]) => {
+                    if (!link) return null;
+                    const { icon: Icon, bgColor } = getPlatformInfo(platform);
+                    return (
+                      <motion.a
+                        key={platform}
+                        href={link}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-gray-400 hover:text-white transition"
+                      >
+                        <Icon className="h-6 w-6" />
+                      </motion.a>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
       </motion.div>
     </div>

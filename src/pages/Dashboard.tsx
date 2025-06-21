@@ -561,14 +561,14 @@ const Dashboard = () => {
                     
                     // Convert to PNG and download
                     const pngUrl = canvas.toDataURL('image/png', 1.0);
-                    const downloadLink = document.createElement('a');
-                    downloadLink.href = pngUrl;
-                    downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
-                    document.body.appendChild(downloadLink);
-                    downloadLink.click();
-                    document.body.removeChild(downloadLink);
+                const downloadLink = document.createElement('a');
+                downloadLink.href = pngUrl;
+                downloadLink.download = `${qr.name.toLowerCase().replace(/\s+/g, '-')}_qr-code.png`;
+                document.body.appendChild(downloadLink);
+                downloadLink.click();
+                document.body.removeChild(downloadLink);
                     URL.revokeObjectURL(url);
-                    resolve();
+              resolve();
                   };
                   
                   img.src = url;
@@ -965,7 +965,7 @@ const Dashboard = () => {
                 }}
                 className="max-w-sm"
               />
-            </div>
+                </div>
             
             {isLoading ? (
               <div className="text-center py-8">Loading...</div>

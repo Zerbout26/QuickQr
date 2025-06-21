@@ -136,8 +136,8 @@ export interface QRCode {
 }
 
 export interface Link {
-  label: string;
-  url: string;
+        label: string;
+        url: string;
   type: string;
 }
 

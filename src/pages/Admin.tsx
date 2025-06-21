@@ -61,7 +61,7 @@ const Admin = () => {
     };
     
     const handler = setTimeout(() => {
-      fetchUsers();
+    fetchUsers();
     }, 500); // Debounce search requests
 
     return () => {
@@ -353,7 +353,7 @@ const Admin = () => {
                 </div>
                 
                 <div className="flex justify-between items-center">
-                  <div className="text-sm text-gray-500">
+                <div className="text-sm text-gray-500">
                     Showing {filteredUsers.length} of {totalUsers} users
                   </div>
                   <div className="flex gap-2">

@@ -337,7 +337,7 @@ const translations = {
     type: 'النوع',
     directLink: 'رابط مباشر',
     url: 'رابط',
-    both: 'ٌٌقائمة',
+    both: 'قائمة',
     vitrine: 'فترينة',
     enterURL: 'أدخل الرابط',
     links: 'الروابط',
@@ -403,29 +403,7 @@ const translations = {
     enterAddress: 'أدخل العنوان',
     enterPhone: 'أدخل الهاتف',
     enterEmail: 'أدخل البريد الإلكتروني',
-    socialMedia: 'وسائل التواصل الاجتماعي',
-    enterFacebook: 'أدخل رابط فيسبوك',
-    enterInstagram: 'أدخل رابط انستغرام',
-    enterTwitter: 'أدخل رابط تويتر',
-    enterLinkedin: 'أدخل رابط لينكد إن',
-    enterYoutube: 'أدخل رابط يوتيوب',
-    enterTiktok: 'أدخل رابط تيك توك',
-    enableContactForm: 'تمكين نموذج الاتصال',
-    formFields: 'حقول النموذج',
-    addField: 'إضافة حقل',
-    enterFieldName: 'أدخل اسم الحقل',
-    fieldType: 'نوع الحقل',
-    textField: 'حقل نصي',
-    emailField: 'حقل بريد إلكتروني',
-    phoneField: 'حقل هاتف',
-    textareaField: 'حقل نصي كبير',
-    required: 'مطلوب',
     footer: 'التذييل',
-    quickLinks: 'روابط سريعة',
-    addQuickLink: 'إضافة رابط سريع',
-    enterQuickLinkLabel: 'أدخل تسمية الرابط السريع',
-    enterQuickLinkUrl: 'أدخل رابط الرابط السريع',
-    socialIcons: 'أيقونات التواصل الاجتماعي',
     foregroundColor: 'لون المقدمة',
     backgroundColor: 'لون الخلفية',
     logo: 'الشعار',
@@ -465,31 +443,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       address: '',
       phone: '',
       email: '',
-      socialMedia: {
-        facebook: '',
-        instagram: '',
-        twitter: '',
-        linkedin: '',
-        youtube: '',
-        tiktok: ''
-      },
-      contactForm: {
-        enabled: false,
-        fields: []
-      }
     },
     footer: {
       copyright: `© ${new Date().getFullYear()}`,
       businessName: '',
-      quickLinks: [],
-      socialIcons: {
-        facebook: '',
-        instagram: '',
-        twitter: '',
-        linkedin: '',
-        youtube: '',
-        tiktok: ''
-      }
     }
   });
   const [foregroundColor, setForegroundColor] = useState('#6366F1');
@@ -819,39 +776,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             address: vitrine.contact.address || '',
             phone: vitrine.contact.phone || '',
             email: vitrine.contact.email,
-            socialMedia: {
-              facebook: vitrine.contact.socialMedia.facebook || '',
-              instagram: vitrine.contact.socialMedia.instagram || '',
-              twitter: vitrine.contact.socialMedia.twitter || '',
-              linkedin: vitrine.contact.socialMedia.linkedin || '',
-              youtube: vitrine.contact.socialMedia.youtube || '',
-              tiktok: vitrine.contact.socialMedia.tiktok || ''
-            },
-            contactForm: {
-              enabled: vitrine.contact.contactForm?.enabled || false,
-              fields: (vitrine.contact.contactForm?.fields || []).map(field => ({
-                name: field.name || '',
-                type: field.type || 'text',
-                required: field.required || false
-              }))
-            }
           },
           footer: {
             copyright: vitrine.footer.copyright || `© ${new Date().getFullYear()}`,
             businessName: vitrine.footer.businessName,
-            quickLinks: vitrine.footer.quickLinks.map(link => ({
-              label: link.label || '',
-              url: link.url || '',
-              type: link.type || 'link'
-            })),
-            socialIcons: {
-              facebook: vitrine.footer.socialIcons.facebook || '',
-              instagram: vitrine.footer.socialIcons.instagram || '',
-              twitter: vitrine.footer.socialIcons.twitter || '',
-              linkedin: vitrine.footer.socialIcons.linkedin || '',
-              youtube: vitrine.footer.socialIcons.youtube || '',
-              tiktok: vitrine.footer.socialIcons.tiktok || ''
-            }
           }
         };
 
@@ -1608,218 +1536,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             contact: { ...vitrine.contact, email: e.target.value }
                           })}
                         />
-                        <div className="space-y-2">
-                          <h4 className="font-medium">{translations[language].socialMedia}</h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              placeholder={translations[language].enterFacebook}
-                              value={vitrine.contact.socialMedia.facebook}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, facebook: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterInstagram}
-                              value={vitrine.contact.socialMedia.instagram}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, instagram: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterTwitter}
-                              value={vitrine.contact.socialMedia.twitter}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, twitter: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterLinkedin}
-                              value={vitrine.contact.socialMedia.linkedin}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, linkedin: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterYoutube}
-                              value={vitrine.contact.socialMedia.youtube}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, youtube: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterTiktok}
-                              value={vitrine.contact.socialMedia.tiktok}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  socialMedia: { ...vitrine.contact.socialMedia, tiktok: e.target.value }
-                                }
-                              })}
-                            />
-                          </div>
-                        </div>
-                        <div className="space-y-2">
-                          <div className="flex items-center space-x-2">
-                            <Checkbox
-                              id="contactForm"
-                              checked={vitrine.contact.contactForm?.enabled}
-                              onCheckedChange={(checked) => setVitrine({
-                                ...vitrine,
-                                contact: {
-                                  ...vitrine.contact,
-                                  contactForm: {
-                                    ...vitrine.contact.contactForm,
-                                    enabled: checked === true
-                                  }
-                                }
-                              })}
-                            />
-                            <label htmlFor="contactForm" className="text-sm font-medium">
-                              {translations[language].enableContactForm}
-                            </label>
-                          </div>
-                          {vitrine.contact.contactForm?.enabled && (
-                            <div className="space-y-2">
-                              <div className="flex justify-between items-center">
-                                <h4 className="font-medium">{translations[language].formFields}</h4>
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => setVitrine({
-                                    ...vitrine,
-                                    contact: {
-                                      ...vitrine.contact,
-                                      contactForm: {
-                                        ...vitrine.contact.contactForm,
-                                        fields: [
-                                          ...(vitrine.contact.contactForm?.fields || []),
-                                          { name: '', type: 'text', required: false }
-                                        ]
-                                      }
-                                    }
-                                  })}
-                                >
-                                  <Plus className="h-4 w-4 mr-2" />
-                                  {translations[language].addField}
-                                </Button>
-                              </div>
-                              {vitrine.contact.contactForm?.fields.map((field, index) => (
-                                <div key={index} className="flex gap-2">
-                                  <Input
-                                    placeholder={translations[language].enterFieldName}
-                                    value={field.name}
-                                    onChange={(e) => {
-                                      const newFields = [...(vitrine.contact.contactForm?.fields || [])];
-                                      newFields[index] = { ...field, name: e.target.value };
-                                      setVitrine({
-                                        ...vitrine,
-                                        contact: {
-                                          ...vitrine.contact,
-                                          contactForm: {
-                                            ...vitrine.contact.contactForm,
-                                            fields: newFields
-                                          }
-                                        }
-                                      });
-                                    }}
-                                  />
-                                  <Select
-                                    value={field.type}
-                                    onValueChange={(value) => {
-                                      const newFields = [...(vitrine.contact.contactForm?.fields || [])];
-                                      newFields[index] = { ...field, type: value as any };
-                                      setVitrine({
-                                        ...vitrine,
-                                        contact: {
-                                          ...vitrine.contact,
-                                          contactForm: {
-                                            ...vitrine.contact.contactForm,
-                                            fields: newFields
-                                          }
-                                        }
-                                      });
-                                    }}
-                                  >
-                                    <SelectTrigger className="w-[180px]">
-                                      <SelectValue placeholder={translations[language].fieldType} />
-                                    </SelectTrigger>
-                                    <SelectContent>
-                                      <SelectItem value="text">{translations[language].textField}</SelectItem>
-                                      <SelectItem value="email">{translations[language].emailField}</SelectItem>
-                                      <SelectItem value="phone">{translations[language].phoneField}</SelectItem>
-                                      <SelectItem value="textarea">{translations[language].textareaField}</SelectItem>
-                                    </SelectContent>
-                                  </Select>
-                                  <div className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`required-${index}`}
-                                      checked={field.required}
-                                      onCheckedChange={(checked) => {
-                                        const newFields = [...(vitrine.contact.contactForm?.fields || [])];
-                                        newFields[index] = { ...field, required: checked === true };
-                                        setVitrine({
-                                          ...vitrine,
-                                          contact: {
-                                            ...vitrine.contact,
-                                            contactForm: {
-                                              ...vitrine.contact.contactForm,
-                                              fields: newFields
-                                            }
-                                          }
-                                        });
-                                      }}
-                                    />
-                                    <label htmlFor={`required-${index}`} className="text-sm">
-                                      {translations[language].required}
-                                    </label>
-                                  </div>
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="icon"
-                                    onClick={() => {
-                                      const newFields = vitrine.contact.contactForm?.fields.filter((_, i) => i !== index);
-                                      setVitrine({
-                                        ...vitrine,
-                                        contact: {
-                                          ...vitrine.contact,
-                                          contactForm: {
-                                            ...vitrine.contact.contactForm,
-                                            fields: newFields || []
-                                          }
-                                        }
-                                      });
-                                    }}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                              ))}
-                            </div>
-                          )}
-                        </div>
                       </div>
                     </div>
 
@@ -1835,139 +1551,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             footer: { ...vitrine.footer, businessName: e.target.value }
                           })}
                         />
-                        <div className="space-y-2">
-                          <div className="flex justify-between items-center">
-                            <h4 className="font-medium">{translations[language].quickLinks}</h4>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  quickLinks: [...vitrine.footer.quickLinks, { label: '', url: '' }]
-                                }
-                              })}
-                            >
-                              <Plus className="h-4 w-4 mr-2" />
-                              {translations[language].addQuickLink}
-                            </Button>
-                          </div>
-                          {vitrine.footer.quickLinks.map((link, index) => (
-                            <div key={index} className="flex gap-2">
-                              <Input
-                                placeholder={translations[language].enterQuickLinkLabel}
-                                value={link.label}
-                                onChange={(e) => {
-                                  const newLinks = [...vitrine.footer.quickLinks];
-                                  newLinks[index] = { ...link, label: e.target.value };
-                                  setVitrine({
-                                    ...vitrine,
-                                    footer: { ...vitrine.footer, quickLinks: newLinks }
-                                  });
-                                }}
-                              />
-                              <Input
-                                placeholder={translations[language].enterQuickLinkUrl}
-                                value={link.url}
-                                onChange={(e) => {
-                                  const newLinks = [...vitrine.footer.quickLinks];
-                                  newLinks[index] = { ...link, url: e.target.value };
-                                  setVitrine({
-                                    ...vitrine,
-                                    footer: { ...vitrine.footer, quickLinks: newLinks }
-                                  });
-                                }}
-                              />
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="icon"
-                                onClick={() => {
-                                  const newLinks = vitrine.footer.quickLinks.filter((_, i) => i !== index);
-                                  setVitrine({
-                                    ...vitrine,
-                                    footer: { ...vitrine.footer, quickLinks: newLinks }
-                                  });
-                                }}
-                              >
-                                <Trash2 className="h-4 w-4" />
-                              </Button>
-                            </div>
-                          ))}
-                        </div>
-                        <div className="space-y-2">
-                          <h4 className="font-medium">{translations[language].socialIcons}</h4>
-                          <div className="grid grid-cols-2 gap-2">
-                            <Input
-                              placeholder={translations[language].enterFacebook}
-                              value={vitrine.footer.socialIcons.facebook}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, facebook: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterInstagram}
-                              value={vitrine.footer.socialIcons.instagram}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, instagram: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterTwitter}
-                              value={vitrine.footer.socialIcons.twitter}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, twitter: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterLinkedin}
-                              value={vitrine.footer.socialIcons.linkedin}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, linkedin: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterYoutube}
-                              value={vitrine.footer.socialIcons.youtube}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, youtube: e.target.value }
-                                }
-                              })}
-                            />
-                            <Input
-                              placeholder={translations[language].enterTiktok}
-                              value={vitrine.footer.socialIcons.tiktok}
-                              onChange={(e) => setVitrine({
-                                ...vitrine,
-                                footer: {
-                                  ...vitrine.footer,
-                                  socialIcons: { ...vitrine.footer.socialIcons, tiktok: e.target.value }
-                                }
-                              })}
-                            />
-                          </div>
-                        </div>
                       </div>
                     </div>
                   </div>
