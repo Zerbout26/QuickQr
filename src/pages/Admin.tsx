@@ -44,7 +44,7 @@ const Admin = () => {
       
       setIsLoading(true);
       try {
-        const { data, totalPages, total } = await adminApi.getAllUsers(currentPage);
+        const { data, totalPages, total } = await adminApi.getAllUsers(currentPage, 10, searchTerm);
         setUsers(data);
         setTotalPages(totalPages);
         setTotalUsers(total);
@@ -60,8 +60,14 @@ const Admin = () => {
       }
     };
     
-    fetchUsers();
-  }, [user, isAdmin, currentPage]);
+    const handler = setTimeout(() => {
+      fetchUsers();
+    }, 500); // Debounce search requests
+
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [user, isAdmin, currentPage, searchTerm]);
 
   const handleActivateUser = async (userId: string) => {
     try {
@@ -123,13 +129,9 @@ const Admin = () => {
     return diffDays.toString();
   };
 
-  // Filtered users based on search and filters
+  // Filtered users based on filters (search is now handled by backend)
   const filteredUsers = useMemo(() => {
     return users.filter(user => {
-      // Filter by search term
-      const matchesSearch = user.email.toLowerCase().includes(searchTerm.toLowerCase());
-      if (!matchesSearch) return false;
-      
       // Filter by account status
       if (statusFilter !== 'all') {
         const isActive = statusFilter === 'active';
@@ -146,7 +148,7 @@ const Admin = () => {
       
       return true;
     });
-  }, [users, searchTerm, statusFilter, trialFilter]);
+  }, [users, statusFilter, trialFilter]);
 
   // Calculate statistics
   const stats = useMemo(() => {
