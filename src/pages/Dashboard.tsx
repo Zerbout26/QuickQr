@@ -136,6 +136,7 @@ const translations = {
     daysLeft: "days left",
     trialExpired: "Trial expired",
     activeSubscription: "Active Subscription",
+    language: "Language",
     previous: "Previous",
     next: "Next"
   },
@@ -252,13 +253,14 @@ const translations = {
     daysLeft: "يتبقى",
     trialExpired: "انتهى التجريبي",
     activeSubscription: "اشتراك نشط",
+    language: "اللغة",
     previous: "السابق",
     next: "التالي"
   }
 };
 
 const Dashboard = () => {
-  const { user, logout, loading: authLoading } = useAuth();
+  const { user, logout, loading: authLoading, isTrialActive, isTrialExpired, daysLeftInTrial } = useAuth();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -269,7 +271,7 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalQRCodes, setTotalQRCodes] = useState(0);
   const navigate = useNavigate();
-  const { language } = useLanguage();
+  const { language, toggleLanguage } = useLanguage();
   const [newUrl, setNewUrl] = useState('');
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
 
@@ -332,14 +334,14 @@ const Dashboard = () => {
     
     try {
       // Prepare the update data
-      const updateData = {
+      const updateData: Partial<QRCode> = {
         name: editingQR.name,
-        type: editingQR.type,
         url: newUrl,
         foregroundColor: editingQR.foregroundColor,
         backgroundColor: editingQR.backgroundColor,
         links: editingQR.links || [],
-        menu: editingQR.menu || { restaurantName: '', description: '', categories: [] }
+        menu: editingQR.menu || { restaurantName: '', categories: [] },
+        type: editingQR.type
       };
 
       console.log('Updating QR code with data:', updateData); // Debug log

@@ -288,7 +288,7 @@ export const qrCodeApi = {
 
   update: async (id: string, data: {
     name?: string;
-    type?: 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
+    type?: 'url' | 'menu' | 'both' | 'direct' | 'vitrine' | 'links';
     url?: string;
     logoUrl?: string;
     foregroundColor?: string;
