@@ -11,7 +11,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { adminApi } from '@/lib/api';
-import { Eye } from 'lucide-react';
+import { Eye, QrCode } from 'lucide-react';
 
 const Admin = () => {
   const { user, isAdmin } = useAuth();
@@ -20,6 +20,9 @@ const Admin = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState<string>('all');
   const [trialFilter, setTrialFilter] = useState<string>('all');
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalUsers, setTotalUsers] = useState(0);
   const navigate = useNavigate();
 
   // Redirect if not an admin
@@ -41,8 +44,10 @@ const Admin = () => {
       
       setIsLoading(true);
       try {
-        const allUsers = await adminApi.getAllUsers();
-        setUsers(allUsers);
+        const { data, totalPages, total } = await adminApi.getAllUsers(currentPage);
+        setUsers(data);
+        setTotalPages(totalPages);
+        setTotalUsers(total);
       } catch (error) {
         console.error('Failed to fetch users', error);
         toast({
@@ -56,7 +61,7 @@ const Admin = () => {
     };
     
     fetchUsers();
-  }, [user, isAdmin]);
+  }, [user, isAdmin, currentPage]);
 
   const handleActivateUser = async (userId: string) => {
     try {
@@ -261,14 +266,15 @@ const Admin = () => {
                         <TableHead>Trial Status</TableHead>
                         <TableHead>Days Left</TableHead>
                         <TableHead>Account Status</TableHead>
-                        <TableHead>Total Visits</TableHead>
+                        <TableHead>Total QR Codes</TableHead>
+                        <TableHead>Total Scans</TableHead>
                         <TableHead>Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {filteredUsers.length === 0 ? (
                         <TableRow>
-                          <TableCell colSpan={8} className="text-center py-8">
+                          <TableCell colSpan={9} className="text-center py-8">
                             No users match your filters
                           </TableCell>
                         </TableRow>
@@ -306,8 +312,14 @@ const Admin = () => {
                             </TableCell>
                             <TableCell>
                               <div className="flex items-center gap-1">
+                                <QrCode className="w-4 h-4 text-gray-500" />
+                                <span>{user.totalQRCodes || 0}</span>
+                              </div>
+                            </TableCell>
+                            <TableCell>
+                              <div className="flex items-center gap-1">
                                 <Eye className="w-4 h-4 text-gray-500" />
-                                <span>{user.totalVisits || 0}</span>
+                                <span>{user.totalScans || 0}</span>
                               </div>
                             </TableCell>
                             <TableCell>
@@ -338,8 +350,28 @@ const Admin = () => {
                   </Table>
                 </div>
                 
-                <div className="text-sm text-gray-500">
-                  Showing {filteredUsers.length} of {users.length} users
+                <div className="flex justify-between items-center">
+                  <div className="text-sm text-gray-500">
+                    Showing {filteredUsers.length} of {totalUsers} users
+                  </div>
+                  <div className="flex gap-2">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                      disabled={currentPage === 1}
+                    >
+                      Previous
+                    </Button>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                      disabled={currentPage === totalPages}
+                    >
+                      Next
+                    </Button>
+                  </div>
                 </div>
               </>
             )}

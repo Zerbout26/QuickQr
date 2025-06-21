@@ -442,8 +442,8 @@ const getAuthHeaders = () => {
 
 // Admin API functions
 export const adminApi = {
-  getAllUsers: async (): Promise<User[]> => {
-    const response = await api.get('/admin/users');
+  getAllUsers: async (page = 1, limit = 10): Promise<{ data: User[], totalPages: number, total: number }> => {
+    const response = await api.get('/admin/users', { params: { page, limit } });
     return response.data;
   },
 

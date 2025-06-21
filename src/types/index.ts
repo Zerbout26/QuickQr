@@ -13,6 +13,8 @@ export interface User {
   createdAt: Date;
   updatedAt: Date;
   totalVisits?: number;
+  totalQRCodes?: number;
+  totalScans?: number;
 }
 
 export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';

@@ -14,28 +14,47 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
       return;
     }
 
-    const users = await userRepository.find({
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = parseInt(req.query.limit as string) || 10;
+    const skip = (page - 1) * limit;
+
+    const [users, total] = await userRepository.findAndCount({
       relations: ['qrCodes'],
       order: {
         createdAt: 'DESC'
-      }
+      },
+      take: limit,
+      skip: skip,
     });
 
     // Calculate total visits for each user
     const usersWithStats = await Promise.all(users.map(async (user) => {
-      const totalVisits = await qrCodeRepository
+      const totalScansResult = await qrCodeRepository
         .createQueryBuilder('qr')
         .select('SUM(qr.scanCount)', 'total')
         .where('qr.user.id = :userId', { userId: user.id })
         .getRawOne();
+      
+      const totalQRCodes = user.qrCodes.length;
+      const totalScans = parseInt(totalScansResult?.total || '0', 10);
+
+      // We don't want to send the full qrCodes array
+      const { qrCodes, ...userWithoutQRCodes } = user;
 
       return {
-        ...user,
-        totalVisits: parseInt(totalVisits?.total || '0', 10)
+        ...userWithoutQRCodes,
+        totalQRCodes,
+        totalScans
       };
     }));
 
-    res.json(usersWithStats);
+    res.json({
+      data: usersWithStats,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit)
+    });
   } catch (error) {
     console.error('Error fetching users:', error);
     res.status(500).json({ error: 'Error fetching users' });
