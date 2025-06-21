@@ -221,6 +221,13 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.backgroundColor = backgroundColor || '#FFFFFF';
       qrCode.textAbove = textAbove || 'Scan me';
       qrCode.textBelow = textBelow || '';
+      // Landing page colors
+      qrCode.primaryColor = req.body.primaryColor || '#8b5cf6';
+      qrCode.primaryHoverColor = req.body.primaryHoverColor || '#7c3aed';
+      qrCode.accentColor = req.body.accentColor || '#ec4899';
+      qrCode.backgroundGradient = req.body.backgroundGradient || 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)';
+      qrCode.loadingSpinnerColor = req.body.loadingSpinnerColor || '#8b5cf6';
+      qrCode.loadingSpinnerBorderColor = req.body.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)';
       qrCode.user = req.user;
 
       if (type === 'direct' && url) {
@@ -315,7 +322,14 @@ export const getQRCode = async (req: AuthRequest, res: Response) => {
         links: true,
         scanCount: true,
         createdAt: true,
-        updatedAt: true
+        updatedAt: true,
+        // Landing page colors
+        primaryColor: true,
+        primaryHoverColor: true,
+        accentColor: true,
+        backgroundGradient: true,
+        loadingSpinnerColor: true,
+        loadingSpinnerBorderColor: true
       },
       where: { id, user: { id: req.user.id } },
       relations: ['user']
@@ -344,7 +358,7 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       const { id } = req.params;
-      const { name, foregroundColor, backgroundColor, links, type, menu, vitrine, url } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu, vitrine, url, primaryColor, primaryHoverColor, accentColor, backgroundGradient, loadingSpinnerColor, loadingSpinnerBorderColor } = req.body;
       let logoUrl = '';
 
       const qrCode = await qrCodeRepository.findOne({
@@ -382,6 +396,14 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
       if (foregroundColor !== undefined) qrCode.foregroundColor = foregroundColor;
       if (backgroundColor !== undefined) qrCode.backgroundColor = backgroundColor;
       if (type !== undefined) qrCode.type = type as QRCodeType;
+      
+      // Update landing page colors
+      if (primaryColor !== undefined) qrCode.primaryColor = primaryColor;
+      if (primaryHoverColor !== undefined) qrCode.primaryHoverColor = primaryHoverColor;
+      if (accentColor !== undefined) qrCode.accentColor = accentColor;
+      if (backgroundGradient !== undefined) qrCode.backgroundGradient = backgroundGradient;
+      if (loadingSpinnerColor !== undefined) qrCode.loadingSpinnerColor = loadingSpinnerColor;
+      if (loadingSpinnerBorderColor !== undefined) qrCode.loadingSpinnerBorderColor = loadingSpinnerBorderColor;
 
       // Handle URL update for landing page redirect
       if (url !== undefined) {
@@ -618,7 +640,14 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
       links: qrCode.links,
       menu: qrCode.menu,
       vitrine: qrCode.vitrine,
-      scanCount: qrCode.scanCount || 0
+      scanCount: qrCode.scanCount || 0,
+      // Landing page colors
+      primaryColor: qrCode.primaryColor || '#8b5cf6',
+      primaryHoverColor: qrCode.primaryHoverColor || '#7c3aed',
+      accentColor: qrCode.accentColor || '#ec4899',
+      backgroundGradient: qrCode.backgroundGradient || 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)',
+      loadingSpinnerColor: qrCode.loadingSpinnerColor || '#8b5cf6',
+      loadingSpinnerBorderColor: qrCode.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)'
     };
 
     res.json(publicQRCode);

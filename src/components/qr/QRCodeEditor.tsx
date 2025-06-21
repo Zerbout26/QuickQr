@@ -154,6 +154,14 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
+  
+  // Landing page colors
+  const [primaryColor, setPrimaryColor] = useState(qrCode.primaryColor || '#8b5cf6');
+  const [primaryHoverColor, setPrimaryHoverColor] = useState(qrCode.primaryHoverColor || '#7c3aed');
+  const [accentColor, setAccentColor] = useState(qrCode.accentColor || '#ec4899');
+  const [backgroundGradient, setBackgroundGradient] = useState(qrCode.backgroundGradient || 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)');
+  const [loadingSpinnerColor, setLoadingSpinnerColor] = useState(qrCode.loadingSpinnerColor || '#8b5cf6');
+  const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState(qrCode.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)');
 
   // Vitrine state
   const [vitrine, setVitrine] = useState(() => {
@@ -613,6 +621,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         formData.append('type', type);
         formData.append('foregroundColor', foregroundColor);
         formData.append('backgroundColor', backgroundColor);
+        formData.append('primaryColor', primaryColor);
+        formData.append('primaryHoverColor', primaryHoverColor);
+        formData.append('accentColor', accentColor);
+        formData.append('backgroundGradient', backgroundGradient);
+        formData.append('loadingSpinnerColor', loadingSpinnerColor);
+        formData.append('loadingSpinnerBorderColor', loadingSpinnerBorderColor);
 
         if (type === 'url' || type === 'both') {
             formData.append('links', JSON.stringify(links));
@@ -1474,6 +1488,105 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   onChange={(e) => setBackgroundColor(e.target.value)}
                   className="flex-1"
                 />
+              </div>
+            </div>
+            
+            {/* Landing Page Colors */}
+            <div className="border-t pt-4">
+              <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="primaryColor">Primary Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="primaryColor"
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="primaryHoverColor"
+                      type="color"
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="accentColor">Accent Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="accentColor"
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="backgroundGradient">Background Gradient</Label>
+                  <Input
+                    id="backgroundGradient"
+                    value={backgroundGradient}
+                    onChange={(e) => setBackgroundGradient(e.target.value)}
+                    placeholder="linear-gradient(to bottom right, #8b5cf620, white, #ec489920)"
+                  />
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="loadingSpinnerColor"
+                      type="color"
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                  <Input
+                    id="loadingSpinnerBorderColor"
+                    value={loadingSpinnerBorderColor}
+                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                    placeholder="rgba(139, 92, 246, 0.2)"
+                  />
+                </div>
               </div>
             </div>
           </TabsContent>
