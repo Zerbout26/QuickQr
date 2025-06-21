@@ -428,6 +428,40 @@ export const qrCodeApi = {
       console.error('Error incrementing scan count:', error);
       throw error;
     }
+  },
+
+  // Landing page colors
+  getLandingPageColors: async (id: string) => {
+    try {
+      const response = await axios.get(`${API_BASE_URL}/qrcodes/${id}/colors`, {
+        headers: {
+          'Accept': 'application/json',
+          'Cache-Control': 'no-cache'
+        },
+        timeout: 5000
+      });
+      return response.data;
+    } catch (error) {
+      console.error('Error fetching landing page colors:', error);
+      throw error;
+    }
+  },
+
+  updateLandingPageColors: async (id: string, colors: {
+    primaryColor?: string;
+    primaryHoverColor?: string;
+    accentColor?: string;
+    backgroundGradient?: string;
+    loadingSpinnerColor?: string;
+    loadingSpinnerBorderColor?: string;
+  }) => {
+    try {
+      const response = await api.put(`/qrcodes/${id}/colors`, colors);
+      return response.data;
+    } catch (error) {
+      console.error('Error updating landing page colors:', error);
+      throw error;
+    }
   }
 };
 

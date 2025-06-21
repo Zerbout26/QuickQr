@@ -146,6 +146,25 @@ export class QRCode {
   @Column({ nullable: true })
   textBelow!: string;
 
+  // Landing page colors
+  @Column({ nullable: true, default: '#8b5cf6' })
+  primaryColor!: string;
+
+  @Column({ nullable: true, default: '#7c3aed' })
+  primaryHoverColor!: string;
+
+  @Column({ nullable: true, default: '#ec4899' })
+  accentColor!: string;
+
+  @Column({ nullable: true, default: 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)' })
+  backgroundGradient!: string;
+
+  @Column({ nullable: true, default: '#8b5cf6' })
+  loadingSpinnerColor!: string;
+
+  @Column({ nullable: true, default: 'rgba(139, 92, 246, 0.2)' })
+  loadingSpinnerBorderColor!: string;
+
   @Column({ type: "int", default: 0 })
   scanCount!: number;
 
@@ -167,16 +186,4 @@ export class QRCode {
 
   @UpdateDateColumn()
   updatedAt!: Date;
-
-  @Index()
-  @Column()
-  url!: string;
-
-  @Index()
-  @Column()
-  originalUrl!: string;
-
-  @Index()
-  @Column({ default: 0 })
-  scanCount!: number;
 } 

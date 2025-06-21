@@ -3,8 +3,18 @@ import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 
+// Landing page colors interface
+interface LandingPageColors {
+  primaryColor: string;
+  primaryHoverColor: string;
+  accentColor: string;
+  backgroundGradient: string;
+  loadingSpinnerColor: string;
+  loadingSpinnerBorderColor: string;
+}
+
 // Critical CSS with !important overrides to eliminate all white space
-const CriticalCSS = () => (
+const CriticalCSS = ({ colors }: { colors: LandingPageColors }) => (
   <style dangerouslySetInnerHTML={{
     __html: `
       html, body, #root {
@@ -15,7 +25,7 @@ const CriticalCSS = () => (
         overflow-x: hidden !important;
       }
       .landing-container {
-        background: linear-gradient(to bottom right, #8b5cf620, white, #ec489920) !important;
+        background: ${colors.backgroundGradient} !important;
         min-height: 100vh !important;
         display: flex !important;
         flex-direction: column !important;
@@ -28,8 +38,8 @@ const CriticalCSS = () => (
         padding: 0 16px !important;
       }
       .loading-spinner {
-        border: 3px solid rgba(139, 92, 246, 0.2) !important;
-        border-top: 3px solid #8b5cf6 !important;
+        border: 3px solid ${colors.loadingSpinnerBorderColor} !important;
+        border-top: 3px solid ${colors.loadingSpinnerColor} !important;
         border-radius: 50% !important;
         width: 24px !important;
         height: 24px !important;
@@ -65,10 +75,29 @@ const LandingPage = () => {
   const [error, setError] = useState<string | null>(null);
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
+  const [landingPageColors, setLandingPageColors] = useState<LandingPageColors>({
+    primaryColor: '#8b5cf6',
+    primaryHoverColor: '#7c3aed',
+    accentColor: '#ec4899',
+    backgroundGradient: 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)',
+    loadingSpinnerColor: '#8b5cf6',
+    loadingSpinnerBorderColor: 'rgba(139, 92, 246, 0.2)'
+  });
 
   // Check if text contains Arabic characters
   const isArabicText = useCallback((text: string = '') => {
     return /[\u0600-\u06FF]/.test(text);
+  }, []);
+
+  // Fetch landing page colors
+  const fetchLandingPageColors = useCallback(async (qrId: string) => {
+    try {
+      const colors = await qrCodeApi.getLandingPageColors(qrId);
+      setLandingPageColors(colors);
+    } catch (error) {
+      console.error('Error fetching landing page colors:', error);
+      // Keep default colors if fetch fails
+    }
   }, []);
 
   // Optimized data fetching with caching and scan count
@@ -83,6 +112,9 @@ const LandingPage = () => {
           setLoading(false);
           return;
         }
+
+        // Fetch landing page colors first
+        await fetchLandingPageColors(id);
 
         // Check cache first
         const cachedData = sessionStorage.getItem(`qr_${id}`);
@@ -150,10 +182,10 @@ const LandingPage = () => {
       isMounted = false;
       controller.abort();
     };
-  }, [id, navigate, isArabicText]);
+  }, [id, navigate, isArabicText, fetchLandingPageColors]);
 
-  if (loading) return <><CriticalCSS /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
-  if (error) return <><CriticalCSS /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
+  if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
+  if (error) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
   if (!qrCode) return null;
 
   const hasMenu = qrCode.menu?.categories?.length > 0;
@@ -162,7 +194,7 @@ const LandingPage = () => {
 
   return (
     <>
-      <CriticalCSS />
+      <CriticalCSS colors={landingPageColors} />
       <div className="landing-container">
         <div className="content-wrapper">
                     {/* Social Links */}
@@ -198,7 +230,11 @@ const LandingPage = () => {
               href="https://www.qrcreator.xyz" 
               target="_blank" 
               rel="noopener noreferrer"
-              className="text-[#8b5cf6] hover:text-[#7c3aed] transition-colors font-medium"
+              style={{ 
+                color: landingPageColors.primaryColor,
+                '--tw-text-opacity': '1'
+              } as React.CSSProperties}
+              className="hover:opacity-80 transition-opacity font-medium"
             >
               www.qrcreator.xyz
             </a>
