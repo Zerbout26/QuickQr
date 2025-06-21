@@ -135,7 +135,9 @@ const translations = {
     trial: "Trial",
     daysLeft: "days left",
     trialExpired: "Trial expired",
-    activeSubscription: "Active Subscription"
+    activeSubscription: "Active Subscription",
+    previous: "Previous",
+    next: "Next"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -249,7 +251,9 @@ const translations = {
     trial: "تجريبي",
     daysLeft: "يتبقى",
     trialExpired: "انتهى التجريبي",
-    activeSubscription: "اشتراك نشط"
+    activeSubscription: "اشتراك نشط",
+    previous: "السابق",
+    next: "التالي"
   }
 };
 
@@ -265,7 +269,9 @@ const Dashboard = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalQRCodes, setTotalQRCodes] = useState(0);
   const navigate = useNavigate();
-  const { language, translations } = useLanguage();
+  const { language } = useLanguage();
+  const [newUrl, setNewUrl] = useState('');
+  const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
 
   const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
@@ -296,6 +302,12 @@ const Dashboard = () => {
       return () => clearTimeout(handler);
     }
   }, [user, currentPage, searchTerm]);
+
+  useEffect(() => {
+    if (!authLoading && !user) {
+      navigate('/signin');
+    }
+  }, [user, authLoading, navigate]);
 
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
@@ -769,7 +781,7 @@ const Dashboard = () => {
     downloadWithLogo();
   };
 
-  if (authLoading) {
+  if (authLoading || !user) {
     return (
       <div className="flex items-center justify-center h-screen">
         <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
@@ -1161,7 +1173,7 @@ const Dashboard = () => {
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
                   >
-                    Previous
+                    {translations[language].previous}
                   </Button>
                   <Button
                     variant="outline"
@@ -1169,7 +1181,7 @@ const Dashboard = () => {
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
                   >
-                    Next
+                    {translations[language].next}
                   </Button>
                 </div>
               </div>
