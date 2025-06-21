@@ -154,7 +154,7 @@ export const translations = {
     type: 'النوع',
     url: 'رابط',
     menu: 'قائمة',
-    both: 'كلاهما',
+    both: 'قائمة',
     direct: 'رابط مباشر',
     vitrine: 'فيتري',
     enterUrl: 'أدخل الرابط',

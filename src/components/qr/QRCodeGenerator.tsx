@@ -13,6 +13,7 @@ import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin,
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
+import { useLanguage } from '@/context/LanguageContext';
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
@@ -27,13 +28,11 @@ const defaultAvailability = {
 };
 
 // QR Preview component that shows an actual QR code
-const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: { 
+const QRPreview = ({ url, color, bgColor, logoUrl }: { 
   url: string; 
   color: string; 
   bgColor: string; 
   logoUrl?: string;
-  textAbove?: string;
-  textBelow?: string;
 }) => {
   const qrRef = useRef<HTMLDivElement>(null);
 
@@ -45,60 +44,32 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
         // Create SVG with text
         const svgNS = "http://www.w3.org/2000/svg";
         const svg = document.createElementNS(svgNS, "svg");
-        svg.setAttribute("width", "400");
-        svg.setAttribute("height", "500");
-        svg.setAttribute("viewBox", "0 0 400 500");
+        svg.setAttribute("width", "300");
+        svg.setAttribute("height", "300");
+        svg.setAttribute("viewBox", "0 0 300 300");
 
         // Add background
         const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("width", "400");
-        rect.setAttribute("height", "500");
+        rect.setAttribute("width", "300");
+        rect.setAttribute("height", "300");
         rect.setAttribute("fill", "#FFFFFF");
         svg.appendChild(rect);
-
-        // Add text above
-        if (textAbove) {
-          const textAboveElement = document.createElementNS(svgNS, "text");
-          textAboveElement.setAttribute("x", "200");
-          textAboveElement.setAttribute("y", "40");
-          textAboveElement.setAttribute("text-anchor", "middle");
-          textAboveElement.setAttribute("font-family", "Arial");
-          textAboveElement.setAttribute("font-size", "24");
-          textAboveElement.setAttribute("font-weight", "bold");
-          textAboveElement.setAttribute("fill", "#374151");
-          textAboveElement.textContent = textAbove;
-          svg.appendChild(textAboveElement);
-        }
 
         // Add QR code
         const qrElement = qrRef.current.querySelector('svg');
         if (qrElement) {
           const qrClone = qrElement.cloneNode(true) as SVGElement;
-          qrClone.setAttribute("x", "50");
-          qrClone.setAttribute("y", textAbove ? "80" : "100");
+          qrClone.setAttribute("x", "0");
+          qrClone.setAttribute("y", "0");
           qrClone.setAttribute("width", "300");
           qrClone.setAttribute("height", "300");
           svg.appendChild(qrClone);
         }
 
-        // Add text below
-        if (textBelow) {
-          const textBelowElement = document.createElementNS(svgNS, "text");
-          textBelowElement.setAttribute("x", "200");
-          textBelowElement.setAttribute("y", textAbove ? "420" : "440");
-          textBelowElement.setAttribute("text-anchor", "middle");
-          textBelowElement.setAttribute("font-family", "Arial");
-          textBelowElement.setAttribute("font-size", "24");
-          textBelowElement.setAttribute("font-weight", "bold");
-          textBelowElement.setAttribute("fill", "#374151");
-          textBelowElement.textContent = textBelow;
-          svg.appendChild(textBelowElement);
-        }
-
         // Add border
         const border = document.createElementNS(svgNS, "rect");
-        border.setAttribute("width", "400");
-        border.setAttribute("height", "500");
+        border.setAttribute("width", "300");
+        border.setAttribute("height", "300");
         border.setAttribute("fill", "none");
         border.setAttribute("stroke", "#E5E7EB");
         border.setAttribute("stroke-width", "2");
@@ -121,20 +92,12 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        canvas.width = 400;
-        canvas.height = 500;
+        canvas.width = 300;
+        canvas.height = 300;
 
         // Fill background
         ctx.fillStyle = '#FFFFFF';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Draw text above
-        if (textAbove) {
-          ctx.fillStyle = '#374151';
-          ctx.font = 'bold 24px Arial';
-          ctx.textAlign = 'center';
-          ctx.fillText(textAbove, canvas.width / 2, 40);
-        }
 
         // Draw QR code
         const qrElement = qrRef.current.querySelector('svg');
@@ -147,17 +110,8 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
           });
           const qrSize = 300;
           const qrX = (canvas.width - qrSize) / 2;
-          const qrY = textAbove ? 80 : 100;
+          const qrY = 0;
           ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
-        }
-
-        // Draw text below
-        if (textBelow) {
-          ctx.fillStyle = '#374151';
-          ctx.font = 'bold 24px Arial';
-          ctx.textAlign = 'center';
-          const textY = textAbove ? 420 : 440;
-          ctx.fillText(textBelow, canvas.width / 2, textY);
         }
 
         // Add border
@@ -197,11 +151,6 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
   
   return (
     <div className="flex flex-col items-center mb-4">
-      {textAbove && (
-        <div className="text-center mb-2 font-medium text-gray-700">
-          {textAbove}
-        </div>
-      )}
       <div 
         ref={qrRef}
         className="w-48 h-48 flex items-center justify-center border rounded-md p-2" 
@@ -224,11 +173,6 @@ const QRPreview = ({ url, color, bgColor, logoUrl, textAbove, textBelow }: {
           } : undefined}
         />
       </div>
-      {textBelow && (
-        <div className="text-center mt-2 font-medium text-gray-700">
-          {textBelow}
-        </div>
-      )}
       <div className="flex gap-2 mt-4">
         <Button
           type="button"
@@ -278,250 +222,224 @@ interface QRCodeFormProps {
 // Translations object
 const translations = {
   en: {
-    basic: "Basic",
-    advanced: "Advanced",
-    name: "Name",
-    myQRCode: "My QR Code",
-    textAboveQR: "Text Above QR Code",
-    enterTextAbove: "Enter text to display above QR code",
-    textBelowQR: "Text Below QR Code",
-    enterTextBelow: "Enter text to display below QR code",
-    type: "Type",
-    url: "URL",
-    menu: "Menu",
-    both: "Qr Menu",
-    directLink: "Direct Link",
-    enterURL: "Enter URL",
-    links: "Links",
-    selectPlatform: "Select platform",
-    website: "Website",
-    facebook: "Facebook",
-    instagram: "Instagram",
-    twitter: "Twitter",
-    linkedin: "LinkedIn",
-    youtube: "YouTube",
-    tiktok: "TikTok",
-    whatsapp: "WhatsApp",
-    telegram: "Telegram",
-    other: "Other",
-    foregroundColor: "Foreground Color",
-    backgroundColor: "Background Color",
-    logo: "Logo",
-    creating: "Creating...",
-    createQRCode: "Create QR Code",
-    downloadPNG: "Download PNG",
-    downloadSVG: "Download SVG",
-    success: "Success",
-    error: "Error",
-    qrCodeDownloaded: "QR code downloaded as",
-    failedToDownload: "Failed to download QR code",
-    invalidFileType: "Invalid file type",
-    pleaseUploadImage: "Please upload an image file (PNG, JPG, etc.)",
-    fileTooLarge: "File too large",
-    logoImageMustBeLess: "Logo image must be less than 2MB",
-    addImage: "Add Image",
-    changeImage: "Change Image",
-    itemImage: "Item Image",
-    categoryName: "Category Name",
-    itemName: "Item Name",
-    description: "Description",
-    price: "Price",
-    availability: "Availability",
+    success: 'Success',
+    error: 'Error',
+    basic: 'Basic',
+    advanced: 'Advanced',
+    name: 'Name',
+    myQRCode: 'My QR Code',
+    type: 'Type',
+    directLink: 'Direct Link',
+    url: 'URL',
+    both: 'Both',
+    vitrine: 'Vitrine',
+    enterURL: 'Enter URL',
+    links: 'Links',
+    addLink: 'Add Link',
+    selectPlatform: 'Select Platform',
+    website: 'Website',
+    facebook: 'Facebook',
+    instagram: 'Instagram',
+    twitter: 'Twitter',
+    linkedin: 'LinkedIn',
+    youtube: 'YouTube',
+    tiktok: 'TikTok',
+    whatsapp: 'WhatsApp',
+    telegram: 'Telegram',
+    location: 'Location',
+    other: 'Other',
+    categoryName: 'Category Name',
+    itemName: 'Item Name',
+    description: 'Description',
+    price: 'Price',
+    itemImage: 'Item Image',
+    addImage: 'Add Image',
+    changeImage: 'Change Image',
+    availability: 'Availability',
     days: {
-      sunday: "Sunday",
-      monday: "Monday",
-      tuesday: "Tuesday",
-      wednesday: "Wednesday",
-      thursday: "Thursday",
-      friday: "Friday",
-      saturday: "Saturday"
+      monday: 'Monday',
+      tuesday: 'Tuesday',
+      wednesday: 'Wednesday',
+      thursday: 'Thursday',
+      friday: 'Friday',
+      saturday: 'Saturday',
+      sunday: 'Sunday',
     },
-    removeItem: "Remove Item",
-    addMenuItem: "Add Menu Item",
-    addCategory: "Add Category",
-    addLink: "Add Link",
-    vitrine: "Vitrine",
-    enterBusinessName: "Business Name",
-    enterTagline: "Tagline",
-    enterCtaText: "CTA Text",
-    enterCtaLink: "CTA Link",
-    enterDescription: "Description",
-    enterCity: "City",
-    addService: "Add Service",
-    enterServiceName: "Service Name",
-    enterServiceDescription: "Service Description",
-    uploadServiceImage: "Upload Service Image",
-    changeServiceImage: "Change Service Image",
-    removeService: "Remove Service",
-    gallery: "Gallery",
-    enterImageTitle: "Image Title",
-    enterImageDescription: "Image Description",
-    testimonials: "Testimonials",
-    addTestimonial: "Add Testimonial",
-    enterTestimonialText: "Testimonial Text",
-    enterAuthor: "Author",
-    enterAddress: "Address",
-    enterPhone: "Phone",
-    enterEmail: "Email",
-    socialMedia: "Social Media",
-    enterFacebook: "Facebook URL",
-    enterInstagram: "Instagram URL",
-    enterTwitter: "Twitter URL",
-    enterLinkedin: "LinkedIn URL",
-    enterYoutube: "YouTube URL",
-    enterTiktok: "TikTok URL",
-    enableContactForm: "Enable Contact Form",
-    formFields: "Form Fields",
-    addField: "Add Field",
-    enterFieldName: "Field Name",
-    fieldType: "Field Type",
-    textField: "Text",
-    emailField: "Email",
-    phoneField: "Phone",
-    textareaField: "Textarea",
-    required: "Required",
-    footer: "Footer",
-    quickLinks: "Quick Links",
-    addQuickLink: "Add Quick Link",
-    enterQuickLinkLabel: "Label",
-    enterQuickLinkUrl: "URL",
-    hero: "Hero",
-    about: "About",
-    services: "Services",
-    socialIcons: "Social Icons",
-    removeImage: "Remove Image",
-    removeTestimonial: "Remove Testimonial",
-    contact: "Contact",
-    cta: "CTA",
-    addCta: "Add CTA",
-    location: "Location"
+    removeItem: 'Remove Item',
+    addMenuItem: 'Add Menu Item',
+    addCategory: 'Add Category',
+    hero: 'Hero',
+    enterBusinessName: 'Enter Business Name',
+    enterTagline: 'Enter Tagline',
+    cta: 'Call to Action',
+    addCta: 'Add CTA',
+    enterCtaText: 'Enter CTA Text',
+    enterCtaLink: 'Enter CTA Link',
+    removeCta: 'Remove CTA',
+    about: 'About',
+    enterDescription: 'Enter Description',
+    enterCity: 'Enter City',
+    services: 'Services',
+    addService: 'Add Service',
+    enterServiceName: 'Enter Service Name',
+    enterServiceDescription: 'Enter Service Description',
+    enterImageTitle: 'Enter Image Title',
+    enterImageDescription: 'Enter Image Description',
+    removeService: 'Remove Service',
+    gallery: 'Gallery',
+    removeImage: 'Remove Image',
+    testimonials: 'Testimonials',
+    addTestimonial: 'Add Testimonial',
+    enterTestimonialText: 'Enter Testimonial Text',
+    enterAuthor: 'Enter Author',
+    removeTestimonial: 'Remove Testimonial',
+    contact: 'Contact',
+    enterAddress: 'Enter Address',
+    enterPhone: 'Enter Phone',
+    enterEmail: 'Enter Email',
+    socialMedia: 'Social Media',
+    enterFacebook: 'Enter Facebook URL',
+    enterInstagram: 'Enter Instagram URL',
+    enterTwitter: 'Enter Twitter URL',
+    enterLinkedin: 'Enter LinkedIn URL',
+    enterYoutube: 'Enter YouTube URL',
+    enterTiktok: 'Enter TikTok URL',
+    enableContactForm: 'Enable Contact Form',
+    formFields: 'Form Fields',
+    addField: 'Add Field',
+    enterFieldName: 'Enter Field Name',
+    fieldType: 'Field Type',
+    textField: 'Text Field',
+    emailField: 'Email Field',
+    phoneField: 'Phone Field',
+    textareaField: 'Textarea Field',
+    required: 'Required',
+    footer: 'Footer',
+    quickLinks: 'Quick Links',
+    addQuickLink: 'Add Quick Link',
+    enterQuickLinkLabel: 'Enter Quick Link Label',
+    enterQuickLinkUrl: 'Enter Quick Link URL',
+    socialIcons: 'Social Icons',
+    foregroundColor: 'Foreground Color',
+    backgroundColor: 'Background Color',
+    logo: 'Logo',
+    createQRCode: 'Create QR Code',
+    updateQRCode: 'Update QR Code',
+    creating: 'Creating...',
   },
   ar: {
-    basic: "أساسي",
-    advanced: "متقدم",
-    name: "الاسم",
-    myQRCode: "رمز QR الخاص بي",
-    textAboveQR: "نص فوق رمز QR",
-    enterTextAbove: "أدخل النص لعرضه فوق رمز QR",
-    textBelowQR: "نص تحت رمز QR",
-    enterTextBelow: "أدخل النص لعرضه تحت رمز QR",
-    type: "النوع",
-    url: "رابط",
-    menu: "قائمة",
-    both: "كلاهما",
-    directLink: "رابط مباشر",
-    enterURL: "أدخل الرابط",
-    links: "الروابط",
-    selectPlatform: "اختر المنصة",
-    website: "الموقع الإلكتروني",
-    facebook: "فيسبوك",
-    instagram: "انستغرام",
-    twitter: "تويتر",
-    linkedin: "لينكد إن",
-    youtube: "يوتيوب",
-    tiktok: "تيك توك",
-    whatsapp: "واتساب",
-    telegram: "تيليجرام",
-    other: "أخرى",
-    foregroundColor: "لون المقدمة",
-    backgroundColor: "لون الخلفية",
-    logo: "الشعار",
-    creating: "جاري الإنشاء...",
-    createQRCode: "إنشاء رمز QR",
-    downloadPNG: "تحميل PNG",
-    downloadSVG: "تحميل SVG",
-    success: "نجاح",
-    error: "خطأ",
-    qrCodeDownloaded: "تم تحميل رمز QR كملف",
-    failedToDownload: "فشل تحميل رمز QR",
-    invalidFileType: "نوع ملف غير صالح",
-    pleaseUploadImage: "يرجى تحميل ملف صورة (PNG، JPG، إلخ)",
-    fileTooLarge: "الملف كبير جداً",
-    logoImageMustBeLess: "يجب أن يكون حجم صورة الشعار أقل من 2 ميجابايت",
-    addImage: "إضافة صورة",
-    changeImage: "تغيير الصورة",
-    itemImage: "صورة العنصر",
-    categoryName: "اسم الفئة",
-    itemName: "اسم العنصر",
-    description: "الوصف",
-    price: "السعر",
-    availability: "التوفر",
+    success: 'نجاح',
+    error: 'خطأ',
+    basic: 'أساسي',
+    advanced: 'متقدم',
+    name: 'الاسم',
+    myQRCode: 'رمز الاستجابة السريعة الخاص بي',
+    type: 'النوع',
+    directLink: 'رابط مباشر',
+    url: 'رابط',
+    both: 'ٌٌقائمة',
+    vitrine: 'فترينة',
+    enterURL: 'أدخل الرابط',
+    links: 'الروابط',
+    addLink: 'إضافة رابط',
+    selectPlatform: 'اختر المنصة',
+    website: 'موقع إلكتروني',
+    facebook: 'فيسبوك',
+    instagram: 'انستغرام',
+    twitter: 'تويتر',
+    linkedin: 'لينكد إن',
+    youtube: 'يوتيوب',
+    tiktok: 'تيك توك',
+    whatsapp: 'واتساب',
+    telegram: 'تيليجرام',
+    location: 'موقع',
+    other: 'آخر',
+    categoryName: 'اسم الفئة',
+    itemName: 'اسم العنصر',
+    description: 'الوصف',
+    price: 'السعر',
+    itemImage: 'صورة العنصر',
+    addImage: 'إضافة صورة',
+    changeImage: 'تغيير الصورة',
+    availability: 'التوفر',
     days: {
-      sunday: "الأحد",
-      monday: "الاثنين",
-      tuesday: "الثلاثاء",
-      wednesday: "الأربعاء",
-      thursday: "الخميس",
-      friday: "الجمعة",
-      saturday: "السبت"
+      monday: 'الاثنين',
+      tuesday: 'الثلاثاء',
+      wednesday: 'الأربعاء',
+      thursday: 'الخميس',
+      friday: 'الجمعة',
+      saturday: 'السبت',
+      sunday: 'الأحد',
     },
-    removeItem: "حذف العنصر",
-    addMenuItem: "إضافة عنصر",
-    addCategory: "إضافة فئة",
-    addLink: "إضافة رابط",
-    vitrine: "فيترين",
-    enterBusinessName: "اسم الشركة",
-    enterTagline: "العنوان",
-    enterCtaText: "نص الإطلاق",
-    enterCtaLink: "رابط الإطلاق",
-    enterDescription: "الوصف",
-    enterCity: "المدينة",
-    addService: "إضافة خدمة",
-    enterServiceName: "اسم الخدمة",
-    enterServiceDescription: "وصف الخدمة",
-    uploadServiceImage: "رفع صورة الخدمة",
-    changeServiceImage: "تغيير صورة الخدمة",
-    removeService: "إزالة الخدمة",
-    gallery: "المعرض",
-    enterImageTitle: "عنوان الصورة",
-    enterImageDescription: "وصف الصورة",
-    testimonials: "التعليقات",
-    addTestimonial: "إضافة تعليق",
-    enterTestimonialText: "نص التعليق",
-    enterAuthor: "المؤلف",
-    enterAddress: "العنوان",
-    enterPhone: "الهاتف",
-    enterEmail: "البريد الإلكتروني",
-    socialMedia: "الوسائل التواصلية",
-    enterFacebook: "رابط فيسبوك",
-    enterInstagram: "رابط انستغرام",
-    enterTwitter: "رابط تويتر",
-    enterLinkedin: "رابط لينكد إن",
-    enterYoutube: "رابط يوتيوب",
-    enterTiktok: "رابط تيك توك",
-    enableContactForm: "تفعيل نموذج الاتصال",
-    formFields: "حقول النموذج",
-    addField: "إضافة حقل",
-    enterFieldName: "اسم الحقل",
-    fieldType: "نوع الحقل",
-    textField: "نص",
-    emailField: "بريد إلكتروني",
-    phoneField: "هاتف",
-    textareaField: "نص طويل",
-    required: "مطلوب",
-    footer: "الأسفل",
-    quickLinks: "روابط سريعة",
-    addQuickLink: "إضافة رابط سريع",
-    enterQuickLinkLabel: "التسمية",
-    enterQuickLinkUrl: "الرابط",
-    hero: "الرئيسية",
-    about: "حول",
-    services: "الخدمات",
-    socialIcons: "أيقونات التواصل الاجتماعي",
-    removeImage: "إزالة الصورة",
-    removeTestimonial: "إزالة التعليق",
-    contact: "اتصل بنا",
-    cta: "الإطلاق",
-    addCta: "إضافة CTA",
-    location: "الموقع"
-  }
+    removeItem: 'إزالة العنصر',
+    addMenuItem: 'إضافة عنصر قائمة',
+    addCategory: 'إضافة فئة',
+    hero: 'البطل',
+    enterBusinessName: 'أدخل اسم العمل',
+    enterTagline: 'أدخل الشعار',
+    cta: 'دعوة للعمل',
+    addCta: 'إضافة CTA',
+    enterCtaText: 'أدخل نص CTA',
+    enterCtaLink: 'أدخل رابط CTA',
+    removeCta: 'إزالة CTA',
+    about: 'حول',
+    enterDescription: 'أدخل الوصف',
+    enterCity: 'أدخل المدينة',
+    services: 'الخدمات',
+    addService: 'إضافة خدمة',
+    enterServiceName: 'أدخل اسم الخدمة',
+    enterServiceDescription: 'أدخل وصف الخدمة',
+    enterImageTitle: 'أدخل عنوان الصورة',
+    enterImageDescription: 'أدخل وصف الصورة',
+    removeService: 'إزالة الخدمة',
+    gallery: 'المعرض',
+    removeImage: 'إزالة الصورة',
+    testimonials: 'الشهادات',
+    addTestimonial: 'إضافة شهادة',
+    enterTestimonialText: 'أدخل نص الشهادة',
+    enterAuthor: 'أدخل المؤلف',
+    removeTestimonial: 'إزالة الشهادة',
+    contact: 'الاتصال',
+    enterAddress: 'أدخل العنوان',
+    enterPhone: 'أدخل الهاتف',
+    enterEmail: 'أدخل البريد الإلكتروني',
+    socialMedia: 'وسائل التواصل الاجتماعي',
+    enterFacebook: 'أدخل رابط فيسبوك',
+    enterInstagram: 'أدخل رابط انستغرام',
+    enterTwitter: 'أدخل رابط تويتر',
+    enterLinkedin: 'أدخل رابط لينكد إن',
+    enterYoutube: 'أدخل رابط يوتيوب',
+    enterTiktok: 'أدخل رابط تيك توك',
+    enableContactForm: 'تمكين نموذج الاتصال',
+    formFields: 'حقول النموذج',
+    addField: 'إضافة حقل',
+    enterFieldName: 'أدخل اسم الحقل',
+    fieldType: 'نوع الحقل',
+    textField: 'حقل نصي',
+    emailField: 'حقل بريد إلكتروني',
+    phoneField: 'حقل هاتف',
+    textareaField: 'حقل نصي كبير',
+    required: 'مطلوب',
+    footer: 'التذييل',
+    quickLinks: 'روابط سريعة',
+    addQuickLink: 'إضافة رابط سريع',
+    enterQuickLinkLabel: 'أدخل تسمية الرابط السريع',
+    enterQuickLinkUrl: 'أدخل رابط الرابط السريع',
+    socialIcons: 'أيقونات التواصل الاجتماعي',
+    foregroundColor: 'لون المقدمة',
+    backgroundColor: 'لون الخلفية',
+    logo: 'الشعار',
+    createQRCode: 'إنشاء رمز الاستجابة السريعة',
+    updateQRCode: 'تحديث رمز الاستجابة السريعة',
+    creating: 'جاري الإنشاء...',
+  },
 };
 
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const { user } = useAuth();
+  const { language } = useLanguage();
   const [name, setName] = useState('');
-  const [id, setId] = useState('');
-  const [type, setType] = useState<'url' | 'menu' | 'both' | 'direct' | 'vitrine'>('url');
+  const [type, setType] = useState('url');
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
@@ -581,10 +499,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [textAbove, setTextAbove] = useState('Scan me');
-  const [textBelow, setTextBelow] = useState('');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
-  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
 
   const resetForm = () => {
     setName('');
@@ -596,8 +511,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     setBackgroundColor('#FFFFFF');
     setLogoFile(null);
     setLogoPreview(null);
-    setTextAbove('Scan me');
-    setTextBelow('');
     setTempImages({});
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
@@ -804,8 +717,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       formData.append('type', type);
       formData.append('foregroundColor', foregroundColor);
       formData.append('backgroundColor', backgroundColor);
-      formData.append('textAbove', textAbove);
-      formData.append('textBelow', textBelow);
       
       if (type === 'direct') {
         formData.append('url', directUrl);
@@ -979,7 +890,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       onCreated(createdQRCode);
       resetForm();
       toast({
-        title: translations[menuLanguage].success,
+        title: translations[language].success,
         description: "QR code created successfully",
       });
     } catch (error: any) {
@@ -987,7 +898,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       setError(error.message || 'Failed to create QR code');
       toast({
         variant: "destructive",
-        title: translations[menuLanguage].error,
+        title: translations[language].error,
         description: error.message || 'Failed to create QR code',
       });
     } finally {
@@ -1001,40 +912,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
         <form onSubmit={handleSubmit}>
           <Tabs defaultValue="basic" className="space-y-4">
             <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">{translations[menuLanguage].basic}</TabsTrigger>
-              <TabsTrigger value="advanced">{translations[menuLanguage].advanced}</TabsTrigger>
+              <TabsTrigger value="basic">{translations[language].basic}</TabsTrigger>
+              <TabsTrigger value="advanced">{translations[language].advanced}</TabsTrigger>
             </TabsList>
             <TabsContent value="basic" className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="name">{translations[menuLanguage].name}</Label>
+                  <Label htmlFor="name">{translations[language].name}</Label>
                   <Input
                     id="name"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder={translations[menuLanguage].myQRCode}
+                    placeholder={translations[language].myQRCode}
+                    required
+                    className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
                   />
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="textAbove">{translations[menuLanguage].textAboveQR}</Label>
-                  <Input
-                    id="textAbove"
-                    value={textAbove}
-                    onChange={(e) => setTextAbove(e.target.value)}
-                    placeholder={translations[menuLanguage].enterTextAbove}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label htmlFor="textBelow">{translations[menuLanguage].textBelowQR}</Label>
-                  <Input
-                    id="textBelow"
-                    value={textBelow}
-                    onChange={(e) => setTextBelow(e.target.value)}
-                    placeholder={translations[menuLanguage].enterTextBelow}
-                  />
-                </div>
-                <div className="space-y-2">
-                  <Label>{translations[menuLanguage].type}</Label>
+                  <Label htmlFor="type">{translations[language].type}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Button
                       type="button"
@@ -1042,7 +937,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('direct')}
                       className="flex-1"
                     >
-                      {translations[menuLanguage].directLink}
+                      {translations[language].directLink}
                     </Button>
                     <Button
                       type="button"
@@ -1050,7 +945,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('url')}
                       className="flex-1"
                     >
-                      {translations[menuLanguage].url}
+                      {translations[language].url}
                     </Button>
                     <Button
                       type="button"
@@ -1058,7 +953,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('both')}
                       className="flex-1"
                     >
-                      {translations[menuLanguage].both}
+                      {translations[language].both}
                     </Button>
                     <Button
                       type="button"
@@ -1066,26 +961,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={() => setType('vitrine')}
                       className="flex-1"
                     >
-                      {translations[menuLanguage].vitrine}
+                      {translations[language].vitrine}
                     </Button>
                   </div>
                 </div>
                 {type === 'direct' && (
                   <div className="space-y-2">
-                    <Label htmlFor="directUrl">{translations[menuLanguage].url}</Label>
+                    <Label htmlFor="directUrl">{translations[language].url}</Label>
                     <Input
                       id="directUrl"
                       type="url"
                       value={directUrl}
                       onChange={(e) => setDirectUrl(e.target.value)}
-                      placeholder={translations[menuLanguage].enterURL}
+                      placeholder={translations[language].enterURL}
                     />
                   </div>
                 )}
                 {(type === 'url' || type === 'both') && (
                   <div className="space-y-2">
                     <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                      <Label>{translations[menuLanguage].links}</Label>
+                      <Label>{translations[language].links}</Label>
                       <Button
                         type="button"
                         variant="outline"
@@ -1094,7 +989,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                         className="flex items-center gap-2 w-full sm:w-auto"
                       >
                         <Plus className="h-4 w-4" />
-                        {translations[menuLanguage].addLink}
+                        {translations[language].addLink}
                       </Button>
                     </div>
                     <div className="space-y-2">
@@ -1105,24 +1000,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             onValueChange={(value) => updateLink(index, 'type', value)}
                           >
                             <SelectTrigger className="w-full sm:w-[180px]">
-                              <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
+                              <SelectValue placeholder={translations[language].selectPlatform} />
                             </SelectTrigger>
                             <SelectContent>
-                              <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
-                              <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
-                              <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
-                              <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
-                              <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
-                              <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
-                              <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
-                              <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
-                              <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
-                              <SelectItem value="location">{translations[menuLanguage].location}</SelectItem>
-                              <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
+                              <SelectItem value="website">{translations[language].website}</SelectItem>
+                              <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
+                              <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
+                              <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
+                              <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
+                              <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
+                              <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
+                              <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
+                              <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
+                              <SelectItem value="location">{translations[language].location}</SelectItem>
+                              <SelectItem value="other">{translations[language].other}</SelectItem>
                             </SelectContent>
                           </Select>
                           <Input
-                            placeholder={translations[menuLanguage].url}
+                            placeholder={translations[language].url}
                             type="url"
                             value={link.url}
                             onChange={(e) => updateLink(index, 'url', e.target.value)}
@@ -1135,24 +1030,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 {(type === 'menu' || type === 'both') && (
                   <div className="space-y-4">
-                    <div className="flex justify-end mb-4">
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={() => setMenuLanguage(menuLanguage === 'en' ? 'ar' : 'en')}
-                        className="flex items-center gap-2"
-                      >
-                        {menuLanguage === 'en' ? 'العربية' : 'English'}
-                      </Button>
-                    </div>
                     {menuCategories.map((category, categoryIndex) => (
                       <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
                         <div className="flex gap-2 items-center">
                           <Input
-                            placeholder={translations[menuLanguage].categoryName}
+                            placeholder={translations[language].categoryName}
                             value={category.name}
                             onChange={(e) => updateCategory(categoryIndex, e.target.value)}
-                            dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
                           />
                           <Button
                             type="button"
@@ -1167,26 +1052,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           {category.items.map((item, itemIndex) => (
                             <div key={itemIndex} className="space-y-2 border p-2 rounded">
                               <Input
-                                placeholder={translations[menuLanguage].itemName}
+                                placeholder={translations[language].itemName}
                                 value={item.name}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
-                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <Textarea
-                                placeholder={translations[menuLanguage].description}
+                                placeholder={translations[language].description}
                                 value={item.description}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
-                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <Input
                                 type="number"
-                                placeholder={translations[menuLanguage].price}
+                                placeholder={translations[language].price}
                                 value={item.price}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
-                                dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
                               />
                               <div className="space-y-2">
-                                <Label>{translations[menuLanguage].itemImage}</Label>
+                                <Label>{translations[language].itemImage}</Label>
                                 <div className="flex items-center gap-4 mb-2">
                                   {item.imageUrl && (
                                     <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
@@ -1204,12 +1089,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                     }}
                                   >
                                     <Upload className="h-4 w-4 mr-2" />
-                                    {item.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
+                                    {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
                                   </Button>
                                 </div>
                               </div>
                               <div className="space-y-2">
-                                <Label>{translations[menuLanguage].availability}</Label>
+                                <Label>{translations[language].availability}</Label>
                                 <div className="grid grid-cols-4 gap-2">
                                   {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
                                     <div key={day} className="flex items-center space-x-2">
@@ -1224,7 +1109,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                         htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
                                         className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                       >
-                                        {translations[menuLanguage].days[day as keyof typeof translations.en.days]}
+                                        {translations[language].days[day as keyof typeof translations.en.days]}
                                       </label>
                                     </div>
                                   ))}
@@ -1237,7 +1122,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 onClick={() => removeMenuItem(categoryIndex, itemIndex)}
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
-                                {translations[menuLanguage].removeItem}
+                                {translations[language].removeItem}
                               </Button>
                             </div>
                           ))}
@@ -1248,7 +1133,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             onClick={() => addMenuItem(categoryIndex)}
                           >
                             <Plus className="h-4 w-4 mr-2" />
-                            {translations[menuLanguage].addMenuItem}
+                            {translations[language].addMenuItem}
                           </Button>
                         </div>
                       </div>
@@ -1260,7 +1145,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                       onClick={addCategory}
                     >
                       <Plus className="h-4 w-4 mr-2" />
-                      {translations[menuLanguage].addCategory}
+                      {translations[language].addCategory}
                     </Button>
                   </div>
                 )}
@@ -1268,10 +1153,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   <div className="space-y-4">
                     {/* Hero Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
-                      <h3 className="text-lg font-semibold">{translations[menuLanguage].hero}</h3>
+                      <h3 className="text-lg font-semibold">{translations[language].hero}</h3>
                       <div className="space-y-2">
                         <Input
-                          placeholder={translations[menuLanguage].enterBusinessName}
+                          placeholder={translations[language].enterBusinessName}
                           value={vitrine.hero.businessName}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1279,7 +1164,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <Input
-                          placeholder={translations[menuLanguage].enterTagline}
+                          placeholder={translations[language].enterTagline}
                           value={vitrine.hero.tagline}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1288,7 +1173,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                         />
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <Label>{translations[menuLanguage].cta}</Label>
+                            <Label>{translations[language].cta}</Label>
                             <Button
                               type="button"
                               variant="outline"
@@ -1302,13 +1187,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              {translations[menuLanguage].addCta}
+                              {translations[language].addCta}
                             </Button>
                           </div>
                           {vitrine.hero.ctas.map((cta, index) => (
                             <div key={index} className="space-y-2 border p-2 rounded">
                               <Input
-                                placeholder={translations[menuLanguage].enterCtaText}
+                                placeholder={translations[language].enterCtaText}
                                 value={cta.text}
                                 onChange={(e) => {
                                   const newCtas = [...vitrine.hero.ctas];
@@ -1332,24 +1217,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                   }}
                                 >
                                   <SelectTrigger className="w-[180px]">
-                                    <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
+                                    <SelectValue placeholder={translations[language].selectPlatform} />
                                   </SelectTrigger>
                                   <SelectContent>
-                                    <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
-                                    <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
-                                    <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
-                                    <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
-                                    <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
-                                    <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
-                                    <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
-                                    <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
-                                    <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
-                                    <SelectItem value="location">{translations[menuLanguage].location}</SelectItem>
-                                    <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
+                                    <SelectItem value="website">{translations[language].website}</SelectItem>
+                                    <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
+                                    <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
+                                    <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
+                                    <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
+                                    <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
+                                    <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
+                                    <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
+                                    <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
+                                    <SelectItem value="location">{translations[language].location}</SelectItem>
+                                    <SelectItem value="other">{translations[language].other}</SelectItem>
                                   </SelectContent>
                                 </Select>
                                 <Input
-                                  placeholder={translations[menuLanguage].enterCtaLink}
+                                  placeholder={translations[language].enterCtaLink}
                                   value={cta.link}
                                   onChange={(e) => {
                                     const newCtas = [...vitrine.hero.ctas];
@@ -1383,10 +1268,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
                     {/* About Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
-                      <h3 className="text-lg font-semibold">{translations[menuLanguage].about}</h3>
+                      <h3 className="text-lg font-semibold">{translations[language].about}</h3>
                       <div className="space-y-2">
                         <Textarea
-                          placeholder={translations[menuLanguage].enterDescription}
+                          placeholder={translations[language].enterDescription}
                           value={vitrine.about.description}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1394,7 +1279,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <Input
-                          placeholder={translations[menuLanguage].enterCity}
+                          placeholder={translations[language].enterCity}
                           value={vitrine.about.city}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1407,7 +1292,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     {/* Services Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold">{translations[menuLanguage].services}</h3>
+                        <h3 className="text-lg font-semibold">{translations[language].services}</h3>
                         <Button
                           type="button"
                           variant="outline"
@@ -1418,14 +1303,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          {translations[menuLanguage].addService}
+                          {translations[language].addService}
                         </Button>
                       </div>
                       <div className="space-y-4">
                         {vitrine.services.map((service, index) => (
                           <div key={index} className="space-y-2 border p-2 rounded">
                             <Input
-                              placeholder={translations[menuLanguage].enterServiceName}
+                              placeholder={translations[language].enterServiceName}
                               value={service.name}
                               onChange={(e) => {
                                 const newServices = [...vitrine.services];
@@ -1434,7 +1319,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Textarea
-                              placeholder={translations[menuLanguage].enterServiceDescription}
+                              placeholder={translations[language].enterServiceDescription}
                               value={service.description}
                               onChange={(e) => {
                                 const newServices = [...vitrine.services];
@@ -1443,7 +1328,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterImageTitle}
+                              placeholder={translations[language].enterImageTitle}
                               value={service.title}
                               onChange={(e) => {
                                 const newServices = [...vitrine.services];
@@ -1452,7 +1337,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Textarea
-                              placeholder={translations[menuLanguage].enterImageDescription}
+                              placeholder={translations[language].enterImageDescription}
                               value={service.imageDescription}
                               onChange={(e) => {
                                 const newServices = [...vitrine.services];
@@ -1518,7 +1403,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 }}
                               >
                                 <Upload className="h-4 w-4 mr-2" />
-                                {service.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
+                                {service.imageUrl ? translations[language].changeImage : translations[language].addImage}
                               </Button>
                             </div>
                             <Button
@@ -1538,7 +1423,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              {translations[menuLanguage].removeService}
+                              {translations[language].removeService}
                             </Button>
                           </div>
                         ))}
@@ -1548,7 +1433,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     {/* Gallery Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold">{translations[menuLanguage].gallery}</h3>
+                        <h3 className="text-lg font-semibold">{translations[language].gallery}</h3>
                         <Button
                           type="button"
                           variant="outline"
@@ -1559,14 +1444,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          {translations[menuLanguage].addImage}
+                          {translations[language].addImage}
                         </Button>
                       </div>
                       <div className="space-y-4">
                         {vitrine.gallery.map((item, index) => (
                           <div key={index} className="space-y-2 border p-2 rounded">
                             <Input
-                              placeholder={translations[menuLanguage].enterImageTitle}
+                              placeholder={translations[language].enterImageTitle}
                               value={item.title}
                               onChange={(e) => {
                                 const newGallery = [...vitrine.gallery];
@@ -1575,7 +1460,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Textarea
-                              placeholder={translations[menuLanguage].enterImageDescription}
+                              placeholder={translations[language].enterImageDescription}
                               value={item.description}
                               onChange={(e) => {
                                 const newGallery = [...vitrine.gallery];
@@ -1610,7 +1495,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 }}
                               >
                                 <Upload className="h-4 w-4 mr-2" />
-                                {item.imageUrl ? translations[menuLanguage].changeImage : translations[menuLanguage].addImage}
+                                {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
                               </Button>
                             </div>
                             <Button
@@ -1623,7 +1508,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              {translations[menuLanguage].removeImage}
+                              {translations[language].removeImage}
                             </Button>
                           </div>
                         ))}
@@ -1633,7 +1518,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     {/* Testimonials Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
                       <div className="flex justify-between items-center">
-                        <h3 className="text-lg font-semibold">{translations[menuLanguage].testimonials}</h3>
+                        <h3 className="text-lg font-semibold">{translations[language].testimonials}</h3>
                         <Button
                           type="button"
                           variant="outline"
@@ -1644,14 +1529,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         >
                           <Plus className="h-4 w-4 mr-2" />
-                          {translations[menuLanguage].addTestimonial}
+                          {translations[language].addTestimonial}
                         </Button>
                       </div>
                       <div className="space-y-4">
                         {vitrine.testimonials.map((testimonial, index) => (
                           <div key={index} className="space-y-2 border p-2 rounded">
                             <Textarea
-                              placeholder={translations[menuLanguage].enterTestimonialText}
+                              placeholder={translations[language].enterTestimonialText}
                               value={testimonial.text}
                               onChange={(e) => {
                                 const newTestimonials = [...vitrine.testimonials];
@@ -1660,7 +1545,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterAuthor}
+                              placeholder={translations[language].enterAuthor}
                               value={testimonial.author}
                               onChange={(e) => {
                                 const newTestimonials = [...vitrine.testimonials];
@@ -1669,7 +1554,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterCity}
+                              placeholder={translations[language].enterCity}
                               value={testimonial.city}
                               onChange={(e) => {
                                 const newTestimonials = [...vitrine.testimonials];
@@ -1687,7 +1572,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               }}
                             >
                               <Trash2 className="h-4 w-4 mr-2" />
-                              {translations[menuLanguage].removeTestimonial}
+                              {translations[language].removeTestimonial}
                             </Button>
                           </div>
                         ))}
@@ -1696,10 +1581,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
                     {/* Contact Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
-                      <h3 className="text-lg font-semibold">{translations[menuLanguage].contact}</h3>
+                      <h3 className="text-lg font-semibold">{translations[language].contact}</h3>
                       <div className="space-y-2">
                         <Input
-                          placeholder={translations[menuLanguage].enterAddress}
+                          placeholder={translations[language].enterAddress}
                           value={vitrine.contact.address}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1707,7 +1592,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <Input
-                          placeholder={translations[menuLanguage].enterPhone}
+                          placeholder={translations[language].enterPhone}
                           value={vitrine.contact.phone}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1715,7 +1600,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <Input
-                          placeholder={translations[menuLanguage].enterEmail}
+                          placeholder={translations[language].enterEmail}
                           type="email"
                           value={vitrine.contact.email}
                           onChange={(e) => setVitrine({
@@ -1724,10 +1609,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           })}
                         />
                         <div className="space-y-2">
-                          <h4 className="font-medium">{translations[menuLanguage].socialMedia}</h4>
+                          <h4 className="font-medium">{translations[language].socialMedia}</h4>
                           <div className="grid grid-cols-2 gap-2">
                             <Input
-                              placeholder={translations[menuLanguage].enterFacebook}
+                              placeholder={translations[language].enterFacebook}
                               value={vitrine.contact.socialMedia.facebook}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1738,7 +1623,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterInstagram}
+                              placeholder={translations[language].enterInstagram}
                               value={vitrine.contact.socialMedia.instagram}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1749,7 +1634,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterTwitter}
+                              placeholder={translations[language].enterTwitter}
                               value={vitrine.contact.socialMedia.twitter}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1760,7 +1645,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterLinkedin}
+                              placeholder={translations[language].enterLinkedin}
                               value={vitrine.contact.socialMedia.linkedin}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1771,7 +1656,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterYoutube}
+                              placeholder={translations[language].enterYoutube}
                               value={vitrine.contact.socialMedia.youtube}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1782,7 +1667,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterTiktok}
+                              placeholder={translations[language].enterTiktok}
                               value={vitrine.contact.socialMedia.tiktok}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -1811,13 +1696,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <label htmlFor="contactForm" className="text-sm font-medium">
-                              {translations[menuLanguage].enableContactForm}
+                              {translations[language].enableContactForm}
                             </label>
                           </div>
                           {vitrine.contact.contactForm?.enabled && (
                             <div className="space-y-2">
                               <div className="flex justify-between items-center">
-                                <h4 className="font-medium">{translations[menuLanguage].formFields}</h4>
+                                <h4 className="font-medium">{translations[language].formFields}</h4>
                                 <Button
                                   type="button"
                                   variant="outline"
@@ -1837,13 +1722,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                   })}
                                 >
                                   <Plus className="h-4 w-4 mr-2" />
-                                  {translations[menuLanguage].addField}
+                                  {translations[language].addField}
                                 </Button>
                               </div>
                               {vitrine.contact.contactForm?.fields.map((field, index) => (
                                 <div key={index} className="flex gap-2">
                                   <Input
-                                    placeholder={translations[menuLanguage].enterFieldName}
+                                    placeholder={translations[language].enterFieldName}
                                     value={field.name}
                                     onChange={(e) => {
                                       const newFields = [...(vitrine.contact.contactForm?.fields || [])];
@@ -1878,13 +1763,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                     }}
                                   >
                                     <SelectTrigger className="w-[180px]">
-                                      <SelectValue placeholder={translations[menuLanguage].fieldType} />
+                                      <SelectValue placeholder={translations[language].fieldType} />
                                     </SelectTrigger>
                                     <SelectContent>
-                                      <SelectItem value="text">{translations[menuLanguage].textField}</SelectItem>
-                                      <SelectItem value="email">{translations[menuLanguage].emailField}</SelectItem>
-                                      <SelectItem value="phone">{translations[menuLanguage].phoneField}</SelectItem>
-                                      <SelectItem value="textarea">{translations[menuLanguage].textareaField}</SelectItem>
+                                      <SelectItem value="text">{translations[language].textField}</SelectItem>
+                                      <SelectItem value="email">{translations[language].emailField}</SelectItem>
+                                      <SelectItem value="phone">{translations[language].phoneField}</SelectItem>
+                                      <SelectItem value="textarea">{translations[language].textareaField}</SelectItem>
                                     </SelectContent>
                                   </Select>
                                   <div className="flex items-center space-x-2">
@@ -1907,7 +1792,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                       }}
                                     />
                                     <label htmlFor={`required-${index}`} className="text-sm">
-                                      {translations[menuLanguage].required}
+                                      {translations[language].required}
                                     </label>
                                   </div>
                                   <Button
@@ -1940,10 +1825,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
                     {/* Footer Section */}
                     <div className="space-y-2 border p-4 rounded-lg">
-                      <h3 className="text-lg font-semibold">{translations[menuLanguage].footer}</h3>
+                      <h3 className="text-lg font-semibold">{translations[language].footer}</h3>
                       <div className="space-y-2">
                         <Input
-                          placeholder={translations[menuLanguage].enterBusinessName}
+                          placeholder={translations[language].enterBusinessName}
                           value={vitrine.footer.businessName}
                           onChange={(e) => setVitrine({
                             ...vitrine,
@@ -1952,7 +1837,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                         />
                         <div className="space-y-2">
                           <div className="flex justify-between items-center">
-                            <h4 className="font-medium">{translations[menuLanguage].quickLinks}</h4>
+                            <h4 className="font-medium">{translations[language].quickLinks}</h4>
                             <Button
                               type="button"
                               variant="outline"
@@ -1966,13 +1851,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             >
                               <Plus className="h-4 w-4 mr-2" />
-                              {translations[menuLanguage].addQuickLink}
+                              {translations[language].addQuickLink}
                             </Button>
                           </div>
                           {vitrine.footer.quickLinks.map((link, index) => (
                             <div key={index} className="flex gap-2">
                               <Input
-                                placeholder={translations[menuLanguage].enterQuickLinkLabel}
+                                placeholder={translations[language].enterQuickLinkLabel}
                                 value={link.label}
                                 onChange={(e) => {
                                   const newLinks = [...vitrine.footer.quickLinks];
@@ -1984,7 +1869,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                                 }}
                               />
                               <Input
-                                placeholder={translations[menuLanguage].enterQuickLinkUrl}
+                                placeholder={translations[language].enterQuickLinkUrl}
                                 value={link.url}
                                 onChange={(e) => {
                                   const newLinks = [...vitrine.footer.quickLinks];
@@ -2013,10 +1898,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           ))}
                         </div>
                         <div className="space-y-2">
-                          <h4 className="font-medium">{translations[menuLanguage].socialIcons}</h4>
+                          <h4 className="font-medium">{translations[language].socialIcons}</h4>
                           <div className="grid grid-cols-2 gap-2">
                             <Input
-                              placeholder={translations[menuLanguage].enterFacebook}
+                              placeholder={translations[language].enterFacebook}
                               value={vitrine.footer.socialIcons.facebook}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2027,7 +1912,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterInstagram}
+                              placeholder={translations[language].enterInstagram}
                               value={vitrine.footer.socialIcons.instagram}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2038,7 +1923,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterTwitter}
+                              placeholder={translations[language].enterTwitter}
                               value={vitrine.footer.socialIcons.twitter}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2049,7 +1934,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterLinkedin}
+                              placeholder={translations[language].enterLinkedin}
                               value={vitrine.footer.socialIcons.linkedin}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2060,7 +1945,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterYoutube}
+                              placeholder={translations[language].enterYoutube}
                               value={vitrine.footer.socialIcons.youtube}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2071,7 +1956,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                               })}
                             />
                             <Input
-                              placeholder={translations[menuLanguage].enterTiktok}
+                              placeholder={translations[language].enterTiktok}
                               value={vitrine.footer.socialIcons.tiktok}
                               onChange={(e) => setVitrine({
                                 ...vitrine,
@@ -2089,12 +1974,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 )}
                 <div className="mt-4">
                   <QRPreview 
-                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://qrcreator.xyz/landing/${id}` : ''}
+                    url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://qrcreator.xyz/landing/preview` : ''}
                     color={foregroundColor}
                     bgColor={backgroundColor}
                     logoUrl={logoPreview || undefined}
-                    textAbove={textAbove}
-                    textBelow={textBelow}
                   />
                 </div>
               </div>
@@ -2102,7 +1985,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
             <TabsContent value="advanced" className="space-y-4">
               <div className="space-y-4">
                 <div className="space-y-2">
-                  <Label htmlFor="foregroundColor">{translations[menuLanguage].foregroundColor}</Label>
+                  <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="foregroundColor"
@@ -2119,7 +2002,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor">{translations[menuLanguage].backgroundColor}</Label>
+                  <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="backgroundColor"
@@ -2136,7 +2019,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                   </div>
                 </div>
                 <div className="space-y-2">
-                  <Label htmlFor="logo">{translations[menuLanguage].logo}</Label>
+                  <Label htmlFor="logo">{translations[language].logo}</Label>
                   <Input
                     id="logo"
                     type="file"
@@ -2150,7 +2033,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           </Tabs>
           <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
             <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
-              {isLoading ? translations[menuLanguage].creating : translations[menuLanguage].createQRCode}
+              {isLoading ? translations[language].creating : translations[language].createQRCode}
             </Button>
           </div>
         </form>

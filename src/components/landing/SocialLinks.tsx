@@ -113,21 +113,21 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
         <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
         
         <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
-          {links.map((link, index) => {
-            const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
-            return (
+      {links.map((link, index) => {
+        const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
+        return (
               <motion.a
-                key={index}
-                href={link.url}
-                target="_blank"
-                rel="noopener noreferrer"
+            key={index}
+              href={link.url}
+              target="_blank"
+              rel="noopener noreferrer"
                 className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full ${
                   links.length === 1 ? 'max-w-[280px]' : ''
                 }`}
-                style={{ 
+              style={{
                   background: bgColor,
                   boxShadow: `0 4px 14px ${bgColor}40`,
-                }}
+              }}
                 whileHover={{ 
                   y: -3,
                   scale: 1.03,
@@ -135,12 +135,12 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
                   boxShadow: `0 6px 18px ${hoverBgColor}60`
                 }}
                 whileTap={{ scale: 0.97 }}
-              >
+            >
                 <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
                 <span className="font-medium truncate">{label}</span>
-              </motion.a>
-            );
-          })}
+            </motion.a>
+        );
+      })}
         </div>
       </motion.div>
     </motion.div>
