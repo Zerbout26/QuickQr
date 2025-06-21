@@ -258,7 +258,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
   });
 };
 
-export const getQRCodes = async (req: AuthRequest, res: Response) => {
+export const getAllQRCodes = async (req: AuthRequest, res: Response) => {
   try {
     if (!req.user) {
       return res.status(401).json({ error: 'Not authenticated' });
@@ -266,7 +266,7 @@ export const getQRCodes = async (req: AuthRequest, res: Response) => {
 
     const page = parseInt(req.query.page as string, 10) || 1;
     const limit = parseInt(req.query.limit as string, 10) || 5;
-    const searchTerm = req.query.searchTerm as string || '';
+    const searchTerm = (req.query.searchTerm as string) || '';
     const skip = (page - 1) * limit;
 
     const where: any = { user: { id: req.user.id } };

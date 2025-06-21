@@ -254,53 +254,53 @@ const translations = {
 };
 
 const Dashboard = () => {
-  const { user, isTrialExpired, isTrialActive, daysLeftInTrial } = useAuth();
+  const { user, logout, loading: authLoading } = useAuth();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isCreating, setIsCreating] = useState(false);
   const [editingQR, setEditingQR] = useState<QRCode | null>(null);
-  const [newUrl, setNewUrl] = useState('');
   const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
-  const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
-  const navigate = useNavigate();
-  const { language, toggleLanguage } = useLanguage();
+  const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalQRCodes, setTotalQRCodes] = useState(0);
-  const [searchTerm, setSearchTerm] = useState('');
+  const navigate = useNavigate();
+  const { language, translations } = useLanguage();
 
-  // Function to fetch QR codes
-  const fetchQRCodes = async () => {
+  const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
-    
     setIsLoading(true);
     try {
-      const { data, totalPages, total } = await qrCodeApi.getAll(currentPage, 5, searchTerm);
+      const { data, total, totalPages } = await qrCodeApi.getAll(page, 5, search);
       setQrCodes(data);
-      setTotalPages(totalPages);
       setTotalQRCodes(total);
+      setTotalPages(totalPages);
     } catch (error) {
-      console.error('Failed to fetch QR codes', error);
+      console.error("Failed to fetch QR codes", error);
       toast({
         variant: "destructive",
-        title: "Error loading QR codes",
-        description: "There was a problem loading your QR codes.",
+        title: "Error",
+        description: "Could not load your QR codes.",
       });
     } finally {
       setIsLoading(false);
     }
   };
 
-  // Redirect if not logged in
   useEffect(() => {
-    if (!user) {
-      navigate('/signin');
-    }
-  }, [user, navigate]);
+    if (user) {
+      const handler = setTimeout(() => {
+        fetchQRCodes(currentPage, searchTerm);
+      }, 500); // Debounce search
 
-  // Initial fetch
-  useEffect(() => {
-    fetchQRCodes();
+      return () => clearTimeout(handler);
+    }
   }, [user, currentPage, searchTerm]);
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+    setCurrentPage(1); // Reset to first page on new search
+  };
 
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
@@ -769,7 +769,13 @@ const Dashboard = () => {
     downloadWithLogo();
   };
 
-  if (!user) return null;
+  if (authLoading) {
+    return (
+      <div className="flex items-center justify-center h-screen">
+        <div className="animate-spin rounded-full h-16 w-16 border-t-4 border-blue-500"></div>
+      </div>
+    );
+  }
 
   return (
     <MainLayout>

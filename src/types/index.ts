@@ -119,66 +119,26 @@ export interface QRCodeLink {
 export interface QRCode {
   id: string;
   name: string;
-  type: 'direct' | 'menu' | 'vitrine';
+  type: 'url' | 'menu' | 'vitrine' | 'links' | 'both';
+  url: string;
+  scanCount: number;
+  user: User;
+  createdAt: Date;
+  updatedAt: Date;
   logoUrl?: string;
-  backgroundColor?: string;
-  originalUrl?: string;
-  links?: Array<{
-    type: string;
-    url: string;
-  }>;
-  menu?: {
-    categories: Array<{
-      name: string;
-      items: MenuItem[];
-    }>;
-    currency?: string;
-  };
-  vitrine?: {
-    hero: {
-      businessName: string;
-      tagline?: string;
-      ctas: Array<{
-        type: string;
-        link: string;
-      }>;
-    };
-    about: {
-      description?: string;
-      city?: string;
-    };
-    services: Array<{
-      name: string;
-      description?: string;
-      title?: string;
-      imageUrl?: string;
-      imageDescription?: string;
-    }>;
-    gallery: Array<{
-      imageUrl: string;
-      title?: string;
-      description?: string;
-    }>;
-    testimonials: Array<{
-      text: string;
-      author: string;
-      city?: string;
-    }>;
-    contact: {
-      address?: string;
-      phone?: string;
-      email?: string;
-      socialMedia: Record<string, string>;
-    };
-    footer: {
-      copyright: string;
-      businessName: string;
-      quickLinks: Array<{
-        label: string;
-        url: string;
-      }>;
-    };
-  };
+  foregroundColor: string;
+  backgroundColor: string;
+  textAbove?: string;
+  textBelow?: string;
+  links: Link[];
+  menu: Menu;
+  vitrine: VitrineSection;
+}
+
+export interface Link {
+  label: string;
+  url: string;
+  type: string;
 }
 
 export interface AuthContextType {
