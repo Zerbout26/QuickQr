@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import {
   createQRCode,
-  getQRCodes,
+  getAllQRCodes,
   getQRCode,
   updateQRCode,
   deleteQRCode,
@@ -22,7 +22,7 @@ router.post('/:id/scan', incrementScanCount);
 // Protected routes (authentication required)
 router.use(auth); 
 router.post('/', createQRCode);
-router.get('/', getQRCodes);
+router.get('/', getAllQRCodes);
 router.get('/:id', getQRCode);
 router.put('/:id', updateQRCode);
 router.delete('/:id', deleteQRCode);
