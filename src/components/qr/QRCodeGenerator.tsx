@@ -1,10 +1,11 @@
 import { useState, useRef } from 'react';
+import { renderToStaticMarkup } from 'react-dom/server';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { QRCode as QRCodeType } from '@/types';
+import { QRCode as QRCodeType, Link, MenuCategory, MenuItem } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
@@ -40,96 +41,76 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
     if (!qrRef.current) return;
 
     try {
+      const svgString = renderToStaticMarkup(
+        <QRCodeSVG
+          value={url}
+          size={284}
+          bgColor={bgColor}
+          fgColor={color}
+          level="H"
+          includeMargin={true}
+          imageSettings={logoUrl ? {
+            src: logoUrl,
+            x: undefined,
+            y: undefined,
+            height: 56,
+            width: 56,
+            excavate: true,
+          } : undefined}
+        />
+      );
+
       if (format === 'svg') {
-        // Create SVG with text
-        const svgNS = "http://www.w3.org/2000/svg";
-        const svg = document.createElementNS(svgNS, "svg");
-        svg.setAttribute("width", "300");
-        svg.setAttribute("height", "300");
-        svg.setAttribute("viewBox", "0 0 300 300");
-
-        // Add background
-        const rect = document.createElementNS(svgNS, "rect");
-        rect.setAttribute("width", "300");
-        rect.setAttribute("height", "300");
-        rect.setAttribute("fill", "#FFFFFF");
-        svg.appendChild(rect);
-
-        // Add QR code
-        const qrElement = qrRef.current.querySelector('svg');
-        if (qrElement) {
-          const qrClone = qrElement.cloneNode(true) as SVGElement;
-          qrClone.setAttribute("x", "0");
-          qrClone.setAttribute("y", "0");
-          qrClone.setAttribute("width", "300");
-          qrClone.setAttribute("height", "300");
-          svg.appendChild(qrClone);
-        }
-
-        // Add border
-        const border = document.createElementNS(svgNS, "rect");
-        border.setAttribute("width", "300");
-        border.setAttribute("height", "300");
-        border.setAttribute("fill", "none");
-        border.setAttribute("stroke", "#E5E7EB");
-        border.setAttribute("stroke-width", "2");
-        svg.appendChild(border);
-
-        // Convert to string and download
-        const svgString = new XMLSerializer().serializeToString(svg);
         const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(blob);
+        const downloadUrl = URL.createObjectURL(blob);
         const a = document.createElement('a');
-        a.href = url;
-        a.download = `qr-code.${format}`;
+        a.href = downloadUrl;
+        a.download = `qr-code.svg`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      } else {
-        // PNG download
+        URL.revokeObjectURL(downloadUrl);
+      } else { // PNG
         const canvas = document.createElement('canvas');
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-
         canvas.width = 300;
         canvas.height = 300;
-
-        // Fill background
-        ctx.fillStyle = '#FFFFFF';
+        const ctx = canvas.getContext('2d');
+        if (!ctx) return;
+        
+        ctx.fillStyle = bgColor;
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-        // Draw QR code
-        const qrElement = qrRef.current.querySelector('svg');
-        if (qrElement) {
-          const svgData = new XMLSerializer().serializeToString(qrElement);
-          const img = new Image();
-          await new Promise<void>((resolve) => {
-            img.onload = () => resolve();
-            img.src = 'data:image/svg+xml;base64,' + btoa(svgData);
-          });
-          const qrSize = 300;
-          const qrX = (canvas.width - qrSize) / 2;
-          const qrY = 0;
-          ctx.drawImage(img, qrX, qrY, qrSize, qrSize);
-        }
+        const img = new Image();
+        
+        const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
+        const imgUrl = URL.createObjectURL(svgBlob);
+        
+        await new Promise<void>((resolve, reject) => {
+            img.onload = () => {
+                const x = (canvas.width - img.width) / 2;
+                const y = (canvas.height - img.height) / 2;
+                ctx.drawImage(img, x, y);
+                URL.revokeObjectURL(imgUrl);
+                resolve();
+            };
+            img.onerror = (err) => {
+                console.error("Failed to load SVG image for canvas drawing", err);
+                URL.revokeObjectURL(imgUrl);
+                reject(new Error("Failed to load SVG image for canvas drawing"));
+            };
+            img.src = imgUrl;
+        });
 
-        // Add border
-        ctx.strokeStyle = '#E5E7EB';
-        ctx.lineWidth = 2;
-        ctx.strokeRect(0, 0, canvas.width, canvas.height);
-
-        // Convert to blob and download
         canvas.toBlob((blob) => {
           if (!blob) return;
-          const url = URL.createObjectURL(blob);
+          const downloadUrl = URL.createObjectURL(blob);
           const a = document.createElement('a');
-          a.href = url;
-          a.download = `qr-code.${format}`;
+          a.href = downloadUrl;
+          a.download = `qr-code.png`;
           document.body.appendChild(a);
           a.click();
           document.body.removeChild(a);
-          URL.revokeObjectURL(url);
+          URL.revokeObjectURL(downloadUrl);
         }, 'image/png', 1.0);
       }
 
@@ -159,7 +140,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
         <QRCodeSVG
           value={url}
           size={176}
-          bgColor={bgColor}
+          bgColor="transparent"
           fgColor={color}
           level="H"
           includeMargin={false}
@@ -194,26 +175,6 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
     </div>
   );
 };
-
-interface Link {
-  label: string;
-  url: string;
-  type: string;
-}
-
-interface MenuItem {
-  name: string;
-  description?: string;
-  price: number;
-  category: string;
-  imageUrl?: string;
-  availability: Record<string, boolean>;
-}
-
-interface MenuCategory {
-  name: string;
-  items: MenuItem[];
-}
 
 interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
@@ -589,7 +550,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       name: '',
       description: '',
       price: 0,
-      category: newCategories[categoryIndex].name,
       imageUrl: '',
       availability: { ...defaultAvailability },
     });
@@ -604,9 +564,19 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
 
   const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number) => {
     const newCategories = [...menuCategories];
+    const item = newCategories[categoryIndex].items[itemIndex];
+    
+    let processedValue = value;
+    if (field === 'price') {
+      processedValue = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(processedValue as number)) {
+        processedValue = 0;
+      }
+    }
+
     newCategories[categoryIndex].items[itemIndex] = {
-      ...newCategories[categoryIndex].items[itemIndex],
-      [field]: value,
+      ...item,
+      [field]: processedValue,
     };
     setMenuCategories(newCategories);
   };
@@ -986,11 +956,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                             dir={language === 'ar' ? 'rtl' : 'ltr'}
                           />
                           <Input
-                            type="number"
                             placeholder={translations[language].price}
+                            type="number"
                             value={item.price}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
-                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
                           />
                           <div className="space-y-2">
                             <Label>{translations[language].itemImage}</Label>

@@ -22,7 +22,7 @@ export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';
 export interface MenuItem {
   name: string;
   description?: string;
-  price: string;
+  price: number;
   imageUrl?: string;
   availability?: Record<string, boolean>;
 }
@@ -119,7 +119,7 @@ export interface QRCodeLink {
 export interface QRCode {
   id: string;
   name: string;
-  type: 'url' | 'menu' | 'vitrine' | 'links' | 'both';
+  type: 'url' | 'menu' | 'vitrine' | 'links' | 'both' | 'direct';
   url: string;
   scanCount: number;
   user: User;

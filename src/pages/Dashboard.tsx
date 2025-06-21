@@ -336,11 +336,21 @@ const Dashboard = () => {
       // Prepare the update data
       const updateData: Partial<QRCode> = {
         name: editingQR.name,
-        url: newUrl,
+        url: editingQR.url,
+        logoUrl: editingQR.logoUrl,
         foregroundColor: editingQR.foregroundColor,
         backgroundColor: editingQR.backgroundColor,
         links: editingQR.links || [],
-        menu: editingQR.menu || { restaurantName: '', categories: [] },
+        menu: editingQR.menu ? {
+          ...editingQR.menu,
+          categories: editingQR.menu.categories.map(category => ({
+            ...category,
+            items: category.items.map(item => ({
+              ...item,
+              price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
+            })),
+          })),
+        } : { restaurantName: '', categories: [] },
         type: editingQR.type
       };
 
@@ -514,8 +524,8 @@ const Dashboard = () => {
             <QRCodeSVG
               value={qr.url}
               size={design.qrSize}
-              bgColor={design.qrBgColor}
-              fgColor={design.qrFgColor}
+              bgColor={qr.backgroundColor || design.qrBgColor}
+              fgColor={qr.foregroundColor || design.qrFgColor}
               level="H"
               includeMargin={true}
               imageSettings={logoImage ? {
@@ -603,8 +613,8 @@ const Dashboard = () => {
             <QRCodeCanvas
               value={qr.url}
               size={design.qrSize}
-              bgColor={design.qrBgColor}
-              fgColor={design.qrFgColor}
+              bgColor={qr.backgroundColor || design.qrBgColor}
+              fgColor={qr.foregroundColor || design.qrFgColor}
               level="H"
               includeMargin={false}
               imageSettings={logoImage ? {

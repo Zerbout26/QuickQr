@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Globe, Upload } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { QRCode, QRCodeType } from '@/types';
+import { QRCode, QRCodeType, MenuItem, MenuCategory, Link } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import {
   Select,
@@ -130,9 +130,10 @@ const translations = {
 };
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
+  type EditorQrType = 'url' | 'menu' | 'vitrine' | 'links' | 'both';
   const [name, setName] = useState(qrCode.name);
-  const [type, setType] = useState<'url' | 'menu' | 'both' | 'vitrine'>(
-    qrCode.type === 'direct' ? 'url' : qrCode.type as 'url' | 'menu' | 'both' | 'vitrine'
+  const [type, setType] = useState<EditorQrType>(
+    qrCode.type === 'direct' ? 'url' : (qrCode.type as EditorQrType)
   );
   const allowedTypes = [
     'website', 'facebook', 'instagram', 'twitter', 'linkedin', 'youtube', 'whatsapp', 'telegram', 'tiktok', 'other'
@@ -483,7 +484,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       name: '',
       description: '',
       price: 0,
-      category: newCategories[categoryIndex].name,
       imageUrl: '',
       availability: { ...defaultAvailability },
     });
@@ -498,9 +498,19 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
   const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number) => {
     const newCategories = [...menuCategories];
+    const item = newCategories[categoryIndex].items[itemIndex];
+
+    let processedValue = value;
+    if (field === 'price') {
+      processedValue = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(processedValue as number)) {
+        processedValue = 0;
+      }
+    }
+
     newCategories[categoryIndex].items[itemIndex] = {
-      ...newCategories[categoryIndex].items[itemIndex],
-      [field]: value,
+      ...item,
+      [field]: processedValue,
     };
     setMenuCategories(newCategories);
   };
@@ -968,12 +978,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
                           />
                           <Input
-                            type="number"
                             placeholder="Price"
+                            type="number"
                             value={item.price}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', parseFloat(e.target.value))}
+                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
                           />
-                          <div className="space-y-2">
+                          <div className="space-y-1">
                             <Label>Availability</Label>
                             <div className="grid grid-cols-4 gap-2">
                               {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
