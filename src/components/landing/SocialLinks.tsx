@@ -6,9 +6,19 @@ interface Link {
   url: string;
 }
 
+interface LandingPageColors {
+  primaryColor: string;
+  primaryHoverColor: string;
+  accentColor: string;
+  backgroundGradient: string;
+  loadingSpinnerColor: string;
+  loadingSpinnerBorderColor: string;
+}
+
 interface SocialLinksProps {
   links: Link[];
   menuLanguage: 'en' | 'ar';
+  colors: LandingPageColors;
 }
 
 const getPlatformInfo = (type: string) => {
@@ -84,7 +94,7 @@ const getPlatformInfo = (type: string) => {
   return platforms[type as keyof typeof platforms] || platforms.other;
 };
 
-const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
+const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
   if (!links || links.length === 0) return null;
 
   return (
@@ -96,7 +106,8 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
       transition={{ duration: 0.5 }}
     >
       <motion.h3 
-        className="text-2xl sm:text-3xl font-bold text-[#8b5cf6] text-center mb-6"
+        className="text-2xl sm:text-3xl font-bold text-center mb-6"
+        style={{ color: colors.primaryColor }}
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
@@ -110,7 +121,12 @@ const SocialLinks = ({ links, menuLanguage }: SocialLinksProps) => {
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.2 }}
       >
-        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-xl -z-10"></div>
+        <div 
+          className="absolute inset-0 bg-gradient-to-br rounded-xl -z-10"
+          style={{
+            background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
+          }}
+        ></div>
         
         <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
       {links.map((link, index) => {

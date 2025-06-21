@@ -423,7 +423,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
   const [primaryHoverColor, setPrimaryHoverColor] = useState('#7c3aed');
   const [accentColor, setAccentColor] = useState('#ec4899');
-  const [backgroundGradient, setBackgroundGradient] = useState('linear-gradient(to bottom right, #8b5cf620, white, #ec489920)');
   const [loadingSpinnerColor, setLoadingSpinnerColor] = useState('#8b5cf6');
   const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState('rgba(139, 92, 246, 0.2)');
 
@@ -442,7 +441,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     setPrimaryColor('#8b5cf6');
     setPrimaryHoverColor('#7c3aed');
     setAccentColor('#ec4899');
-    setBackgroundGradient('linear-gradient(to bottom right, #8b5cf620, white, #ec489920)');
     setLoadingSpinnerColor('#8b5cf6');
     setLoadingSpinnerBorderColor('rgba(139, 92, 246, 0.2)');
     if (fileInputRef.current) {
@@ -664,7 +662,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       formData.append('primaryColor', primaryColor);
       formData.append('primaryHoverColor', primaryHoverColor);
       formData.append('accentColor', accentColor);
-      formData.append('backgroundGradient', backgroundGradient);
       formData.append('loadingSpinnerColor', loadingSpinnerColor);
       formData.append('loadingSpinnerBorderColor', loadingSpinnerBorderColor);
       
@@ -1646,13 +1643,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundGradient">Background Gradient</Label>
-                  <Input
-                    id="backgroundGradient"
-                    value={backgroundGradient}
-                    onChange={(e) => setBackgroundGradient(e.target.value)}
-                    placeholder="linear-gradient(to bottom right, #8b5cf620, white, #ec489920)"
-                  />
+                  <Label>Background Gradient</Label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
+                    <p className="text-sm text-gray-600 mb-2">
+                      The background gradient is automatically generated based on your Primary and Accent colors.
+                    </p>
+                    <div 
+                      className="w-full h-8 rounded border"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
+                      }}
+                    ></div>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">

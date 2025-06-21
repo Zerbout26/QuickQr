@@ -624,7 +624,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         formData.append('primaryColor', primaryColor);
         formData.append('primaryHoverColor', primaryHoverColor);
         formData.append('accentColor', accentColor);
-        formData.append('backgroundGradient', backgroundGradient);
         formData.append('loadingSpinnerColor', loadingSpinnerColor);
         formData.append('loadingSpinnerBorderColor', loadingSpinnerBorderColor);
 
@@ -1551,13 +1550,18 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundGradient">Background Gradient</Label>
-                  <Input
-                    id="backgroundGradient"
-                    value={backgroundGradient}
-                    onChange={(e) => setBackgroundGradient(e.target.value)}
-                    placeholder="linear-gradient(to bottom right, #8b5cf620, white, #ec489920)"
-                  />
+                  <Label>Background Gradient</Label>
+                  <div className="p-3 bg-gray-50 rounded-md border">
+                    <p className="text-sm text-gray-600 mb-2">
+                      The background gradient is automatically generated based on your Primary and Accent colors.
+                    </p>
+                    <div 
+                      className="w-full h-8 rounded border"
+                      style={{ 
+                        background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
+                      }}
+                    ></div>
+                  </div>
                 </div>
                 
                 <div className="space-y-2">

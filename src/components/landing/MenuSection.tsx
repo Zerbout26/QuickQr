@@ -1,6 +1,15 @@
 import { motion } from 'framer-motion';
 import { MenuItem } from '@/types';
 
+interface LandingPageColors {
+  primaryColor: string;
+  primaryHoverColor: string;
+  accentColor: string;
+  backgroundGradient: string;
+  loadingSpinnerColor: string;
+  loadingSpinnerBorderColor: string;
+}
+
 interface MenuSectionProps {
   menu: {
     categories: {
@@ -12,6 +21,7 @@ interface MenuSectionProps {
   menuLanguage: 'en' | 'ar';
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
+  colors: LandingPageColors;
 }
 
 const translations = {
@@ -29,7 +39,7 @@ const translations = {
   },
 };
 
-const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory }: MenuSectionProps) => {
+const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory, colors }: MenuSectionProps) => {
   if (!menu?.categories) return null;
 
   const isItemAvailableToday = (item: MenuItem): boolean => {
@@ -48,10 +58,16 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
         transition={{ duration: 0.5 }}
         className="text-center"
       >
-        <h3 className="text-3xl sm:text-4xl font-bold text-[#6d28d9] mb-2">
+        <h3 
+          className="text-3xl sm:text-4xl font-bold mb-2"
+          style={{ color: colors.primaryColor }}
+        >
           {translations[menuLanguage].menu}
         </h3>
-        <div className="w-20 h-1 bg-[#8b5cf6] mx-auto rounded-full"></div>
+        <div 
+          className="w-20 h-1 mx-auto rounded-full"
+          style={{ backgroundColor: colors.primaryColor }}
+        ></div>
       </motion.div>
 
       {/* Category Filter */}
@@ -68,9 +84,10 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
             onClick={() => setSelectedCategory(null)}
             className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
               selectedCategory === null
-                ? 'bg-[#6d28d9] text-white shadow-sm'
+                ? 'text-white shadow-sm'
                 : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
             }`}
+            style={selectedCategory === null ? { backgroundColor: colors.primaryColor } : {}}
           >
             {translations[menuLanguage].allItems}
           </motion.button>
@@ -82,9 +99,10 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
               onClick={() => setSelectedCategory(category)}
               className={`px-4 py-2 rounded-md text-sm font-medium whitespace-nowrap transition-all ${
                 selectedCategory === category
-                  ? 'bg-[#6d28d9] text-white shadow-sm'
+                  ? 'text-white shadow-sm'
                   : 'bg-gray-50 text-gray-600 hover:bg-gray-100'
               }`}
+              style={selectedCategory === category ? { backgroundColor: colors.primaryColor } : {}}
             >
               {category}
             </motion.button>
@@ -154,7 +172,10 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                           )}
                           
                           <div className="flex justify-between items-center">
-                            <span className="text-lg font-bold text-[#6d28d9]">
+                            <span 
+                              className="text-lg font-bold"
+                              style={{ color: colors.primaryColor }}
+                            >
                               {item.price} {menu.currency || 'DZD'}
                             </span>
                           </div>

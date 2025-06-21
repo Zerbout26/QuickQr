@@ -13,45 +13,156 @@ interface LandingPageColors {
   loadingSpinnerBorderColor: string;
 }
 
+// Function to generate dynamic background gradient based on user colors
+const generateDynamicBackground = (primaryColor: string, accentColor: string): string => {
+  // Convert hex to RGB for better gradient control
+  const hexToRgb = (hex: string) => {
+    const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result ? {
+      r: parseInt(result[1], 16),
+      g: parseInt(result[2], 16),
+      b: parseInt(result[3], 16)
+    } : null;
+  };
+
+  const primaryRgb = hexToRgb(primaryColor);
+  const accentRgb = hexToRgb(accentColor);
+
+  if (!primaryRgb || !accentRgb) {
+    // Fallback to default gradient if color parsing fails
+    return 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)';
+  }
+
+  // Check if primary and accent colors are the same
+  const isSameColor = primaryColor.toLowerCase() === accentColor.toLowerCase();
+  
+  if (isSameColor) {
+    // When colors are the same, create a monochromatic gradient
+    const colorIntensity = (primaryRgb.r + primaryRgb.g + primaryRgb.b) / 3;
+    
+    if (colorIntensity > 200) {
+      // Light colors - create subtle gradient with white
+      return `linear-gradient(135deg, 
+        ${primaryColor}30 0%, 
+        ${primaryColor}20 25%, 
+        white 50%, 
+        ${primaryColor}20 75%, 
+        ${primaryColor}30 100%
+      )`;
+    } else if (colorIntensity > 150) {
+      // Medium-light colors - more pronounced gradient
+      return `linear-gradient(135deg, 
+        ${primaryColor}40 0%, 
+        ${primaryColor}25 30%, 
+        white 60%, 
+        ${primaryColor}25 80%, 
+        ${primaryColor}40 100%
+      )`;
+    } else {
+      // Dark colors - subtle gradient
+      return `linear-gradient(135deg, 
+        ${primaryColor}25 0%, 
+        ${primaryColor}15 30%, 
+        white 60%, 
+        ${primaryColor}15 80%, 
+        ${primaryColor}25 100%
+      )`;
+    }
+  }
+
+  // Different colors - create multiple gradient options
+  const gradients = [
+    // Option 1: Diagonal gradient with degradation
+    `linear-gradient(135deg, 
+      ${primaryColor}25 0%, 
+      ${primaryColor}15 20%, 
+      white 50%, 
+      ${accentColor}15 80%, 
+      ${accentColor}25 100%
+    )`,
+    
+    // Option 2: Radial gradient for more organic feel
+    `radial-gradient(ellipse at center, 
+      ${primaryColor}20 0%, 
+      ${primaryColor}12 30%, 
+      white 60%, 
+      ${accentColor}12 80%, 
+      ${accentColor}20 100%
+    )`,
+    
+    // Option 3: Multi-stop gradient for more complex degradation
+    `linear-gradient(135deg, 
+      ${primaryColor}30 0%, 
+      ${primaryColor}20 15%, 
+      ${primaryColor}10 30%, 
+      white 50%, 
+      ${accentColor}10 70%, 
+      ${accentColor}20 85%, 
+      ${accentColor}30 100%
+    )`
+  ];
+
+  // Choose gradient based on color intensity
+  const colorIntensity = (primaryRgb.r + primaryRgb.g + primaryRgb.b) / 3;
+  const accentIntensity = (accentRgb.r + accentRgb.g + accentRgb.b) / 3;
+  
+  // Use different gradients based on color characteristics
+  if (colorIntensity < 128 && accentIntensity < 128) {
+    // Dark colors - use more subtle gradient
+    return gradients[0];
+  } else if (Math.abs(colorIntensity - accentIntensity) > 100) {
+    // High contrast colors - use radial gradient
+    return gradients[1];
+  } else {
+    // Similar intensity colors - use multi-stop gradient
+    return gradients[2];
+  }
+};
+
 // Critical CSS with !important overrides to eliminate all white space
-const CriticalCSS = ({ colors }: { colors: LandingPageColors }) => (
-  <style dangerouslySetInnerHTML={{
-    __html: `
-      html, body, #root {
-        margin: 0 !important;
-        padding: 0 !important;
-        width: 100% !important;
-        min-height: 100vh !important;
-        overflow-x: hidden !important;
-      }
-      .landing-container {
-        background: ${colors.backgroundGradient} !important;
-        min-height: 100vh !important;
-        display: flex !important;
-        flex-direction: column !important;
-      }
-      .content-wrapper {
-        flex: 1 !important;
-        width: 100% !important;
-        max-width: 1200px !important;
-        margin: 0 auto !important;
-        padding: 0 16px !important;
-      }
-      .loading-spinner {
-        border: 3px solid ${colors.loadingSpinnerBorderColor} !important;
-        border-top: 3px solid ${colors.loadingSpinnerColor} !important;
-        border-radius: 50% !important;
-        width: 24px !important;
-        height: 24px !important;
-        animation: spin 1s linear infinite !important;
-      }
-      @keyframes spin {
-        0% { transform: rotate(0deg) !important; }
-        100% { transform: rotate(360deg) !important; }
-      }
-    `
-  }} />
-);
+const CriticalCSS = ({ colors }: { colors: LandingPageColors }) => {
+  // Generate dynamic background based on user colors
+  const dynamicBackground = generateDynamicBackground(colors.primaryColor, colors.accentColor);
+  
+  return (
+    <style dangerouslySetInnerHTML={{
+      __html: `
+        html, body, #root {
+          margin: 0 !important;
+          padding: 0 !important;
+          width: 100% !important;
+          min-height: 100vh !important;
+          overflow-x: hidden !important;
+        }
+        .landing-container {
+          background: ${dynamicBackground} !important;
+          min-height: 100vh !important;
+          display: flex !important;
+          flex-direction: column !important;
+        }
+        .content-wrapper {
+          flex: 1 !important;
+          width: 100% !important;
+          max-width: 1200px !important;
+          margin: 0 auto !important;
+          padding: 0 16px !important;
+        }
+        .loading-spinner {
+          border: 3px solid ${colors.loadingSpinnerBorderColor} !important;
+          border-top: 3px solid ${colors.loadingSpinnerColor} !important;
+          border-radius: 50% !important;
+          width: 24px !important;
+          height: 24px !important;
+          animation: spin 1s linear infinite !important;
+        }
+        @keyframes spin {
+          0% { transform: rotate(0deg) !important; }
+          100% { transform: rotate(360deg) !important; }
+        }
+      `
+    }} />
+  );
+};
 
 // Lazy load all components with prefetch
 const MenuSection = lazy(() => import(
@@ -79,7 +190,7 @@ const LandingPage = () => {
     primaryColor: '#8b5cf6',
     primaryHoverColor: '#7c3aed',
     accentColor: '#ec4899',
-    backgroundGradient: 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)',
+    backgroundGradient: 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)',
     loadingSpinnerColor: '#8b5cf6',
     loadingSpinnerBorderColor: 'rgba(139, 92, 246, 0.2)'
   });
@@ -155,19 +266,20 @@ const LandingPage = () => {
         if (data.type === 'direct' && data.originalUrl) {
           window.location.href = data.originalUrl;
         }
-      } catch (err: any) {
+      } catch (err: unknown) {
         if (!isMounted) return;
         
         console.error('Error fetching QR code:', err);
-        if (err.response) {
-          if (err.response.status === 403) {
+        if (err && typeof err === 'object' && 'response' in err) {
+          const errorResponse = err as { response: { status: number; data?: { error?: string } } };
+          if (errorResponse.response.status === 403) {
             navigate('/payment-instructions');
             return;
           }
-          if (err.response.status === 404) {
+          if (errorResponse.response.status === 404) {
             setError('QR code not found');
           } else {
-            setError(err.response.data?.error || 'Failed to load QR code');
+            setError(errorResponse.response.data?.error || 'Failed to load QR code');
           }
         } else {
           setError('Failed to load QR code');
@@ -200,7 +312,11 @@ const LandingPage = () => {
                     {/* Social Links */}
           {hasLinks && (
             <Suspense fallback={null}>
-              <SocialLinks links={qrCode.links} menuLanguage={menuLanguage} />
+              <SocialLinks 
+                links={qrCode.links} 
+                menuLanguage={menuLanguage} 
+                colors={landingPageColors}
+              />
             </Suspense>
           )}
 
@@ -212,6 +328,7 @@ const LandingPage = () => {
                 menuLanguage={menuLanguage}
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
+                colors={landingPageColors}
               />
             </Suspense>
           )}
@@ -219,7 +336,11 @@ const LandingPage = () => {
           {/* Vitrine Section */}
           {hasVitrine && (
             <Suspense fallback={null}>
-              <VitrineSection vitrine={qrCode.vitrine} menuLanguage={menuLanguage} />
+              <VitrineSection 
+                vitrine={qrCode.vitrine} 
+                menuLanguage={menuLanguage} 
+                colors={landingPageColors}
+              />
             </Suspense>
           )}
 

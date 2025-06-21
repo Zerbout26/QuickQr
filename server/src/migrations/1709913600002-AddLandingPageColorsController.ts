@@ -10,7 +10,7 @@ export class AddLandingPageColorsController1709913600002 implements MigrationInt
             ADD COLUMN IF NOT EXISTS "primaryColor" character varying DEFAULT '#8b5cf6',
             ADD COLUMN IF NOT EXISTS "primaryHoverColor" character varying DEFAULT '#7c3aed',
             ADD COLUMN IF NOT EXISTS "accentColor" character varying DEFAULT '#ec4899',
-            ADD COLUMN IF NOT EXISTS "backgroundGradient" character varying DEFAULT 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)',
+            ADD COLUMN IF NOT EXISTS "backgroundGradient" character varying DEFAULT 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)',
             ADD COLUMN IF NOT EXISTS "loadingSpinnerColor" character varying DEFAULT '#8b5cf6',
             ADD COLUMN IF NOT EXISTS "loadingSpinnerBorderColor" character varying DEFAULT 'rgba(139, 92, 246, 0.2)'
         `);

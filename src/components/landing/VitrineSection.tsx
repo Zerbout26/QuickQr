@@ -2,6 +2,15 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin } from 'lucide-react';
 import { useState } from 'react';
 
+interface LandingPageColors {
+  primaryColor: string;
+  primaryHoverColor: string;
+  accentColor: string;
+  backgroundGradient: string;
+  loadingSpinnerColor: string;
+  loadingSpinnerBorderColor: string;
+}
+
 interface VitrineSectionProps {
   vitrine: {
     hero: {
@@ -50,10 +59,11 @@ interface VitrineSectionProps {
     };
   };
   menuLanguage: 'en' | 'ar';
+  colors: LandingPageColors;
 }
 
 const getPlatformInfo = (type: string) => {
-  const platforms: Record<string, { label: string; icon: any; bgColor: string; hoverBgColor: string }> = {
+  const platforms: Record<string, { label: string; icon: React.ComponentType<{ className?: string }>; bgColor: string; hoverBgColor: string }> = {
     facebook: {
       label: 'Facebook',
       icon: Facebook,
@@ -181,16 +191,22 @@ const BlurImage = ({ src, alt, className }: { src: string; alt: string; classNam
   );
 };
 
-const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
+const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) => {
   if (!vitrine) return null;
 
   return (
     <div className="space-y-16 mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
       <div className="text-center mb-12 relative">
-        <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20 -z-10 rounded-3xl"></div>
+        <div 
+          className="absolute inset-0 -z-10 rounded-3xl"
+          style={{
+            background: `linear-gradient(to bottom right, ${colors.primaryColor}20, white, ${colors.accentColor}20)`
+          }}
+        ></div>
         <motion.h2 
-          className="text-4xl sm:text-5xl font-bold tracking-tight text-[#8b5cf6] mb-6"
+          className="text-4xl sm:text-5xl font-bold tracking-tight mb-6"
+          style={{ color: colors.primaryColor }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -243,15 +259,26 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-white to-[#ec4899]/20 -z-10 rounded-3xl"></div>
-          <h3 className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] mb-6">
+          <div 
+            className="absolute inset-0 -z-10 rounded-3xl"
+            style={{
+              background: `linear-gradient(to bottom right, ${colors.primaryColor}20, white, ${colors.accentColor}20)`
+            }}
+          ></div>
+          <h3 
+            className="text-3xl sm:text-4xl font-bold mb-6"
+            style={{ color: colors.primaryColor }}
+          >
             {menuLanguage === 'ar' ? 'من نحن' : 'About Us'}
           </h3>
           <p className="text-gray-600 text-lg sm:text-xl leading-relaxed">
             {vitrine.about.description}
           </p>
           {vitrine.about.city && (
-            <p className="text-[#8b5cf6]/80 mt-4 text-lg font-medium">
+            <p 
+              className="mt-4 text-lg font-medium"
+              style={{ color: `${colors.primaryColor}80` }}
+            >
               {vitrine.about.city}
             </p>
           )}
@@ -262,7 +289,8 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.services.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-center mb-8"
+            style={{ color: colors.primaryColor }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -283,7 +311,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 via-[#ec4899]/5 to-transparent -z-10"></div>
+                <div 
+                  className="absolute inset-0 -z-10"
+                  style={{
+                    background: `linear-gradient(to bottom right, ${colors.primaryColor}10, ${colors.accentColor}05, transparent)`
+                  }}
+                ></div>
                 {service.imageUrl && (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <BlurImage
@@ -293,13 +326,24 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     />
                   </div>
                 )}
-                <div className="p-6 bg-gradient-to-br from-white to-[#8b5cf6]/5">
-                  <h4 className="text-2xl font-bold text-[#8b5cf6] mb-3">{service.name}</h4>
+                <div 
+                  className="p-6"
+                  style={{
+                    background: `linear-gradient(to bottom right, white, ${colors.primaryColor}05)`
+                  }}
+                >
+                  <h4 
+                    className="text-2xl font-bold mb-3"
+                    style={{ color: colors.primaryColor }}
+                  >{service.name}</h4>
                   {service.description && (
                     <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
                   )}
                   {service.title && (
-                    <p className="text-[#8b5cf6]/80 font-medium">{service.title}</p>
+                    <p 
+                      className="font-medium"
+                      style={{ color: `${colors.primaryColor}80` }}
+                    >{service.title}</p>
                   )}
                   {service.imageDescription && (
                     <p className="text-gray-500 mt-2 text-sm">{service.imageDescription}</p>
@@ -315,7 +359,8 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.gallery.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-center mb-8"
+            style={{ color: colors.primaryColor }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -336,7 +381,12 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/10 via-[#ec4899]/5 to-transparent -z-10"></div>
+                <div 
+                  className="absolute inset-0 -z-10"
+                  style={{
+                    background: `linear-gradient(to bottom right, ${colors.primaryColor}10, ${colors.accentColor}05, transparent)`
+                  }}
+                ></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <BlurImage
                     src={item.imageUrl}
@@ -344,9 +394,17 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                     className="transition-transform duration-500 group-hover:scale-110"
                   />
                 </div>
-                <div className="p-6 bg-gradient-to-br from-white to-[#8b5cf6]/5">
+                <div 
+                  className="p-6"
+                  style={{
+                    background: `linear-gradient(to bottom right, white, ${colors.primaryColor}05)`
+                  }}
+                >
                   {item.title && (
-                    <h4 className="text-2xl font-bold text-[#8b5cf6] mb-3">{item.title}</h4>
+                    <h4 
+                      className="text-2xl font-bold mb-3"
+                      style={{ color: colors.primaryColor }}
+                    >{item.title}</h4>
                   )}
                   {item.description && (
                     <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
@@ -362,7 +420,8 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {vitrine.testimonials.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+            className="text-3xl sm:text-4xl font-bold text-center mb-8"
+            style={{ color: colors.primaryColor }}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -379,13 +438,27 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
-                <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
-                <div className="absolute top-4 left-4 text-6xl text-[#8b5cf6]/10 font-serif">"</div>
+                <div 
+                  className="absolute inset-0 rounded-2xl -z-10"
+                  style={{
+                    background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
+                  }}
+                ></div>
+                <div 
+                  className="absolute top-4 left-4 text-6xl font-serif"
+                  style={{ color: `${colors.primaryColor}10` }}
+                >"</div>
                 <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
                 <div className="flex items-center justify-between">
-                  <span className="font-bold text-[#8b5cf6] text-lg">{testimonial.author}</span>
+                  <span 
+                    className="font-bold text-lg"
+                    style={{ color: colors.primaryColor }}
+                  >{testimonial.author}</span>
                   {testimonial.city && (
-                    <span className="text-[#8b5cf6]/80 text-base">{testimonial.city}</span>
+                    <span 
+                      className="text-base"
+                      style={{ color: `${colors.primaryColor}80` }}
+                    >{testimonial.city}</span>
                   )}
                 </div>
               </motion.div>
@@ -397,7 +470,8 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
       {/* Contact Section */}
       <div className="space-y-10 px-4">
         <motion.h3 
-          className="text-3xl sm:text-4xl font-bold text-[#8b5cf6] text-center mb-8"
+          className="text-3xl sm:text-4xl font-bold text-center mb-8"
+          style={{ color: colors.primaryColor }}
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -411,10 +485,18 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
+            <div 
+              className="absolute inset-0 rounded-2xl -z-10"
+              style={{
+                background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
+              }}
+            ></div>
             {vitrine.contact.address && (
               <div>
-                <h4 className="font-bold text-[#8b5cf6] text-lg mb-2">
+                <h4 
+                  className="font-bold text-lg mb-2"
+                  style={{ color: colors.primaryColor }}
+                >
                   {menuLanguage === 'ar' ? 'العنوان' : 'Address'}
                 </h4>
                 <p className="text-gray-600 text-base">{vitrine.contact.address}</p>
@@ -422,7 +504,10 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             )}
             {vitrine.contact.phone && (
               <div>
-                <h4 className="font-bold text-[#8b5cf6] text-lg mb-2">
+                <h4 
+                  className="font-bold text-lg mb-2"
+                  style={{ color: colors.primaryColor }}
+                >
                   {menuLanguage === 'ar' ? 'الهاتف' : 'Phone'}
                 </h4>
                 <p className="text-gray-600 text-base">{vitrine.contact.phone}</p>
@@ -430,7 +515,10 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             )}
             {vitrine.contact.email && (
               <div>
-                <h4 className="font-bold text-[#8b5cf6] text-lg mb-2">
+                <h4 
+                  className="font-bold text-lg mb-2"
+                  style={{ color: colors.primaryColor }}
+                >
                   {menuLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </h4>
                 <p className="text-gray-600 text-base">{vitrine.contact.email}</p>
@@ -443,8 +531,16 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <div className="absolute inset-0 bg-gradient-to-br from-[#8b5cf6]/20 via-[#ec4899]/10 to-transparent rounded-2xl -z-10"></div>
-            <h4 className="font-bold text-[#8b5cf6] text-lg mb-4">
+            <div 
+              className="absolute inset-0 rounded-2xl -z-10"
+              style={{
+                background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
+              }}
+            ></div>
+            <h4 
+              className="font-bold text-lg mb-4"
+              style={{ color: colors.primaryColor }}
+            >
               {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
             </h4>
             <div className="flex flex-wrap justify-center gap-4">
@@ -512,13 +608,23 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             </div>
             {vitrine.footer.quickLinks && vitrine.footer.quickLinks.length > 0 && (
               <div className="flex-1 min-w-[200px]">
-                <h4 className="font-semibold text-white mb-3">
+                <h4 
+                  className="font-semibold mb-3"
+                  style={{ color: colors.primaryColor }}
+                >
                   {menuLanguage === 'ar' ? 'روابط سريعة' : 'Quick Links'}
                 </h4>
                 <ul className="space-y-2">
                   {vitrine.footer.quickLinks.map((link, index) => (
                     <li key={index}>
-                      <a href={link.url} className="text-gray-400 hover:text-white transition">
+                      <a 
+                        href={link.url} 
+                        className="text-gray-400 hover:transition"
+                        style={{ 
+                          '--tw-text-opacity': '1',
+                          '&:hover': { color: colors.primaryColor }
+                        } as React.CSSProperties}
+                      >
                         {link.label}
                       </a>
                     </li>
@@ -528,7 +634,10 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
             )}
             {vitrine.footer.socialIcons && Object.keys(vitrine.footer.socialIcons).length > 0 && (
               <div className="flex-1 min-w-[200px] text-center md:text-right">
-                <h4 className="font-semibold text-white mb-3">
+                <h4 
+                  className="font-semibold mb-3"
+                  style={{ color: colors.primaryColor }}
+                >
                   {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
                 </h4>
                 <div className="flex justify-center md:justify-end gap-4">
@@ -541,7 +650,11 @@ const VitrineSection = ({ vitrine, menuLanguage }: VitrineSectionProps) => {
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:text-white transition"
+                        className="text-gray-400 hover:transition"
+                        style={{ 
+                          '--tw-text-opacity': '1',
+                          '&:hover': { color: colors.primaryColor }
+                        } as React.CSSProperties}
                       >
                         <Icon className="h-6 w-6" />
                       </motion.a>
