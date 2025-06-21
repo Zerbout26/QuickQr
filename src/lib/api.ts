@@ -1,5 +1,5 @@
 import axios, { AxiosError, AxiosResponse } from 'axios';
-import { User } from '@/types';
+import { User, Menu, VitrineSection, QRCode } from '@/types';
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
@@ -383,8 +383,8 @@ export const qrCodeApi = {
     return response.data;
   },
 
-  getAll: async () => {
-    const response = await api.get('/qrcodes');
+  getAll: async (page = 1, limit = 5, searchTerm = ''): Promise<{ data: QRCode[], totalPages: number, total: number }> => {
+    const response = await api.get('/qrcodes', { params: { page, limit, searchTerm } });
     return response.data;
   },
 

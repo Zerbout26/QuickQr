@@ -5,7 +5,7 @@ import QRCodeGenerator from '@/components/qr/QRCodeGenerator';
 import { useAuth } from '@/context/AuthContext';
 import { QRCode } from '@/types';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Card, CardContent, CardHeader, CardTitle, CardFooter } from '@/components/ui/card';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogDescription } from '@/components/ui/dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
@@ -263,6 +263,10 @@ const Dashboard = () => {
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const navigate = useNavigate();
   const { language, toggleLanguage } = useLanguage();
+  const [currentPage, setCurrentPage] = useState(1);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalQRCodes, setTotalQRCodes] = useState(0);
+  const [searchTerm, setSearchTerm] = useState('');
 
   // Function to fetch QR codes
   const fetchQRCodes = async () => {
@@ -270,8 +274,10 @@ const Dashboard = () => {
     
     setIsLoading(true);
     try {
-      const codes = await qrCodeApi.getAll();
-      setQrCodes(codes);
+      const { data, totalPages, total } = await qrCodeApi.getAll(currentPage, 5, searchTerm);
+      setQrCodes(data);
+      setTotalPages(totalPages);
+      setTotalQRCodes(total);
     } catch (error) {
       console.error('Failed to fetch QR codes', error);
       toast({
@@ -294,7 +300,7 @@ const Dashboard = () => {
   // Initial fetch
   useEffect(() => {
     fetchQRCodes();
-  }, [user]);
+  }, [user, currentPage, searchTerm]);
 
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
@@ -929,29 +935,24 @@ const Dashboard = () => {
               </Button>
             </div>
             
+            <div className="mb-4">
+              <Input
+                placeholder="Search QR Codes by name..."
+                value={searchTerm}
+                onChange={(e) => {
+                  setSearchTerm(e.target.value);
+                  setCurrentPage(1); // Reset to first page on search
+                }}
+                className="max-w-sm"
+              />
+            </div>
+            
             {isLoading ? (
-              <div className="flex justify-center py-16">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-10 h-10 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
-                  <p className="text-gray-500">{translations[language].loading}</p>
-                </div>
-              </div>
+              <div className="text-center py-8">Loading...</div>
             ) : qrCodes.length === 0 ? (
-              <div className="text-center py-16 border rounded-xl shadow-sm bg-gray-50">
-                <div className="flex flex-col items-center gap-3">
-                  <div className="w-16 h-16 rounded-full bg-gray-100 flex items-center justify-center">
-                    <Plus className="w-8 h-8 text-gray-400" />
-                  </div>
-                  <h3 className="text-xl font-medium text-gray-700 font-cairo">{translations[language].noQRCodes}</h3>
-                  <p className="text-gray-500 max-w-md mx-auto">You haven't created any QR codes yet. {translations[language].createNewQR} to get started.</p>
-                  <Button 
-                    onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
-                    variant="outline" 
-                    className="mt-3 border-primary text-primary hover:bg-primary/5"
-                  >
-                    {translations[language].createNewQR}
-                  </Button>
-                </div>
+              <div className="text-center py-16 border-2 border-dashed rounded-lg">
+                <p className="text-lg font-medium text-gray-700">{translations[language].noQRCodes}</p>
+                <p className="text-gray-500 mt-2">{translations[language].createNewQR} to get started.</p>
               </div>
             ) : (
               <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -1140,6 +1141,31 @@ const Dashboard = () => {
                     </CardContent>
                   </Card>
                 ))}
+              </div>
+            )}
+            {qrCodes.length > 0 && (
+              <div className="flex justify-between items-center mt-6">
+                <div className="text-sm text-gray-500">
+                  Showing {qrCodes.length} of {totalQRCodes} QR Codes
+                </div>
+                <div className="flex gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+                    disabled={currentPage === 1}
+                  >
+                    Previous
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+                    disabled={currentPage === totalPages}
+                  >
+                    Next
+                  </Button>
+                </div>
               </div>
             )}
           </TabsContent>

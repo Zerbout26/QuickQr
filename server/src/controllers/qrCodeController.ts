@@ -7,8 +7,11 @@ import path from 'path';
 import fs from 'fs';
 import crypto from 'crypto';
 import { upload, uploadToCloudinary, deleteFromCloudinary, getOptimizedUrl } from '../config/cloudinary';
+import { User } from '../models/User';
+import { ILike } from 'typeorm';
 
 const qrCodeRepository = AppDataSource.getRepository(QRCode);
+const userRepository = AppDataSource.getRepository(User);
 const FRONTEND_URL = process.env.FRONTEND_URL || 'http://localhost:8080';
 
 // Configure multer for file uploads
@@ -261,12 +264,30 @@ export const getQRCodes = async (req: AuthRequest, res: Response) => {
       return res.status(401).json({ error: 'Not authenticated' });
     }
 
-    const qrCodes = await qrCodeRepository.find({
-      where: { user: { id: req.user.id } },
-      order: { createdAt: 'DESC' }
+    const page = parseInt(req.query.page as string, 10) || 1;
+    const limit = parseInt(req.query.limit as string, 10) || 5;
+    const searchTerm = req.query.searchTerm as string || '';
+    const skip = (page - 1) * limit;
+
+    const where: any = { user: { id: req.user.id } };
+    if (searchTerm) {
+      where.name = ILike(`%${searchTerm}%`);
+    }
+
+    const [qrCodes, total] = await qrCodeRepository.findAndCount({
+      where,
+      order: { createdAt: 'DESC' },
+      take: limit,
+      skip,
     });
 
-    res.json(qrCodes);
+    res.json({
+      data: qrCodes,
+      total,
+      page,
+      limit,
+      totalPages: Math.ceil(total / limit),
+    });
   } catch (error) {
     res.status(500).json({ error: 'Error fetching QR codes' });
   }
