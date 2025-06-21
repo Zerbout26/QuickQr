@@ -155,7 +155,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                           
                           <div className="flex justify-between items-center">
                             <span className="text-lg font-bold text-[#6d28d9]">
-                              {item.price} {menu.currency || '$'}
+                              {item.price} {menu.currency || 'DZD'}
                             </span>
                           </div>
                         </div>
