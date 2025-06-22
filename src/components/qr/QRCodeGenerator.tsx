@@ -10,7 +10,7 @@ import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
 import { qrCodeApi } from '@/lib/api';
-import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download, MapPin } from 'lucide-react';
+import { Upload, X, Plus, Trash2, Globe, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Download, MapPin, Settings, ChevronDown, ChevronUp } from 'lucide-react';
 import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
@@ -418,6 +418,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [error, setError] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
+  const [showBrandingSettings, setShowBrandingSettings] = useState(false);
   
   // Landing page colors
   const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
@@ -1547,162 +1548,209 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               />
             </div>
           </div>
-          <div className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Input
-                  id="foregroundColor"
-                  type="color"
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
-                  className="w-full sm:w-20"
-                />
-                <Input
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
-                  className="flex-1"
-                />
+          {/* Branding & Appearance Toggle Button */}
+          <div className="mt-6">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowBrandingSettings(!showBrandingSettings)}
+              className="w-full flex items-center justify-between"
+            >
+              <div className="flex items-center gap-2">
+                <Settings className="h-4 w-4" />
+                <span>Branding & Appearance</span>
               </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Input
-                  id="backgroundColor"
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="w-full sm:w-20"
-                />
-                <Input
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            
-            {/* Landing Page Colors */}
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="primaryColor">Primary Color</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      id="primaryColor"
-                      type="color"
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-full sm:w-20"
-                    />
-                    <Input
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      id="primaryHoverColor"
-                      type="color"
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                      className="w-full sm:w-20"
-                    />
-                    <Input
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="accentColor">Accent Color</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      id="accentColor"
-                      type="color"
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="w-full sm:w-20"
-                    />
-                    <Input
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Background Gradient</Label>
-                  <div className="p-3 bg-gray-50 rounded-md border">
-                    <p className="text-sm text-gray-600 mb-2">
-                      The background gradient is automatically generated based on your Primary and Accent colors.
-                    </p>
-                    <div 
-                      className="w-full h-8 rounded border"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      id="loadingSpinnerColor"
-                      type="color"
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                      className="w-full sm:w-20"
-                    />
-                    <Input
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
-                  <Input
-                    id="loadingSpinnerBorderColor"
-                    value={loadingSpinnerBorderColor}
-                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
-                    placeholder="rgba(139, 92, 246, 0.2)"
-                  />
-                </div>
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Label htmlFor="logo">{translations[language].logo}</Label>
-              <Input
-                id="logo"
-                type="file"
-                accept="image/*"
-                onChange={handleLogoUpload}
-                ref={fileInputRef}
-              />
-            </div>
+              {showBrandingSettings ? (
+                <ChevronUp className="h-4 w-4" />
+              ) : (
+                <ChevronDown className="h-4 w-4" />
+              )}
+            </Button>
           </div>
-          <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
-            <Button type="submit" disabled={isLoading} className="w-full sm:w-auto">
+
+          {/* Branding & Appearance Section */}
+          {showBrandingSettings && (
+            <div className="mt-4 border rounded-lg p-4 bg-gray-50">
+              <div className="space-y-4">
+                {/* Logo Upload */}
+                <div className="space-y-2">
+                  <Label>{translations[language].logo}</Label>
+                  <div className="flex items-center gap-4">
+                    {logoPreview && (
+                      <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
+                    )}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      <Upload className="h-4 w-4 mr-2" />
+                      {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                    </Button>
+                    {logoPreview && (
+                      <Button type="button" variant="destructive" size="icon" onClick={removeLogo}>
+                        <X className="h-4 w-4" />
+                      </Button>
+                    )}
+                    <input
+                      type="file"
+                      ref={fileInputRef}
+                      onChange={handleLogoUpload}
+                      accept="image/*"
+                      className="hidden"
+                    />
+                  </div>
+                </div>
+                
+                {/* QR Code Colors */}
+                <div className="space-y-2">
+                  <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="foregroundColor"
+                      type="color"
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
+                  <div className="flex gap-2">
+                    <Input
+                      id="backgroundColor"
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="w-20"
+                    />
+                    <Input
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                {/* Landing Page Colors */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryColor">Primary Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="primaryColor"
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-20"
+                        />
+                        <Input
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="primaryHoverColor"
+                          type="color"
+                          value={primaryHoverColor}
+                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="w-20"
+                        />
+                        <Input
+                          value={primaryHoverColor}
+                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="accentColor">Accent Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="accentColor"
+                          type="color"
+                          value={accentColor}
+                          onChange={(e) => setAccentColor(e.target.value)}
+                          className="w-20"
+                        />
+                        <Input
+                          value={accentColor}
+                          onChange={(e) => setAccentColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label>Background Gradient</Label>
+                      <div className="p-3 bg-gray-50 rounded-md border">
+                        <p className="text-sm text-gray-600 mb-2">
+                          The background gradient is automatically generated based on your Primary and Accent colors.
+                        </p>
+                        <div 
+                          className="w-full h-8 rounded border"
+                          style={{ 
+                            background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="loadingSpinnerColor"
+                          type="color"
+                          value={loadingSpinnerColor}
+                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                          className="w-20"
+                        />
+                        <Input
+                          value={loadingSpinnerColor}
+                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                      <Input
+                        id="loadingSpinnerBorderColor"
+                        value={loadingSpinnerBorderColor}
+                        onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                        placeholder="rgba(139, 92, 246, 0.2)"
+                      />
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+          <div className="mt-6 flex justify-end">
+            <Button type="submit" disabled={isLoading}>
               {isLoading ? translations[language].creating : translations[language].createQRCode}
             </Button>
           </div>
+          {error && <div className="text-red-500 mt-2">{error}</div>}
         </form>
       </CardContent>
     </Card>
