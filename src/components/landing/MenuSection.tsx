@@ -51,31 +51,12 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
 
   return (
     <div className="space-y-12 px-4 pb-16" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Menu Header */}
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        className="text-center"
-      >
-        <h3 
-          className="text-3xl sm:text-4xl font-bold mb-2"
-          style={{ color: colors.primaryColor }}
-        >
-          {translations[menuLanguage].menu}
-        </h3>
-        <div 
-          className="w-20 h-1 mx-auto rounded-full"
-          style={{ backgroundColor: colors.primaryColor }}
-        ></div>
-      </motion.div>
-
       {/* Category Filter */}
       <motion.div 
         className="bg-white rounded-lg p-2 shadow-sm max-w-4xl mx-auto border border-gray-100"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.1 }}
+        transition={{ duration: 0.5 }}
       >
         <div className="flex items-center gap-2 overflow-x-auto pb-1 scrollbar-hide">
           <motion.button

@@ -177,6 +177,10 @@ const SocialLinks = lazy(() => import(
   /* webpackPrefetch: true */
   '@/components/landing/SocialLinks'
 ));
+const QRHeader = lazy(() => import(
+  /* webpackPrefetch: true */
+  '@/components/landing/QRHeader'
+));
 
 const LandingPage = () => {
   const { id } = useParams<{ id: string }>();
@@ -309,7 +313,18 @@ const LandingPage = () => {
       <CriticalCSS colors={landingPageColors} />
       <div className="landing-container">
         <div className="content-wrapper">
-                    {/* Social Links */}
+          {/* QR Header - Always show for menu and URL types */}
+          {(qrCode.type === 'menu' || qrCode.type === 'url' || qrCode.type === 'both') && (
+            <Suspense fallback={null}>
+              <QRHeader 
+                qrCode={qrCode}
+                menuLanguage={menuLanguage} 
+                colors={landingPageColors}
+              />
+            </Suspense>
+          )}
+
+          {/* Social Links */}
           {hasLinks && (
             <Suspense fallback={null}>
               <SocialLinks 

@@ -99,36 +99,26 @@ const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
 
   return (
     <motion.div 
-      className="w-full px-4 py-8"
+      className="w-full px-4 py-4"
       dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.5 }}
     >
-      <motion.h3 
-        className="text-2xl sm:text-3xl font-bold text-center mb-6"
-        style={{ color: colors.primaryColor }}
+      <motion.div 
+        className="bg-white rounded-lg p-4 shadow-sm max-w-sm sm:max-w-md mx-auto"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5, delay: 0.1 }}
       >
-        {menuLanguage === 'ar' ? 'روابط التواصل' : 'Social Links'}
-      </motion.h3>
-      
-      <motion.div 
-        className="bg-white rounded-xl p-6 shadow-md max-w-md sm:max-w-2xl mx-auto"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5, delay: 0.2 }}
-      >
         <div 
-          className="absolute inset-0 bg-gradient-to-br rounded-xl -z-10"
+          className="absolute inset-0 bg-gradient-to-br rounded-lg -z-10"
           style={{
-            background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
+            background: `linear-gradient(to bottom right, ${colors.primaryColor}10, ${colors.accentColor}05, transparent)`
           }}
         ></div>
         
-        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-3 max-w-2xl mx-auto`}>
+        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-2 max-w-md mx-auto`}>
       {links.map((link, index) => {
         const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
         return (
@@ -137,22 +127,22 @@ const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
               href={link.url}
               target="_blank"
               rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-3 py-2.5 rounded-lg text-white font-medium shadow-md transition-all duration-300 text-sm sm:text-base sm:px-4 sm:py-3 w-full ${
-                  links.length === 1 ? 'max-w-[280px]' : ''
+                className={`flex items-center justify-center gap-2 px-2 py-2 rounded-md text-white font-medium shadow-sm transition-all duration-300 text-xs sm:text-sm w-full ${
+                  links.length === 1 ? 'max-w-[200px]' : ''
                 }`}
               style={{
                   background: bgColor,
-                  boxShadow: `0 4px 14px ${bgColor}40`,
+                  boxShadow: `0 2px 8px ${bgColor}30`,
               }}
                 whileHover={{ 
-                  y: -3,
-                  scale: 1.03,
+                  y: -2,
+                  scale: 1.02,
                   backgroundColor: hoverBgColor,
-                  boxShadow: `0 6px 18px ${hoverBgColor}60`
+                  boxShadow: `0 4px 12px ${hoverBgColor}50`
                 }}
-                whileTap={{ scale: 0.97 }}
+                whileTap={{ scale: 0.98 }}
             >
-                <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="font-medium truncate">{label}</span>
             </motion.a>
         );
