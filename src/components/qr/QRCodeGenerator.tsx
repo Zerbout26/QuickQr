@@ -1571,7 +1571,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           {/* Branding & Appearance Section */}
           {showBrandingSettings && (
             <div className="mt-4 border rounded-lg p-4 bg-gray-50">
-              <div className="space-y-4">
+          <div className="space-y-4">
                 {/* Logo Upload */}
                 <div className="space-y-2">
                   <Label>{translations[language].logo}</Label>
@@ -1603,102 +1603,102 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 </div>
                 
                 {/* QR Code Colors */}
-                <div className="space-y-2">
-                  <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
+            <div className="space-y-2">
+              <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
                   <div className="flex gap-2">
-                    <Input
-                      id="foregroundColor"
-                      type="color"
-                      value={foregroundColor}
-                      onChange={(e) => setForegroundColor(e.target.value)}
+                <Input
+                  id="foregroundColor"
+                  type="color"
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
                       className="w-20"
+                />
+                <Input
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+                
+            <div className="space-y-2">
+              <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
+                  <div className="flex gap-2">
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="w-20"
+                />
+                <Input
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                  className="flex-1"
+                />
+              </div>
+            </div>
+            
+            {/* Landing Page Colors */}
+            <div className="border-t pt-4">
+              <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+              
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <Label htmlFor="primaryColor">Primary Color</Label>
+                      <div className="flex gap-2">
+                    <Input
+                      id="primaryColor"
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-20"
                     />
                     <Input
-                      value={foregroundColor}
-                      onChange={(e) => setForegroundColor(e.target.value)}
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
                       className="flex-1"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
-                  <div className="flex gap-2">
+                  <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
+                      <div className="flex gap-2">
                     <Input
-                      id="backgroundColor"
+                      id="primaryHoverColor"
                       type="color"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="w-20"
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="w-20"
                     />
                     <Input
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
                       className="flex-1"
                     />
                   </div>
                 </div>
                 
-                {/* Landing Page Colors */}
-                <div className="border-t pt-4">
-                  <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
-                  
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="primaryColor">Primary Color</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="accentColor">Accent Color</Label>
                       <div className="flex gap-2">
-                        <Input
-                          id="primaryColor"
-                          type="color"
-                          value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
+                    <Input
+                      id="accentColor"
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
                           className="w-20"
-                        />
-                        <Input
-                          value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="primaryHoverColor"
-                          type="color"
-                          value={primaryHoverColor}
-                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="w-20"
-                        />
-                        <Input
-                          value={primaryHoverColor}
-                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="accentColor">Accent Color</Label>
-                      <div className="flex gap-2">
-                        <Input
-                          id="accentColor"
-                          type="color"
-                          value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
-                          className="w-20"
-                        />
-                        <Input
-                          value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
+                    />
+                    <Input
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
                       <Label>Background Gradient</Label>
                       <div className="p-3 bg-gray-50 rounded-md border">
                         <p className="text-sm text-gray-600 mb-2">
@@ -1711,39 +1711,39 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                           }}
                         ></div>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
                       <div className="flex gap-2">
-                        <Input
-                          id="loadingSpinnerColor"
-                          type="color"
-                          value={loadingSpinnerColor}
-                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                    <Input
+                      id="loadingSpinnerColor"
+                      type="color"
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
                           className="w-20"
-                        />
-                        <Input
-                          value={loadingSpinnerColor}
-                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                          className="flex-1"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
-                      <Input
-                        id="loadingSpinnerBorderColor"
-                        value={loadingSpinnerBorderColor}
-                        onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
-                        placeholder="rgba(139, 92, 246, 0.2)"
-                      />
-                    </div>
+                    />
+                    <Input
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                      className="flex-1"
+                    />
                   </div>
+                </div>
+                
+                <div className="space-y-2">
+                  <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                  <Input
+                    id="loadingSpinnerBorderColor"
+                    value={loadingSpinnerBorderColor}
+                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                    placeholder="rgba(139, 92, 246, 0.2)"
+                  />
                 </div>
               </div>
             </div>
+            </div>
+          </div>
           )}
           <div className="mt-6 flex justify-end">
             <Button type="submit" disabled={isLoading}>

@@ -205,8 +205,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
           }}
         ></div>
         <motion.h2 
-          className="text-4xl sm:text-5xl font-bold tracking-tight mb-6"
-          style={{ color: colors.primaryColor }}
+          className="text-4xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-800"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -266,8 +265,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             }}
           ></div>
           <h3 
-            className="text-3xl sm:text-4xl font-bold mb-6"
-            style={{ color: colors.primaryColor }}
+            className="text-3xl sm:text-4xl font-bold mb-6 text-gray-800"
           >
             {menuLanguage === 'ar' ? 'من نحن' : 'About Us'}
           </h3>
@@ -276,8 +274,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
           </p>
           {vitrine.about.city && (
             <p 
-              className="mt-4 text-lg font-medium"
-              style={{ color: `${colors.primaryColor}80` }}
+              className="mt-4 text-lg font-medium text-gray-700"
             >
               {vitrine.about.city}
             </p>
@@ -289,8 +286,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
       {vitrine.services.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8"
-            style={{ color: colors.primaryColor }}
+            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -333,16 +329,14 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                   }}
                 >
                   <h4 
-                    className="text-2xl font-bold mb-3"
-                    style={{ color: colors.primaryColor }}
+                    className="text-2xl font-bold mb-3 text-gray-800"
                   >{service.name}</h4>
                   {service.description && (
                     <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
                   )}
                   {service.title && (
                     <p 
-                      className="font-medium"
-                      style={{ color: `${colors.primaryColor}80` }}
+                      className="font-medium text-gray-700"
                     >{service.title}</p>
                   )}
                   {service.imageDescription && (
@@ -359,8 +353,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
       {vitrine.gallery.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8"
-            style={{ color: colors.primaryColor }}
+            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -420,8 +413,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
       {vitrine.testimonials.length > 0 && (
         <div className="space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8"
-            style={{ color: colors.primaryColor }}
+            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
@@ -451,13 +443,11 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                 <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
                 <div className="flex items-center justify-between">
                   <span 
-                    className="font-bold text-lg"
-                    style={{ color: colors.primaryColor }}
+                    className="font-bold text-lg text-gray-800"
                   >{testimonial.author}</span>
                   {testimonial.city && (
                     <span 
-                      className="text-base"
-                      style={{ color: `${colors.primaryColor}80` }}
+                      className="text-base text-gray-700"
                     >{testimonial.city}</span>
                   )}
                 </div>
@@ -470,8 +460,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
       {/* Contact Section */}
       <div className="space-y-10 px-4">
         <motion.h3 
-          className="text-3xl sm:text-4xl font-bold text-center mb-8"
-          style={{ color: colors.primaryColor }}
+          className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -494,8 +483,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.contact.address && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2"
-                  style={{ color: colors.primaryColor }}
+                  className="font-bold text-lg mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'العنوان' : 'Address'}
                 </h4>
@@ -505,8 +493,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.contact.phone && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2"
-                  style={{ color: colors.primaryColor }}
+                  className="font-bold text-lg mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'الهاتف' : 'Phone'}
                 </h4>
@@ -516,8 +503,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.contact.email && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2"
-                  style={{ color: colors.primaryColor }}
+                  className="font-bold text-lg mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </h4>
@@ -538,8 +524,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
               }}
             ></div>
             <h4 
-              className="font-bold text-lg mb-4"
-              style={{ color: colors.primaryColor }}
+              className="font-bold text-lg mb-4 text-gray-800"
             >
               {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
             </h4>
@@ -609,8 +594,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.footer.quickLinks && vitrine.footer.quickLinks.length > 0 && (
               <div className="flex-1 min-w-[200px]">
                 <h4 
-                  className="font-semibold mb-3"
-                  style={{ color: colors.primaryColor }}
+                  className="font-semibold mb-3 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'روابط سريعة' : 'Quick Links'}
                 </h4>
@@ -619,11 +603,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     <li key={index}>
                       <a 
                         href={link.url} 
-                        className="text-gray-400 hover:transition"
-                        style={{ 
-                          '--tw-text-opacity': '1',
-                          '&:hover': { color: colors.primaryColor }
-                        } as React.CSSProperties}
+                        className="text-gray-600 hover:text-gray-800 transition-colors"
                       >
                         {link.label}
                       </a>
@@ -635,8 +615,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.footer.socialIcons && Object.keys(vitrine.footer.socialIcons).length > 0 && (
               <div className="flex-1 min-w-[200px] text-center md:text-right">
                 <h4 
-                  className="font-semibold mb-3"
-                  style={{ color: colors.primaryColor }}
+                  className="font-semibold mb-3 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
                 </h4>
@@ -650,11 +629,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                         href={link}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="text-gray-400 hover:transition"
-                        style={{ 
-                          '--tw-text-opacity': '1',
-                          '&:hover': { color: colors.primaryColor }
-                        } as React.CSSProperties}
+                        className="text-gray-600 hover:text-gray-800 transition-colors"
                       >
                         <Icon className="h-6 w-6" />
                       </motion.a>

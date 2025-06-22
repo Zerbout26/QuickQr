@@ -136,7 +136,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                         
                         <div className={`p-5 ${item.imageUrl ? 'sm:w-2/3' : 'w-full'}`}>
                           <div className="flex justify-between items-start gap-4 mb-2">
-                            <h3 className="text-xl font-semibold text-gray-900">{item.name}</h3>
+                            <h3 className="text-xl font-semibold text-gray-800">{item.name}</h3>
                             <span className={`px-2 py-1 rounded text-xs font-semibold whitespace-nowrap ${
                               isAvailable
                                 ? 'bg-green-50 text-green-700'
@@ -154,8 +154,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                           
                           <div className="flex justify-between items-center">
                             <span 
-                              className="text-lg font-bold"
-                              style={{ color: colors.primaryColor }}
+                              className="text-lg font-bold text-gray-800"
                             >
                               {item.price} {menu.currency || 'DZD'}
                             </span>
