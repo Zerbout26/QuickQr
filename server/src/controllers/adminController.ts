@@ -39,7 +39,7 @@ export const getAllUsers = async (req: AuthRequest, res: Response): Promise<void
       skip: skip,
     });
 
-    // Calculate total visits for each user
+    // Calculate total visits for each users
     const usersWithStats = await Promise.all(users.map(async (user) => {
       const totalScansResult = await qrCodeRepository
         .createQueryBuilder('qr')
