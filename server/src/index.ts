@@ -73,6 +73,7 @@ app.use(cors({
       'https://qrme.netlify.app',
       'https://qrcreator.xyz',
       'http://localhost:8080',
+      'http://localhost:8081',
       'http://localhost:5173'
     ];
     
