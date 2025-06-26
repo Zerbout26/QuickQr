@@ -66,8 +66,11 @@ const translations = {
     cancelled: 'Cancelled',
     delivered: 'Delivered',
     all: 'All',
+    allOrders: 'All Orders',
     search: 'Search orders...',
+    searchOrders: 'Search orders...',
     noOrders: 'No orders found',
+    noOrdersFound: 'No orders found',
     orderDetails: 'Order Details',
     customerInfo: 'Customer Information',
     orderItems: 'Order Items',
@@ -94,6 +97,11 @@ const translations = {
     notes: 'Notes',
     adminNotes: 'Admin Notes',
     addNotes: 'Add notes...',
+    manageOrders: 'Manage and track all orders',
+    showing: 'Showing',
+    to: 'to',
+    results: 'results',
+    clearFilters: 'Clear Filters',
   },
   ar: {
     orders: 'الطلبات',
@@ -111,8 +119,11 @@ const translations = {
     cancelled: 'ملغي',
     delivered: 'تم التوصيل',
     all: 'الكل',
+    allOrders: 'جميع الطلبات',
     search: 'البحث في الطلبات...',
+    searchOrders: 'البحث في الطلبات...',
     noOrders: 'لا توجد طلبات',
+    noOrdersFound: 'لا توجد طلبات',
     orderDetails: 'تفاصيل الطلب',
     customerInfo: 'معلومات العميل',
     orderItems: 'عناصر الطلب',
@@ -139,6 +150,11 @@ const translations = {
     notes: 'ملاحظات',
     adminNotes: 'ملاحظات الإدارة',
     addNotes: 'إضافة ملاحظات...',
+    manageOrders: 'إدارة وتتبع جميع الطلبات',
+    showing: 'عرض',
+    to: 'إلى',
+    results: 'نتيجة',
+    clearFilters: 'مسح المرشحات',
   }
 };
 
@@ -159,6 +175,8 @@ const Orders = () => {
 
   const t = translations[language];
 
+  const ordersPerPage = 10;
+
   useEffect(() => {
     fetchOrders();
   }, [page, statusFilter, searchTerm]);
@@ -168,8 +186,8 @@ const Orders = () => {
       setLoading(true);
       const params = new URLSearchParams({
         page: page.toString(),
-        limit: '10',
-        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter }),
+        limit: ordersPerPage.toString(),
+        ...(statusFilter !== 'all' && { status: statusFilter }),
         ...(searchTerm && { searchTerm })
       });
 
@@ -198,9 +216,9 @@ const Orders = () => {
       const data = await response.json();
       console.log('Orders data:', data);
       
-      setOrders(data.data);
-      setTotalPages(data.totalPages);
-      setTotalOrders(data.total);
+      setOrders(data.data || data.orders || []);
+      setTotalPages(data.totalPages || Math.ceil((data.total || 0) / ordersPerPage));
+      setTotalOrders(data.total || 0);
     } catch (error) {
       console.error('Error fetching orders:', error);
       toast({
@@ -300,6 +318,26 @@ const Orders = () => {
     });
   };
 
+  const handlePageChange = (newPage: number) => {
+    setPage(newPage);
+  };
+
+  const handleStatusFilterChange = (status: string) => {
+    setStatusFilter(status);
+    setPage(1); // Reset to first page when filtering
+  };
+
+  const handleSearchChange = (value: string) => {
+    setSearchTerm(value);
+    setPage(1); // Reset to first page when searching
+  };
+
+  const clearFilters = () => {
+    setStatusFilter('all');
+    setSearchTerm('');
+    setPage(1);
+  };
+
   if (loading) {
     return (
       <MainLayout>
@@ -323,30 +361,50 @@ const Orders = () => {
         </div>
 
         {/* Filters */}
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
-          <div className="flex-1">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
-              <Input
-                placeholder={t.search}
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="pl-10"
-              />
+        <div className="bg-white rounded-lg shadow p-4 mb-6">
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+            {/* Search */}
+            <div>
+              <label className="block text-sm font-medium mb-2">{t.search}</label>
+              <div className="relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400 h-4 w-4" />
+                <Input
+                  placeholder={t.searchOrders}
+                  value={searchTerm}
+                  onChange={(e) => handleSearchChange(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+            </div>
+
+            {/* Status Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">{t.status}</label>
+              <Select value={statusFilter} onValueChange={handleStatusFilterChange}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allOrders}</SelectItem>
+                  <SelectItem value="pending">{t.pending}</SelectItem>
+                  <SelectItem value="confirmed">{t.confirmed}</SelectItem>
+                  <SelectItem value="cancelled">{t.cancelled}</SelectItem>
+                  <SelectItem value="delivered">{t.delivered}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Clear Filters */}
+            <div className="flex items-end">
+              <Button 
+                variant="outline" 
+                onClick={clearFilters}
+                className="w-full"
+              >
+                {t.clearFilters}
+              </Button>
             </div>
           </div>
-          <Select value={statusFilter} onValueChange={setStatusFilter}>
-            <SelectTrigger className="w-full sm:w-48">
-              <SelectValue placeholder={t.status} />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">{t.all}</SelectItem>
-              <SelectItem value="pending">{t.pending}</SelectItem>
-              <SelectItem value="confirmed">{t.confirmed}</SelectItem>
-              <SelectItem value="cancelled">{t.cancelled}</SelectItem>
-              <SelectItem value="delivered">{t.delivered}</SelectItem>
-            </SelectContent>
-          </Select>
         </div>
 
         {/* Orders List */}
@@ -398,7 +456,7 @@ const Orders = () => {
                     {orders.map((order, index) => (
                       <tr key={order.id} className="hover:bg-gray-50">
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
-                          <div className="font-medium text-gray-900">{(page - 1) * 10 + index + 1}</div>
+                          <div className="font-medium text-gray-900">{(page - 1) * ordersPerPage + index + 1}</div>
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <div className="text-gray-900">{order.customerInfo.name}</div>
@@ -459,6 +517,20 @@ const Orders = () => {
                               >
                                 <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                                </svg>
+                              </Button>
+                            )}
+
+                            {order.status === 'delivered' && (
+                              <Button 
+                                size="sm"
+                                variant="ghost"
+                                className="h-8 w-8 p-0 text-green-600 hover:bg-green-50 hover:text-green-700"
+                                disabled
+                                title={t.delivered}
+                              >
+                                <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                                 </svg>
                               </Button>
                             )}
@@ -589,27 +661,85 @@ const Orders = () => {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex justify-between items-center mt-8">
-            <div className="text-sm text-gray-600">
-              {t.page} {page} {t.of} {totalPages} ({totalOrders} {t.items})
-            </div>
-            <div className="flex gap-2">
+          <div className="bg-white px-4 py-3 flex items-center justify-between border-t border-gray-200 sm:px-6 rounded-b-lg">
+            <div className="flex-1 flex justify-between sm:hidden">
               <Button
                 variant="outline"
-                onClick={() => setPage(page - 1)}
+                onClick={() => handlePageChange(page - 1)}
                 disabled={page === 1}
+                className="relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
-                <ChevronLeft className="h-4 w-4 mr-2" />
                 {t.previous}
               </Button>
               <Button
                 variant="outline"
-                onClick={() => setPage(page + 1)}
+                onClick={() => handlePageChange(page + 1)}
                 disabled={page === totalPages}
+                className="ml-3 relative inline-flex items-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
               >
                 {t.next}
-                <ChevronRight className="h-4 w-4 ml-2" />
               </Button>
+            </div>
+            <div className="hidden sm:flex-1 sm:flex sm:items-center sm:justify-between">
+              <div>
+                <p className="text-sm text-gray-700">
+                  {t.showing} <span className="font-medium">{(page - 1) * ordersPerPage + 1}</span> {t.to}{' '}
+                  <span className="font-medium">
+                    {Math.min(page * ordersPerPage, totalOrders)}
+                  </span>{' '}
+                  {t.of} <span className="font-medium">{totalOrders}</span> {t.results}
+                </p>
+              </div>
+              <div>
+                <nav className="relative z-0 inline-flex rounded-md shadow-sm -space-x-px" aria-label="Pagination">
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(page - 1)}
+                    disabled={page === 1}
+                    className="relative inline-flex items-center px-2 py-2 rounded-l-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    <ChevronLeft className="h-5 w-5" />
+                  </Button>
+                  
+                  {/* Page Numbers */}
+                  {Array.from({ length: Math.min(5, totalPages) }, (_, i) => {
+                    let pageNum;
+                    if (totalPages <= 5) {
+                      pageNum = i + 1;
+                    } else if (page <= 3) {
+                      pageNum = i + 1;
+                    } else if (page >= totalPages - 2) {
+                      pageNum = totalPages - 4 + i;
+                    } else {
+                      pageNum = page - 2 + i;
+                    }
+                    
+                    return (
+                      <Button
+                        key={pageNum}
+                        variant={page === pageNum ? "default" : "outline"}
+                        onClick={() => handlePageChange(pageNum)}
+                        className={`relative inline-flex items-center px-4 py-2 border text-sm font-medium ${
+                          page === pageNum
+                            ? 'z-10 bg-blue-50 border-blue-500 text-blue-600'
+                            : 'bg-white border-gray-300 text-gray-500 hover:bg-gray-50'
+                        }`}
+                      >
+                        {pageNum}
+                      </Button>
+                    );
+                  })}
+                  
+                  <Button
+                    variant="outline"
+                    onClick={() => handlePageChange(page + 1)}
+                    disabled={page === totalPages}
+                    className="relative inline-flex items-center px-2 py-2 rounded-r-md border border-gray-300 bg-white text-sm font-medium text-gray-500 hover:bg-gray-50"
+                  >
+                    <ChevronRight className="h-5 w-5" />
+                  </Button>
+                </nav>
+              </div>
             </div>
           </div>
         )}
