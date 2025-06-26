@@ -50,12 +50,23 @@ const translations = {
 const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory, colors }: MenuSectionProps) => {
   if (!menu?.categories) return null;
 
-  const [activeQuantity, setActiveQuantity] = useState<{cat: number; item: number} | null>(null);
-  const [quantity, setQuantity] = useState(1);
+  // Track quantity for each item by category and item index
+  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
 
   const isItemAvailableToday = (item: MenuItem): boolean => {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
     return item.availability?.[today] ?? true;
+  };
+
+  const handleQuantityChange = (catIdx: number, itemIdx: number, delta: number) => {
+    const key = `${catIdx}-${itemIdx}`;
+    setQuantities(qs => ({ ...qs, [key]: Math.max(1, (qs[key] || 1) + delta) }));
+  };
+
+  const handleConfirm = (catIdx: number, itemIdx: number) => {
+    // TODO: Add to basket logic
+    const key = `${catIdx}-${itemIdx}`;
+    setQuantities(qs => ({ ...qs, [key]: 1 }));
   };
 
   const categories = menu.categories.map(cat => cat.name);
@@ -123,7 +134,8 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
               <div className="grid grid-cols-1 gap-6">
                 {category.items.map((item, itemIndex) => {
                   const isAvailable = isItemAvailableToday(item);
-                  const isActive = activeQuantity && activeQuantity.cat === categoryIndex && activeQuantity.item === itemIndex;
+                  const key = `${categoryIndex}-${itemIndex}`;
+                  const quantity = quantities[key] || 1;
                   return (
                     <motion.article
                       key={itemIndex}
@@ -172,46 +184,27 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                             </span>
                           </div>
                           {menu.orderable && (
-                            <div>
+                            <div className="flex items-center gap-2 mt-2">
+                              <span>{translations[menuLanguage].quantity}:</span>
                               <button
-                                className="mt-3 px-4 py-2 rounded bg-primary text-white font-semibold hover:bg-primary/90 transition"
-                                style={{ backgroundColor: colors.primaryColor }}
-                                onClick={() => {
-                                  setActiveQuantity({cat: categoryIndex, item: itemIndex});
-                                  setQuantity(1);
-                                }}
+                                className="px-2 py-1 border rounded"
+                                onClick={() => handleQuantityChange(categoryIndex, itemIndex, -1)}
                                 type="button"
-                                disabled={isActive}
+                              >-</button>
+                              <span className="px-2">{quantity}</span>
+                              <button
+                                className="px-2 py-1 border rounded"
+                                onClick={() => handleQuantityChange(categoryIndex, itemIndex, 1)}
+                                type="button"
+                              >+</button>
+                              <button
+                                className="ml-4 px-4 py-1 rounded bg-primary text-white font-semibold hover:bg-primary/90 transition"
+                                style={{ backgroundColor: colors.primaryColor }}
+                                onClick={() => handleConfirm(categoryIndex, itemIndex)}
+                                type="button"
                               >
                                 {translations[menuLanguage].addToBasket}
                               </button>
-                              {isActive && (
-                                <div className="flex items-center gap-2 mt-2">
-                                  <span>{translations[menuLanguage].quantity}:</span>
-                                  <button
-                                    className="px-2 py-1 border rounded"
-                                    onClick={() => setQuantity(q => Math.max(1, q - 1))}
-                                    type="button"
-                                  >-</button>
-                                  <span className="px-2">{quantity}</span>
-                                  <button
-                                    className="px-2 py-1 border rounded"
-                                    onClick={() => setQuantity(q => q + 1)}
-                                    type="button"
-                                  >+</button>
-                                  <button
-                                    className="ml-4 px-4 py-1 rounded bg-green-600 text-white font-semibold hover:bg-green-700 transition"
-                                    onClick={() => {
-                                      // TODO: Add to basket logic
-                                      setActiveQuantity(null);
-                                      setQuantity(1);
-                                    }}
-                                    type="button"
-                                  >
-                                    {translations[menuLanguage].confirm}
-                                  </button>
-                                </div>
-                              )}
                             </div>
                           )}
                         </div>
