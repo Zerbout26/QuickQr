@@ -93,6 +93,11 @@ const Navbar = () => {
                   <LayoutDashboard className="w-4 h-4" /> {translations[language].dashboard}
                 </Button>
               </Link>
+              <Link to="/orders">
+                <Button variant="ghost" className="font-medium hover:bg-gray-100 flex items-center gap-1.5">
+                  <Menu className="w-4 h-4" /> {language === 'ar' ? 'الطلبات' : 'Orders'}
+                </Button>
+              </Link>
               
               {/* Trial status indicator */}
               {isTrialActive() && (
