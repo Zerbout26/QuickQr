@@ -206,6 +206,12 @@ const LandingPage = () => {
     price: number;
   }[]>([]);
   const [isBasketOpen, setIsBasketOpen] = useState(false);
+  const [showCodForm, setShowCodForm] = useState(false);
+  const [codFormData, setCodFormData] = useState({
+    name: '',
+    phone: '',
+    address: '',
+  });
 
   // Check if text contains Arabic characters
   const isArabicText = useCallback((text: string = '') => {
@@ -332,6 +338,26 @@ const LandingPage = () => {
 
   // Calculate total items in basket
   const totalItems = basket.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Handle COD form submission
+  const handleCodFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    // TODO: Send order data to backend
+    console.log('Order submitted:', {
+      items: basket,
+      customerInfo: codFormData,
+      total: basket.reduce((sum, b) => sum + b.price * b.quantity, 0)
+    });
+    
+    // Reset form and close modal
+    setCodFormData({ name: '', phone: '', address: '' });
+    setShowCodForm(false);
+    setBasket([]);
+    setIsBasketOpen(false);
+    
+    // Show success message (you can add a toast notification here)
+    alert(menuLanguage === 'ar' ? 'تم تأكيد الطلب بنجاح!' : 'Order confirmed successfully!');
+  };
 
   if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
   if (error) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
@@ -515,14 +541,126 @@ const LandingPage = () => {
                     className="w-full py-3 rounded-lg font-semibold text-white transition-colors"
                     style={{ backgroundColor: landingPageColors.primaryColor }}
                     onClick={() => {
-                      // TODO: Handle order confirmation
-                      console.log('Order confirmed:', basket);
+                      if (qrCode?.menu?.codFormEnabled) {
+                        setShowCodForm(true);
+                      } else {
+                        // TODO: Handle order confirmation without COD form
+                        console.log('Order confirmed:', basket);
+                        alert(menuLanguage === 'ar' ? 'تم تأكيد الطلب بنجاح!' : 'Order confirmed successfully!');
+                        setBasket([]);
+                        setIsBasketOpen(false);
+                      }
                     }}
                   >
                     {menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
                   </button>
                 </div>
               )}
+            </div>
+          </div>
+        )}
+
+        {/* COD Form Modal */}
+        {showCodForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
+              <div className="p-6">
+                <div className="flex items-center justify-between mb-6">
+                  <h3 className="text-xl font-bold">
+                    {menuLanguage === 'ar' ? 'معلومات التوصيل' : 'Delivery Information'}
+                  </h3>
+                  <button
+                    onClick={() => setShowCodForm(false)}
+                    className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <form onSubmit={handleCodFormSubmit} className="space-y-4">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {menuLanguage === 'ar' ? 'الاسم الكامل' : 'Full Name'} *
+                    </label>
+                    <input
+                      type="text"
+                      required
+                      value={codFormData.name}
+                      onChange={(e) => setCodFormData(prev => ({ ...prev, name: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={menuLanguage === 'ar' ? 'أدخل اسمك الكامل' : 'Enter your full name'}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {menuLanguage === 'ar' ? 'رقم الهاتف' : 'Phone Number'} *
+                    </label>
+                    <input
+                      type="tel"
+                      required
+                      value={codFormData.phone}
+                      onChange={(e) => setCodFormData(prev => ({ ...prev, phone: e.target.value }))}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={menuLanguage === 'ar' ? 'أدخل رقم هاتفك' : 'Enter your phone number'}
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-1">
+                      {menuLanguage === 'ar' ? 'عنوان التوصيل' : 'Delivery Address'} *
+                    </label>
+                    <textarea
+                      required
+                      value={codFormData.address}
+                      onChange={(e) => setCodFormData(prev => ({ ...prev, address: e.target.value }))}
+                      rows={3}
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                      placeholder={menuLanguage === 'ar' ? 'أدخل عنوان التوصيل الكامل' : 'Enter your complete delivery address'}
+                    />
+                  </div>
+
+                  {/* Order Summary */}
+                  <div className="border-t pt-4">
+                    <h4 className="font-semibold mb-2">
+                      {menuLanguage === 'ar' ? 'ملخص الطلب' : 'Order Summary'}
+                    </h4>
+                    <div className="space-y-2 max-h-32 overflow-y-auto">
+                      {basket.map(b => (
+                        <div key={b.key} className="flex justify-between text-sm">
+                          <span>{b.item.name} x{b.quantity}</span>
+                          <span>{b.price * b.quantity} {qrCode?.menu?.currency || 'DZD'}</span>
+                        </div>
+                      ))}
+                    </div>
+                    <div className="border-t pt-2 mt-2">
+                      <div className="flex justify-between font-bold">
+                        <span>{menuLanguage === 'ar' ? 'المجموع' : 'Total'}:</span>
+                        <span>{basket.reduce((sum, b) => sum + b.price * b.quantity, 0)} {qrCode?.menu?.currency || 'DZD'}</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="flex gap-3 pt-4">
+                    <button
+                      type="button"
+                      onClick={() => setShowCodForm(false)}
+                      className="flex-1 px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition-colors"
+                    >
+                      {menuLanguage === 'ar' ? 'إلغاء' : 'Cancel'}
+                    </button>
+                    <button
+                      type="submit"
+                      className="flex-1 px-4 py-2 rounded-md font-semibold text-white transition-colors"
+                      style={{ backgroundColor: landingPageColors.primaryColor }}
+                    >
+                      {menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
+                    </button>
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
         )}
