@@ -395,6 +395,61 @@ const LandingPage = () => {
     }
   };
 
+  const handleDirectOrderSubmit = async () => {
+    if (isSubmitting) return; // Prevent multiple submissions
+    
+    setIsSubmitting(true);
+    
+    try {
+      const orderData = {
+        qrCodeId: qrCode!.id,
+        items: basket.map(b => ({
+          key: b.key,
+          itemName: b.item.name,
+          categoryName: b.categoryName,
+          quantity: b.quantity,
+          price: b.price,
+          imageUrl: b.item.imageUrl
+        })),
+        customerInfo: {
+          name: 'Anonymous',
+          phone: 'N/A',
+          address: 'N/A'
+        }
+      };
+
+      // Send order to backend
+      const response = await fetch('https://quickqr-heyg.onrender.com/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+
+      // Reset basket and close
+      setBasket([]);
+      setIsBasketOpen(false);
+      
+      // Show custom success dialog
+      setShowConfirmDialog(true);
+      
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert(menuLanguage === 'ar' ? 
+        'حدث خطأ أثناء تأكيد الطلب. يرجى المحاولة مرة أخرى.' : 
+        'Error creating order. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
   if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
   if (error) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
   if (!qrCode) return null;
@@ -581,11 +636,7 @@ const LandingPage = () => {
                       if (qrCode?.menu?.codFormEnabled) {
                         setShowCodForm(true);
                       } else {
-                        // TODO: Handle order confirmation without COD form
-                        console.log('Order confirmed:', basket);
-                        alert(menuLanguage === 'ar' ? 'تم تأكيد الطلب بنجاح!' : 'Order confirmed successfully!');
-                        setBasket([]);
-                        setIsBasketOpen(false);
+                        handleDirectOrderSubmit();
                       }
                     }}
                   >
