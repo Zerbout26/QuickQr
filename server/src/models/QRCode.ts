@@ -130,6 +130,7 @@ export class QRCode {
     description?: string;
     categories: MenuCategory[];
     orderable?: boolean;
+    codFormEnabled?: boolean;
   };
 
   @Column({ nullable: true })

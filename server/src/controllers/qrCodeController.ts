@@ -227,10 +227,10 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       }
 
       // Parse menu if provided
-      let parsedMenu: { restaurantName: string; description?: string; categories: MenuCategory[] } | null = null;
+      let parsedMenu: { restaurantName: string; description?: string; categories: MenuCategory[]; orderable?: boolean; codFormEnabled?: boolean } | null = null;
       if ((type === 'menu' || type === 'both') && menu) {
         try {
-          parsedMenu = JSON.parse(menu) as { restaurantName: string; description?: string; categories: MenuCategory[] };
+          parsedMenu = JSON.parse(menu) as { restaurantName: string; description?: string; categories: MenuCategory[]; orderable?: boolean; codFormEnabled?: boolean };
           
           // Handle menu item images
           if (req.files && (req.files as any)['menuItemImages']) {

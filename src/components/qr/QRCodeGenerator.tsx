@@ -289,6 +289,7 @@ const translations = {
     updateQRCode: 'Update QR Code',
     creating: 'Creating...',
     orderableMenuToggle: "Enable Orderable Menu",
+    codFormToggle: "Enable COD Form",
   },
   ar: {
     success: 'نجاح',
@@ -374,6 +375,7 @@ const translations = {
     updateQRCode: 'تحديث رمز الاستجابة السريعة',
     creating: 'جاري الإنشاء...',
     orderableMenuToggle: "تفعيل قائمة الطلبات",
+    codFormToggle: "تفعيل نموذج الدفع عند الاستلام",
   },
 };
 
@@ -423,6 +425,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
   const [showBrandingSettings, setShowBrandingSettings] = useState(false);
   const [menuOrderable, setMenuOrderable] = useState(false);
+  const [codFormEnabled, setCodFormEnabled] = useState(false);
   
   // Landing page colors
   const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
@@ -451,6 +454,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
     if (fileInputRef.current) {
       fileInputRef.current.value = '';
     }
+    setMenuOrderable(false);
+    setCodFormEnabled(false);
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -681,7 +686,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
           restaurantName: name || 'My Restaurant',
           description: '',
           categories: menuCategories,
-          orderable: menuOrderable
+          orderable: menuOrderable,
+          codFormEnabled: codFormEnabled
         };
         formData.append('menu', JSON.stringify(menuData));
 
@@ -922,133 +928,146 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
               </div>
             )}
             {(type === 'menu' || type === 'both') && (
-              <div className="flex items-center gap-2 mb-2">
-                <Switch
-                  checked={menuOrderable}
-                  onCheckedChange={setMenuOrderable}
-                  id="orderable-menu-toggle"
-                />
-                <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
-              </div>
-            )}
-            {(type === 'menu' || type === 'both') && (
               <div className="space-y-4">
-                {menuCategories.map((category, categoryIndex) => (
-                  <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
-                    <div className="flex gap-2 items-center">
-                      <Input
-                        placeholder={translations[language].categoryName}
-                        value={category.name}
-                        onChange={(e) => updateCategory(categoryIndex, e.target.value)}
-                        dir={language === 'ar' ? 'rtl' : 'ltr'}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeCategory(categoryIndex)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                    <div className="space-y-2 mt-4">
-                      {category.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="space-y-2 border p-2 rounded">
-                          <Input
-                            placeholder={translations[language].itemName}
-                            value={item.name}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
-                            dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          />
-                          <Textarea
-                            placeholder={translations[language].description}
-                            value={item.description}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
-                            dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          />
-                          <Input
-                            placeholder={translations[language].price}
-                            type="number"
-                            value={item.price}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
-                          />
-                          <div className="space-y-2">
-                            <Label>{translations[language].itemImage}</Label>
-                            <div className="flex items-center gap-4 mb-2">
-                              {item.imageUrl && (
-                                <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                              )}
-                              <Button
-                                type="button"
-                                variant="outline"
-                                size="sm"
-                                onClick={() => {
-                                  const input = document.createElement('input');
-                                  input.type = 'file';
-                                  input.accept = 'image/*';
-                                  input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
-                                  input.click();
-                                }}
-                              >
-                                <Upload className="h-4 w-4 mr-2" />
-                                {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
-                              </Button>
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>{translations[language].availability}</Label>
-                            <div className="grid grid-cols-4 gap-2">
-                              {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                <div key={day} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`new-${categoryIndex}-${itemIndex}-${day}`}
-                                    checked={isAvailable}
-                                    onCheckedChange={(checked) => 
-                                      handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
-                                    }
-                                  />
-                                  <label
-                                    htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {translations[language].days[day as keyof typeof translations.en.days]}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            {translations[language].removeItem}
-                          </Button>
-                        </div>
-                      ))}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        className="w-full"
-                        onClick={() => addMenuItem(categoryIndex)}
-                      >
-                        <Plus className="h-4 w-4 mr-2" />
-                        {translations[language].addMenuItem}
-                      </Button>
-                    </div>
+                {/* Orderable and COD Form Toggles */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={menuOrderable}
+                      onCheckedChange={setMenuOrderable}
+                      id="orderable-menu-toggle"
+                    />
+                    <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={addCategory}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  {translations[language].addCategory}
-                </Button>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={codFormEnabled}
+                      onCheckedChange={setCodFormEnabled}
+                      id="cod-form-toggle"
+                    />
+                    <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle}</Label>
+                  </div>
+                </div>
+                
+                {/* Menu Categories */}
+                <div className="space-y-4">
+                  {menuCategories.map((category, categoryIndex) => (
+                    <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          placeholder={translations[language].categoryName}
+                          value={category.name}
+                          onChange={(e) => updateCategory(categoryIndex, e.target.value)}
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeCategory(categoryIndex)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                      <div className="space-y-2 mt-4">
+                        {category.items.map((item, itemIndex) => (
+                          <div key={itemIndex} className="space-y-2 border p-2 rounded">
+                            <Input
+                              placeholder={translations[language].itemName}
+                              value={item.name}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                              dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            />
+                            <Textarea
+                              placeholder={translations[language].description}
+                              value={item.description}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                              dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            />
+                            <Input
+                              placeholder={translations[language].price}
+                              type="number"
+                              value={item.price}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
+                            />
+                            <div className="space-y-2">
+                              <Label>{translations[language].itemImage}</Label>
+                              <div className="flex items-center gap-4 mb-2">
+                                {item.imageUrl && (
+                                  <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                )}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const input = document.createElement('input');
+                                    input.type = 'file';
+                                    input.accept = 'image/*';
+                                    input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
+                                    input.click();
+                                  }}
+                                >
+                                  <Upload className="h-4 w-4 mr-2" />
+                                  {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
+                                </Button>
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>{translations[language].availability}</Label>
+                              <div className="grid grid-cols-4 gap-2">
+                                {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                  <div key={day} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                      checked={isAvailable}
+                                      onCheckedChange={(checked) => 
+                                        handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      {translations[language].days[day as keyof typeof translations.en.days]}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              {translations[language].removeItem}
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => addMenuItem(categoryIndex)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          {translations[language].addMenuItem}
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={addCategory}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    {translations[language].addCategory}
+                  </Button>
+                </div>
               </div>
             )}
             {type === 'vitrine' && (

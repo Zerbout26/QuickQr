@@ -91,7 +91,8 @@ const translations = {
     tiktok: "TikTok",
     qrCodeUpdated: "QR code updated successfully",
     updateFailed: "Failed to update QR code",
-    orderableMenuToggle: "Enable Orderable Menu"
+    orderableMenuToggle: "Enable Orderable Menu",
+    codFormToggle: "Enable COD Form"
   },
   ar: {
     basic: "أساسي",
@@ -128,7 +129,8 @@ const translations = {
     tiktok: "تيكتوك",
     qrCodeUpdated: "تم تحديث رمز QR بنجاح",
     updateFailed: "فشل تحديث رمز QR",
-    orderableMenuToggle: "تفعيل قائمة الطلبات"
+    orderableMenuToggle: "تفعيل قائمة الطلبات",
+    codFormToggle: "تفعيل نموذج الدفع عند الاستلام"
   }
 };
 
@@ -616,6 +618,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
   // Add state for menuOrderable
   const [menuOrderable, setMenuOrderable] = useState(qrCode.menu?.orderable ?? false);
+  const [codFormEnabled, setCodFormEnabled] = useState(qrCode.menu?.codFormEnabled ?? false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -640,7 +643,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         if (type === 'menu' || type === 'both') {
             formData.append('menu', JSON.stringify({
                 categories: menuCategories,
-                orderable: menuOrderable
+                orderable: menuOrderable,
+                codFormEnabled: codFormEnabled
             }));
 
             // Handle menu item images
@@ -945,18 +949,27 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             )}
 
             {(type === 'menu' || type === 'both') && (
-              <div className="flex items-center gap-2 mb-2">
-                <Switch
-                  checked={menuOrderable}
-                  onCheckedChange={setMenuOrderable}
-                  id="orderable-menu-toggle"
-                />
-                <Label htmlFor="orderable-menu-toggle">{translations[menuLanguage].orderableMenuToggle}</Label>
-              </div>
-            )}
-
-            {(type === 'menu' || type === 'both') && (
               <div className="space-y-4">
+                {/* Orderable and COD Form Toggles */}
+                <div className="space-y-3">
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={menuOrderable}
+                      onCheckedChange={setMenuOrderable}
+                      id="orderable-menu-toggle"
+                    />
+                    <Label htmlFor="orderable-menu-toggle">{translations[menuLanguage].orderableMenuToggle}</Label>
+                  </div>
+                  <div className="flex items-center gap-2">
+                    <Switch
+                      checked={codFormEnabled}
+                      onCheckedChange={setCodFormEnabled}
+                      id="cod-form-toggle"
+                    />
+                    <Label htmlFor="cod-form-toggle">{translations[menuLanguage].codFormToggle}</Label>
+                  </div>
+                </div>
+                
                 {menuCategories.map((category, categoryIndex) => (
                   <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
                     <div className="flex gap-2 items-center">

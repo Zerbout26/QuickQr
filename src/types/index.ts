@@ -38,6 +38,7 @@ export interface Menu {
   categories: MenuCategory[];
   currency?: string;
   orderable?: boolean;
+  codFormEnabled?: boolean;
 }
 
 export interface VitrineSection {
@@ -134,6 +135,12 @@ export interface QRCode {
   links: Link[];
   menu: Menu;
   vitrine: VitrineSection;
+  primaryColor?: string;
+  primaryHoverColor?: string;
+  accentColor?: string;
+  backgroundGradient?: string;
+  loadingSpinnerColor?: string;
+  loadingSpinnerBorderColor?: string;
 }
 
 export interface Link {

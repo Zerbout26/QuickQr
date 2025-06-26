@@ -18,12 +18,13 @@ interface MenuSectionProps {
       items: MenuItem[];
     }[];
     currency?: string;
-    orderable: boolean;
+    orderable?: boolean;
   };
   menuLanguage: 'en' | 'ar';
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
   colors: LandingPageColors;
+  onAddToBasket: (item: MenuItem, quantity: number, key: string, categoryName: string, price: number) => void;
 }
 
 const translations = {
@@ -47,7 +48,7 @@ const translations = {
   },
 };
 
-const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory, colors }: MenuSectionProps) => {
+const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory, colors, onAddToBasket }: MenuSectionProps) => {
   if (!menu?.categories) return null;
 
   // Track quantity for each item by category and item index
@@ -64,8 +65,11 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
   };
 
   const handleConfirm = (catIdx: number, itemIdx: number) => {
-    // TODO: Add to basket logic
     const key = `${catIdx}-${itemIdx}`;
+    const category = menu.categories[catIdx];
+    const item = category.items[itemIdx];
+    const quantity = quantities[key] || 1;
+    onAddToBasket(item, quantity, key, category.name, item.price);
     setQuantities(qs => ({ ...qs, [key]: 1 }));
   };
 

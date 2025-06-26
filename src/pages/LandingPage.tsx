@@ -198,6 +198,14 @@ const LandingPage = () => {
     loadingSpinnerColor: '#8b5cf6',
     loadingSpinnerBorderColor: 'rgba(139, 92, 246, 0.2)'
   });
+  const [basket, setBasket] = useState<{
+    key: string; // categoryIndex-itemIndex
+    item: MenuItem;
+    quantity: number;
+    categoryName: string;
+    price: number;
+  }[]>([]);
+  const [isBasketOpen, setIsBasketOpen] = useState(false);
 
   // Check if text contains Arabic characters
   const isArabicText = useCallback((text: string = '') => {
@@ -300,6 +308,31 @@ const LandingPage = () => {
     };
   }, [id, navigate, isArabicText, fetchLandingPageColors]);
 
+  // Add item to basket or update quantity if already present
+  const addToBasket = (item: MenuItem, quantity: number, key: string, categoryName: string, price: number) => {
+    setBasket(prev => {
+      const existing = prev.find(b => b.key === key);
+      if (existing) {
+        return prev.map(b => b.key === key ? { ...b, quantity: b.quantity + quantity } : b);
+      } else {
+        return [...prev, { key, item, quantity, categoryName, price }];
+      }
+    });
+  };
+
+  // Remove item from basket
+  const removeFromBasket = (key: string) => {
+    setBasket(prev => prev.filter(b => b.key !== key));
+  };
+
+  // Update quantity in basket
+  const updateBasketQuantity = (key: string, quantity: number) => {
+    setBasket(prev => prev.map(b => b.key === key ? { ...b, quantity } : b));
+  };
+
+  // Calculate total items in basket
+  const totalItems = basket.reduce((sum, item) => sum + item.quantity, 0);
+
   if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
   if (error) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
   if (!qrCode) return null;
@@ -344,6 +377,7 @@ const LandingPage = () => {
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
                 colors={landingPageColors}
+                onAddToBasket={addToBasket}
               />
             </Suspense>
           )}
@@ -376,6 +410,130 @@ const LandingPage = () => {
             </a>
           </div>
         </div>
+
+        {/* Floating Basket Toggle Button */}
+        {qrCode?.menu?.orderable && (
+          <div className="fixed bottom-6 right-6 z-50">
+            <button
+              onClick={() => setIsBasketOpen(!isBasketOpen)}
+              className="relative w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
+              style={{ backgroundColor: landingPageColors.primaryColor }}
+            >
+              <svg className="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+              </svg>
+              {totalItems > 0 && (
+                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs rounded-full w-6 h-6 flex items-center justify-center font-bold">
+                  {totalItems > 99 ? '99+' : totalItems}
+                </span>
+              )}
+            </button>
+          </div>
+        )}
+
+        {/* Side Basket */}
+        {qrCode?.menu?.orderable && (
+          <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 ${isBasketOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+            <div className="flex flex-col h-full">
+              {/* Basket Header */}
+              <div className="flex items-center justify-between p-4 border-b border-gray-200">
+                <h3 className="text-xl font-bold">{menuLanguage === 'ar' ? 'سلة الطلبات' : 'Basket'}</h3>
+                <button
+                  onClick={() => setIsBasketOpen(false)}
+                  className="p-2 hover:bg-gray-100 rounded-full transition-colors"
+                >
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                  </svg>
+                </button>
+              </div>
+
+              {/* Basket Items */}
+              <div className="flex-1 overflow-y-auto p-4">
+                {basket.length === 0 ? (
+                  <div className="text-center text-gray-500 py-8">
+                    <svg className="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
+                    </svg>
+                    <p>{menuLanguage === 'ar' ? 'السلة فارغة' : 'Basket is empty'}</p>
+                  </div>
+                ) : (
+                  <div className="space-y-4">
+                    {basket.map(b => (
+                      <div key={b.key} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                        {b.item.imageUrl && (
+                          <img
+                            src={b.item.imageUrl}
+                            alt={b.item.name}
+                            className="w-12 h-12 object-cover rounded"
+                          />
+                        )}
+                        <div className="flex-1 min-w-0">
+                          <h4 className="font-medium text-sm truncate">{b.item.name}</h4>
+                          <p className="text-xs text-gray-500">{b.categoryName}</p>
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => updateBasketQuantity(b.key, Math.max(1, b.quantity - 1))}
+                                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
+                              >
+                                -
+                              </button>
+                              <span className="text-sm font-medium w-8 text-center">{b.quantity}</span>
+                              <button
+                                onClick={() => updateBasketQuantity(b.key, b.quantity + 1)}
+                                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
+                              >
+                                +
+                              </button>
+                            </div>
+                            <div className="text-right">
+                              <p className="text-sm font-semibold">{b.price * b.quantity} {qrCode.menu.currency || 'DZD'}</p>
+                              <button
+                                onClick={() => removeFromBasket(b.key)}
+                                className="text-xs text-red-500 hover:underline"
+                              >
+                                {menuLanguage === 'ar' ? 'حذف' : 'Remove'}
+                              </button>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              {/* Basket Footer */}
+              {basket.length > 0 && (
+                <div className="border-t border-gray-200 p-4">
+                  <div className="flex justify-between items-center mb-4">
+                    <span className="font-bold">{menuLanguage === 'ar' ? 'المجموع' : 'Total'}:</span>
+                    <span className="text-lg font-bold">{basket.reduce((sum, b) => sum + b.price * b.quantity, 0)} {qrCode.menu.currency || 'DZD'}</span>
+                  </div>
+                  <button
+                    className="w-full py-3 rounded-lg font-semibold text-white transition-colors"
+                    style={{ backgroundColor: landingPageColors.primaryColor }}
+                    onClick={() => {
+                      // TODO: Handle order confirmation
+                      console.log('Order confirmed:', basket);
+                    }}
+                  >
+                    {menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        )}
+
+        {/* Backdrop */}
+        {isBasketOpen && (
+          <div
+            className="fixed inset-0 bg-black bg-opacity-50 z-30"
+            onClick={() => setIsBasketOpen(false)}
+          />
+        )}
       </div>
     </>
   );
