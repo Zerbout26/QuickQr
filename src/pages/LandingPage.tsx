@@ -359,7 +359,7 @@ const LandingPage = () => {
       };
 
       // Send order to backend
-      const response = await fetch(`${import.meta.env.VITE_API_URL || 'https://quickqr-heyg.onrender.com'}/api/orders`, {
+      const response = await fetch('https://quickqr-heyg.onrender.com/api/orders', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
