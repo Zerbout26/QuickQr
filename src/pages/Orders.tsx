@@ -147,7 +147,7 @@ const Orders = () => {
   const [page, setPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
-  const [statusFilter, setStatusFilter] = useState<string>('');
+  const [statusFilter, setStatusFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [editingStatus, setEditingStatus] = useState<string>('');
@@ -165,7 +165,7 @@ const Orders = () => {
       const params = new URLSearchParams({
         page: page.toString(),
         limit: '10',
-        ...(statusFilter && { status: statusFilter }),
+        ...(statusFilter && statusFilter !== 'all' && { status: statusFilter }),
         ...(searchTerm && { searchTerm })
       });
 
@@ -315,7 +315,7 @@ const Orders = () => {
             <SelectValue placeholder={t.status} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="">{t.all}</SelectItem>
+            <SelectItem value="all">{t.all}</SelectItem>
             <SelectItem value="pending">{t.pending}</SelectItem>
             <SelectItem value="confirmed">{t.confirmed}</SelectItem>
             <SelectItem value="cancelled">{t.cancelled}</SelectItem>
