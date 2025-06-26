@@ -37,6 +37,7 @@ export interface Menu {
   description?: string;
   categories: MenuCategory[];
   currency?: string;
+  orderable?: boolean;
 }
 
 export interface VitrineSection {

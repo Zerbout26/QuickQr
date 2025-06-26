@@ -15,6 +15,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Checkbox } from '@/components/ui/checkbox';
 import { useLanguage } from '@/context/LanguageContext';
+import { Switch } from '@/components/ui/switch';
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
@@ -287,6 +288,7 @@ const translations = {
     createQRCode: 'Create QR Code',
     updateQRCode: 'Update QR Code',
     creating: 'Creating...',
+    orderableMenuToggle: "Enable Orderable Menu",
   },
   ar: {
     success: 'نجاح',
@@ -371,6 +373,7 @@ const translations = {
     createQRCode: 'إنشاء رمز الاستجابة السريعة',
     updateQRCode: 'تحديث رمز الاستجابة السريعة',
     creating: 'جاري الإنشاء...',
+    orderableMenuToggle: "تفعيل قائمة الطلبات",
   },
 };
 
@@ -419,6 +422,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
   const [showBrandingSettings, setShowBrandingSettings] = useState(false);
+  const [menuOrderable, setMenuOrderable] = useState(false);
   
   // Landing page colors
   const [primaryColor, setPrimaryColor] = useState('#8b5cf6');
@@ -673,36 +677,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
       }
       
       if (type === 'menu' || type === 'both') {
-        // First, create the menu data without image URLs
         const menuData = {
           restaurantName: name || 'My Restaurant',
           description: '',
-          categories: menuCategories.map((category, categoryIndex) => ({
-            name: category.name || 'Unnamed Category',
-            items: category.items.map((item, itemIndex) => ({
-              name: item.name || 'Unnamed Item',
-              description: item.description || '',
-              price: Number(item.price) || 0,
-              category: category.name || 'Unnamed Category',
-              imageUrl: item.imageUrl || '',
-              availability: {
-                sunday: item.availability?.sunday ?? true,
-                monday: item.availability?.monday ?? true,
-                tuesday: item.availability?.tuesday ?? true,
-                wednesday: item.availability?.wednesday ?? true,
-                thursday: item.availability?.thursday ?? true,
-                friday: item.availability?.friday ?? true,
-                saturday: item.availability?.saturday ?? true
-              }
-            }))
-          }))
+          categories: menuCategories,
+          orderable: menuOrderable
         };
-
-        // Validate menu data
-        if (!menuData.restaurantName || menuData.categories.length === 0) {
-          throw new Error('Please provide a restaurant name and at least one category with items');
-        }
-
         formData.append('menu', JSON.stringify(menuData));
 
         // Then, upload each menu item image
@@ -939,6 +919,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                     </div>
                   ))}
                 </div>
+              </div>
+            )}
+            {(type === 'menu' || type === 'both') && (
+              <div className="flex items-center gap-2 mb-2">
+                <Switch
+                  checked={menuOrderable}
+                  onCheckedChange={setMenuOrderable}
+                  id="orderable-menu-toggle"
+                />
+                <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
               </div>
             )}
             {(type === 'menu' || type === 'both') && (

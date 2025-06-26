@@ -129,6 +129,7 @@ export class QRCode {
     restaurantName: string;
     description?: string;
     categories: MenuCategory[];
+    orderable?: boolean;
   };
 
   @Column({ nullable: true })

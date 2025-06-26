@@ -15,6 +15,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
+import { Switch } from '@/components/ui/switch';
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
@@ -89,7 +90,8 @@ const translations = {
     url: "URL",
     tiktok: "TikTok",
     qrCodeUpdated: "QR code updated successfully",
-    updateFailed: "Failed to update QR code"
+    updateFailed: "Failed to update QR code",
+    orderableMenuToggle: "Enable Orderable Menu"
   },
   ar: {
     basic: "أساسي",
@@ -125,7 +127,8 @@ const translations = {
     url: "رابط",
     tiktok: "تيكتوك",
     qrCodeUpdated: "تم تحديث رمز QR بنجاح",
-    updateFailed: "فشل تحديث رمز QR"
+    updateFailed: "فشل تحديث رمز QR",
+    orderableMenuToggle: "تفعيل قائمة الطلبات"
   }
 };
 
@@ -611,6 +614,9 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     }));
   };
 
+  // Add state for menuOrderable
+  const [menuOrderable, setMenuOrderable] = useState(qrCode.menu?.orderable ?? false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
@@ -633,7 +639,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
         if (type === 'menu' || type === 'both') {
             formData.append('menu', JSON.stringify({
-                categories: menuCategories
+                categories: menuCategories,
+                orderable: menuOrderable
             }));
 
             // Handle menu item images
@@ -938,6 +945,17 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             )}
 
             {(type === 'menu' || type === 'both') && (
+              <div className="flex items-center gap-2 mb-2">
+                <Switch
+                  checked={menuOrderable}
+                  onCheckedChange={setMenuOrderable}
+                  id="orderable-menu-toggle"
+                />
+                <Label htmlFor="orderable-menu-toggle">{translations[menuLanguage].orderableMenuToggle}</Label>
+              </div>
+            )}
+
+            {(type === 'menu' || type === 'both') && (
               <div className="space-y-4">
                 {menuCategories.map((category, categoryIndex) => (
                   <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
@@ -1050,295 +1068,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   <Plus className="h-4 w-4 mr-2" />
                   Add Category
                 </Button>
-              </div>
-            )}
-
-            {type === 'vitrine' && (
-              <div className="space-y-6">
-                {renderHeroSection()}
-
-                {/* About Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <h3 className="text-lg font-medium">About Section</h3>
-                  <div className="space-y-2">
-                    <Label>Description</Label>
-                    <textarea
-                      value={vitrine.about.description}
-                      onChange={(e) => updateVitrineSection('about', { ...vitrine.about, description: e.target.value })}
-                      placeholder="Enter description"
-                      className="w-full min-h-[100px] p-2 border rounded-md"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>City</Label>
-                    <Input
-                      value={vitrine.about.city}
-                      onChange={(e) => updateVitrineSection('about', { ...vitrine.about, city: e.target.value })}
-                      placeholder="Enter city"
-                    />
-                  </div>
-                </div>
-
-                {/* Services Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Services</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addVitrineItem('services', { name: '', description: '', imageUrl: '' })}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Service
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    {vitrine.services.map((service, index) => (
-                      <div key={index} className="space-y-2 border p-4 rounded">
-                        <div className="flex items-center gap-4 mb-2">
-                          {service.imageUrl && (
-                            <img src={service.imageUrl} alt={service.name} className="w-16 h-16 object-cover rounded" />
-                          )}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const input = document.createElement('input');
-                              input.type = 'file';
-                              input.accept = 'image/*';
-                              input.onchange = (e) => handleVitrineImageUpload('services', index, e as any);
-                              input.click();
-                            }}
-                          >
-                            <Upload className="h-4 w-4 mr-2" />
-                            {service.imageUrl ? 'Change Image' : 'Add Image'}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeVitrineImage('services', index)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <Input
-                          placeholder="Service Name"
-                          value={service.name}
-                          onChange={(e) => updateVitrineItem('services', index, 'name', e.target.value)}
-                        />
-                        <Input
-                          placeholder="Description"
-                          value={service.description || ''}
-                          onChange={(e) => updateVitrineItem('services', index, 'description', e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Gallery Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Gallery</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addVitrineItem('gallery', { imageUrl: '', title: '', description: '' })}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Image
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    {vitrine.gallery.map((item, index) => (
-                      <div key={index} className="space-y-2 border p-4 rounded">
-                        <div className="flex items-center gap-4 mb-2">
-                          {item.imageUrl && (
-                            <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded" />
-                          )}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const input = document.createElement('input');
-                              input.type = 'file';
-                              input.accept = 'image/*';
-                              input.onchange = (e) => handleVitrineImageUpload('gallery', index, e as any);
-                              input.click();
-                            }}
-                          >
-                            <Upload className="h-4 w-4 mr-2" />
-                            {item.imageUrl ? 'Change Image' : 'Add Image'}
-                          </Button>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeVitrineImage('gallery', index)}
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                        <Input
-                          placeholder="Title"
-                          value={item.title || ''}
-                          onChange={(e) => updateVitrineItem('gallery', index, 'title', e.target.value)}
-                        />
-                        <Input
-                          placeholder="Description"
-                          value={item.description || ''}
-                          onChange={(e) => updateVitrineItem('gallery', index, 'description', e.target.value)}
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Testimonials Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">Testimonials</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => addVitrineItem('testimonials', { text: '', author: '', city: '' })}
-                    >
-                      <Plus className="h-4 w-4 mr-2" />
-                      Add Testimonial
-                    </Button>
-                  </div>
-                  <div className="space-y-4">
-                    {vitrine.testimonials.map((testimonial, index) => (
-                      <div key={index} className="space-y-2 border p-4 rounded">
-                        <textarea
-                          placeholder="Testimonial Text"
-                          value={testimonial.text}
-                          onChange={(e) => updateVitrineItem('testimonials', index, 'text', e.target.value)}
-                          className="w-full min-h-[100px] p-2 border rounded-md"
-                        />
-                        <Input
-                          placeholder="Author Name"
-                          value={testimonial.author}
-                          onChange={(e) => updateVitrineItem('testimonials', index, 'author', e.target.value)}
-                        />
-                        <Input
-                          placeholder="City"
-                          value={testimonial.city || ''}
-                          onChange={(e) => updateVitrineItem('testimonials', index, 'city', e.target.value)}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeVitrineItem('testimonials', index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Contact Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <h3 className="text-lg font-medium">Contact Information</h3>
-                  <div className="space-y-2">
-                    <Label>Phone</Label>
-                    <Input
-                      value={vitrine.contact.phone}
-                      onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, phone: e.target.value })}
-                      placeholder="Enter phone number"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Email</Label>
-                    <Input
-                      value={vitrine.contact.email}
-                      onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, email: e.target.value })}
-                      placeholder="Enter email"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Address</Label>
-                    <Input
-                      value={vitrine.contact.address || ''}
-                      onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, address: e.target.value })}
-                      placeholder="Enter address"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Social Media</Label>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Input
-                        value={vitrine.contact.socialMedia.facebook || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, facebook: e.target.value }
-                        })}
-                        placeholder="Facebook URL"
-                      />
-                      <Input
-                        value={vitrine.contact.socialMedia.instagram || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, instagram: e.target.value }
-                        })}
-                        placeholder="Instagram URL"
-                      />
-                      <Input
-                        value={vitrine.contact.socialMedia.twitter || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, twitter: e.target.value }
-                        })}
-                        placeholder="Twitter URL"
-                      />
-                      <Input
-                        value={vitrine.contact.socialMedia.linkedin || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, linkedin: e.target.value }
-                        })}
-                        placeholder="LinkedIn URL"
-                      />
-                      <Input
-                        value={vitrine.contact.socialMedia.youtube || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, youtube: e.target.value }
-                        })}
-                        placeholder="YouTube URL"
-                      />
-                      <Input
-                        value={vitrine.contact.socialMedia.tiktok || ''}
-                        onChange={(e) => updateVitrineSection('contact', {
-                          ...vitrine.contact,
-                          socialMedia: { ...vitrine.contact.socialMedia, tiktok: e.target.value }
-                        })}
-                        placeholder="TikTok URL"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Footer Section */}
-                <div className="space-y-4 border p-4 rounded-lg">
-                  <h3 className="text-lg font-medium">Footer</h3>
-                  <div className="space-y-2">
-                    <Label>Copyright Text</Label>
-                    <Input
-                      value={vitrine.footer.copyright}
-                      onChange={(e) => updateVitrineSection('footer', { ...vitrine.footer, copyright: e.target.value })}
-                      placeholder="Enter copyright text"
-                    />
-                  </div>
-                </div>
               </div>
             )}
           </TabsContent>
