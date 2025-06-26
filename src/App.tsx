@@ -8,6 +8,7 @@ import { LanguageProvider } from "./context/LanguageContext";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
 import Admin from "./pages/Admin";
+import Orders from "./pages/Orders";
 import NotFound from "./pages/NotFound";
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
@@ -35,6 +36,11 @@ const App = () => (
               <Route path="/dashboard" element={
                 <PrivateRoute>
                   <Dashboard />
+                </PrivateRoute>
+              } />
+              <Route path="/orders" element={
+                <PrivateRoute>
+                  <Orders />
                 </PrivateRoute>
               } />
               <Route path="/admin" element={
