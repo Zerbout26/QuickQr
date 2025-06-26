@@ -198,20 +198,18 @@ const LandingPage = () => {
     loadingSpinnerColor: '#8b5cf6',
     loadingSpinnerBorderColor: 'rgba(139, 92, 246, 0.2)'
   });
-  const [basket, setBasket] = useState<{
-    key: string; // categoryIndex-itemIndex
+  const [basket, setBasket] = useState<Array<{
+    key: string;
     item: MenuItem;
     quantity: number;
     categoryName: string;
     price: number;
-  }[]>([]);
+  }>>([]);
   const [isBasketOpen, setIsBasketOpen] = useState(false);
   const [showCodForm, setShowCodForm] = useState(false);
-  const [codFormData, setCodFormData] = useState({
-    name: '',
-    phone: '',
-    address: '',
-  });
+  const [codFormData, setCodFormData] = useState({ name: '', phone: '', address: '' });
+  const [showConfirmDialog, setShowConfirmDialog] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Check if text contains Arabic characters
   const isArabicText = useCallback((text: string = '') => {
@@ -343,10 +341,13 @@ const LandingPage = () => {
   const handleCodFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     
+    if (isSubmitting) return; // Prevent multiple submissions
+    
+    setIsSubmitting(true);
+    
     try {
-      // Prepare order data
       const orderData = {
-        qrCodeId: id,
+        qrCodeId: qrCode!.id,
         items: basket.map(b => ({
           key: b.key,
           itemName: b.item.name,
@@ -380,11 +381,8 @@ const LandingPage = () => {
       setBasket([]);
       setIsBasketOpen(false);
       
-      // Show success message
-      alert(menuLanguage === 'ar' ? 
-        `تم تأكيد الطلب بنجاح! رقم الطلب: ${result.order.orderNumber}` : 
-        `Order confirmed successfully! Order #: ${result.order.orderNumber}`
-      );
+      // Show custom success dialog
+      setShowConfirmDialog(true);
       
     } catch (error) {
       console.error('Error creating order:', error);
@@ -392,6 +390,8 @@ const LandingPage = () => {
         'حدث خطأ أثناء تأكيد الطلب. يرجى المحاولة مرة أخرى.' : 
         'Error creating order. Please try again.'
       );
+    } finally {
+      setIsSubmitting(false);
     }
   };
 
@@ -574,8 +574,9 @@ const LandingPage = () => {
                     <span className="text-lg font-bold">{basket.reduce((sum, b) => sum + b.price * b.quantity, 0)} {qrCode.menu.currency || 'DZD'}</span>
                   </div>
                   <button
-                    className="w-full py-3 rounded-lg font-semibold text-white transition-colors"
+                    className="w-full py-3 rounded-lg font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                     style={{ backgroundColor: landingPageColors.primaryColor }}
+                    disabled={isSubmitting}
                     onClick={() => {
                       if (qrCode?.menu?.codFormEnabled) {
                         setShowCodForm(true);
@@ -588,7 +589,14 @@ const LandingPage = () => {
                       }
                     }}
                   >
-                    {menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
+                    {isSubmitting ? (
+                      <div className="flex items-center justify-center">
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                        {menuLanguage === 'ar' ? 'جاري التأكيد...' : 'Confirming...'}
+                      </div>
+                    ) : (
+                      menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'
+                    )}
                   </button>
                 </div>
               )}
@@ -689,13 +697,58 @@ const LandingPage = () => {
                     </button>
                     <button
                       type="submit"
-                      className="flex-1 px-4 py-2 rounded-md font-semibold text-white transition-colors"
+                      disabled={isSubmitting}
+                      className="flex-1 px-4 py-2 rounded-md font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                       style={{ backgroundColor: landingPageColors.primaryColor }}
                     >
-                      {menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'}
+                      {isSubmitting ? (
+                        <div className="flex items-center justify-center">
+                          <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin mr-2"></div>
+                          {menuLanguage === 'ar' ? 'جاري التأكيد...' : 'Confirming...'}
+                        </div>
+                      ) : (
+                        menuLanguage === 'ar' ? 'تأكيد الطلب' : 'Confirm Order'
+                      )}
                     </button>
                   </div>
                 </form>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Custom Confirm Order Success Dialog */}
+        {showConfirmDialog && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+            <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
+              <div className="p-6 text-center">
+                {/* Success Icon */}
+                <div className="mx-auto w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-4">
+                  <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                  </svg>
+                </div>
+                
+                {/* Success Message */}
+                <h3 className="text-xl font-bold text-gray-900 mb-2">
+                  {menuLanguage === 'ar' ? 'تم تأكيد الطلب بنجاح!' : 'Order Confirmed Successfully!'}
+                </h3>
+                
+                <p className="text-gray-600 mb-6">
+                  {menuLanguage === 'ar' 
+                    ? 'شكراً لك! تم استلام طلبك وسيتم التواصل معك قريباً.' 
+                    : 'Thank you! Your order has been received and we will contact you soon.'
+                  }
+                </p>
+                
+                {/* Close Button */}
+                <button
+                  onClick={() => setShowConfirmDialog(false)}
+                  className="w-full px-4 py-2 rounded-md font-semibold text-white transition-colors"
+                  style={{ backgroundColor: landingPageColors.primaryColor }}
+                >
+                  {menuLanguage === 'ar' ? 'حسناً' : 'OK'}
+                </button>
               </div>
             </div>
           </div>
