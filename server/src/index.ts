@@ -9,6 +9,7 @@ import userRoutes from './routes/userRoutes';
 import qrCodeRoutes from './routes/qrCodeRoutes';
 import landingRoutes from './routes/landingRoutes';
 import adminRoutes from './routes/adminRoutes';
+import orderRoutes from './routes/orderRoutes';
 import { auth, generateAuthToken } from './middleware/auth';
 import { AuthRequest } from './middleware/auth';
 import axios from 'axios';
@@ -300,6 +301,7 @@ const shutdown = async () => {
 app.use('/api/users', userRoutes);
 app.use('/api/qrcodes', qrCodeRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/orders', orderRoutes);
 app.use('/landing', landingRoutes);
 
 // Function to create admin user

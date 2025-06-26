@@ -340,23 +340,59 @@ const LandingPage = () => {
   const totalItems = basket.reduce((sum, item) => sum + item.quantity, 0);
 
   // Handle COD form submission
-  const handleCodFormSubmit = (e: React.FormEvent) => {
+  const handleCodFormSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    // TODO: Send order data to backend
-    console.log('Order submitted:', {
-      items: basket,
-      customerInfo: codFormData,
-      total: basket.reduce((sum, b) => sum + b.price * b.quantity, 0)
-    });
     
-    // Reset form and close modal
-    setCodFormData({ name: '', phone: '', address: '' });
-    setShowCodForm(false);
-    setBasket([]);
-    setIsBasketOpen(false);
-    
-    // Show success message (you can add a toast notification here)
-    alert(menuLanguage === 'ar' ? 'تم تأكيد الطلب بنجاح!' : 'Order confirmed successfully!');
+    try {
+      // Prepare order data
+      const orderData = {
+        qrCodeId: id,
+        items: basket.map(b => ({
+          key: b.key,
+          itemName: b.item.name,
+          categoryName: b.categoryName,
+          quantity: b.quantity,
+          price: b.price,
+          imageUrl: b.item.imageUrl
+        })),
+        customerInfo: codFormData
+      };
+
+      // Send order to backend
+      const response = await fetch(`${process.env.REACT_APP_API_URL || 'https://quickqr-heyg.onrender.com'}/api/orders`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || 'Failed to create order');
+      }
+
+      const result = await response.json();
+      
+      // Reset form and close modal
+      setCodFormData({ name: '', phone: '', address: '' });
+      setShowCodForm(false);
+      setBasket([]);
+      setIsBasketOpen(false);
+      
+      // Show success message
+      alert(menuLanguage === 'ar' ? 
+        `تم تأكيد الطلب بنجاح! رقم الطلب: ${result.order.orderNumber}` : 
+        `Order confirmed successfully! Order #: ${result.order.orderNumber}`
+      );
+      
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert(menuLanguage === 'ar' ? 
+        'حدث خطأ أثناء تأكيد الطلب. يرجى المحاولة مرة أخرى.' : 
+        'Error creating order. Please try again.'
+      );
+    }
   };
 
   if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;

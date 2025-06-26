@@ -1,6 +1,7 @@
 import { DataSource } from "typeorm";
 import { User } from "../models/User";
 import { QRCode } from "../models/QRCode";
+import { Order } from "../models/Order";
 
 export const AppDataSource = new DataSource({
   type: "postgres",
@@ -14,7 +15,7 @@ export const AppDataSource = new DataSource({
   },
   synchronize: false,
   logging: process.env.NODE_ENV === 'development',
-  entities: [User, QRCode],
+  entities: [User, QRCode, Order],
   migrations: ["src/migrations/*.ts"],
   migrationsRun: true,
   migrationsTableName: "migrations",
