@@ -65,6 +65,8 @@ const SignInForm = () => {
       // Redirect based on original location or user role
       if (user.role === 'admin' && from === '/dashboard') {
         navigate('/admin');
+      } else if (user.hasVitrine && user.hasMenu) {
+        navigate('/dashboard');
       } else {
         navigate('/choose-qr-type');
       }

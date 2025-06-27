@@ -260,7 +260,7 @@ const translations = {
 };
 
 const Dashboard = () => {
-  const { user, logout, loading: authLoading, isTrialActive, isTrialExpired, daysLeftInTrial } = useAuth();
+  const { user, logout, loading: authLoading, isTrialActive, isTrialExpired, daysLeftInTrial, refreshUserProfile } = useAuth();
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
@@ -385,6 +385,7 @@ const Dashboard = () => {
       await qrCodeApi.delete(qrId);
       setQrCodes(prev => prev.filter(qr => qr.id !== qrId));
       setDeleteConfirmQR(null);
+      if (refreshUserProfile) await refreshUserProfile();
       toast({
         title: "QR Code Deleted",
         description: "Your QR code has been deleted successfully.",

@@ -219,6 +219,8 @@ const translations = {
     addImage: 'Add Image',
     changeImage: 'Change Image',
     availability: 'Availability',
+    editAvailability: 'Edit Availability',
+    hideAvailability: 'Hide Availability',
     days: {
       monday: 'Monday',
       tuesday: 'Tuesday',
@@ -291,6 +293,8 @@ const translations = {
     creating: 'Creating...',
     orderableMenuToggle: "Enable Orderable Menu",
     codFormToggle: "Enable COD Form",
+    qrCreated: 'QR code created successfully',
+    errorCreatingQR: 'Failed to create QR code',
   },
   ar: {
     success: 'نجاح',
@@ -327,6 +331,8 @@ const translations = {
     addImage: 'إضافة صورة',
     changeImage: 'تغيير الصورة',
     availability: 'التوفر',
+    editAvailability: 'تعديل التوفر',
+    hideAvailability: 'إخفاء التوفر',
     days: {
       monday: 'الاثنين',
       tuesday: 'الثلاثاء',
@@ -377,14 +383,24 @@ const translations = {
     creating: 'جاري الإنشاء...',
     orderableMenuToggle: "تفعيل قائمة الطلبات",
     codFormToggle: "تفعيل نموذج الدفع عند الاستلام",
+    qrCreated: 'تم إنشاء رمز الاستجابة السريعة بنجاح',
+    errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
   },
 };
 
 const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType }) => {
-  const { user } = useAuth();
+  const { user, refreshUserProfile } = useAuth();
   const { language } = useLanguage();
   const [name, setName] = useState('');
-  const [type, setType] = useState<string>(selectedType || 'menu');
+  const getInitialType = () => {
+    if (selectedType) return selectedType;
+    if (user) {
+      if (user.hasMenu && !user.hasVitrine) return 'vitrine';
+      if (user.hasVitrine && !user.hasMenu) return 'menu';
+    }
+    return 'menu';
+  };
+  const [type, setType] = useState<string>(getInitialType());
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
@@ -435,10 +451,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
   const [loadingSpinnerColor, setLoadingSpinnerColor] = useState('#8b5cf6');
   const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState('rgba(139, 92, 246, 0.2)');
 
+  const [editingAvailability, setEditingAvailability] = useState<{ [key: string]: boolean }>({});
+
   // If selectedType changes, update type
   useEffect(() => {
     if (selectedType) setType(selectedType);
   }, [selectedType]);
+
+  // Add a useEffect to update type if user changes (e.g., after refresh)
+  useEffect(() => {
+    setType(getInitialType());
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user, selectedType]);
 
   const resetForm = () => {
     setName('');
@@ -462,6 +486,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
     }
     setMenuOrderable(false);
     setCodFormEnabled(false);
+    setEditingAvailability({});
   };
 
   const handleLogoUpload = (event: React.ChangeEvent<HTMLInputElement>) => {
@@ -665,8 +690,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError('');
     setIsLoading(true);
-
     try {
       const formData = new FormData();
       formData.append('name', name || 'My QR Code');
@@ -798,19 +823,20 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
       }
 
       const createdQRCode = await response.json();
-      onCreated(createdQRCode);
+      if (onCreated) onCreated(createdQRCode);
+      if (refreshUserProfile) await refreshUserProfile();
       resetForm();
       toast({
         title: translations[language].success,
-        description: "QR code created successfully",
+        description: translations[language].qrCreated,
       });
     } catch (error: any) {
       console.error('Error creating QR code:', error);
-      setError(error.message || 'Failed to create QR code');
+      setError(translations[language].errorCreatingQR);
       toast({
         variant: "destructive",
         title: translations[language].error,
-        description: error.message || 'Failed to create QR code',
+        description: error.message || translations[language].errorCreatingQR,
       });
     } finally {
       setIsLoading(false);
@@ -833,30 +859,49 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                 className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
               />
             </div>
-            {/* QR Type Selector */}
-            {!selectedType ? (
+            {/* QR Type Selector as Buttons */}
+            {!selectedType && user && (
               <div className="mb-4">
                 <Label htmlFor="type">Type</Label>
-                <Select value={type} onValueChange={setType}>
-                  <SelectTrigger id="type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="vitrine">Vitrine</SelectItem>
-                    <SelectItem value="menu">Menu</SelectItem>
-                    <SelectItem value="url">URL</SelectItem>
-                    <SelectItem value="both">Menu + URL</SelectItem>
-                    <SelectItem value="links">Links</SelectItem>
-                    <SelectItem value="direct">Direct Link</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-            ) : (
-              <div className="mb-4">
-                <Label>Type</Label>
-                <span className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold text-sm">
-                  {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
-                </span>
+                <div className="flex gap-4 mt-2">
+                  {/* Show both if user has neither */}
+                  {(!user.hasVitrine && !user.hasMenu) && <>
+                    <Button
+                      type="button"
+                      variant={type === 'menu' ? 'default' : 'outline'}
+                      onClick={() => setType('menu')}
+                      className="flex-1"
+                    >
+                      Menu
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'vitrine' ? 'default' : 'outline'}
+                      onClick={() => setType('vitrine')}
+                      className="flex-1"
+                    >
+                      Vitrine
+                    </Button>
+                  </>}
+                  {/* Show only menu if user hasVitrine but not hasMenu */}
+                  {(user.hasVitrine && !user.hasMenu) && (
+                    <Button type="button" variant="default" className="flex-1" disabled>
+                      Menu
+                    </Button>
+                  )}
+                  {/* Show only vitrine if user hasMenu but not hasVitrine */}
+                  {(user.hasMenu && !user.hasVitrine) && (
+                    <Button type="button" variant="default" className="flex-1" disabled>
+                      Vitrine
+                    </Button>
+                  )}
+                  {/* If user has both, show disabled message */}
+                  {(user.hasVitrine && user.hasMenu) && (
+                    <Button type="button" variant="outline" className="flex-1" disabled>
+                      You already have both QR types
+                    </Button>
+                  )}
+                </div>
               </div>
             )}
             {type === 'direct' && (
@@ -965,82 +1010,95 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                         </Button>
                       </div>
                       <div className="space-y-2 mt-4">
-                        {category.items.map((item, itemIndex) => (
-                          <div key={itemIndex} className="space-y-2 border p-2 rounded">
-                            <Input
-                              placeholder={translations[language].itemName}
-                              value={item.name}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
-                              dir={language === 'ar' ? 'rtl' : 'ltr'}
-                            />
-                            <Textarea
-                              placeholder={translations[language].description}
-                              value={item.description}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
-                              dir={language === 'ar' ? 'rtl' : 'ltr'}
-                            />
-                            <Input
-                              placeholder={translations[language].price}
-                              type="number"
-                              value={item.price}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
-                            />
-                            <div className="space-y-2">
-                              <Label>{translations[language].itemImage}</Label>
-                              <div className="flex items-center gap-4 mb-2">
-                                {item.imageUrl && (
-                                  <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                                )}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const input = document.createElement('input');
-                                    input.type = 'file';
-                                    input.accept = 'image/*';
-                                    input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
-                                    input.click();
-                                  }}
-                                >
-                                  <Upload className="h-4 w-4 mr-2" />
-                                  {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
-                                </Button>
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label>{translations[language].availability}</Label>
-                              <div className="grid grid-cols-4 gap-2">
-                                {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                  <div key={day} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`new-${categoryIndex}-${itemIndex}-${day}`}
-                                      checked={isAvailable}
-                                      onCheckedChange={(checked) => 
-                                        handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
-                                      }
-                                    />
-                                    <label
-                                      htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
-                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                      {translations[language].days[day as keyof typeof translations.en.days]}
-                                    </label>
+                        {category.items.map((item, itemIndex) => {
+                          const availKey = `${categoryIndex}-${itemIndex}`;
+                          return (
+                            <div key={itemIndex} className="space-y-2 border p-2 rounded">
+                              <Input
+                                placeholder={translations[language].itemName}
+                                value={item.name}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
+                              />
+                              <Textarea
+                                placeholder={translations[language].description}
+                                value={item.description}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
+                              />
+                              <Input
+                                placeholder={translations[language].price}
+                                type="number"
+                                value={item.price}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
+                              />
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
+                              >
+                                {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
+                              </Button>
+                              {editingAvailability[availKey] && (
+                                <div className="space-y-2">
+                                  <Label>{translations[language].availability}</Label>
+                                  <div className="grid grid-cols-4 gap-2">
+                                    {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                      <div key={day} className="flex items-center space-x-2">
+                                        <Checkbox
+                                          id={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                          checked={isAvailable}
+                                          onCheckedChange={(checked) => 
+                                            handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
+                                          }
+                                        />
+                                        <label
+                                          htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
+                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                          {translations[language].days[day as keyof typeof translations.en.days]}
+                                        </label>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
+                                </div>
+                              )}
+                              <div className="space-y-2">
+                                <Label>{translations[language].itemImage}</Label>
+                                <div className="flex items-center gap-4 mb-2">
+                                  {item.imageUrl && (
+                                    <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
+                                  )}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
+                                      input.click();
+                                    }}
+                                  >
+                                    <Upload className="h-4 w-4 mr-2" />
+                                    {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
+                                  </Button>
+                                </div>
                               </div>
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                              >
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                {translations[language].removeItem}
+                              </Button>
                             </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              {translations[language].removeItem}
-                            </Button>
-                          </div>
-                        ))}
+                          );
+                        })}
                         <Button
                           type="button"
                           variant="outline"
@@ -1750,7 +1808,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
           </div>
           )}
           <div className="mt-6 flex justify-end">
-            <Button type="submit" disabled={isLoading}>
+            <Button type="submit" disabled={isLoading || (user && user.hasMenu && user.hasVitrine)}>
               {isLoading ? translations[language].creating : translations[language].createQRCode}
             </Button>
           </div>
