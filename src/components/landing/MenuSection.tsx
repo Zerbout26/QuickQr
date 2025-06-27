@@ -363,38 +363,43 @@ const MenuSection = ({
               <DialogHeader>
                 <DialogTitle>{dialogItem.item.name}</DialogTitle>
               </DialogHeader>
-              {getValidImages(dialogItem.item).length > 0 && (
-                <div className="relative w-full h-64 mb-4">
-                  <img
-                    src={getValidImages(dialogItem.item)[imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0]}
-                    alt={dialogItem.item.name}
-                    className="w-full h-full object-cover rounded"
-                  />
-                  {getValidImages(dialogItem.item).length > 1 && (
-                    <>
-                      <button
-                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, getValidImages(dialogItem.item), -1); }}
-                        type="button"
-                      >
-                        &#8592;
-                      </button>
-                      <button
-                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, getValidImages(dialogItem.item), 1); }}
-                        type="button"
-                      >
-                        &#8594;
-                      </button>
-                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                        {getValidImages(dialogItem.item).map((_, idx) => (
-                          <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
-                        ))}
-                      </div>
-                    </>
-                  )}
-                </div>
-              )}
+              {(() => {
+                const dialogImages = getValidImages(dialogItem.item);
+                console.log('Dialog images:', dialogImages);
+                console.log('Dialog item:', dialogItem.item);
+                return dialogImages.length > 0 && (
+                  <div className="relative w-full h-64 mb-4">
+                    <img
+                      src={dialogImages[imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0]}
+                      alt={dialogItem.item.name}
+                      className="w-full h-full object-cover rounded"
+                    />
+                    {dialogImages.length > 1 && (
+                      <>
+                        <button
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, dialogImages, -1); }}
+                          type="button"
+                        >
+                          &#8592;
+                        </button>
+                        <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, dialogImages, 1); }}
+                          type="button"
+                        >
+                          &#8594;
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {dialogImages.map((_, idx) => (
+                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
               {dialogItem.item.description && (
                 <p className="mb-3 text-gray-700 text-sm">{dialogItem.item.description}</p>
               )}
