@@ -36,6 +36,12 @@ export class User {
   @Column({ default: false })
   hasActiveSubscription!: boolean;
 
+  @Column({ default: false })
+  hasVitrine!: boolean;
+
+  @Column({ default: false })
+  hasMenu!: boolean;
+
   @OneToMany(() => QRCode, qrCode => qrCode.user)
   qrCodes!: QRCode[];
 

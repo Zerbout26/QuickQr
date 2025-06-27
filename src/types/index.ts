@@ -15,6 +15,8 @@ export interface User {
   totalVisits?: number;
   totalQRCodes?: number;
   totalScans?: number;
+  hasVitrine: boolean;
+  hasMenu: boolean;
 }
 
 export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';

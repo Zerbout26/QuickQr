@@ -346,6 +346,21 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         const savedQRCode = await qrCodeRepository.save(qrCode);
         savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
+
+        // Set hasVitrine or hasMenu on user if needed
+        if (type === 'vitrine' || type === 'menu') {
+          const user = await userRepository.findOne({ where: { id: req.user.id } });
+          if (user) {
+            if (type === 'vitrine' && !user.hasVitrine) {
+              user.hasVitrine = true;
+              await userRepository.save(user);
+            }
+            if (type === 'menu' && !user.hasMenu) {
+              user.hasMenu = true;
+              await userRepository.save(user);
+            }
+          }
+        }
         return res.status(201).json(finalQRCode);
       } else {
         const tempId = crypto.randomUUID();
@@ -357,6 +372,21 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
         savedQRCode.originalUrl = savedQRCode.url;
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
+
+        // Set hasVitrine or hasMenu on user if needed
+        if (type === 'vitrine' || type === 'menu') {
+          const user = await userRepository.findOne({ where: { id: req.user.id } });
+          if (user) {
+            if (type === 'vitrine' && !user.hasVitrine) {
+              user.hasVitrine = true;
+              await userRepository.save(user);
+            }
+            if (type === 'menu' && !user.hasMenu) {
+              user.hasMenu = true;
+              await userRepository.save(user);
+            }
+          }
+        }
         return res.status(201).json(finalQRCode);
       }
 
@@ -666,6 +696,7 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
+    const qrType = qrCode.type;
     try {
       // Delete logo from Cloudinary if exists
       if (qrCode.logoUrl) {
@@ -698,6 +729,27 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
 
       // Delete the QR code from the database
       await qrCodeRepository.remove(qrCode);
+
+      // After deletion, check if user has any more QRs of this type
+      if (qrType === 'vitrine' || qrType === 'menu') {
+        const user = await userRepository.findOne({ where: { id: req.user.id }, relations: ['qrCodes'] });
+        if (user) {
+          if (qrType === 'vitrine') {
+            const hasVitrine = user.qrCodes.some(qr => qr.type === 'vitrine');
+            if (!hasVitrine && user.hasVitrine) {
+              user.hasVitrine = false;
+              await userRepository.save(user);
+            }
+          }
+          if (qrType === 'menu') {
+            const hasMenu = user.qrCodes.some(qr => qr.type === 'menu');
+            if (!hasMenu && user.hasMenu) {
+              user.hasMenu = false;
+              await userRepository.save(user);
+            }
+          }
+        }
+      }
       res.status(204).send();
     } catch (deleteError) {
       console.error('Error during deletion process:', deleteError);
