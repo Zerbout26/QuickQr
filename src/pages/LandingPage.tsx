@@ -477,7 +477,7 @@ const LandingPage = () => {
   return (
     <>
       <CriticalCSS colors={landingPageColors} />
-      <div className="landing-container pt-24 pb-20">
+      <div className="landing-container pb-20">
         <div className="content-wrapper">
           {/* QR Header - Always show for menu and URL types */}
           {(qrCode.type === 'menu' || qrCode.type === 'url' || qrCode.type === 'both') && (
