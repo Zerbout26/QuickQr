@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { MenuItem } from '@/types';
+import { motion } from 'framer-motion';
 
 interface ProductsSectionProps {
   products: MenuItem[];
@@ -16,6 +17,19 @@ interface ProductsSectionProps {
 
 type SelectedVariants = { [variantName: string]: string };
 
+const translations = {
+  en: {
+    products: 'Our Products',
+    addToBasket: 'Add to Basket',
+    quantity: 'Quantity',
+  },
+  ar: {
+    products: 'منتجاتنا',
+    addToBasket: 'أضف إلى السلة',
+    quantity: 'الكمية',
+  },
+};
+
 const ProductsSection: React.FC<ProductsSectionProps> = ({
   products,
   storeName,
@@ -26,6 +40,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
 }) => {
   const [selectedVariants, setSelectedVariants] = useState<{ [key: string]: SelectedVariants }>({});
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({});
 
   const handleVariantChange = (productId: string, variantName: string, optionName: string) => {
     setSelectedVariants(prev => ({
@@ -37,10 +52,10 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     }));
   };
 
-  const handleQuantityChange = (productId: string, quantity: number) => {
+  const handleQuantityChange = (productId: string, delta: number) => {
     setQuantities(prev => ({
       ...prev,
-      [productId]: Math.max(1, quantity)
+      [productId]: Math.max(1, (prev[productId] || 1) + delta)
     }));
   };
 
@@ -53,8 +68,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     }, 0);
   };
 
-  const handleAddToBasket = (product: MenuItem) => {
-    const productId = `${product.name}-${Date.now()}`;
+  const handleAddToBasket = (product: MenuItem, productId: string) => {
     const quantity = quantities[productId] || 1;
     const variants = selectedVariants[productId];
     const priceAdjustment = getVariantPriceAdjustment(product, variants);
@@ -70,178 +84,186 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     });
   };
 
+  const handleImageNav = (key: string, images: string[], dir: 1 | -1) => {
+    setImageIndexes(prev => {
+      const current = prev[key] || 0;
+      const next = (current + dir + images.length) % images.length;
+      return { ...prev, [key]: next };
+    });
+  };
+
+  const getValidImages = (item: MenuItem) => {
+    const imgs = (item.images || []).filter(url => !url.startsWith('blob:'));
+    if (imgs.length > 0) return imgs;
+    if (item.imageUrl) return [item.imageUrl];
+    return [];
+  };
+
   if (!products || products.length === 0) return null;
 
-  // Display single product in a large card
-  const product = products[0];
-  const productId = `${product.name}-0`;
-  const quantity = quantities[productId] || 1;
-  const variants = selectedVariants[productId];
-  const priceAdjustment = getVariantPriceAdjustment(product, variants);
-  const finalPrice = product.price + priceAdjustment;
-
   return (
-    <div className="min-h-screen bg-gray-50 flex items-center justify-center py-8">
-      <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
-        {/* Single Product Card */}
-        <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
-          <div className="grid grid-cols-1 lg:grid-cols-2">
-            {/* Product Image */}
-            <div className="relative">
-              {product.images && product.images.length > 0 ? (
-                <div className="aspect-square overflow-hidden">
+    <div className="px-4 pb-16 max-w-7xl mx-auto" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Header */}
+      <motion.div 
+        className="text-center mb-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+      >
+        <h2 className="text-3xl font-bold mb-2" style={{ color: colors.primaryColor }}>
+          {translations[menuLanguage].products}
+        </h2>
+        <p className="text-gray-600">
+          {menuLanguage === 'ar' ? 'اكتشف مجموعتنا المميزة من المنتجات' : 'Discover our amazing collection of products'}
+        </p>
+      </motion.div>
+
+      {/* Products Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {products.map((product, index) => {
+          const productId = `${product.name}-${index}`;
+          const quantity = quantities[productId] || 1;
+          const variants = selectedVariants[productId];
+          const priceAdjustment = getVariantPriceAdjustment(product, variants);
+          const finalPrice = product.price + priceAdjustment;
+          const validImages = getValidImages(product);
+
+          return (
+            <motion.div
+              key={productId}
+              className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 hover:shadow-md"
+              whileHover={{ y: -4 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: index * 0.05 }}
+            >
+              {/* Product Image */}
+              {validImages.length > 0 && (
+                <div className="relative h-48 w-full overflow-hidden">
                   <img
-                    src={product.images[0]}
+                    src={validImages[imageIndexes[productId] || 0]}
                     alt={product.name}
-                    className="w-full h-full object-cover"
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                     loading="lazy"
                   />
-                </div>
-              ) : (
-                <div className="aspect-square bg-gray-100 flex items-center justify-center">
-                  <svg className="w-24 h-24 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                </div>
-              )}
-            </div>
-
-            {/* Product Details */}
-            <div className="p-8 lg:p-12 flex flex-col justify-center">
-              {/* Store Name */}
-              <div className="mb-6">
-                <h3 className="text-sm font-medium text-gray-500 uppercase tracking-wide">
-                  {storeName}
-                </h3>
-              </div>
-
-              {/* Product Name */}
-              <h1 className="text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
-                {product.name}
-              </h1>
-              
-              {/* Product Description */}
-              {product.description && (
-                <p className="text-lg text-gray-600 mb-6 leading-relaxed">
-                  {product.description}
-                </p>
-              )}
-
-              {/* Variants */}
-              {product.variants && product.variants.length > 0 && (
-                <div className="space-y-4 mb-6">
-                  {product.variants.map((variant) => (
-                    <div key={variant.name} className="space-y-2">
-                      <label className="text-sm font-medium text-gray-700">
-                        {variant.name}:
-                      </label>
-                      <select
-                        value={variants?.[variant.name] || ''}
-                        onChange={(e) => handleVariantChange(productId, variant.name, e.target.value)}
-                        className="w-full p-3 border border-gray-300 rounded-lg text-base focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  {validImages.length > 1 && (
+                    <>
+                      <button
+                        className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                        onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, -1); }}
+                        type="button"
                       >
-                        <option value="">{menuLanguage === 'ar' ? 'اختر' : 'Select'}</option>
-                        {variant.options.map((option) => (
-                          <option key={option.name} value={option.name}>
-                            {option.name}
-                            {option.price && option.price !== 0 && (
-                              option.price > 0 ? ` (+${option.price})` : ` (${option.price})`
-                            )}
-                          </option>
+                        &#8592;
+                      </button>
+                      <button
+                        className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                        onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, 1); }}
+                        type="button"
+                      >
+                        &#8594;
+                      </button>
+                      <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        {validImages.map((_, idx) => (
+                          <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[productId] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
                         ))}
-                      </select>
-                    </div>
-                  ))}
+                      </div>
+                    </>
+                  )}
+                  <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
                 </div>
               )}
 
-              {/* Price */}
-              <div className="mb-8">
-                <div className="flex items-baseline gap-3">
-                  <span className="text-4xl font-bold" style={{ color: colors.primaryColor }}>
-                    {finalPrice} {currency || 'DZD'}
-                  </span>
-                  {priceAdjustment > 0 && (
-                    <span className="text-xl text-gray-500 line-through">
-                      {product.price} {currency || 'DZD'}
-                    </span>
-                  )}
-                </div>
-              </div>
-
-              {/* Quantity and Add to Cart */}
-              <div className="space-y-4">
-                {/* Quantity Selector */}
-                <div className="flex items-center gap-4">
-                  <span className="text-lg font-medium text-gray-700">
-                    {menuLanguage === 'ar' ? 'الكمية' : 'Quantity'}:
-                  </span>
-                  <div className="flex items-center border-2 border-gray-300 rounded-lg">
-                    <button
-                      onClick={() => handleQuantityChange(productId, quantity - 1)}
-                      className="px-4 py-3 hover:bg-gray-100 transition-colors text-gray-600 text-lg font-medium"
-                    >
-                      -
-                    </button>
-                    <span className="px-6 py-3 border-x-2 border-gray-300 min-w-[60px] text-center text-lg font-bold">
-                      {quantity}
-                    </span>
-                    <button
-                      onClick={() => handleQuantityChange(productId, quantity + 1)}
-                      className="px-4 py-3 hover:bg-gray-100 transition-colors text-gray-600 text-lg font-medium"
-                    >
-                      +
-                    </button>
-                  </div>
+              {/* Product Info */}
+              <div className="p-4">
+                <div className="flex justify-between items-start gap-2 mb-2">
+                  <h3 className="text-lg font-semibold text-gray-800">{product.name}</h3>
                 </div>
                 
-                {/* Add to Cart Button */}
-                <button
-                  onClick={() => handleAddToBasket(product)}
-                  className="w-full py-4 px-8 rounded-lg text-xl font-bold text-white transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                  style={{ 
-                    backgroundColor: colors.primaryColor,
-                  }}
-                  onMouseEnter={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.primaryHoverColor;
-                  }}
-                  onMouseLeave={(e) => {
-                    e.currentTarget.style.backgroundColor = colors.primaryColor;
-                  }}
-                >
-                  <svg className="w-6 h-6 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4m0 0L7 13m0 0l-2.5 5M7 13l2.5 5m6-5v6a2 2 0 01-2 2H9a2 2 0 01-2-2v-6m8 0V9a2 2 0 00-2-2H9a2 2 0 00-2 2v4.01" />
-                  </svg>
-                  {menuLanguage === 'ar' ? 'أضف للسلة' : 'Add to Cart'}
-                </button>
-              </div>
+                {product.description && (
+                  <p className="text-gray-600 mb-3 text-sm leading-relaxed line-clamp-2">
+                    {product.description}
+                  </p>
+                )}
 
-              {/* Trust Indicators */}
-              <div className="mt-8 pt-6 border-t border-gray-200">
-                <div className="flex flex-wrap gap-4 text-sm text-gray-500">
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {menuLanguage === 'ar' ? 'جودة مضمونة' : 'Quality Guaranteed'}
+                {/* Variants */}
+                {product.variants && product.variants.length > 0 && (
+                  <div className="space-y-2 mb-3">
+                    {product.variants.map((variant) => (
+                      <div key={variant.name} className="flex flex-col gap-1">
+                        <span className="font-medium text-sm text-gray-700">
+                          {variant.name}:
+                        </span>
+                        <div className="flex flex-wrap gap-1">
+                          {variant.options.map(option => {
+                            const isSelected = variants?.[variant.name] === option.name;
+                            return (
+                              <button
+                                key={option.name}
+                                type="button"
+                                className={`px-2 py-1 rounded-full border text-xs font-medium transition-all ${
+                                  isSelected
+                                    ? 'text-white border-primary shadow'
+                                    : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                }`}
+                                style={isSelected ? {
+                                  backgroundColor: colors.primaryColor,
+                                  borderColor: colors.primaryColor
+                                } : {}}
+                                onClick={() => handleVariantChange(
+                                  productId, 
+                                  variant.name, 
+                                  isSelected ? '' : option.name
+                                )}
+                              >
+                                {option.name}
+                                {option.price ? ` (+${option.price} ${currency || 'DZD'})` : ''}
+                              </button>
+                            );
+                          })}
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {menuLanguage === 'ar' ? 'شحن سريع' : 'Fast Shipping'}
-                  </div>
-                  <div className="flex items-center">
-                    <svg className="w-5 h-5 mr-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    {menuLanguage === 'ar' ? 'خدمة عملاء 24/7' : '24/7 Support'}
+                )}
+
+                {/* Price and Add to Basket */}
+                <div className="flex justify-between items-center mt-4">
+                  <span className="text-lg font-bold text-gray-800">
+                    {finalPrice} {currency || 'DZD'}
+                  </span>
+                  
+                  <div className="flex items-center gap-2">
+                    <div className="flex items-center border rounded-lg overflow-hidden">
+                      <button
+                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200 transition"
+                        onClick={() => handleQuantityChange(productId, -1)}
+                        type="button"
+                      >
+                        -
+                      </button>
+                      <span className="px-2 w-8 text-center">{quantity}</span>
+                      <button
+                        className="px-2 py-1 bg-gray-100 hover:bg-gray-200 transition"
+                        onClick={() => handleQuantityChange(productId, 1)}
+                        type="button"
+                      >
+                        +
+                      </button>
+                    </div>
+                    <button
+                      className="px-3 py-1 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition"
+                      style={{ backgroundColor: colors.primaryColor }}
+                      onClick={() => handleAddToBasket(product, productId)}
+                      type="button"
+                    >
+                      {translations[menuLanguage].addToBasket}
+                    </button>
                   </div>
                 </div>
               </div>
-            </div>
-          </div>
-        </div>
+            </motion.div>
+          );
+        })}
       </div>
     </div>
   );
