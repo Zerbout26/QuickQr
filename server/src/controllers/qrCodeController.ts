@@ -124,6 +124,7 @@ const generateDynamicBackground = (primaryColor: string, accentColor: string): s
 const uploadFields = upload.fields([
   { name: 'logo', maxCount: 1 },
   { name: 'menuItemImages', maxCount: 20 }, // Allow up to 20 menu item images
+  { name: 'productImages', maxCount: 20 }, // Allow up to 20 product images
   { name: 'vitrineImages', maxCount: 20 } // Allow up to 20 vitrine images
 ]);
 
