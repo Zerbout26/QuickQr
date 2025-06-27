@@ -231,7 +231,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                                             : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                                         }`}
                                         style={isSelected ? { backgroundColor: colors.primaryColor, borderColor: colors.primaryColor } : {}}
-                                        onClick={() => handleVariantChange(key, variant.name, option.name)}
+                                        onClick={() => handleVariantChange(key, variant.name, isSelected ? '' : option.name)}
                                       >
                                         {option.name}{option.price ? ` (+${option.price} ${menu.currency || 'DZD'})` : ''}
                                       </button>
