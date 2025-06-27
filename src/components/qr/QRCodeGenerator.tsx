@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { QRCode as QRCodeType, Link, MenuCategory, MenuItem } from '@/types';
+import { QRCode as QRCodeType, Link, MenuCategory, MenuItem, Variant, VariantOption } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
@@ -616,10 +616,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
     setMenuCategories(newCategories);
   };
 
-  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number) => {
+  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number | Variant[]) => {
     const newCategories = [...menuCategories];
     const item = newCategories[categoryIndex].items[itemIndex];
-    
     let processedValue = value;
     if (field === 'price') {
       processedValue = typeof value === 'string' ? parseFloat(value) : value;
@@ -627,7 +626,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
         processedValue = 0;
       }
     }
-
     newCategories[categoryIndex].items[itemIndex] = {
       ...item,
       [field]: processedValue,
@@ -1086,6 +1084,102 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                     {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
                                   </Button>
                                 </div>
+                              </div>
+                              {/* Variants Section */}
+                              <div className="space-y-2">
+                                <Label>Variants</Label>
+                                {(item.variants || []).map((variant, variantIdx) => (
+                                  <div key={variantIdx} className="border rounded p-2 mb-2">
+                                    <div className="flex items-center gap-2 mb-2">
+                                      <Input
+                                        value={variant.name}
+                                        onChange={e => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants[variantIdx].name = e.target.value;
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                        placeholder="Variant name (e.g. Size, Color)"
+                                        className="flex-1"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants.splice(variantIdx, 1);
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                    {/* Variant Options */}
+                                    <div className="space-y-1 ml-4">
+                                      {(variant.options || []).map((option, optionIdx) => (
+                                        <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                          <Input
+                                            value={option.name}
+                                            onChange={e => {
+                                              const newVariants = [...(item.variants || [])];
+                                              newVariants[variantIdx].options[optionIdx].name = e.target.value;
+                                              updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                            }}
+                                            placeholder="Option (e.g. Small, Red)"
+                                            className="flex-1"
+                                          />
+                                          <Input
+                                            type="number"
+                                            value={option.price ?? ''}
+                                            onChange={e => {
+                                              const newVariants = [...(item.variants || [])];
+                                              newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
+                                              updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                            }}
+                                            placeholder="Price adj."
+                                            className="w-24"
+                                          />
+                                          <Button
+                                            type="button"
+                                            variant="destructive"
+                                            size="icon"
+                                            onClick={() => {
+                                              const newVariants = [...(item.variants || [])];
+                                              newVariants[variantIdx].options.splice(optionIdx, 1);
+                                              updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                            }}
+                                          >
+                                            <Trash2 className="h-4 w-4" />
+                                          </Button>
+                                        </div>
+                                      ))}
+                                      <Button
+                                        type="button"
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants[variantIdx].options.push({ name: '' });
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                      >
+                                        + Add Option
+                                      </Button>
+                                    </div>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newVariants = [...(item.variants || [])];
+                                    newVariants.push({ name: '', options: [] });
+                                    updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                  }}
+                                >
+                                  + Add Variant
+                                </Button>
                               </div>
                               <Button
                                 type="button"

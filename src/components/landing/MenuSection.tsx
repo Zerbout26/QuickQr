@@ -1,5 +1,5 @@
 import { motion } from 'framer-motion';
-import { MenuItem } from '@/types';
+import { MenuItem, Variant, VariantOption } from '@/types';
 import React, { useState } from 'react';
 
 interface LandingPageColors {
@@ -53,6 +53,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
 
   // Track quantity for each item by category and item index
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
+  const [selectedVariants, setSelectedVariants] = useState<{ [key: string]: { [variantName: string]: string } }>({});
 
   const isItemAvailableToday = (item: MenuItem): boolean => {
     const today = new Date().toLocaleDateString('en-US', { weekday: 'long' }).toLowerCase();
@@ -64,12 +65,41 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
     setQuantities(qs => ({ ...qs, [key]: Math.max(1, (qs[key] || 1) + delta) }));
   };
 
+  const getVariantPriceAdjustment = (item: MenuItem, key: string) => {
+    if (!item.variants) return 0;
+    const selected = selectedVariants[key] || {};
+    return item.variants.reduce((sum, variant) => {
+      const selectedOptionName = selected[variant.name];
+      const option = variant.options.find(opt => opt.name === selectedOptionName);
+      return sum + (option?.price || 0);
+    }, 0);
+  };
+
+  const handleVariantChange = (key: string, variantName: string, optionName: string) => {
+    setSelectedVariants(prev => ({
+      ...prev,
+      [key]: {
+        ...(prev[key] || {}),
+        [variantName]: optionName
+      }
+    }));
+  };
+
   const handleConfirm = (catIdx: number, itemIdx: number) => {
     const key = `${catIdx}-${itemIdx}`;
     const category = menu.categories[catIdx];
     const item = category.items[itemIdx];
     const quantity = quantities[key] || 1;
-    onAddToBasket(item, quantity, key, category.name, item.price);
+    const variantAdjustment = getVariantPriceAdjustment(item, key);
+    const finalPrice = item.price + variantAdjustment;
+    const selected = selectedVariants[key] || {};
+    onAddToBasket(
+      { ...item, selectedVariants: selected },
+      quantity,
+      key,
+      category.name,
+      finalPrice
+    );
     setQuantities(qs => ({ ...qs, [key]: 1 }));
   };
 
@@ -140,6 +170,9 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                   const isAvailable = isItemAvailableToday(item);
                   const key = `${categoryIndex}-${itemIndex}`;
                   const quantity = quantities[key] || 1;
+                  const variantAdjustment = getVariantPriceAdjustment(item, key);
+                  const finalPrice = item.price + variantAdjustment;
+                  const selected = selectedVariants[key] || {};
                   return (
                     <motion.article
                       key={itemIndex}
@@ -180,11 +213,33 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                             </p>
                           )}
                           
+                          {item.variants && item.variants.length > 0 && (
+                            <div className="space-y-2 mb-2">
+                              {item.variants.map((variant) => (
+                                <div key={variant.name} className="flex items-center gap-2">
+                                  <span className="font-medium text-sm">{variant.name}:</span>
+                                  <select
+                                    className="border rounded px-2 py-1 text-sm"
+                                    value={selected[variant.name] || ''}
+                                    onChange={e => handleVariantChange(key, variant.name, e.target.value)}
+                                  >
+                                    <option value="">Select</option>
+                                    {variant.options.map(option => (
+                                      <option key={option.name} value={option.name}>
+                                        {option.name}{option.price ? ` (+${option.price} ${menu.currency || 'DZD'})` : ''}
+                                      </option>
+                                    ))}
+                                  </select>
+                                </div>
+                              ))}
+                            </div>
+                          )}
+                          
                           <div className="flex justify-between items-center">
                             <span 
                               className="text-lg font-bold text-gray-800"
                             >
-                              {item.price} {menu.currency || 'DZD'}
+                              {(item.price + variantAdjustment)} {menu.currency || 'DZD'}
                             </span>
                           </div>
                           {menu.orderable && (
@@ -206,6 +261,7 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                                 style={{ backgroundColor: colors.primaryColor }}
                                 onClick={() => handleConfirm(categoryIndex, itemIndex)}
                                 type="button"
+                                disabled={item.variants && item.variants.some(v => !selected[v.name])}
                               >
                                 {translations[menuLanguage].addToBasket}
                               </button>

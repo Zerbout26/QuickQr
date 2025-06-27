@@ -14,6 +14,7 @@ import { ChevronLeft, ChevronRight, Eye, Edit, Trash2, Filter, Search } from 'lu
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
+type SelectedVariants = { [variantName: string]: string };
 interface OrderItem {
   key: string;
   itemName: string;
@@ -21,6 +22,7 @@ interface OrderItem {
   quantity: number;
   price: number;
   imageUrl?: string;
+  selectedVariants?: SelectedVariants;
 }
 
 interface CustomerInfo {
@@ -506,6 +508,7 @@ const Orders = () => {
                       <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                         {t.date}
                       </th>
+                      <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${language === 'ar' ? 'text-right' : 'text-left'}`}>Items</th>
                       <th className={`px-6 py-3 text-xs font-medium text-gray-500 uppercase tracking-wider ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                         {t.actions}
                       </th>
@@ -535,6 +538,20 @@ const Orders = () => {
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <div className="text-gray-900">{formatDate(order.createdAt)}</div>
+                        </td>
+                        <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
+                          <div className="space-y-1">
+                            {order.items.map((item, idx) => (
+                              <div key={idx}>
+                                <span className="font-medium">{item.itemName}</span>
+                                {item.selectedVariants && (
+                                  <span className="block text-xs text-gray-500">
+                                    {Object.entries(item.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
+                                  </span>
+                                )}
+                              </div>
+                            ))}
+                          </div>
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <div className={`flex gap-2 ${language === 'ar' ? 'flex-row-reverse justify-end' : 'flex-row justify-start'}`}>
@@ -632,6 +649,13 @@ const Orders = () => {
                                             <div>
                                               <p className="font-medium">{item.itemName}</p>
                                               <p className="text-sm text-gray-600">{item.categoryName}</p>
+                                              {item.selectedVariants && (
+                                                <ul className="text-xs text-gray-500 mt-1 space-y-0.5">
+                                                  {Object.entries(item.selectedVariants).map(([variant, option]) => (
+                                                    <li key={variant}>{variant}: {option}</li>
+                                                  ))}
+                                                </ul>
+                                              )}
                                             </div>
                                             <div className="text-right">
                                               <p>{item.quantity} x {item.price} DZD</p>

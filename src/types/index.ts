@@ -21,12 +21,23 @@ export interface User {
 
 export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';
 
+export interface VariantOption {
+  name: string; // e.g. "Small", "Red"
+  price?: number; // Optional price adjustment
+}
+
+export interface Variant {
+  name: string; // e.g. "Size", "Color"
+  options: VariantOption[];
+}
+
 export interface MenuItem {
   name: string;
   description?: string;
   price: number;
   imageUrl?: string;
   availability?: Record<string, boolean>;
+  variants?: Variant[];
 }
 
 export interface MenuCategory {

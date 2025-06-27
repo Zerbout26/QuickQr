@@ -11,6 +11,7 @@ export interface OrderItem {
   quantity: number;
   price: number;
   imageUrl?: string;
+  selectedVariants?: { [variantName: string]: string };
 }
 
 export interface CustomerInfo {

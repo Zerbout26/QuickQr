@@ -182,6 +182,9 @@ const QRHeader = lazy(() => import(
   '@/components/landing/QRHeader'
 ));
 
+// Add SelectedVariants type
+type SelectedVariants = { [variantName: string]: string };
+
 const LandingPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -204,6 +207,7 @@ const LandingPage = () => {
     quantity: number;
     categoryName: string;
     price: number;
+    selectedVariants?: SelectedVariants;
   }>>([]);
   const [isBasketOpen, setIsBasketOpen] = useState(false);
   const [showCodForm, setShowCodForm] = useState(false);
@@ -312,14 +316,14 @@ const LandingPage = () => {
     };
   }, [id, navigate, isArabicText, fetchLandingPageColors]);
 
-  // Add item to basket or update quantity if already present
-  const addToBasket = (item: MenuItem, quantity: number, key: string, categoryName: string, price: number) => {
+  // Update basket state to include selectedVariants
+  const addToBasket = (item: MenuItem, quantity: number, key: string, categoryName: string, price: number, selectedVariants?: SelectedVariants) => {
     setBasket(prev => {
-      const existing = prev.find(b => b.key === key);
+      const existing = prev.find(b => b.key === key && JSON.stringify(b.selectedVariants) === JSON.stringify(selectedVariants));
       if (existing) {
-        return prev.map(b => b.key === key ? { ...b, quantity: b.quantity + quantity } : b);
+        return prev.map(b => (b.key === key && JSON.stringify(b.selectedVariants) === JSON.stringify(selectedVariants)) ? { ...b, quantity: b.quantity + quantity } : b);
       } else {
-        return [...prev, { key, item, quantity, categoryName, price }];
+        return [...prev, { key, item, quantity, categoryName, price, selectedVariants }];
       }
     });
   };
@@ -354,7 +358,8 @@ const LandingPage = () => {
           categoryName: b.categoryName,
           quantity: b.quantity,
           price: b.price,
-          imageUrl: b.item.imageUrl
+          imageUrl: b.item.imageUrl,
+          selectedVariants: b.selectedVariants
         })),
         customerInfo: codFormData
       };
@@ -409,7 +414,8 @@ const LandingPage = () => {
           categoryName: b.categoryName,
           quantity: b.quantity,
           price: b.price,
-          imageUrl: b.item.imageUrl
+          imageUrl: b.item.imageUrl,
+          selectedVariants: b.selectedVariants
         })),
         customerInfo: {
           name: 'Anonymous',
@@ -577,7 +583,7 @@ const LandingPage = () => {
                 ) : (
                   <div className="space-y-4">
                     {basket.map(b => (
-                      <div key={b.key} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                      <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
                         {b.item.imageUrl && (
                           <img
                             src={b.item.imageUrl}
@@ -588,6 +594,13 @@ const LandingPage = () => {
                         <div className="flex-1 min-w-0">
                           <h4 className="font-medium text-sm truncate">{b.item.name}</h4>
                           <p className="text-xs text-gray-500">{b.categoryName}</p>
+                          {b.selectedVariants && (
+                            <ul className="text-xs text-gray-600 mt-1 space-y-0.5">
+                              {Object.entries(b.selectedVariants).map(([variant, option]) => (
+                                <li key={variant}>{variant}: {option}</li>
+                              ))}
+                            </ul>
+                          )}
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center gap-2">
                               <button
@@ -724,8 +737,15 @@ const LandingPage = () => {
                     </h4>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
                       {basket.map(b => (
-                        <div key={b.key} className="flex justify-between text-sm">
-                          <span>{b.item.name} x{b.quantity}</span>
+                        <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex justify-between text-sm">
+                          <span>
+                            {b.item.name} x{b.quantity}
+                            {b.selectedVariants && (
+                              <span className="block text-xs text-gray-500">
+                                {Object.entries(b.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
+                              </span>
+                            )}
+                          </span>
                           <span>{b.price * b.quantity} {qrCode?.menu?.currency || 'DZD'}</span>
                         </div>
                       ))}

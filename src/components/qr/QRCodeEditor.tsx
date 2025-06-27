@@ -5,7 +5,7 @@ import { Label } from '@/components/ui/label';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Plus, Trash2, Facebook, Instagram, Twitter, Linkedin, Youtube, MessageCircle, Send, Globe, Upload } from 'lucide-react';
 import { toast } from '@/components/ui/use-toast';
-import { QRCode, QRCodeType, MenuItem, MenuCategory, Link } from '@/types';
+import { QRCode, QRCodeType, MenuItem, MenuCategory, Link, Variant, VariantOption } from '@/types';
 import { qrCodeApi } from '@/lib/api';
 import {
   Select,
@@ -22,26 +22,6 @@ const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 interface QRCodeEditorProps {
   qrCode: QRCode;
   onUpdated: (updatedQRCode: QRCode) => void;
-}
-
-interface MenuItem {
-  name: string;
-  description?: string;
-  price: number;
-  category: string;
-  imageUrl?: string;
-  availability: Record<string, boolean>;
-}
-
-interface MenuCategory {
-  name: string;
-  items: MenuItem[];
-}
-
-interface Link {
-  label: string;
-  url: string;
-  type: 'website' | 'facebook' | 'instagram' | 'twitter' | 'linkedin' | 'youtube' | 'whatsapp' | 'telegram' | 'tiktok' | 'other';
 }
 
 const defaultAvailability = {
@@ -389,7 +369,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   };
 
   const addLink = () => {
-    setLinks([...links, { label: '', url: '', type: 'website' }]);
+    setLinks([...links, { label: '', url: '', type: 'website' as const }]);
   };
 
   const removeLink = (index: number) => {
@@ -461,7 +441,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     }
   };
 
-  const getPlatformLabel = (type: string): string => {
+  const getPlatformLabel = (type: Link['type']): string => {
     switch (type) {
       case 'facebook': return 'Follow us on Facebook';
       case 'instagram': return 'Follow us on Instagram';
@@ -509,10 +489,9 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setMenuCategories(newCategories);
   };
 
-  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number) => {
+  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number | Variant[]) => {
     const newCategories = [...menuCategories];
     const item = newCategories[categoryIndex].items[itemIndex];
-
     let processedValue = value;
     if (field === 'price') {
       processedValue = typeof value === 'string' ? parseFloat(value) : value;
@@ -520,7 +499,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         processedValue = 0;
       }
     }
-
     newCategories[categoryIndex].items[itemIndex] = {
       ...item,
       [field]: processedValue,
@@ -775,8 +753,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             />
             <div className="flex gap-2">
               <Select
-                value={cta.type || 'website'}
-                onValueChange={(value) => updateCTA(index, 'type', value)}
+                value={cta.type as Link['type'] || 'website'}
+                onValueChange={(value) => updateCTA(index, 'type', value as Link['type'])}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select platform" />
@@ -909,8 +887,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   {links.map((link, index) => (
                     <div key={index} className="flex gap-2">
                       <Select
-                        value={link.type || 'website'}
-                        onValueChange={(value) => updateLink(index, 'type', value)}
+                        value={link.type as Link['type'] || 'website'}
+                        onValueChange={(value) => updateLink(index, 'type', value as Link['type'])}
                       >
                         <SelectTrigger className="w-[180px]">
                           <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
@@ -1048,6 +1026,100 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                 </div>
                               ))}
                             </div>
+                          </div>
+                          <div className="space-y-2">
+                            <Label>Variants</Label>
+                            {(item.variants || []).map((variant, variantIdx) => (
+                              <div key={variantIdx} className="border rounded p-2 mb-2">
+                                <div className="flex items-center gap-2 mb-2">
+                                  <Input
+                                    value={variant.name}
+                                    onChange={e => {
+                                      const newVariants = [...(item.variants || [])];
+                                      newVariants[variantIdx].name = e.target.value;
+                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                    }}
+                                    placeholder="Variant name (e.g. Size, Color)"
+                                    className="flex-1"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => {
+                                      const newVariants = [...(item.variants || [])];
+                                      newVariants.splice(variantIdx, 1);
+                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                    }}
+                                  >
+                                    <Trash2 className="h-4 w-4" />
+                                  </Button>
+                                </div>
+                                <div className="space-y-1 ml-4">
+                                  {(variant.options || []).map((option, optionIdx) => (
+                                    <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                      <Input
+                                        value={option.name}
+                                        onChange={e => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants[variantIdx].options[optionIdx].name = e.target.value;
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                        placeholder="Option (e.g. Small, Red)"
+                                        className="flex-1"
+                                      />
+                                      <Input
+                                        type="number"
+                                        value={option.price ?? ''}
+                                        onChange={e => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                        placeholder="Price adj."
+                                        className="w-24"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => {
+                                          const newVariants = [...(item.variants || [])];
+                                          newVariants[variantIdx].options.splice(optionIdx, 1);
+                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                        }}
+                                      >
+                                        <Trash2 className="h-4 w-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const newVariants = [...(item.variants || [])];
+                                      newVariants[variantIdx].options.push({ name: '' });
+                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                    }}
+                                  >
+                                    + Add Option
+                                  </Button>
+                                </div>
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const newVariants = [...(item.variants || [])];
+                                newVariants.push({ name: '', options: [] });
+                                updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                              }}
+                            >
+                              + Add Variant
+                            </Button>
                           </div>
                           <Button
                             type="button"
