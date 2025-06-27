@@ -185,6 +185,16 @@ const QRHeader = lazy(() => import(
 // Add SelectedVariants type
 type SelectedVariants = { [variantName: string]: string };
 
+// Helper to calculate price with variants
+const getVariantPriceAdjustment = (item: MenuItem, selectedVariants?: SelectedVariants) => {
+  if (!item.variants || !selectedVariants) return 0;
+  return item.variants.reduce((sum, variant) => {
+    const selectedOptionName = selectedVariants[variant.name];
+    const option = variant.options.find(opt => opt.name === selectedOptionName);
+    return sum + (option?.price || 0);
+  }, 0);
+};
+
 const LandingPage = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
@@ -582,54 +592,58 @@ const LandingPage = () => {
                   </div>
                 ) : (
                   <div className="space-y-4">
-                    {basket.map(b => (
-                      <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                        {b.item.imageUrl && (
-                          <img
-                            src={b.item.imageUrl}
-                            alt={b.item.name}
-                            className="w-12 h-12 object-cover rounded"
-                          />
-                        )}
-                        <div className="flex-1 min-w-0">
-                          <h4 className="font-medium text-sm truncate">{b.item.name}</h4>
-                          <p className="text-xs text-gray-500">{b.categoryName}</p>
-                          {b.selectedVariants && (
-                            <ul className="text-xs text-gray-600 mt-1 space-y-0.5">
-                              {Object.entries(b.selectedVariants).map(([variant, option]) => (
-                                <li key={variant}>{variant}: {option}</li>
-                              ))}
-                            </ul>
+                    {basket.map(b => {
+                      const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
+                      const finalPrice = b.item.price + variantAdjustment;
+                      return (
+                        <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
+                          {b.item.imageUrl && (
+                            <img
+                              src={b.item.imageUrl}
+                              alt={b.item.name}
+                              className="w-12 h-12 object-cover rounded"
+                            />
                           )}
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-2">
-                              <button
-                                onClick={() => updateBasketQuantity(b.key, Math.max(1, b.quantity - 1))}
-                                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
-                              >
-                                -
-                              </button>
-                              <span className="text-sm font-medium w-8 text-center">{b.quantity}</span>
-                              <button
-                                onClick={() => updateBasketQuantity(b.key, b.quantity + 1)}
-                                className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
-                              >
-                                +
-                              </button>
-                            </div>
-                            <div className="text-right">
-                              <p className="text-sm font-semibold">{b.price * b.quantity} {qrCode.menu.currency || 'DZD'}</p>
-                              <button
-                                onClick={() => removeFromBasket(b.key)}
-                                className="text-xs text-red-500 hover:underline"
-                              >
-                                {menuLanguage === 'ar' ? 'حذف' : 'Remove'}
-                              </button>
+                          <div className="flex-1 min-w-0">
+                            <h4 className="font-medium text-sm truncate">{b.item.name}</h4>
+                            <p className="text-xs text-gray-500">{b.categoryName}</p>
+                            {b.selectedVariants && (
+                              <ul className="text-xs text-gray-600 mt-1 space-y-0.5">
+                                {Object.entries(b.selectedVariants).map(([variant, option]) => (
+                                  <li key={variant}>{variant}: {option}</li>
+                                ))}
+                              </ul>
+                            )}
+                            <div className="flex items-center justify-between mt-2">
+                              <div className="flex items-center gap-2">
+                                <button
+                                  onClick={() => updateBasketQuantity(b.key, Math.max(1, b.quantity - 1))}
+                                  className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
+                                >
+                                  -
+                                </button>
+                                <span className="text-sm font-medium w-8 text-center">{b.quantity}</span>
+                                <button
+                                  onClick={() => updateBasketQuantity(b.key, b.quantity + 1)}
+                                  className="w-6 h-6 rounded-full border border-gray-300 flex items-center justify-center text-xs hover:bg-gray-100"
+                                >
+                                  +
+                                </button>
+                              </div>
+                              <div className="text-right">
+                                <p className="text-sm font-semibold">{finalPrice * b.quantity} {qrCode.menu.currency || 'DZD'}</p>
+                                <button
+                                  onClick={() => removeFromBasket(b.key)}
+                                  className="text-xs text-red-500 hover:underline"
+                                >
+                                  {menuLanguage === 'ar' ? 'حذف' : 'Remove'}
+                                </button>
+                              </div>
                             </div>
                           </div>
                         </div>
-                      </div>
-                    ))}
+                      );
+                    })}
                   </div>
                 )}
               </div>
@@ -639,7 +653,11 @@ const LandingPage = () => {
                 <div className="border-t border-gray-200 p-4">
                   <div className="flex justify-between items-center mb-4">
                     <span className="font-bold">{menuLanguage === 'ar' ? 'المجموع' : 'Total'}:</span>
-                    <span className="text-lg font-bold">{basket.reduce((sum, b) => sum + b.price * b.quantity, 0)} {qrCode.menu.currency || 'DZD'}</span>
+                    <span className="text-lg font-bold">{basket.reduce((sum, b) => {
+                      const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
+                      const finalPrice = b.item.price + variantAdjustment;
+                      return sum + finalPrice * b.quantity;
+                    }, 0)} {qrCode.menu.currency || 'DZD'}</span>
                   </div>
                   <button
                     className="w-full py-3 rounded-lg font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -736,24 +754,36 @@ const LandingPage = () => {
                       {menuLanguage === 'ar' ? 'ملخص الطلب' : 'Order Summary'}
                     </h4>
                     <div className="space-y-2 max-h-32 overflow-y-auto">
-                      {basket.map(b => (
-                        <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex justify-between text-sm">
-                          <span>
-                            {b.item.name} x{b.quantity}
-                            {b.selectedVariants && (
-                              <span className="block text-xs text-gray-500">
-                                {Object.entries(b.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
-                              </span>
-                            )}
-                          </span>
-                          <span>{b.price * b.quantity} {qrCode?.menu?.currency || 'DZD'}</span>
-                        </div>
-                      ))}
+                      {basket.map(b => {
+                        const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
+                        const finalPrice = b.item.price + variantAdjustment;
+                        return (
+                          <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex justify-between text-sm">
+                            <span>
+                              {b.item.name} x{b.quantity}
+                              {b.selectedVariants && (
+                                <span className="block text-xs text-gray-500">
+                                  {Object.entries(b.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
+                                </span>
+                              )}
+                            </span>
+                            <span>{(() => {
+                              const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
+                              const finalPrice = b.item.price + variantAdjustment;
+                              return finalPrice * b.quantity;
+                            })()} {qrCode?.menu?.currency || 'DZD'}</span>
+                          </div>
+                        );
+                      })}
                     </div>
                     <div className="border-t pt-2 mt-2">
                       <div className="flex justify-between font-bold">
                         <span>{menuLanguage === 'ar' ? 'المجموع' : 'Total'}:</span>
-                        <span>{basket.reduce((sum, b) => sum + b.price * b.quantity, 0)} {qrCode?.menu?.currency || 'DZD'}</span>
+                        <span>{basket.reduce((sum, b) => {
+                          const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
+                          const finalPrice = b.item.price + variantAdjustment;
+                          return sum + finalPrice * b.quantity;
+                        }, 0)} {qrCode?.menu?.currency || 'DZD'}</span>
                       </div>
                     </div>
                   </div>

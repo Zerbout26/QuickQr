@@ -24,7 +24,7 @@ interface MenuSectionProps {
   selectedCategory: string | null;
   setSelectedCategory: (category: string | null) => void;
   colors: LandingPageColors;
-  onAddToBasket: (item: MenuItem, quantity: number, key: string, categoryName: string, price: number) => void;
+  onAddToBasket: (item: MenuItem, quantity: number, key: string, categoryName: string, price: number, selectedVariants?: { [variantName: string]: string }) => void;
 }
 
 const translations = {
@@ -94,11 +94,12 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
     const finalPrice = item.price + variantAdjustment;
     const selected = selectedVariants[key] || {};
     onAddToBasket(
-      { ...item, selectedVariants: selected },
+      item,
       quantity,
       key,
       category.name,
-      finalPrice
+      finalPrice,
+      selected
     );
     setQuantities(qs => ({ ...qs, [key]: 1 }));
   };
@@ -216,20 +217,26 @@ const MenuSection = ({ menu, menuLanguage, selectedCategory, setSelectedCategory
                           {item.variants && item.variants.length > 0 && (
                             <div className="space-y-2 mb-2">
                               {item.variants.map((variant) => (
-                                <div key={variant.name} className="flex items-center gap-2">
+                                <div key={variant.name} className="flex items-center gap-2 flex-wrap">
                                   <span className="font-medium text-sm">{variant.name}:</span>
-                                  <select
-                                    className="border rounded px-2 py-1 text-sm"
-                                    value={selected[variant.name] || ''}
-                                    onChange={e => handleVariantChange(key, variant.name, e.target.value)}
-                                  >
-                                    <option value="">Select</option>
-                                    {variant.options.map(option => (
-                                      <option key={option.name} value={option.name}>
+                                  {variant.options.map(option => {
+                                    const isSelected = selected[variant.name] === option.name;
+                                    return (
+                                      <button
+                                        key={option.name}
+                                        type="button"
+                                        className={`px-3 py-1 rounded border text-sm font-medium transition-all mr-2 mb-2 ${
+                                          isSelected
+                                            ? 'bg-primary text-white border-primary shadow'
+                                            : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                                        }`}
+                                        style={isSelected ? { backgroundColor: colors.primaryColor, borderColor: colors.primaryColor } : {}}
+                                        onClick={() => handleVariantChange(key, variant.name, option.name)}
+                                      >
                                         {option.name}{option.price ? ` (+${option.price} ${menu.currency || 'DZD'})` : ''}
-                                      </option>
-                                    ))}
-                                  </select>
+                                      </button>
+                                    );
+                                  })}
                                 </div>
                               ))}
                             </div>
