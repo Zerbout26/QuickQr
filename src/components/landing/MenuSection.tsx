@@ -230,14 +230,14 @@ const MenuSection = ({
                           <>
                             <button
                               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                              onClick={e => { e.stopPropagation(); handleImageNav(key, item.images!, -1); }}
+                              onClick={e => { e.stopPropagation(); handleImageNav(key, getValidImages(item), -1); }}
                               type="button"
                             >
                               &#8592;
                             </button>
                             <button
                               className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                              onClick={e => { e.stopPropagation(); handleImageNav(key, item.images!, 1); }}
+                              onClick={e => { e.stopPropagation(); handleImageNav(key, getValidImages(item), 1); }}
                               type="button"
                             >
                               &#8594;
@@ -374,14 +374,14 @@ const MenuSection = ({
                     <>
                       <button
                         className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, dialogItem.item.images!, -1); }}
+                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, getValidImages(dialogItem.item), -1); }}
                         type="button"
                       >
                         &#8592;
                       </button>
                       <button
                         className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, dialogItem.item.images!, 1); }}
+                        onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`, getValidImages(dialogItem.item), 1); }}
                         type="button"
                       >
                         &#8594;
