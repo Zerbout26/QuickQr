@@ -138,7 +138,12 @@ const MenuSection = ({
 
   const categories = menu.categories.map(cat => cat.name);
 
-  const getValidImages = (images?: string[]) => (images || []).filter(url => !url.startsWith('blob:'));
+  const getValidImages = (item: MenuItem) => {
+    const imgs = (item.images || []).filter(url => !url.startsWith('blob:'));
+    if (imgs.length > 0) return imgs;
+    if (item.imageUrl) return [item.imageUrl];
+    return [];
+  };
 
   return (
     <div className="px-4 pb-16 max-w-7xl mx-auto" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
@@ -213,15 +218,15 @@ const MenuSection = ({
                     transition={{ delay: itemIndex * 0.05 }}
                     onClick={() => setDialogItem({ item, categoryIndex, itemIndex })}
                   >
-                    {getValidImages(item.images).length > 0 && (
+                    {getValidImages(item).length > 0 && (
                       <div className="relative h-48 w-full overflow-hidden">
                         <img
-                          src={getValidImages(item.images)[imageIndexes[key] || 0]}
+                          src={getValidImages(item)[imageIndexes[key] || 0]}
                           alt={item.name}
                           className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
                           loading="lazy"
                         />
-                        {getValidImages(item.images).length > 1 && (
+                        {getValidImages(item).length > 1 && (
                           <>
                             <button
                               className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
@@ -238,7 +243,7 @@ const MenuSection = ({
                               &#8594;
                             </button>
                             <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                              {getValidImages(item.images).map((_, idx) => (
+                              {getValidImages(item).map((_, idx) => (
                                 <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[key] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
                               ))}
                             </div>
@@ -358,14 +363,14 @@ const MenuSection = ({
               <DialogHeader>
                 <DialogTitle>{dialogItem.item.name}</DialogTitle>
               </DialogHeader>
-              {getValidImages(dialogItem.item.images).length > 0 && (
+              {getValidImages(dialogItem.item).length > 0 && (
                 <div className="relative w-full h-64 mb-4">
                   <img
-                    src={getValidImages(dialogItem.item.images)[imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0]}
+                    src={getValidImages(dialogItem.item)[imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0]}
                     alt={dialogItem.item.name}
                     className="w-full h-full object-cover rounded"
                   />
-                  {getValidImages(dialogItem.item.images).length > 1 && (
+                  {getValidImages(dialogItem.item).length > 1 && (
                     <>
                       <button
                         className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
@@ -382,7 +387,7 @@ const MenuSection = ({
                         &#8594;
                       </button>
                       <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
-                        {getValidImages(dialogItem.item.images).map((_, idx) => (
+                        {getValidImages(dialogItem.item).map((_, idx) => (
                           <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogItem.categoryIndex}-${dialogItem.itemIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
                         ))}
                       </div>

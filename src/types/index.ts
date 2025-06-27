@@ -36,6 +36,7 @@ export interface MenuItem {
   description?: string;
   price: number;
   images?: string[];
+  imageUrl?: string; // legacy support
   availability?: Record<string, boolean>;
   variants?: Variant[];
 }
