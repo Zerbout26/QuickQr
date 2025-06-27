@@ -681,9 +681,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
 
         // Then, upload each menu item image
         for (const [key, file] of Object.entries(tempImages)) {
-          if (file instanceof File) {
-            const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
-            const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+          if (file instanceof File && key.startsWith('menu-')) {
+            const [_, categoryIndex, itemIndex, imageIndex] = key.split('-').map(Number);
+            const uniqueFilename = `menu-${categoryIndex}-${itemIndex}-${imageIndex}-${Date.now()}-${file.name}`;
             formData.append('menuItemImages', file, uniqueFilename);
           }
         }
@@ -1034,6 +1034,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                           const newImages = [...(item.images || [])];
                                           newImages.splice(imgIdx, 1);
                                           updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                          
+                                          // Remove corresponding file from tempImages
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
+                                          if (tempImages[key]) {
+                                            const newTempImages = { ...tempImages };
+                                            delete newTempImages[key];
+                                            setTempImages(newTempImages);
+                                          }
                                         }}
                                       >
                                         &times;
@@ -1052,7 +1060,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                       input.onchange = (e) => {
                                         const files = Array.from((e.target as HTMLInputElement).files || []);
                                         const newImages = [...(item.images || [])];
-                                        files.forEach(file => {
+                                        files.forEach((file, fileIndex) => {
+                                          // Store file in tempImages for upload
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
+                                          setTempImages(prev => ({ ...prev, [key]: file }));
+                                          // Create temporary URL for preview
                                           const url = URL.createObjectURL(file);
                                           newImages.push(url);
                                         });

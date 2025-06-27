@@ -580,9 +580,9 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
             // Handle menu item images
             for (const [key, file] of Object.entries(tempImages)) {
-                if (file instanceof File) {
-                    const [_, categoryIndex, itemIndex] = key.split('-').map(Number);
-                    const uniqueFilename = `${categoryIndex}-${itemIndex}-${Date.now()}-${file.name}`;
+                if (file instanceof File && key.startsWith('menu-')) {
+                    const [_, categoryIndex, itemIndex, imageIndex] = key.split('-').map(Number);
+                    const uniqueFilename = `menu-${categoryIndex}-${itemIndex}-${imageIndex}-${Date.now()}-${file.name}`;
                     formData.append('menuItemImages', file, uniqueFilename);
                 }
             }
@@ -597,12 +597,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     services: vitrine.services.map(service => ({
                         ...service,
                         // Keep existing Cloudinary URLs, only clear blob URLs
-                        imageUrl: service.imageUrl?.startsWith('blob:') ? '' : service.imageUrl
+                        images: service.images?.filter(img => !img.startsWith('blob:')) || []
                     })),
                     gallery: vitrine.gallery.map(item => ({
                         ...item,
                         // Keep existing Cloudinary URLs, only clear blob URLs
-                        imageUrl: item.imageUrl?.startsWith('blob:') ? '' : item.imageUrl
+                        images: item.images?.filter(img => !img.startsWith('blob:')) || []
                     }))
                 };
                 
@@ -706,8 +706,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             />
             <div className="flex gap-2">
               <Select
-                value={cta.type as Link['type'] || 'website'}
-                onValueChange={(value) => updateCTA(index, 'type', value as Link['type'])}
+                value={cta.type}
+                onValueChange={(value) => updateCTA(index, 'type', value)}
               >
                 <SelectTrigger className="w-[180px]">
                   <SelectValue placeholder="Select platform" />
@@ -954,7 +954,11 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                     input.onchange = (e) => {
                                       const files = Array.from((e.target as HTMLInputElement).files || []);
                                       const newImages = [...(item.images || [])];
-                                      files.forEach(file => {
+                                      files.forEach((file, fileIndex) => {
+                                        // Store file in tempImages for upload
+                                        const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
+                                        setTempImages(prev => ({ ...prev, [key]: file }));
+                                        // Create temporary URL for preview
                                         const url = URL.createObjectURL(file);
                                         newImages.push(url);
                                       });
@@ -1104,7 +1108,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => removeItemImage(categoryIndex, itemIndex)}
+                            onClick={() => removeMenuItem(categoryIndex, itemIndex)}
                           >
                             <Trash2 className="h-4 w-4 mr-2" />
                             Remove Item
