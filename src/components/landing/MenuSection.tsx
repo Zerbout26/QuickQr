@@ -429,17 +429,19 @@ const MenuSection = ({
                 <span className="text-lg font-bold text-gray-800">
                   {(dialogItem.item.price + getVariantPriceAdjustment(dialogItem.item, `${dialogItem.categoryIndex}-${dialogItem.itemIndex}`))} {menu.currency || 'DZD'}
                 </span>
-                <button
-                  className="px-3 py-1 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition"
-                  style={{ backgroundColor: colors.primaryColor }}
-                  onClick={() => {
-                    handleConfirm(dialogItem.categoryIndex, dialogItem.itemIndex);
-                    setDialogItem(null);
-                  }}
-                  type="button"
-                >
-                  {translations[menuLanguage].addToBasket}
-                </button>
+                {menu.orderable && (
+                  <button
+                    className="px-3 py-1 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition"
+                    style={{ backgroundColor: colors.primaryColor }}
+                    onClick={() => {
+                      handleConfirm(dialogItem.categoryIndex, dialogItem.itemIndex);
+                      setDialogItem(null);
+                    }}
+                    type="button"
+                  >
+                    {translations[menuLanguage].addToBasket}
+                  </button>
+                )}
               </div>
               <DialogClose asChild>
                 <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">&times;</button>
