@@ -283,15 +283,16 @@ const MenuSection = ({
                                           ? 'text-white border-primary shadow'
                                           : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
                                       }`}
-                                      style={isSelected ? { 
-                                        backgroundColor: colors.primaryColor, 
-                                        borderColor: colors.primaryColor 
-                                      } : {}}
-                                      onClick={() => handleVariantChange(
+                                      style={isSelected ? {
+                                        backgroundColor: colors.primaryColor,
+                                        borderColor: colors.primaryColor
+                                      } : menu.orderable === false ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                                      onClick={() => menu.orderable !== false && handleVariantChange(
                                         key, 
                                         variant.name, 
                                         isSelected ? '' : option.name
                                       )}
+                                      disabled={menu.orderable === false}
                                     >
                                       {option.name}
                                       {option.price ? ` (+${option.price} ${menu.currency || 'DZD'})` : ''}
@@ -412,8 +413,9 @@ const MenuSection = ({
                               style={isSelected ? {
                                 backgroundColor: colors.primaryColor,
                                 borderColor: colors.primaryColor
-                              } : {}}
-                              onClick={() => handleVariantChange(key, variant.name, isSelected ? '' : option.name)}
+                              } : menu.orderable === false ? { opacity: 0.5, cursor: 'not-allowed' } : {}}
+                              onClick={() => menu.orderable !== false && handleVariantChange(key, variant.name, isSelected ? '' : option.name)}
+                              disabled={menu.orderable === false}
                             >
                               {option.name}
                               {option.price ? ` (+${option.price} ${menu.currency || 'DZD'})` : ''}
