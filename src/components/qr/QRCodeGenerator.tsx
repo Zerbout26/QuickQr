@@ -533,6 +533,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
 
   const addLink = () => {
     setLinks([...links, { label: '', url: '', type: 'website' }]);
+    if (type !== 'both') setType('both');
   };
 
   const removeLink = (index: number) => {
@@ -604,7 +605,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
       name: '',
       description: '',
       price: 0,
-      imageUrl: '',
+      images: [],
       availability: { ...defaultAvailability },
     });
     setMenuCategories(newCategories);
@@ -616,7 +617,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
     setMenuCategories(newCategories);
   };
 
-  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number | Variant[]) => {
+  const updateMenuItem = (
+    categoryIndex: number,
+    itemIndex: number,
+    field: keyof MenuItem,
+    value: string | number | Variant[] | string[]
+  ) => {
     const newCategories = [...menuCategories];
     const item = newCategories[categoryIndex].items[itemIndex];
     let processedValue = value;
@@ -631,53 +637,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
       [field]: processedValue,
     };
     setMenuCategories(newCategories);
-  };
-
-  const handleMenuItemImageUpload = async (categoryIndex: number, itemIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        variant: "destructive",
-        title: "Invalid file type",
-        description: "Please upload an image file (PNG, JPG, etc.)",
-      });
-      return;
-    }
-
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: "File too large",
-        description: "Image must be less than 2MB",
-      });
-      return;
-    }
-
-    // Store the file temporarily
-    const key = `menu-${categoryIndex}-${itemIndex}`;
-    setTempImages(prev => ({ ...prev, [key]: file }));
-
-    // Create a temporary URL for preview
-    const tempUrl = URL.createObjectURL(file);
-    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
-  };
-
-  const removeItemImage = (categoryIndex: number, itemIndex: number) => {
-    const newCategories = [...menuCategories];
-    newCategories[categoryIndex].items[itemIndex].imageUrl = '';
-    setMenuCategories(newCategories);
-    
-    // Remove from temp images if exists
-    const key = `menu-${categoryIndex}-${itemIndex}`;
-    setTempImages(prev => {
-      const newTempImages = { ...prev };
-      delete newTempImages[key];
-      return newTempImages;
-    });
   };
 
   const handleItemAvailabilityChange = (categoryIndex: number, itemIndex: number, day: string, checked: boolean) => {
@@ -764,12 +723,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
           services: vitrine.services.map(service => ({
             name: service.name || '',
             description: service.description || '',
-            imageUrl: '', // Reset imageUrl as it will be updated after Cloudinary upload
+            images: [],
             title: service.title || '',
             imageDescription: service.imageDescription || ''
           })),
           gallery: vitrine.gallery.map(item => ({
-            imageUrl: item.imageUrl || '',
+            images: [],
             title: item.title || '',
             description: item.description || ''
           })),
@@ -1063,11 +1022,24 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                 </div>
                               )}
                               <div className="space-y-2">
-                                <Label>{translations[language].itemImage}</Label>
-                                <div className="flex items-center gap-4 mb-2">
-                                  {item.imageUrl && (
-                                    <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                                  )}
+                                <Label>Images</Label>
+                                <div className="flex gap-2 flex-wrap mb-2">
+                                  {(item.images || []).map((imgUrl, imgIdx) => (
+                                    <div key={imgIdx} className="relative group">
+                                      <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
+                                      <button
+                                        type="button"
+                                        className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                        onClick={() => {
+                                          const newImages = [...(item.images || [])];
+                                          newImages.splice(imgIdx, 1);
+                                          updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                        }}
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
+                                  ))}
                                   <Button
                                     type="button"
                                     variant="outline"
@@ -1076,12 +1048,20 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                       const input = document.createElement('input');
                                       input.type = 'file';
                                       input.accept = 'image/*';
-                                      input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
+                                      input.multiple = true;
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || []);
+                                        const newImages = [...(item.images || [])];
+                                        files.forEach(file => {
+                                          const url = URL.createObjectURL(file);
+                                          newImages.push(url);
+                                        });
+                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                      };
                                       input.click();
                                     }}
                                   >
-                                    <Upload className="h-4 w-4 mr-2" />
-                                    {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
+                                    + Add Image
                                   </Button>
                                 </div>
                               </div>
@@ -1367,7 +1347,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                       size="sm"
                       onClick={() => setVitrine({
                         ...vitrine,
-                        services: [...vitrine.services, { name: '', description: '', imageUrl: '', title: '', imageDescription: '' }]
+                        services: [...vitrine.services, { name: '', description: '', images: [], title: '', imageDescription: '' }]
                       })}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -1414,10 +1394,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                           }}
                         />
                         <div className="flex items-center gap-4">
-                          {service.imageUrl && (
+                          {service.images.length > 0 && (
                             <div className="relative w-24 h-24">
                               <img
-                                src={service.imageUrl}
+                                src={service.images[0]}
                                 alt={service.name}
                                 className="w-full h-full object-cover rounded"
                                 onError={(e) => {
@@ -1433,7 +1413,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                 className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
                                 onClick={() => {
                                   const newServices = [...vitrine.services];
-                                  newServices[index] = { ...service, imageUrl: '' };
+                                  newServices[index] = { ...service, images: [] };
                                   setVitrine({ ...vitrine, services: newServices });
                                   // Remove from tempImages if exists
                                   const key = `service-${index}`;
@@ -1463,7 +1443,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                   setTempImages(prev => ({ ...prev, [key]: file }));
                                   const tempUrl = URL.createObjectURL(file);
                                   const newServices = [...vitrine.services];
-                                  newServices[index] = { ...service, imageUrl: tempUrl };
+                                  newServices[index] = { ...service, images: [tempUrl] };
                                   setVitrine({ ...vitrine, services: newServices });
                                 }
                               };
@@ -1471,7 +1451,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                             }}
                           >
                             <Upload className="h-4 w-4 mr-2" />
-                            {service.imageUrl ? translations[language].changeImage : translations[language].addImage}
+                            {service.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
                           </Button>
                         </div>
                         <Button
@@ -1508,7 +1488,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                       size="sm"
                       onClick={() => setVitrine({
                         ...vitrine,
-                        gallery: [...vitrine.gallery, { imageUrl: '', title: '', description: '' }]
+                        gallery: [...vitrine.gallery, { images: [], title: '', description: '' }]
                       })}
                     >
                       <Plus className="h-4 w-4 mr-2" />
@@ -1537,8 +1517,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                           }}
                         />
                         <div className="flex items-center gap-4">
-                          {item.imageUrl && (
-                            <img src={item.imageUrl} alt={item.title} className="w-16 h-16 object-cover rounded" />
+                          {item.images.length > 0 && (
+                            <img src={item.images[0]} alt={item.title} className="w-16 h-16 object-cover rounded" />
                           )}
                           <Button
                             type="button"
@@ -1555,7 +1535,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                                   setTempImages(prev => ({ ...prev, [key]: file }));
                                   const tempUrl = URL.createObjectURL(file);
                                   const newGallery = [...vitrine.gallery];
-                                  newGallery[index] = { ...item, imageUrl: tempUrl };
+                                  newGallery[index] = { ...item, images: [tempUrl] };
                                   setVitrine({ ...vitrine, gallery: newGallery });
                                 }
                               };
@@ -1563,7 +1543,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                             }}
                           >
                             <Upload className="h-4 w-4 mr-2" />
-                            {item.imageUrl ? translations[language].changeImage : translations[language].addImage}
+                            {item.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
                           </Button>
                         </div>
                         <Button

@@ -35,7 +35,7 @@ export interface MenuItem {
   name: string;
   description?: string;
   price: number;
-  imageUrl?: string;
+  images?: string[];
   availability?: Record<string, boolean>;
   variants?: Variant[];
 }
@@ -72,12 +72,12 @@ export interface VitrineSection {
   services: Array<{
     name: string;
     description?: string;
-    imageUrl?: string;
+    images?: string[];
     title?: string;
     imageDescription?: string;
   }>;
   gallery: Array<{
-    imageUrl: string;
+    images?: string[];
     title?: string;
     description?: string;
   }>;

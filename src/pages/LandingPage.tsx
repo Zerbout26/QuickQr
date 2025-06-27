@@ -368,7 +368,7 @@ const LandingPage = () => {
           categoryName: b.categoryName,
           quantity: b.quantity,
           price: b.price,
-          imageUrl: b.item.imageUrl,
+          imageUrl: b.item.images && b.item.images.length > 0 ? b.item.images[0] : undefined,
           selectedVariants: b.selectedVariants
         })),
         customerInfo: codFormData
@@ -424,7 +424,7 @@ const LandingPage = () => {
           categoryName: b.categoryName,
           quantity: b.quantity,
           price: b.price,
-          imageUrl: b.item.imageUrl,
+          imageUrl: b.item.images && b.item.images.length > 0 ? b.item.images[0] : undefined,
           selectedVariants: b.selectedVariants
         })),
         customerInfo: {
@@ -477,24 +477,13 @@ const LandingPage = () => {
   return (
     <>
       <CriticalCSS colors={landingPageColors} />
-      <div className="landing-container">
+      <div className="landing-container pt-24">
         <div className="content-wrapper">
           {/* QR Header - Always show for menu and URL types */}
           {(qrCode.type === 'menu' || qrCode.type === 'url' || qrCode.type === 'both') && (
             <Suspense fallback={null}>
               <QRHeader 
                 qrCode={qrCode}
-                menuLanguage={menuLanguage} 
-                colors={landingPageColors}
-              />
-            </Suspense>
-          )}
-
-          {/* Social Links */}
-          {hasLinks && (
-            <Suspense fallback={null}>
-              <SocialLinks 
-                links={qrCode.links} 
                 menuLanguage={menuLanguage} 
                 colors={landingPageColors}
               />
@@ -597,9 +586,9 @@ const LandingPage = () => {
                       const finalPrice = b.item.price + variantAdjustment;
                       return (
                         <div key={b.key + JSON.stringify(b.selectedVariants)} className="flex items-start gap-3 p-3 bg-gray-50 rounded-lg">
-                          {b.item.imageUrl && (
+                          {b.item.images && b.item.images.length > 0 && (
                             <img
-                              src={b.item.imageUrl}
+                              src={b.item.images[0]}
                               alt={b.item.name}
                               className="w-12 h-12 object-cover rounded"
                             />
@@ -862,6 +851,16 @@ const LandingPage = () => {
             onClick={() => setIsBasketOpen(false)}
           />
         )}
+
+        <div className="fixed bottom-0 left-0 w-full z-50 shadow bg-white/90 min-h-14 flex items-center" style={{background: landingPageColors.backgroundGradient}}>
+          <Suspense fallback={null}>
+            <SocialLinks 
+              links={qrCode.links} 
+              menuLanguage={menuLanguage} 
+              colors={landingPageColors}
+            />
+          </Suspense>
+        </div>
       </div>
     </>
   );

@@ -477,7 +477,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       name: '',
       description: '',
       price: 0,
-      imageUrl: '',
+      images: [],
       availability: { ...defaultAvailability },
     });
     setMenuCategories(newCategories);
@@ -489,7 +489,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setMenuCategories(newCategories);
   };
 
-  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number | Variant[]) => {
+  const updateMenuItem = (categoryIndex: number, itemIndex: number, field: keyof MenuItem, value: string | number | Variant[] | string[]) => {
     const newCategories = [...menuCategories];
     const item = newCategories[categoryIndex].items[itemIndex];
     let processedValue = value;
@@ -504,53 +504,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       [field]: processedValue,
     };
     setMenuCategories(newCategories);
-  };
-
-  const handleMenuItemImageUpload = async (categoryIndex: number, itemIndex: number, e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    // Check file type
-    if (!file.type.startsWith('image/')) {
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].invalidFileType,
-        description: translations[menuLanguage].pleaseUploadImage,
-      });
-      return;
-    }
-
-    // Check file size (max 2MB)
-    if (file.size > 2 * 1024 * 1024) {
-      toast({
-        variant: "destructive",
-        title: translations[menuLanguage].fileTooLarge,
-        description: translations[menuLanguage].imageMustBeLess,
-      });
-      return;
-    }
-
-    // Store the file temporarily with a unique key
-    const key = `menu-${categoryIndex}-${itemIndex}-${Date.now()}`;
-    setTempImages(prev => ({ ...prev, [key]: file }));
-
-    // Create a temporary URL for preview
-    const tempUrl = URL.createObjectURL(file);
-    updateMenuItem(categoryIndex, itemIndex, 'imageUrl', tempUrl);
-  };
-
-  const removeItemImage = (categoryIndex: number, itemIndex: number) => {
-    const newCategories = [...menuCategories];
-    newCategories[categoryIndex].items[itemIndex].imageUrl = '';
-    setMenuCategories(newCategories);
-    
-    // Remove from temp images if exists
-    const key = `menu-${categoryIndex}-${itemIndex}`;
-    setTempImages(prev => {
-      const newTempImages = { ...prev };
-      delete newTempImages[key];
-      return newTempImages;
-    });
   };
 
   const handleItemAvailabilityChange = (categoryIndex: number, itemIndex: number, day: string, checked: boolean) => {
@@ -970,24 +923,50 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                       {category.items.map((item, itemIndex) => (
                         <div key={itemIndex} className="space-y-2 border p-2 rounded">
                           <div className="flex items-center gap-4 mb-2">
-                            {item.imageUrl && (
-                              <img src={item.imageUrl} alt={item.name} className="w-16 h-16 object-cover rounded" />
-                            )}
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => {
-                                const input = document.createElement('input');
-                                input.type = 'file';
-                                input.accept = 'image/*';
-                                input.onchange = (e) => handleMenuItemImageUpload(categoryIndex, itemIndex, e as any);
-                                input.click();
-                              }}
-                            >
-                              <Upload className="h-4 w-4 mr-2" />
-                              {item.imageUrl ? 'Change Image' : 'Add Image'}
-                            </Button>
+                            <div className="space-y-2">
+                              <Label>Images</Label>
+                              <div className="flex gap-2 flex-wrap mb-2">
+                                {(item.images || []).map((imgUrl, imgIdx) => (
+                                  <div key={imgIdx} className="relative group">
+                                    <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
+                                    <button
+                                      type="button"
+                                      className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                      onClick={() => {
+                                        const newImages = [...(item.images || [])];
+                                        newImages.splice(imgIdx, 1);
+                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                      }}
+                                    >
+                                      &times;
+                                    </button>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const input = document.createElement('input');
+                                    input.type = 'file';
+                                    input.accept = 'image/*';
+                                    input.multiple = true;
+                                    input.onchange = (e) => {
+                                      const files = Array.from((e.target as HTMLInputElement).files || []);
+                                      const newImages = [...(item.images || [])];
+                                      files.forEach(file => {
+                                        const url = URL.createObjectURL(file);
+                                        newImages.push(url);
+                                      });
+                                      updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                    };
+                                    input.click();
+                                  }}
+                                >
+                                  + Add Image
+                                </Button>
+                              </div>
+                            </div>
                           </div>
                           <Input
                             placeholder="Item Name"

@@ -1,5 +1,6 @@
 import { motion } from 'framer-motion';
 import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin } from 'lucide-react';
+import { useState } from 'react';
 
 interface Link {
   type: string;
@@ -95,7 +96,19 @@ const getPlatformInfo = (type: string) => {
 };
 
 const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
-  if (!links || links.length === 0) return null;
+  const [copied, setCopied] = useState(false);
+  if (!links) links = [];
+  const shareUrl = typeof window !== 'undefined' ? window.location.href : '';
+
+  const handleShare = async () => {
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 1500);
+    } catch {
+      setCopied(false);
+    }
+  };
 
   return (
     <motion.div 
@@ -118,22 +131,22 @@ const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
           }}
         ></div>
         
-        <div className={`grid ${links.length === 1 ? 'grid-cols-1 place-items-center' : 'grid-cols-2'} gap-2 max-w-md mx-auto`}>
-      {links.map((link, index) => {
-        const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
-        return (
+        <div className="flex flex-row flex-wrap gap-2 max-w-md mx-auto items-center justify-center">
+          {links.map((link, index) => {
+            const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(link.type);
+            return (
               <motion.a
-            key={index}
-              href={link.url}
-              target="_blank"
-              rel="noopener noreferrer"
-                className={`flex items-center justify-center gap-2 px-2 py-2 rounded-md text-white font-medium shadow-sm transition-all duration-300 text-xs sm:text-sm w-full ${
+                key={index}
+                href={link.url}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex items-center justify-center gap-2 px-2 py-2 rounded-md text-white font-medium shadow-sm transition-all duration-300 text-xs sm:text-sm ${
                   links.length === 1 ? 'max-w-[200px]' : ''
                 }`}
-              style={{
+                style={{
                   background: bgColor,
                   boxShadow: `0 2px 8px ${bgColor}30`,
-              }}
+                }}
                 whileHover={{ 
                   y: -2,
                   scale: 1.02,
@@ -141,12 +154,24 @@ const SocialLinks = ({ links, menuLanguage, colors }: SocialLinksProps) => {
                   boxShadow: `0 4px 12px ${hoverBgColor}50`
                 }}
                 whileTap={{ scale: 0.98 }}
-            >
+              >
                 <Icon className="h-3 w-3 sm:h-4 sm:w-4" />
                 <span className="font-medium truncate">{label}</span>
-            </motion.a>
-        );
-      })}
+              </motion.a>
+            );
+          })}
+          {/* Share Button */}
+          <motion.button
+            type="button"
+            onClick={handleShare}
+            className="flex items-center justify-center gap-2 px-2 py-2 rounded-md text-white font-medium shadow-sm transition-all duration-300 text-xs sm:text-sm bg-gray-700 hover:bg-gray-900"
+            style={{ boxShadow: '0 2px 8px #6B728030' }}
+            whileHover={{ y: -2, scale: 1.02, backgroundColor: '#111827', boxShadow: '0 4px 12px #11182750' }}
+            whileTap={{ scale: 0.98 }}
+          >
+            <ExternalLink className="h-3 w-3 sm:h-4 sm:w-4" />
+            <span className="font-medium truncate">{copied ? (menuLanguage === 'ar' ? 'تم النسخ!' : 'Copied!') : (menuLanguage === 'ar' ? 'مشاركة الصفحة' : 'Share Page')}</span>
+          </motion.button>
         </div>
       </motion.div>
     </motion.div>
