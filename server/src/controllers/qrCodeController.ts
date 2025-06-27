@@ -197,7 +197,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         return res.status(401).json({ error: 'Not authenticated' });
       }
 
-      const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url, vitrine } = req.body;
+      const { name, foregroundColor, backgroundColor, links, type, menu, textAbove, textBelow, url, vitrine, products } = req.body;
       const frontendDomain = (req as any).frontendDomain;
       let logoUrl = '';
       const qrCodeData: any = {};
@@ -301,6 +301,79 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
+      // Parse products if provided
+      let parsedProducts: { storeName?: string; currency?: string; orderable?: boolean; codFormEnabled?: boolean; products: MenuItem[] } | null = null;
+      if (type === 'products' && products) {
+        try {
+          parsedProducts = JSON.parse(products) as { storeName?: string; currency?: string; orderable?: boolean; codFormEnabled?: boolean; products: MenuItem[] };
+          
+          // Handle product images
+          if (req.files && (req.files as any)['productImages']) {
+            const productImages = (req.files as any)['productImages'];
+            for (let i = 0; i < productImages.length; i++) {
+              const imageFile = productImages[i];
+              try {
+                // Upload image to Cloudinary
+                const imageUrl = await uploadToCloudinary(imageFile);
+                
+                // Get optimized URL for the product image
+                const optimizedUrl = getOptimizedUrl(imageUrl, {
+                  width: 500,
+                  height: 500,
+                  crop: 'fill',
+                  quality: 'auto'
+                });
+                
+                // Extract product and image indices from the filename
+                const filename = imageFile.originalname;
+                const parts = filename.split('-');
+                if (parts.length >= 3) {
+                  const productIndex = parseInt(parts[1], 10);
+                  const imageIndex = parseInt(parts[2], 10);
+                  
+                  if (!isNaN(productIndex) && !isNaN(imageIndex) &&
+                      parsedProducts.products[productIndex]) {
+                    
+                    const product = parsedProducts.products[productIndex];
+                    
+                    // Initialize images array if it doesn't exist
+                    if (!product.images) {
+                      product.images = [];
+                    }
+                    
+                    // Replace the blob URL at the specific index with the Cloudinary URL
+                    if (product.images[imageIndex]) {
+                      product.images[imageIndex] = optimizedUrl;
+                    } else {
+                      // If the index doesn't exist, push to the end
+                      product.images.push(optimizedUrl);
+                    }
+                    
+                    // Also update imageUrl for backward compatibility (use the first image)
+                    if (product.images.length > 0) {
+                      product.imageUrl = product.images[0];
+                    }
+                    
+                    console.log(`Updated images array for product ${productIndex}: ${JSON.stringify(product.images)}`);
+                  } else {
+                    console.warn(`Invalid indices in filename: ${filename}`);
+                  }
+                } else {
+                  console.warn(`Invalid filename format: ${filename}`);
+                }
+              } catch (uploadError) {
+                console.error('Error uploading image to Cloudinary:', uploadError);
+                // Continue with other images even if one fails
+                continue;
+              }
+            }
+          }
+        } catch (e) {
+          console.error('Error parsing products:', e);
+          return res.status(400).json({ error: 'Invalid products format' });
+        }
+      }
+
       // Handle vitrine images
       if (req.files && 'vitrineImages' in req.files) {
         const vitrineImages = req.files['vitrineImages'] as Express.Multer.File[];
@@ -341,6 +414,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
       qrCode.type = type || 'url';
       qrCode.links = parsedLinks;
       qrCode.menu = parsedMenu || { restaurantName: '', categories: [] };
+      qrCode.products = parsedProducts || { products: [] };
       qrCode.vitrine = qrCodeData.vitrine;
       qrCode.logoUrl = logoUrl;
       qrCode.foregroundColor = foregroundColor || '#6366F1';
@@ -368,7 +442,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
 
         // Set hasVitrine or hasMenu on user if needed
-        if (type === 'vitrine' || type === 'menu') {
+        if (type === 'vitrine' || type === 'menu' || type === 'products') {
           const user = await userRepository.findOne({ where: { id: req.user.id } });
           if (user) {
             if (type === 'vitrine' && !user.hasVitrine) {
@@ -376,6 +450,10 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
               await userRepository.save(user);
             }
             if (type === 'menu' && !user.hasMenu) {
+              user.hasMenu = true;
+              await userRepository.save(user);
+            }
+            if (type === 'products' && !user.hasMenu) {
               user.hasMenu = true;
               await userRepository.save(user);
             }
@@ -394,7 +472,7 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
 
         // Set hasVitrine or hasMenu on user if needed
-        if (type === 'vitrine' || type === 'menu') {
+        if (type === 'vitrine' || type === 'menu' || type === 'products') {
           const user = await userRepository.findOne({ where: { id: req.user.id } });
           if (user) {
             if (type === 'vitrine' && !user.hasVitrine) {
@@ -402,6 +480,10 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
               await userRepository.save(user);
             }
             if (type === 'menu' && !user.hasMenu) {
+              user.hasMenu = true;
+              await userRepository.save(user);
+            }
+            if (type === 'products' && !user.hasMenu) {
               user.hasMenu = true;
               await userRepository.save(user);
             }
@@ -474,6 +556,7 @@ export const getQRCode = async (req: AuthRequest, res: Response) => {
         foregroundColor: true,
         backgroundColor: true,
         menu: true,
+        products: true,
         vitrine: true,
         links: true,
         scanCount: true,
@@ -769,7 +852,7 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
       await qrCodeRepository.remove(qrCode);
 
       // After deletion, check if user has any more QRs of this type
-      if (qrType === 'vitrine' || qrType === 'menu') {
+      if (qrType === 'vitrine' || qrType === 'menu' || qrType === 'products') {
         const user = await userRepository.findOne({ where: { id: req.user.id }, relations: ['qrCodes'] });
         if (user) {
           if (qrType === 'vitrine') {
@@ -785,6 +868,10 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
               user.hasMenu = false;
               await userRepository.save(user);
             }
+          }
+          if (qrType === 'products' && !user.hasMenu) {
+            user.hasMenu = true;
+            await userRepository.save(user);
           }
         }
       }
@@ -835,6 +922,7 @@ export const getPublicQRCode = async (req: Request, res: Response) => {
       textBelow: qrCode.textBelow,
       links: qrCode.links,
       menu: qrCode.menu,
+      products: qrCode.products,
       vitrine: qrCode.vitrine,
       scanCount: qrCode.scanCount || 0,
       // Landing page colors

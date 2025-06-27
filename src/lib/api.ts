@@ -158,7 +158,7 @@ export const authApi = {
 export const qrCodeApi = {
   create: async (data: {
     name: string;
-    type: 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
+    type: 'url' | 'menu' | 'both' | 'direct' | 'vitrine' | 'products';
     url?: string;
     logoUrl?: string;
     foregroundColor: string;
@@ -178,6 +178,19 @@ export const qrCodeApi = {
           imageUrl?: string;
         }[];
       }[];
+    };
+    products?: {
+      storeName: string;
+      description?: string;
+      products: {
+        name: string;
+        description?: string;
+        price: number;
+        imageUrl?: string;
+      }[];
+      currency?: string;
+      orderable?: boolean;
+      codFormEnabled?: boolean;
     };
     vitrine?: {
       hero: {
@@ -277,6 +290,10 @@ export const qrCodeApi = {
       formData.append('vitrine', JSON.stringify(data.vitrine));
     }
     
+    if (data.type === 'products' && data.products) {
+      formData.append('products', JSON.stringify(data.products));
+    }
+    
     const response = await api.post('/qrcodes', formData, {
       headers: {
         'Content-Type': 'multipart/form-data',
@@ -288,7 +305,7 @@ export const qrCodeApi = {
 
   update: async (id: string, data: {
     name?: string;
-    type?: 'url' | 'menu' | 'both' | 'direct' | 'vitrine' | 'links';
+    type?: 'url' | 'menu' | 'both' | 'direct' | 'vitrine' | 'links' | 'products';
     url?: string;
     logoUrl?: string;
     foregroundColor?: string;
@@ -308,6 +325,19 @@ export const qrCodeApi = {
           imageUrl?: string;
         }[];
       }[];
+    };
+    products?: {
+      storeName: string;
+      description?: string;
+      products: {
+        name: string;
+        description?: string;
+        price: number;
+        imageUrl?: string;
+      }[];
+      currency?: string;
+      orderable?: boolean;
+      codFormEnabled?: boolean;
     };
     vitrine?: {
       hero: {

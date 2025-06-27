@@ -1,7 +1,7 @@
 import { Entity, PrimaryGeneratedColumn, Column, CreateDateColumn, UpdateDateColumn, ManyToOne, Index } from "typeorm";
 import { User } from "./User";
 
-export type QRCodeType = 'url' | 'menu' | 'both' | 'direct' | 'vitrine';
+export type QRCodeType = 'url' | 'menu' | 'both' | 'direct' | 'vitrine' | 'products';
 
 export interface MenuItem {
   name: string;
@@ -23,6 +23,14 @@ export interface MenuItem {
 export interface MenuCategory {
   name: string;
   items: MenuItem[];
+}
+
+export interface Products {
+  storeName?: string;
+  currency?: string;
+  orderable?: boolean;
+  codFormEnabled?: boolean;
+  products: MenuItem[];
 }
 
 export interface Link {
@@ -132,6 +140,9 @@ export class QRCode {
     orderable?: boolean;
     codFormEnabled?: boolean;
   };
+
+  @Column("simple-json", { nullable: true })
+  products!: Products;
 
   @Column({ nullable: true })
   logoUrl!: string;
