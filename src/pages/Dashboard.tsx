@@ -277,6 +277,7 @@ const Dashboard = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const selectedType = queryParams.get('type');
+  const [activeTab, setActiveTab] = useState<'create' | 'manage'>('manage');
 
   const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
@@ -936,7 +937,7 @@ const Dashboard = () => {
         )}
         
         {/* Main tabs navigation */}
-        <Tabs defaultValue="create" className="mb-8">
+        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as 'create' | 'manage')} defaultValue="manage" className="mb-8">
           <TabsList className="grid w-full max-w-md grid-cols-2 p-1 rounded-xl bg-gray-100">
             <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
               <div className="flex items-center gap-2">
@@ -962,7 +963,7 @@ const Dashboard = () => {
             <div className="flex items-center justify-between mb-6">
               <h2 className="text-2xl font-semibold font-cairo">{translations[language].myQRCodes}</h2>
               <Button 
-                onClick={() => document.querySelector('[data-value="create"]')?.dispatchEvent(new Event('click'))}
+                onClick={() => setActiveTab('create')}
                 className="dz-button flex items-center gap-2"
               >
                 <Plus className="w-4 h-4" /> {translations[language].createNewQR}
