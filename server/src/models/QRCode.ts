@@ -9,15 +9,15 @@ export interface MenuItem {
   price: number;
   category: string;
   imageUrl?: string;
-  availability: {
-    sunday: boolean;
-    monday: boolean;
-    tuesday: boolean;
-    wednesday: boolean;
-    thursday: boolean;
-    friday: boolean;
-    saturday: boolean;
-  };
+  images?: string[];
+  availability?: Record<string, boolean>;
+  variants?: {
+    name: string;
+    options: {
+      name: string;
+      price?: number;
+    }[];
+  }[];
 }
 
 export interface MenuCategory {

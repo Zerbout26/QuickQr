@@ -199,7 +199,7 @@ const MenuSection = ({
         {menu.categories
           .filter(category => selectedCategory === null || category.name === selectedCategory)
           .map((category, categoryIndex) => (
-            <React.Fragment key={categoryIndex}>
+            <div key={categoryIndex}>
               {category.items.map((item, itemIndex) => {
                 const isAvailable = isItemAvailableToday(item);
                 const key = `${categoryIndex}-${itemIndex}`;
@@ -351,7 +351,7 @@ const MenuSection = ({
                   </motion.div>
                 );
               })}
-            </React.Fragment>
+            </div>
           ))}
       </div>
 

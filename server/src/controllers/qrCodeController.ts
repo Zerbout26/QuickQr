@@ -252,16 +252,36 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
                 // Extract category and item indices from the filename
                 const filename = imageFile.originalname;
                 const parts = filename.split('-');
-                if (parts.length >= 2) {
-                  const categoryIndex = parseInt(parts[0], 10);
-                  const itemIndex = parseInt(parts[1], 10);
+                if (parts.length >= 4) {
+                  const categoryIndex = parseInt(parts[1], 10);
+                  const itemIndex = parseInt(parts[2], 10);
+                  const imageIndex = parseInt(parts[3], 10);
                   
-                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
+                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) && !isNaN(imageIndex) &&
                       parsedMenu.categories[categoryIndex] && 
                       parsedMenu.categories[categoryIndex].items[itemIndex]) {
-                    // Update the imageUrl in the menu item
-                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = optimizedUrl;
-                    console.log(`Updated image URL for category ${categoryIndex}, item ${itemIndex}: ${optimizedUrl}`);
+                    
+                    const menuItem = parsedMenu.categories[categoryIndex].items[itemIndex];
+                    
+                    // Initialize images array if it doesn't exist
+                    if (!menuItem.images) {
+                      menuItem.images = [];
+                    }
+                    
+                    // Replace the blob URL at the specific index with the Cloudinary URL
+                    if (menuItem.images[imageIndex]) {
+                      menuItem.images[imageIndex] = optimizedUrl;
+                    } else {
+                      // If the index doesn't exist, push to the end
+                      menuItem.images.push(optimizedUrl);
+                    }
+                    
+                    // Also update imageUrl for backward compatibility (use the first image)
+                    if (menuItem.images.length > 0) {
+                      menuItem.imageUrl = menuItem.images[0];
+                    }
+                    
+                    console.log(`Updated images array for category ${categoryIndex}, item ${itemIndex}: ${JSON.stringify(menuItem.images)}`);
                   } else {
                     console.warn(`Invalid indices in filename: ${filename}`);
                   }
@@ -586,27 +606,45 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
                 // Extract category and item indices from the filename
                 const filename = imageFile.originalname;
                 const parts = filename.split('-');
-                if (parts.length >= 2) {
-                  const categoryIndex = parseInt(parts[0], 10);
-                  const itemIndex = parseInt(parts[1], 10);
+                if (parts.length >= 4) {
+                  const categoryIndex = parseInt(parts[1], 10);
+                  const itemIndex = parseInt(parts[2], 10);
+                  const imageIndex = parseInt(parts[3], 10);
                   
-                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) &&
+                  if (!isNaN(categoryIndex) && !isNaN(itemIndex) && !isNaN(imageIndex) &&
                       parsedMenu.categories[categoryIndex] && 
                       parsedMenu.categories[categoryIndex].items[itemIndex]) {
-                    // Delete old image if exists
-                    const oldImageUrl = parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl;
-                    if (oldImageUrl) {
-                      const publicId = oldImageUrl.split('/').pop()?.split('.')[0];
-                      if (publicId) {
-                        await deleteFromCloudinary(publicId);
-                      }
+                    
+                    const menuItem = parsedMenu.categories[categoryIndex].items[itemIndex];
+                    
+                    // Initialize images array if it doesn't exist
+                    if (!menuItem.images) {
+                      menuItem.images = [];
                     }
-                    // Update the imageUrl in the menu item
-                    parsedMenu.categories[categoryIndex].items[itemIndex].imageUrl = optimizedUrl;
+                    
+                    // Replace the blob URL at the specific index with the Cloudinary URL
+                    if (menuItem.images[imageIndex]) {
+                      menuItem.images[imageIndex] = optimizedUrl;
+                    } else {
+                      // If the index doesn't exist, push to the end
+                      menuItem.images.push(optimizedUrl);
+                    }
+                    
+                    // Also update imageUrl for backward compatibility (use the first image)
+                    if (menuItem.images.length > 0) {
+                      menuItem.imageUrl = menuItem.images[0];
+                    }
+                    
+                    console.log(`Updated images array for category ${categoryIndex}, item ${itemIndex}: ${JSON.stringify(menuItem.images)}`);
+                  } else {
+                    console.warn(`Invalid indices in filename: ${filename}`);
                   }
+                } else {
+                  console.warn(`Invalid filename format: ${filename}`);
                 }
               } catch (uploadError) {
                 console.error('Error uploading image to Cloudinary:', uploadError);
+                // Continue with other images even if one fails
                 continue;
               }
             }

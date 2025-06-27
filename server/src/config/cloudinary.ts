@@ -11,12 +11,7 @@ cloudinary.config({
 
 // Configure Cloudinary storage
 const storage = new CloudinaryStorage({
-    cloudinary: cloudinary,
-    params: {
-        folder: 'quickqr',
-        allowed_formats: ['jpg', 'jpeg', 'png', 'gif'],
-        transformation: [{ width: 1000, height: 1000, crop: 'limit' }]
-    }
+    cloudinary: cloudinary
 });
 
 // Create multer upload instance
