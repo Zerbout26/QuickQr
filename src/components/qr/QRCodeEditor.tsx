@@ -115,7 +115,7 @@ const translations = {
 };
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
-  type EditorQrType = 'url' | 'menu' | 'vitrine' | 'links' | 'both';
+  type EditorQrType = 'url' | 'menu' | 'vitrine' | 'links' | 'both' | 'products';
   const [name, setName] = useState(qrCode.name);
   const [type, setType] = useState<EditorQrType>(
     qrCode.type === 'direct' ? 'url' : (qrCode.type as EditorQrType)
@@ -126,10 +126,11 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [links, setLinks] = useState<Link[]>(
     (qrCode.links || []).map(link => ({
       ...link,
-      type: allowedTypes.includes(link.type as any) ? link.type as Link['type'] : 'website'
+      type: allowedTypes.includes(link.type as any) ? link.type as any : 'website'
     }))
   );
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>(qrCode.menu?.categories || []);
+  const [products, setProducts] = useState<MenuItem[]>(qrCode.products?.products || []);
   const [foregroundColor, setForegroundColor] = useState(qrCode.foregroundColor || '#000000');
   const [backgroundColor, setBackgroundColor] = useState(qrCode.backgroundColor || '#FFFFFF');
   const [logoUrl, setLogoUrl] = useState<string | null>(qrCode.logoUrl || null);
@@ -512,6 +513,48 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     setMenuCategories(newCategories);
   };
 
+  // Products management functions
+  const addProduct = () => {
+    setProducts([...products, {
+      name: '',
+      description: '',
+      price: 0,
+      images: [],
+      availability: { ...defaultAvailability },
+    }]);
+  };
+
+  const removeProduct = (index: number) => {
+    setProducts(products.filter((_, i) => i !== index));
+  };
+
+  const updateProduct = (
+    index: number,
+    field: keyof MenuItem,
+    value: string | number | Variant[] | string[]
+  ) => {
+    const newProducts = [...products];
+    const product = newProducts[index];
+    let processedValue = value;
+    if (field === 'price') {
+      processedValue = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(processedValue as number)) {
+        processedValue = 0;
+      }
+    }
+    newProducts[index] = {
+      ...product,
+      [field]: processedValue,
+    };
+    setProducts(newProducts);
+  };
+
+  const handleProductAvailabilityChange = (index: number, day: string, checked: boolean) => {
+    const updatedProducts = [...products];
+    updatedProducts[index].availability[day] = checked;
+    setProducts(updatedProducts);
+  };
+
   // Add CTA handler
   const addCTA = () => {
     setVitrine(prev => ({
@@ -584,6 +627,25 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     const [_, categoryIndex, itemIndex, imageIndex] = key.split('-').map(Number);
                     const uniqueFilename = `menu-${categoryIndex}-${itemIndex}-${imageIndex}-${Date.now()}-${file.name}`;
                     formData.append('menuItemImages', file, uniqueFilename);
+                }
+            }
+        }
+
+        if (type === 'products') {
+            formData.append('products', JSON.stringify({
+                storeName: name || 'My Product Store',
+                description: '',
+                products: products,
+                orderable: true,
+                codFormEnabled: true
+            }));
+
+            // Handle product images
+            for (const [key, file] of Object.entries(tempImages)) {
+                if (file instanceof File && key.startsWith('product-')) {
+                    const [_, productIndex, imageIndex] = key.split('-').map(Number);
+                    const uniqueFilename = `product-${productIndex}-${imageIndex}-${Date.now()}-${file.name}`;
+                    formData.append('productImages', file, uniqueFilename);
                 }
             }
         }
@@ -1136,6 +1198,115 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   <Plus className="h-4 w-4 mr-2" />
                   Add Category
                 </Button>
+              </div>
+            )}
+
+            {type === 'products' && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Product Showcase</h3>
+                  <p className="text-sm text-gray-600">E-commerce enabled by default</p>
+                </div>
+                
+                {products.map((product, productIndex) => (
+                  <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
+                    <div className="flex items-center gap-4 mb-2">
+                      <div className="space-y-2">
+                        <Label>Images</Label>
+                        <div className="flex gap-2 flex-wrap mb-2">
+                          {(product.images || []).map((imgUrl, imgIdx) => (
+                            <div key={imgIdx} className="relative group">
+                              <img src={imgUrl} alt={product.name} className="w-16 h-16 object-cover rounded border" />
+                              <button
+                                type="button"
+                                className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                onClick={() => {
+                                  const newImages = [...(product.images || [])];
+                                  newImages.splice(imgIdx, 1);
+                                  updateProduct(productIndex, 'images', newImages);
+                                }}
+                              >
+                                &times;
+                              </button>
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.multiple = true;
+                              input.onchange = (e) => {
+                                const files = Array.from((e.target as HTMLInputElement).files || []);
+                                const newImages = [...(product.images || [])];
+                                files.forEach((file, fileIndex) => {
+                                  // Store file in tempImages for upload
+                                  const key = `product-${productIndex}-${newImages.length + fileIndex}`;
+                                  setTempImages(prev => ({ ...prev, [key]: file }));
+                                  // Create temporary URL for preview
+                                  const url = URL.createObjectURL(file);
+                                  newImages.push(url);
+                                });
+                                updateProduct(productIndex, 'images', newImages);
+                              };
+                              input.click();
+                            }}
+                          >
+                            + Add Image
+                          </Button>
+                        </div>
+                      </div>
+                    </div>
+                    <Input
+                      placeholder="Product Name"
+                      value={product.name}
+                      onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Description"
+                      value={product.description || ''}
+                      onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
+                    />
+                    <Input
+                      placeholder="Price"
+                      type="number"
+                      value={product.price}
+                      onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
+                    />
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => removeProduct(productIndex)}
+                    >
+                      <Trash2 className="h-4 w-4 mr-2" />
+                      Remove Product
+                    </Button>
+                  </div>
+                ))}
+                <Button
+                  type="button"
+                  variant="outline"
+                  className="w-full"
+                  onClick={addProduct}
+                >
+                  <Plus className="h-4 w-4 mr-2" />
+                  Add New Product
+                </Button>
+              </div>
+            )}
+
+            {type === 'vitrine' && (
+              <div className="space-y-4">
+                <div className="flex justify-between items-center">
+                  <h3 className="text-lg font-semibold">Vitrine</h3>
+                  <p className="text-sm text-gray-600">E-commerce enabled by default</p>
+                </div>
+                
+                {/* Vitrine content */}
               </div>
             )}
           </TabsContent>

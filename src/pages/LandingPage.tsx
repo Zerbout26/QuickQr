@@ -169,6 +169,10 @@ const MenuSection = lazy(() => import(
   /* webpackPrefetch: true */
   '@/components/landing/MenuSection'
 ));
+const ProductsSection = lazy(() => import(
+  /* webpackPrefetch: true */
+  '@/components/landing/ProductsSection'
+));
 const VitrineSection = lazy(() => import(
   /* webpackPrefetch: true */
   '@/components/landing/VitrineSection'
@@ -471,8 +475,10 @@ const LandingPage = () => {
   if (!qrCode) return null;
 
   const hasMenu = qrCode.menu?.categories?.length > 0;
+  const hasProducts = qrCode.products?.products?.length > 0;
   const hasLinks = qrCode.links?.length > 0;
   const hasVitrine = qrCode.vitrine && Object.keys(qrCode.vitrine).length > 0;
+  const isOrderable = qrCode.menu?.orderable || qrCode.products?.orderable;
 
   return (
     <>
@@ -499,6 +505,20 @@ const LandingPage = () => {
                 selectedCategory={selectedCategory}
                 setSelectedCategory={setSelectedCategory}
                 colors={landingPageColors}
+                onAddToBasket={addToBasket}
+              />
+            </Suspense>
+          )}
+
+          {/* Products Section */}
+          {qrCode.products?.products && qrCode.products.products.length > 0 && (
+            <Suspense fallback={null}>
+              <ProductsSection
+                products={qrCode.products.products}
+                storeName={qrCode.products.storeName || qrCode.name}
+                menuLanguage={menuLanguage}
+                colors={landingPageColors}
+                currency={qrCode.products.currency}
                 onAddToBasket={addToBasket}
               />
             </Suspense>
@@ -534,7 +554,7 @@ const LandingPage = () => {
         </div>
 
         {/* Floating Basket Toggle Button */}
-        {qrCode?.menu?.orderable && (
+        {isOrderable && (
           <div className="fixed bottom-6 right-6 z-50">
             <button
               onClick={() => setIsBasketOpen(!isBasketOpen)}
@@ -554,7 +574,7 @@ const LandingPage = () => {
         )}
 
         {/* Side Basket */}
-        {qrCode?.menu?.orderable && (
+        {isOrderable && (
           <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 ${isBasketOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex flex-col h-full">
               {/* Basket Header */}
@@ -620,7 +640,7 @@ const LandingPage = () => {
                                 </button>
                               </div>
                               <div className="text-right">
-                                <p className="text-sm font-semibold">{finalPrice * b.quantity} {qrCode.menu.currency || 'DZD'}</p>
+                                <p className="text-sm font-semibold">{finalPrice * b.quantity} {qrCode.menu?.currency || qrCode.products?.currency || 'DZD'}</p>
                                 <button
                                   onClick={() => removeFromBasket(b.key)}
                                   className="text-xs text-red-500 hover:underline"
@@ -646,7 +666,7 @@ const LandingPage = () => {
                       const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
                       const finalPrice = b.item.price + variantAdjustment;
                       return sum + finalPrice * b.quantity;
-                    }, 0)} {qrCode.menu.currency || 'DZD'}</span>
+                    }, 0)} {qrCode.menu?.currency || qrCode.products?.currency || 'DZD'}</span>
                   </div>
                   <button
                     className="w-full py-3 rounded-lg font-semibold text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
@@ -760,7 +780,7 @@ const LandingPage = () => {
                               const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
                               const finalPrice = b.item.price + variantAdjustment;
                               return finalPrice * b.quantity;
-                            })()} {qrCode?.menu?.currency || 'DZD'}</span>
+                            })()} {qrCode?.menu?.currency || qrCode?.products?.currency || 'DZD'}</span>
                           </div>
                         );
                       })}
@@ -772,7 +792,7 @@ const LandingPage = () => {
                           const variantAdjustment = getVariantPriceAdjustment(b.item, b.selectedVariants);
                           const finalPrice = b.item.price + variantAdjustment;
                           return sum + finalPrice * b.quantity;
-                        }, 0)} {qrCode?.menu?.currency || 'DZD'}</span>
+                        }, 0)} {qrCode?.menu?.currency || qrCode?.products?.currency || 'DZD'}</span>
                       </div>
                     </div>
                   </div>

@@ -404,6 +404,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
+  const [products, setProducts] = useState<MenuItem[]>([]);
   const [vitrine, setVitrine] = useState({
     hero: {
       businessName: '',
@@ -464,12 +465,21 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [user, selectedType]);
 
+  // Set defaults for products type (e-commerce)
+  useEffect(() => {
+    if (type === 'products') {
+      setMenuOrderable(true);
+      setCodFormEnabled(true);
+    }
+  }, [type]);
+
   const resetForm = () => {
     setName('');
     setType('menu');
     setDirectUrl('');
     setLinks([]);
     setMenuCategories([]);
+    setProducts([]);
     setForegroundColor('#6366F1');
     setBackgroundColor('#FFFFFF');
     setLogoFile(null);
@@ -599,6 +609,47 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
     setMenuCategories(newCategories);
   };
 
+  const addProduct = () => {
+    setProducts([...products, {
+      name: '',
+      description: '',
+      price: 0,
+      images: [],
+      availability: { ...defaultAvailability },
+    }]);
+  };
+
+  const removeProduct = (index: number) => {
+    setProducts(products.filter((_, i) => i !== index));
+  };
+
+  const updateProduct = (
+    index: number,
+    field: keyof MenuItem,
+    value: string | number | Variant[] | string[]
+  ) => {
+    const newProducts = [...products];
+    const product = newProducts[index];
+    let processedValue = value;
+    if (field === 'price') {
+      processedValue = typeof value === 'string' ? parseFloat(value) : value;
+      if (isNaN(processedValue as number)) {
+        processedValue = 0;
+      }
+    }
+    newProducts[index] = {
+      ...product,
+      [field]: processedValue,
+    };
+    setProducts(newProducts);
+  };
+
+  const handleProductAvailabilityChange = (index: number, day: string, checked: boolean) => {
+    const updatedProducts = [...products];
+    updatedProducts[index].availability[day] = checked;
+    setProducts(updatedProducts);
+  };
+
   const addMenuItem = (categoryIndex: number) => {
     const newCategories = [...menuCategories];
     newCategories[categoryIndex].items.push({
@@ -685,6 +736,26 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
             const [_, categoryIndex, itemIndex, imageIndex] = key.split('-').map(Number);
             const uniqueFilename = `menu-${categoryIndex}-${itemIndex}-${imageIndex}-${Date.now()}-${file.name}`;
             formData.append('menuItemImages', file, uniqueFilename);
+          }
+        }
+      }
+
+      if (type === 'products') {
+        const productsData = {
+          storeName: name || 'My Product Store',
+          description: '',
+          products: products,
+          orderable: menuOrderable,
+          codFormEnabled: codFormEnabled
+        };
+        formData.append('products', JSON.stringify(productsData));
+
+        // Upload each product image
+        for (const [key, file] of Object.entries(tempImages)) {
+          if (file instanceof File && key.startsWith('product-')) {
+            const [_, productIndex, imageIndex] = key.split('-').map(Number);
+            const uniqueFilename = `product-${productIndex}-${imageIndex}-${Date.now()}-${file.name}`;
+            formData.append('productImages', file, uniqueFilename);
           }
         }
       }
@@ -821,7 +892,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
               <div className="mb-4">
                 <Label htmlFor="type">Type</Label>
                 <div className="flex gap-4 mt-2">
-                  {/* Show both if user has neither */}
+                  {/* Show all options if user has neither */}
                   {(!user.hasVitrine && !user.hasMenu) && <>
                     <Button
                       type="button"
@@ -833,6 +904,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                     </Button>
                     <Button
                       type="button"
+                      variant={type === 'products' ? 'default' : 'outline'}
+                      onClick={() => setType('products')}
+                      className="flex-1"
+                    >
+                      Products
+                    </Button>
+                    <Button
+                      type="button"
                       variant={type === 'vitrine' ? 'default' : 'outline'}
                       onClick={() => setType('vitrine')}
                       className="flex-1"
@@ -840,22 +919,53 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                       Vitrine
                     </Button>
                   </>}
-                  {/* Show only menu if user hasVitrine but not hasMenu */}
-                  {(user.hasVitrine && !user.hasMenu) && (
-                    <Button type="button" variant="default" className="flex-1" disabled>
+                  {/* Show menu and products if user hasVitrine but not hasMenu */}
+                  {(user.hasVitrine && !user.hasMenu) && <>
+                    <Button
+                      type="button"
+                      variant={type === 'menu' ? 'default' : 'outline'}
+                      onClick={() => setType('menu')}
+                      className="flex-1"
+                    >
                       Menu
                     </Button>
-                  )}
-                  {/* Show only vitrine if user hasMenu but not hasVitrine */}
-                  {(user.hasMenu && !user.hasVitrine) && (
-                    <Button type="button" variant="default" className="flex-1" disabled>
+                    <Button
+                      type="button"
+                      variant={type === 'products' ? 'default' : 'outline'}
+                      onClick={() => setType('products')}
+                      className="flex-1"
+                    >
+                      Products
+                    </Button>
+                  </>}
+                  {/* Show products and vitrine if user hasMenu but not hasVitrine */}
+                  {(user.hasMenu && !user.hasVitrine) && <>
+                    <Button
+                      type="button"
+                      variant={type === 'products' ? 'default' : 'outline'}
+                      onClick={() => setType('products')}
+                      className="flex-1"
+                    >
+                      Products
+                    </Button>
+                    <Button
+                      type="button"
+                      variant={type === 'vitrine' ? 'default' : 'outline'}
+                      onClick={() => setType('vitrine')}
+                      className="flex-1"
+                    >
                       Vitrine
                     </Button>
-                  )}
-                  {/* If user has both, show disabled message */}
+                  </>}
+                  {/* If user has both, show only products */}
                   {(user.hasVitrine && user.hasMenu) && (
-                    <Button type="button" variant="outline" className="flex-1" disabled>
-                      You already have both QR types
+                    <Button
+                      type="button"
+                      variant={type === 'products' ? 'default' : 'outline'}
+                      onClick={() => setType('products')}
+                      className="flex-1"
+                    >
+                      Products
                     </Button>
                   )}
                 </div>
@@ -934,7 +1044,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                       onCheckedChange={setMenuOrderable}
                       id="orderable-menu-toggle"
                     />
-                    <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
+                    <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle} (Optional)</Label>
                   </div>
                   <div className="flex items-center gap-2">
                     <Switch
@@ -942,7 +1052,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                       onCheckedChange={setCodFormEnabled}
                       id="cod-form-toggle"
                     />
-                    <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle}</Label>
+                    <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle} (Optional)</Label>
                   </div>
                 </div>
                 
@@ -1205,6 +1315,244 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                   >
                     <Plus className="h-4 w-4 mr-2" />
                     {translations[language].addCategory}
+                  </Button>
+                </div>
+              </div>
+            )}
+            {type === 'products' && (
+              <div className="space-y-4">
+                {/* Products */}
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">Product Showcase</h3>
+                    <p className="text-sm text-gray-600">Add products to your catalog</p>
+                  </div>
+                  {products.map((product, productIndex) => {
+                    const availKey = `product-${productIndex}`;
+                    return (
+                      <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
+                        <Input
+                          placeholder={translations[language].itemName}
+                          value={product.name}
+                          onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
+                        />
+                        <Textarea
+                          placeholder={translations[language].description}
+                          value={product.description}
+                          onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
+                        />
+                        <Input
+                          placeholder={translations[language].price}
+                          type="number"
+                          value={product.price}
+                          onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
+                        >
+                          {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
+                        </Button>
+                        {editingAvailability[availKey] && (
+                          <div className="space-y-2">
+                            <Label>{translations[language].availability}</Label>
+                            <div className="grid grid-cols-4 gap-2">
+                              {Object.entries(product.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                <div key={day} className="flex items-center space-x-2">
+                                  <Checkbox
+                                    id={`product-${productIndex}-${day}`}
+                                    checked={isAvailable}
+                                    onCheckedChange={(checked) => 
+                                      handleProductAvailabilityChange(productIndex, day, checked === true)
+                                    }
+                                  />
+                                  <label
+                                    htmlFor={`product-${productIndex}-${day}`}
+                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                  >
+                                    {translations[language].days[day as keyof typeof translations.en.days]}
+                                  </label>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        <div className="space-y-2">
+                          <Label>Images</Label>
+                          <div className="flex gap-2 flex-wrap mb-2">
+                            {(product.images || []).map((imgUrl, imgIdx) => (
+                              <div key={imgIdx} className="relative group">
+                                <img src={imgUrl} alt={product.name} className="w-16 h-16 object-cover rounded border" />
+                                <button
+                                  type="button"
+                                  className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                  onClick={() => {
+                                    const newImages = [...(product.images || [])];
+                                    newImages.splice(imgIdx, 1);
+                                    updateProduct(productIndex, 'images', newImages);
+                                    
+                                    // Remove corresponding file from tempImages
+                                    const key = `product-${productIndex}-${imgIdx}`;
+                                    if (tempImages[key]) {
+                                      const newTempImages = { ...tempImages };
+                                      delete newTempImages[key];
+                                      setTempImages(newTempImages);
+                                    }
+                                  }}
+                                >
+                                  &times;
+                                </button>
+                              </div>
+                            ))}
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => {
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.multiple = true;
+                                input.onchange = (e) => {
+                                  const files = Array.from((e.target as HTMLInputElement).files || []);
+                                  const newImages = [...(product.images || [])];
+                                  files.forEach((file, fileIndex) => {
+                                    // Store file in tempImages for upload
+                                    const key = `product-${productIndex}-${newImages.length + fileIndex}`;
+                                    setTempImages(prev => ({ ...prev, [key]: file }));
+                                    // Create temporary URL for preview
+                                    const url = URL.createObjectURL(file);
+                                    newImages.push(url);
+                                  });
+                                  updateProduct(productIndex, 'images', newImages);
+                                };
+                                input.click();
+                              }}
+                            >
+                              + Add Image
+                            </Button>
+                          </div>
+                        </div>
+                        {/* Variants Section */}
+                        <div className="space-y-2">
+                          <Label>Variants</Label>
+                          {(product.variants || []).map((variant, variantIdx) => (
+                            <div key={variantIdx} className="border rounded p-2 mb-2">
+                              <div className="flex items-center gap-2 mb-2">
+                                <Input
+                                  value={variant.name}
+                                  onChange={e => {
+                                    const newVariants = [...(product.variants || [])];
+                                    newVariants[variantIdx].name = e.target.value;
+                                    updateProduct(productIndex, 'variants', newVariants);
+                                  }}
+                                  placeholder="Variant name (e.g. Size, Color)"
+                                  className="flex-1"
+                                />
+                                <Button
+                                  type="button"
+                                  variant="destructive"
+                                  size="icon"
+                                  onClick={() => {
+                                    const newVariants = [...(product.variants || [])];
+                                    newVariants.splice(variantIdx, 1);
+                                    updateProduct(productIndex, 'variants', newVariants);
+                                  }}
+                                >
+                                  <Trash2 className="h-4 w-4" />
+                                </Button>
+                              </div>
+                              {/* Variant Options */}
+                              <div className="space-y-1 ml-4">
+                                {(variant.options || []).map((option, optionIdx) => (
+                                  <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                    <Input
+                                      value={option.name}
+                                      onChange={e => {
+                                        const newVariants = [...(product.variants || [])];
+                                        newVariants[variantIdx].options[optionIdx].name = e.target.value;
+                                        updateProduct(productIndex, 'variants', newVariants);
+                                      }}
+                                      placeholder="Option (e.g. Small, Red)"
+                                      className="flex-1"
+                                    />
+                                    <Input
+                                      type="number"
+                                      value={option.price ?? ''}
+                                      onChange={e => {
+                                        const newVariants = [...(product.variants || [])];
+                                        newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
+                                        updateProduct(productIndex, 'variants', newVariants);
+                                      }}
+                                      placeholder="Price adj."
+                                      className="w-24"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      onClick={() => {
+                                        const newVariants = [...(product.variants || [])];
+                                        newVariants[variantIdx].options.splice(optionIdx, 1);
+                                        updateProduct(productIndex, 'variants', newVariants);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                ))}
+                                <Button
+                                  type="button"
+                                  variant="outline"
+                                  size="sm"
+                                  onClick={() => {
+                                    const newVariants = [...(product.variants || [])];
+                                    newVariants[variantIdx].options.push({ name: '' });
+                                    updateProduct(productIndex, 'variants', newVariants);
+                                  }}
+                                >
+                                  + Add Option
+                                </Button>
+                              </div>
+                            </div>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newVariants = [...(product.variants || [])];
+                              newVariants.push({ name: '', options: [] });
+                              updateProduct(productIndex, 'variants', newVariants);
+                            }}
+                          >
+                            + Add Variant
+                          </Button>
+                        </div>
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
+                          onClick={() => removeProduct(productIndex)}
+                        >
+                          <Trash2 className="h-4 w-4 mr-2" />
+                          {translations[language].removeItem}
+                        </Button>
+                      </div>
+                    );
+                  })}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={addProduct}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Product
                   </Button>
                 </div>
               </div>
@@ -1719,7 +2067,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
           {/* Branding & Appearance Section */}
           {showBrandingSettings && (
             <div className="mt-4 border rounded-lg p-4 bg-gray-50">
-          <div className="space-y-4">
+              <div className="space-y-4">
                 {/* Logo Upload */}
                 <div className="space-y-2">
                   <Label>{translations[language].logo}</Label>
@@ -1751,102 +2099,102 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                 </div>
                 
                 {/* QR Code Colors */}
-            <div className="space-y-2">
-              <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
                   <div className="flex gap-2">
-                <Input
-                  id="foregroundColor"
-                  type="color"
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
+                    <Input
+                      id="foregroundColor"
+                      type="color"
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
                       className="w-20"
-                />
-                <Input
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
+                    />
+                    <Input
+                      value={foregroundColor}
+                      onChange={(e) => setForegroundColor(e.target.value)}
+                      className="flex-1"
+                    />
+                  </div>
+                </div>
                 
-            <div className="space-y-2">
-              <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
+                <div className="space-y-2">
+                  <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
                   <div className="flex gap-2">
-                <Input
-                  id="backgroundColor"
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
+                    <Input
+                      id="backgroundColor"
+                      type="color"
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
                       className="w-20"
-                />
-                <Input
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            
-            {/* Landing Page Colors */}
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="primaryColor">Primary Color</Label>
-                      <div className="flex gap-2">
-                    <Input
-                      id="primaryColor"
-                      type="color"
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="w-20"
                     />
                     <Input
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
+                      value={backgroundColor}
+                      onChange={(e) => setBackgroundColor(e.target.value)}
                       className="flex-1"
                     />
                   </div>
                 </div>
                 
-                <div className="space-y-2">
-                  <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
+                {/* Landing Page Colors */}
+                <div className="border-t pt-4">
+                  <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+                  
+                  <div className="space-y-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryColor">Primary Color</Label>
                       <div className="flex gap-2">
-                    <Input
-                      id="primaryHoverColor"
-                      type="color"
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                        <Input
+                          id="primaryColor"
+                          type="color"
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
                           className="w-20"
-                    />
-                    <Input
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="accentColor">Accent Color</Label>
+                        />
+                        <Input
+                          value={primaryColor}
+                          onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
                       <div className="flex gap-2">
-                    <Input
-                      id="accentColor"
-                      type="color"
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
+                        <Input
+                          id="primaryHoverColor"
+                          type="color"
+                          value={primaryHoverColor}
+                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
                           className="w-20"
-                    />
-                    <Input
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
+                        />
+                        <Input
+                          value={primaryHoverColor}
+                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="accentColor">Accent Color</Label>
+                      <div className="flex gap-2">
+                        <Input
+                          id="accentColor"
+                          type="color"
+                          value={accentColor}
+                          onChange={(e) => setAccentColor(e.target.value)}
+                          className="w-20"
+                        />
+                        <Input
+                          value={accentColor}
+                          onChange={(e) => setAccentColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
                       <Label>Background Gradient</Label>
                       <div className="p-3 bg-gray-50 rounded-md border">
                         <p className="text-sm text-gray-600 mb-2">
@@ -1859,39 +2207,39 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
                           }}
                         ></div>
                       </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
                       <div className="flex gap-2">
-                    <Input
-                      id="loadingSpinnerColor"
-                      type="color"
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                        <Input
+                          id="loadingSpinnerColor"
+                          type="color"
+                          value={loadingSpinnerColor}
+                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
                           className="w-20"
-                    />
-                    <Input
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                      className="flex-1"
-                    />
+                        />
+                        <Input
+                          value={loadingSpinnerColor}
+                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                          className="flex-1"
+                        />
+                      </div>
+                    </div>
+                    
+                    <div className="space-y-2">
+                      <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                      <Input
+                        id="loadingSpinnerBorderColor"
+                        value={loadingSpinnerBorderColor}
+                        onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                        placeholder="rgba(139, 92, 246, 0.2)"
+                      />
+                    </div>
                   </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
-                  <Input
-                    id="loadingSpinnerBorderColor"
-                    value={loadingSpinnerBorderColor}
-                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
-                    placeholder="rgba(139, 92, 246, 0.2)"
-                  />
                 </div>
               </div>
             </div>
-            </div>
-          </div>
           )}
           <div className="mt-6 flex justify-end">
             <Button type="submit" disabled={isLoading || (user && user.hasMenu && user.hasVitrine)}>

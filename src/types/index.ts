@@ -19,7 +19,7 @@ export interface User {
   hasMenu: boolean;
 }
 
-export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine';
+export type QRCodeType = 'url' | 'both' | 'direct' | 'vitrine' | 'products';
 
 export interface VariantOption {
   name: string; // e.g. "Small", "Red"
@@ -50,6 +50,15 @@ export interface Menu {
   restaurantName: string;
   description?: string;
   categories: MenuCategory[];
+  currency?: string;
+  orderable?: boolean;
+  codFormEnabled?: boolean;
+}
+
+export interface Products {
+  storeName: string;
+  description?: string;
+  products: MenuItem[];
   currency?: string;
   orderable?: boolean;
   codFormEnabled?: boolean;
@@ -135,7 +144,7 @@ export interface QRCodeLink {
 export interface QRCode {
   id: string;
   name: string;
-  type: 'url' | 'menu' | 'vitrine' | 'links' | 'both' | 'direct';
+  type: 'url' | 'menu' | 'vitrine' | 'links' | 'both' | 'direct' | 'products';
   url: string;
   scanCount: number;
   user: User;
@@ -148,6 +157,7 @@ export interface QRCode {
   textBelow?: string;
   links: Link[];
   menu: Menu;
+  products: Products;
   vitrine: VitrineSection;
   primaryColor?: string;
   primaryHoverColor?: string;
