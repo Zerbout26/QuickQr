@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState, useRef, useEffect } from 'react';
 import { renderToStaticMarkup } from 'react-dom/server';
 import { useAuth } from '@/context/AuthContext';
 import { Button } from '@/components/ui/button';
@@ -179,6 +179,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
 
 interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
+  selectedType?: string;
 }
 
 // Translations object
@@ -379,11 +380,11 @@ const translations = {
   },
 };
 
-const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
+const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType }) => {
   const { user } = useAuth();
   const { language } = useLanguage();
   const [name, setName] = useState('');
-  const [type, setType] = useState('url');
+  const [type, setType] = useState<string>(selectedType || 'menu');
   const [directUrl, setDirectUrl] = useState('');
   const [links, setLinks] = useState<Link[]>([]);
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>([]);
@@ -434,9 +435,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
   const [loadingSpinnerColor, setLoadingSpinnerColor] = useState('#8b5cf6');
   const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState('rgba(139, 92, 246, 0.2)');
 
+  // If selectedType changes, update type
+  useEffect(() => {
+    if (selectedType) setType(selectedType);
+  }, [selectedType]);
+
   const resetForm = () => {
     setName('');
-    setType('url');
+    setType('menu');
     setDirectUrl('');
     setLinks([]);
     setMenuCategories([]);
@@ -827,43 +833,32 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50"
               />
             </div>
-            <div className="space-y-2">
-              <Label htmlFor="type">{translations[language].type}</Label>
-              <div className="flex flex-col sm:flex-row gap-2">
-                <Button
-                  type="button"
-                  variant={type === 'direct' ? 'default' : 'outline'}
-                  onClick={() => setType('direct')}
-                  className="flex-1"
-                >
-                  {translations[language].directLink}
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === 'url' ? 'default' : 'outline'}
-                  onClick={() => setType('url')}
-                  className="flex-1"
-                >
-                  {translations[language].url}
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === 'both' ? 'default' : 'outline'}
-                  onClick={() => setType('both')}
-                  className="flex-1"
-                >
-                  {translations[language].both}
-                </Button>
-                <Button
-                  type="button"
-                  variant={type === 'vitrine' ? 'default' : 'outline'}
-                  onClick={() => setType('vitrine')}
-                  className="flex-1"
-                >
-                  {translations[language].vitrine}
-                </Button>
+            {/* QR Type Selector */}
+            {!selectedType ? (
+              <div className="mb-4">
+                <Label htmlFor="type">Type</Label>
+                <Select value={type} onValueChange={setType}>
+                  <SelectTrigger id="type">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="vitrine">Vitrine</SelectItem>
+                    <SelectItem value="menu">Menu</SelectItem>
+                    <SelectItem value="url">URL</SelectItem>
+                    <SelectItem value="both">Menu + URL</SelectItem>
+                    <SelectItem value="links">Links</SelectItem>
+                    <SelectItem value="direct">Direct Link</SelectItem>
+                  </SelectContent>
+                </Select>
               </div>
-            </div>
+            ) : (
+              <div className="mb-4">
+                <Label>Type</Label>
+                <span className="inline-block px-3 py-1 rounded bg-blue-100 text-blue-700 font-semibold text-sm">
+                  {selectedType.charAt(0).toUpperCase() + selectedType.slice(1)}
+                </span>
+              </div>
+            )}
             {type === 'direct' && (
               <div className="space-y-2">
                 <Label htmlFor="directUrl">{translations[language].url}</Label>
@@ -876,7 +871,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated }) => {
                 />
               </div>
             )}
-            {(type === 'url' || type === 'both') && (
+            {(type === 'menu' || selectedType === 'menu') && (
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                   <Label>{translations[language].links}</Label>

@@ -20,6 +20,7 @@ import PrivateRoute from '@/components/PrivateRoute';
 import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import Profile from '@/pages/Profile';
+import ChooseQRType from './pages/ChooseQRType';
 
 const queryClient = new QueryClient();
 
@@ -83,6 +84,7 @@ const App = () => (
                 </PrivateRoute>
               } />
               <Route path="/profile" element={<Profile />} />
+              <Route path="/choose-qr-type" element={<ChooseQRType />} />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

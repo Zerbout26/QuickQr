@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import QRCodeGenerator from '@/components/qr/QRCodeGenerator';
 import { useAuth } from '@/context/AuthContext';
@@ -274,6 +274,9 @@ const Dashboard = () => {
   const { language, toggleLanguage } = useLanguage();
   const [newUrl, setNewUrl] = useState('');
   const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
+  const location = useLocation();
+  const queryParams = new URLSearchParams(location.search);
+  const selectedType = queryParams.get('type');
 
   const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
@@ -949,7 +952,7 @@ const Dashboard = () => {
           {/* QR Code Creation Tab */}
           <TabsContent value="create" className="py-8 px-1">
             <div className="algerian-card p-6 animate-fade-in">
-              <QRCodeGenerator onCreated={handleQRCreated} />
+              <QRCodeGenerator selectedType={selectedType} onCreated={handleQRCreated} />
             </div>
           </TabsContent>
           

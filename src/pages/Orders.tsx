@@ -172,6 +172,8 @@ const Orders = () => {
   const [editingStatus, setEditingStatus] = useState<string>('');
   const [editingNotes, setEditingNotes] = useState<string>('');
   const [deleteConfirmOrder, setDeleteConfirmOrder] = useState<Order | null>(null);
+  const [orderStats, setOrderStats] = useState<any>(null);
+  const [statsLoading, setStatsLoading] = useState(true);
 
   const t = translations[language];
 
@@ -179,6 +181,12 @@ const Orders = () => {
 
   useEffect(() => {
     fetchOrders();
+    fetchOrderStats();
+    const interval = setInterval(() => {
+      fetchOrders();
+      fetchOrderStats();
+    }, 10000); // 10 seconds
+    return () => clearInterval(interval);
   }, [page, statusFilter, searchTerm]);
 
   const fetchOrders = async () => {
@@ -228,6 +236,25 @@ const Orders = () => {
       });
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchOrderStats = async () => {
+    try {
+      setStatsLoading(true);
+      const token = localStorage.getItem('qr-generator-token');
+      const response = await fetch(`${API_BASE_URL}/orders/stats`, {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        }
+      });
+      if (!response.ok) throw new Error('Failed to fetch stats');
+      const data = await response.json();
+      setOrderStats(data);
+    } catch (error) {
+      setOrderStats(null);
+    } finally {
+      setStatsLoading(false);
     }
   };
 
@@ -351,6 +378,38 @@ const Orders = () => {
   return (
     <MainLayout>
       <div className="container mx-auto px-4 py-8">
+        {/* Statistics Cards */}
+        <div className="mb-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+              <span className="text-2xl font-bold text-blue-600">{statsLoading ? '...' : orderStats?.totalOrders ?? 0}</span>
+              <span className="text-gray-600 mt-1 text-sm font-medium">{t.orders}</span>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+              <span className="text-2xl font-bold text-yellow-500">{statsLoading ? '...' : (orderStats?.stats?.find((s:any) => s.order_status === 'pending')?.count ?? 0)}</span>
+              <span className="text-gray-600 mt-1 text-sm font-medium">{t.pending}</span>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+              <span className="text-2xl font-bold text-blue-500">{statsLoading ? '...' : (orderStats?.stats?.find((s:any) => s.order_status === 'confirmed')?.count ?? 0)}</span>
+              <span className="text-gray-600 mt-1 text-sm font-medium">{t.confirmed}</span>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+              <span className="text-2xl font-bold text-green-600">{statsLoading ? '...' : (orderStats?.stats?.find((s:any) => s.order_status === 'delivered')?.count ?? 0)}</span>
+              <span className="text-gray-600 mt-1 text-sm font-medium">{t.delivered}</span>
+            </div>
+            <div className="bg-white rounded-lg shadow p-4 flex flex-col items-center">
+              <span className="text-2xl font-bold text-red-500">{statsLoading ? '...' : (orderStats?.stats?.find((s:any) => s.order_status === 'cancelled')?.count ?? 0)}</span>
+              <span className="text-gray-600 mt-1 text-sm font-medium">{t.cancelled}</span>
+            </div>
+          </div>
+          {/* Optionally show total revenue */}
+          {orderStats?.totalRevenue !== undefined && (
+            <div className="mt-4 text-center text-lg font-semibold text-gray-700">
+              {t.total}: <span className="text-green-700">{orderStats.totalRevenue} DZD</span>
+            </div>
+          )}
+        </div>
+
         <div className="flex justify-between items-center mb-6">
           <div>
             <h1 className="text-3xl font-bold text-gray-900">{t.orders}</h1>

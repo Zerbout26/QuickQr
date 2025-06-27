@@ -66,7 +66,7 @@ const SignInForm = () => {
       if (user.role === 'admin' && from === '/dashboard') {
         navigate('/admin');
       } else {
-        navigate(from);
+        navigate('/choose-qr-type');
       }
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
