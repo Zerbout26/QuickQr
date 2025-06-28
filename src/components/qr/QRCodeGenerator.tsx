@@ -295,6 +295,7 @@ const translations = {
     creating: 'Creating...',
     orderableMenuToggle: "Enable Orderable Menu",
     codFormToggle: "Enable COD Form",
+    showOtherTypes: "Show Other Types",
     qrCreated: 'QR code created successfully',
     errorCreatingQR: 'Failed to create QR code',
     downloadQRCode: 'Download the QR Code',
@@ -387,6 +388,7 @@ const translations = {
     creating: 'جاري الإنشاء...',
     orderableMenuToggle: "تفعيل قائمة الطلبات",
     codFormToggle: "تفعيل نموذج الدفع عند الاستلام",
+    showOtherTypes: "عرض الأنواع الأخرى",
     qrCreated: 'تم إنشاء رمز الاستجابة السريعة بنجاح',
     errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
     downloadQRCode: 'تحميل رمز الاستجابة السريعة',
@@ -942,7 +944,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     onClick={onAllowOtherTypes}
                     className="text-blue-600 border-blue-300 hover:bg-blue-100"
                   >
-                    Show Other Types
+                    {translations[language].showOtherTypes}
                   </Button>
                 )}
               </div>
