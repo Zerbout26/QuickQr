@@ -931,7 +931,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     type="button"
                     variant="outline"
                     size="sm"
-                    onClick={onAllowOtherTypes}
+                    onClick={() => {
+                      setShowOtherTypes(true);
+                      if (onAllowOtherTypes) onAllowOtherTypes();
+                    }}
                     className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
                   >
                     {translations[language].showOtherTypes}
@@ -996,50 +999,81 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             </div>
             
             {/* QR Type Selector as Buttons */}
-            {!selectedType && user && !fromOnboarding && (
+            {(!selectedType && user && !fromOnboarding) || showOtherTypes ? (
               <div className="mb-2">
                 <Label htmlFor="type" className="text-sm sm:text-base font-medium">Type</Label>
                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-1">
-                  {/* Show available options based on current limits */}
-                  {canCreateMenu && (
-                    <Button
-                      type="button"
-                      variant={type === 'menu' ? 'default' : 'outline'}
-                      onClick={() => setType('menu')}
-                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                    >
-                      Menu
-                    </Button>
-                  )}
-                  {canCreateProducts && (
-                    <Button
-                      type="button"
-                      variant={type === 'products' ? 'default' : 'outline'}
-                      onClick={() => setType('products')}
-                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                    >
-                      Products ({currentProductsCount}/10)
-                    </Button>
-                  )}
-                  {canCreateVitrine && (
-                    <Button
-                      type="button"
-                      variant={type === 'vitrine' ? 'default' : 'outline'}
-                      onClick={() => setType('vitrine')}
-                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                    >
-                      Vitrine
-                    </Button>
-                  )}
-                  {/* Show message if no options available */}
-                  {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
-                    <div className="text-center text-gray-500 py-2 text-sm">
-                      You have reached the maximum limit for all QR code types.
-                    </div>
+                  {/* Show all options when showOtherTypes is true, otherwise show available options based on current limits */}
+                  {showOtherTypes ? (
+                    <>
+                      <Button
+                        type="button"
+                        variant={type === 'menu' ? 'default' : 'outline'}
+                        onClick={() => setType('menu')}
+                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                      >
+                        Menu
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={type === 'products' ? 'default' : 'outline'}
+                        onClick={() => setType('products')}
+                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                      >
+                        Products ({currentProductsCount}/10)
+                      </Button>
+                      <Button
+                        type="button"
+                        variant={type === 'vitrine' ? 'default' : 'outline'}
+                        onClick={() => setType('vitrine')}
+                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                      >
+                        Vitrine
+                      </Button>
+                    </>
+                  ) : (
+                    <>
+                      {canCreateMenu && (
+                        <Button
+                          type="button"
+                          variant={type === 'menu' ? 'default' : 'outline'}
+                          onClick={() => setType('menu')}
+                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                        >
+                          Menu
+                        </Button>
+                      )}
+                      {canCreateProducts && (
+                        <Button
+                          type="button"
+                          variant={type === 'products' ? 'default' : 'outline'}
+                          onClick={() => setType('products')}
+                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                        >
+                          Products ({currentProductsCount}/10)
+                        </Button>
+                      )}
+                      {canCreateVitrine && (
+                        <Button
+                          type="button"
+                          variant={type === 'vitrine' ? 'default' : 'outline'}
+                          onClick={() => setType('vitrine')}
+                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                        >
+                          Vitrine
+                        </Button>
+                      )}
+                      {/* Show message if no options available */}
+                      {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
+                        <div className="text-center text-gray-500 py-2 text-sm">
+                          You have reached the maximum limit for all QR code types.
+                        </div>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
-            )}
+            ) : null}
             {type === 'direct' && (
               <div className="space-y-1">
                 <Label htmlFor="directUrl" className="text-sm sm:text-base font-medium">{translations[language].url}</Label>
@@ -1421,10 +1455,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       variant="outline"
                       size="sm"
                       onClick={addProduct}
+                      disabled={products.length >= 1}
                       className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
-                      {translations[language].addProduct}
+                      {products.length === 0 ? translations[language].addProduct : '1 Product Maximum'}
                     </Button>
                   </div>
                   <div className="space-y-2">
