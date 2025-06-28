@@ -976,7 +976,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 />
               </div>
             )}
-            {(type === 'menu' || selectedType === 'menu') && (
+            {(type === 'menu' || selectedType === 'menu' || type === 'both') && (
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
                   <Label className="text-sm sm:text-base font-medium">{translations[language].links}</Label>
