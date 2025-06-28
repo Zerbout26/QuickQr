@@ -282,8 +282,10 @@ const Dashboard = () => {
   const queryParams = new URLSearchParams(location.search);
   const selectedType = queryParams.get('type');
   const openGenerator = queryParams.get('openGenerator');
+  const onboardingParam = queryParams.get('onboarding');
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('manage');
   const [fromOnboarding, setFromOnboarding] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(false);
 
   // Check if user is coming from onboarding
   useEffect(() => {
@@ -345,6 +347,24 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Check if user has any QR codes and redirect to onboarding if not
+  useEffect(() => {
+    if (user && !isLoading && qrCodes.length === 0 && totalQRCodes === 0) {
+      // User has no QR codes, redirect to onboarding
+      navigate('/dashboard?onboarding=true');
+    }
+  }, [user, isLoading, qrCodes.length, totalQRCodes, navigate]);
+
+  // Handle onboarding parameter
+  useEffect(() => {
+    if (onboardingParam === 'true') {
+      setShowOnboarding(true);
+      setActiveTab('create');
+      // Clear the URL parameter
+      navigate('/dashboard', { replace: true });
+    }
+  }, [onboardingParam, navigate]);
+
   const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);
     setCurrentPage(1); // Reset to first page on new search
@@ -352,6 +372,7 @@ const Dashboard = () => {
 
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
+    setShowOnboarding(false); // Clear onboarding state when QR is created
     toast({
       title: "QR Code Created",
       description: "Your new QR code has been created successfully.",
@@ -1004,7 +1025,7 @@ const Dashboard = () => {
               <QRCodeGenerator 
                 selectedType={selectedType} 
                 onCreated={handleQRCreated} 
-                fromOnboarding={fromOnboarding}
+                fromOnboarding={fromOnboarding || showOnboarding}
                 onAllowOtherTypes={allowOtherTypes}
               />
             </div>

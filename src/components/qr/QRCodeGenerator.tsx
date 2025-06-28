@@ -5,7 +5,7 @@ import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Card, CardContent } from '@/components/ui/card';
-import { QRCode as QRCodeType, Link, MenuCategory, MenuItem, Variant, VariantOption } from '@/types';
+import { QRCode as QRCodeType, Link, MenuCategory, MenuItem, Variant, VariantOption, QRCode } from '@/types';
 import { toast } from '@/components/ui/use-toast';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { QRCodeSVG } from 'qrcode.react';
@@ -460,6 +460,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
 
   const [editingAvailability, setEditingAvailability] = useState<{ [key: string]: boolean }>({});
 
+  const [showOtherTypes, setShowOtherTypes] = useState(false);
+  const [userQRCodes, setUserQRCodes] = useState<QRCode[]>([]);
+  const [isLoadingQRCodes, setIsLoadingQRCodes] = useState(false);
+
   // If selectedType changes, update type
   useEffect(() => {
     if (selectedType) setType(selectedType);
@@ -478,6 +482,34 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       setCodFormEnabled(true);
     }
   }, [type]);
+
+  // Fetch user's QR codes to check limits
+  const fetchUserQRCodes = async () => {
+    if (!user) return;
+    setIsLoadingQRCodes(true);
+    try {
+      const { data } = await qrCodeApi.getAll(1, 100, ''); // Get all QR codes
+      setUserQRCodes(data);
+    } catch (error) {
+      console.error('Failed to fetch user QR codes:', error);
+    } finally {
+      setIsLoadingQRCodes(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserQRCodes();
+  }, [user]);
+
+  // Calculate current QR code counts
+  const currentMenuCount = userQRCodes.filter(qr => qr.type === 'menu').length;
+  const currentVitrineCount = userQRCodes.filter(qr => qr.type === 'vitrine').length;
+  const currentProductsCount = userQRCodes.filter(qr => qr.type === 'products').length;
+
+  // Check if user can create more of each type
+  const canCreateMenu = currentMenuCount < 1;
+  const canCreateVitrine = currentVitrineCount < 1;
+  const canCreateProducts = currentProductsCount < 10;
 
   const resetForm = () => {
     setName('');
@@ -944,8 +976,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               <div className="mb-4">
                 <Label htmlFor="type">Type</Label>
                 <div className="flex gap-4 mt-2">
-                  {/* Show all options if user has neither */}
-                  {(!user.hasVitrine && !user.hasMenu) && <>
+                  {/* Show available options based on current limits */}
+                  {canCreateMenu && (
                     <Button
                       type="button"
                       variant={type === 'menu' ? 'default' : 'outline'}
@@ -954,14 +986,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     >
                       Menu
                     </Button>
+                  )}
+                  {canCreateProducts && (
                     <Button
                       type="button"
                       variant={type === 'products' ? 'default' : 'outline'}
                       onClick={() => setType('products')}
                       className="flex-1"
                     >
-                      Products
+                      Products ({currentProductsCount}/10)
                     </Button>
+                  )}
+                  {canCreateVitrine && (
                     <Button
                       type="button"
                       variant={type === 'vitrine' ? 'default' : 'outline'}
@@ -970,55 +1006,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     >
                       Vitrine
                     </Button>
-                  </>}
-                  {/* Show menu and products if user hasVitrine but not hasMenu */}
-                  {(user.hasVitrine && !user.hasMenu) && <>
-                    <Button
-                      type="button"
-                      variant={type === 'menu' ? 'default' : 'outline'}
-                      onClick={() => setType('menu')}
-                      className="flex-1"
-                    >
-                      Menu
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={type === 'products' ? 'default' : 'outline'}
-                      onClick={() => setType('products')}
-                      className="flex-1"
-                    >
-                      Products
-                    </Button>
-                  </>}
-                  {/* Show products and vitrine if user hasMenu but not hasVitrine */}
-                  {(user.hasMenu && !user.hasVitrine) && <>
-                    <Button
-                      type="button"
-                      variant={type === 'products' ? 'default' : 'outline'}
-                      onClick={() => setType('products')}
-                      className="flex-1"
-                    >
-                      Products
-                    </Button>
-                    <Button
-                      type="button"
-                      variant={type === 'vitrine' ? 'default' : 'outline'}
-                      onClick={() => setType('vitrine')}
-                      className="flex-1"
-                    >
-                      Vitrine
-                    </Button>
-                  </>}
-                  {/* If user has both, show only products */}
-                  {(user.hasVitrine && user.hasMenu) && (
-                    <Button
-                      type="button"
-                      variant={type === 'products' ? 'default' : 'outline'}
-                      onClick={() => setType('products')}
-                      className="flex-1"
-                    >
-                      Products
-                    </Button>
+                  )}
+                  {/* Show message if no options available */}
+                  {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
+                    <div className="text-center text-gray-500 py-4">
+                      You have reached the maximum limit for all QR code types.
+                    </div>
                   )}
                 </div>
               </div>
@@ -2262,7 +2255,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             </div>
           )}
           <div className="mt-6 flex justify-end">
-            <Button type="submit" disabled={isLoading || (user && user.hasMenu && user.hasVitrine)}>
+            <Button 
+              type="submit" 
+              disabled={isLoading || (!canCreateMenu && !canCreateProducts && !canCreateVitrine)}
+            >
               {isLoading ? translations[language].creating : translations[language].createQRCode}
             </Button>
           </div>

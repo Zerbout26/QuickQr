@@ -442,20 +442,28 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         savedQRCode.url = `${frontendDomain}/landing/${savedQRCode.id}`;
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
 
-        // Set hasVitrine or hasMenu on user if needed
+        // Set hasVitrine, hasMenu, or hasProducts on user if needed
         if (type === 'vitrine' || type === 'menu' || type === 'products') {
-          const user = await userRepository.findOne({ where: { id: req.user.id } });
+          const user = await userRepository.findOne({ 
+            where: { id: req.user.id },
+            relations: ['qrCodes']
+          });
           if (user) {
-            if (type === 'vitrine' && !user.hasVitrine) {
+            // Count current QR codes by type
+            const vitrineCount = user.qrCodes.filter(qr => qr.type === 'vitrine').length;
+            const menuCount = user.qrCodes.filter(qr => qr.type === 'menu').length;
+            const productsCount = user.qrCodes.filter(qr => qr.type === 'products').length;
+
+            if (type === 'vitrine' && vitrineCount === 0) {
               user.hasVitrine = true;
               await userRepository.save(user);
             }
-            if (type === 'menu' && !user.hasMenu) {
+            if (type === 'menu' && menuCount === 0) {
               user.hasMenu = true;
               await userRepository.save(user);
             }
-            if (type === 'products' && !user.hasMenu) {
-              user.hasMenu = true;
+            if (type === 'products' && productsCount === 0) {
+              user.hasProducts = true;
               await userRepository.save(user);
             }
           }
@@ -472,20 +480,28 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         savedQRCode.originalUrl = savedQRCode.url;
         const finalQRCode = await qrCodeRepository.save(savedQRCode);
 
-        // Set hasVitrine or hasMenu on user if needed
+        // Set hasVitrine, hasMenu, or hasProducts on user if needed
         if (type === 'vitrine' || type === 'menu' || type === 'products') {
-          const user = await userRepository.findOne({ where: { id: req.user.id } });
+          const user = await userRepository.findOne({ 
+            where: { id: req.user.id },
+            relations: ['qrCodes']
+          });
           if (user) {
-            if (type === 'vitrine' && !user.hasVitrine) {
+            // Count current QR codes by type
+            const vitrineCount = user.qrCodes.filter(qr => qr.type === 'vitrine').length;
+            const menuCount = user.qrCodes.filter(qr => qr.type === 'menu').length;
+            const productsCount = user.qrCodes.filter(qr => qr.type === 'products').length;
+
+            if (type === 'vitrine' && vitrineCount === 0) {
               user.hasVitrine = true;
               await userRepository.save(user);
             }
-            if (type === 'menu' && !user.hasMenu) {
+            if (type === 'menu' && menuCount === 0) {
               user.hasMenu = true;
               await userRepository.save(user);
             }
-            if (type === 'products' && !user.hasMenu) {
-              user.hasMenu = true;
+            if (type === 'products' && productsCount === 0) {
+              user.hasProducts = true;
               await userRepository.save(user);
             }
           }
@@ -931,22 +947,25 @@ export const deleteQRCode = async (req: AuthRequest, res: Response) => {
         const user = await userRepository.findOne({ where: { id: req.user.id }, relations: ['qrCodes'] });
         if (user) {
           if (qrType === 'vitrine') {
-            const hasVitrine = user.qrCodes.some(qr => qr.type === 'vitrine');
-            if (!hasVitrine && user.hasVitrine) {
+            const vitrineCount = user.qrCodes.filter(qr => qr.type === 'vitrine').length;
+            if (vitrineCount === 0 && user.hasVitrine) {
               user.hasVitrine = false;
               await userRepository.save(user);
             }
           }
           if (qrType === 'menu') {
-            const hasMenu = user.qrCodes.some(qr => qr.type === 'menu');
-            if (!hasMenu && user.hasMenu) {
+            const menuCount = user.qrCodes.filter(qr => qr.type === 'menu').length;
+            if (menuCount === 0 && user.hasMenu) {
               user.hasMenu = false;
               await userRepository.save(user);
             }
           }
-          if (qrType === 'products' && !user.hasMenu) {
-            user.hasMenu = true;
-            await userRepository.save(user);
+          if (qrType === 'products') {
+            const productsCount = user.qrCodes.filter(qr => qr.type === 'products').length;
+            if (productsCount === 0 && user.hasProducts) {
+              user.hasProducts = false;
+              await userRepository.save(user);
+            }
           }
         }
       }
