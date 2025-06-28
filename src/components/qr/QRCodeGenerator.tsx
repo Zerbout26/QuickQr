@@ -1015,77 +1015,46 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             </div>
             
             {/* QR Type Selector as Buttons */}
-            {(!selectedType && user && !fromOnboarding) || showOtherTypes ? (
+            {(!selectedType && user && !fromOnboarding && userQRCodes.length === 0) ? (
               <div className="mb-2">
                 <Label htmlFor="type" className="text-sm sm:text-base font-medium">Type</Label>
                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-1">
-                  {/* Show all options when showOtherTypes is true, otherwise show available options based on current limits */}
-                  {showOtherTypes ? (
-                    <>
-                      <Button
-                        type="button"
-                        variant={type === 'menu' ? 'default' : 'outline'}
-                        onClick={() => setType('menu')}
-                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                      >
-                        Menu
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={type === 'products' ? 'default' : 'outline'}
-                        onClick={() => setType('products')}
-                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                      >
-                        Products ({currentProductsCount}/10)
-                      </Button>
-                      <Button
-                        type="button"
-                        variant={type === 'vitrine' ? 'default' : 'outline'}
-                        onClick={() => setType('vitrine')}
-                        className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                      >
-                        Vitrine
-                      </Button>
-                    </>
-                  ) : (
-                    <>
-                      {canCreateMenu && (
-                        <Button
-                          type="button"
-                          variant={type === 'menu' ? 'default' : 'outline'}
-                          onClick={() => setType('menu')}
-                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                        >
-                          Menu
-                        </Button>
-                      )}
-                      {canCreateProducts && (
-                        <Button
-                          type="button"
-                          variant={type === 'products' ? 'default' : 'outline'}
-                          onClick={() => setType('products')}
-                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                        >
-                          Products ({currentProductsCount}/10)
-                        </Button>
-                      )}
-                      {canCreateVitrine && (
-                        <Button
-                          type="button"
-                          variant={type === 'vitrine' ? 'default' : 'outline'}
-                          onClick={() => setType('vitrine')}
-                          className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                        >
-                          Vitrine
-                        </Button>
-                      )}
-                      {/* Show message if no options available */}
-                      {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
-                        <div className="text-center text-gray-500 py-2 text-sm">
-                          You have reached the maximum limit for all QR code types.
-                        </div>
-                      )}
-                    </>
+                  {/* Show available options based on current limits for new users */}
+                  {canCreateMenu && (
+                    <Button
+                      type="button"
+                      variant={type === 'menu' ? 'default' : 'outline'}
+                      onClick={() => setType('menu')}
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                    >
+                      Menu
+                    </Button>
+                  )}
+                  {canCreateProducts && (
+                    <Button
+                      type="button"
+                      variant={type === 'products' ? 'default' : 'outline'}
+                      onClick={() => setType('products')}
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                    >
+                      Products ({currentProductsCount}/10)
+                    </Button>
+                  )}
+                  {canCreateVitrine && (
+                    <Button
+                      type="button"
+                      variant={type === 'vitrine' ? 'default' : 'outline'}
+                      onClick={() => setType('vitrine')}
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                    >
+                      Vitrine
+                    </Button>
+                  )}
+                  {/* Show message if no options available */}
+                  {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
+                    <div className="text-center text-gray-500 py-2 text-sm">
+                      You have reached the maximum limit for all QR code types.
+                    </div>
                   )}
                 </div>
               </div>
@@ -1164,7 +1133,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             )}
             {(type === 'menu' || type === 'both') && (
-              <div className="space-y-3">
+                <div className="space-y-3">
                 {/* Orderable and COD Form Toggles */}
                 <div className="space-y-2">
                   <div className="flex items-center gap-2 sm:gap-3">
@@ -1463,7 +1432,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             {(type === 'products' || selectedType === 'products') && (
               <div className="space-y-3">
                 {/* Products Section */}
-                <div className="space-y-2">
+                  <div className="space-y-2">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
                     <Label className="text-sm sm:text-base font-medium">{translations[language].products}</Label>
                     <Button
@@ -1483,7 +1452,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       const availKey = `product-${index}`;
                       return (
                         <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
-                          <Input
+                    <Input
                             placeholder={translations[language].productName}
                             value={product.name}
                             onChange={(e) => updateProduct(index, 'name', e.target.value)}
@@ -1496,18 +1465,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             onChange={(e) => updateProduct(index, 'description', e.target.value)}
                             dir={language === 'ar' ? 'rtl' : 'ltr'}
                             className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
-                          />
-                          <Input
+                    />
+                    <Input
                             placeholder={translations[language].price}
                             type="number"
                             value={product.price}
                             onChange={(e) => updateProduct(index, 'price', e.target.value)}
                             className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
                             onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
                             className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                           >
@@ -1591,8 +1560,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                               >
                                 + Add Image
-                              </Button>
-                            </div>
+                        </Button>
+                      </div>
                           </div>
                           {/* Variants Section */}
                           <div className="space-y-1 sm:space-y-2">
@@ -1600,7 +1569,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             {(product.variants || []).map((variant, variantIdx) => (
                               <div key={variantIdx} className="border rounded p-2 sm:p-3 mb-1 sm:mb-2">
                                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-start sm:items-center mb-1 sm:mb-2">
-                                  <Input
+                          <Input
                                     value={variant.name}
                                     onChange={e => {
                                       const newVariants = [...(product.variants || [])];
@@ -1628,7 +1597,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 <div className="space-y-1 sm:space-y-2 ml-2 sm:ml-4">
                                   {(variant.options || []).map((option, optionIdx) => (
                                     <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
-                                      <Input
+                            <Input
                                         value={option.name}
                                         onChange={e => {
                                           const newVariants = [...(product.variants || [])];
@@ -1648,12 +1617,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         }}
                                         placeholder="Price adj."
                                         className="w-full sm:w-20 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                                      />
-                                      <Button
-                                        type="button"
+                            />
+                            <Button
+                              type="button"
                                         variant="destructive"
-                                        size="icon"
-                                        onClick={() => {
+                              size="icon"
+                              onClick={() => {
                                           const newVariants = [...(product.variants || [])];
                                           newVariants[variantIdx].options.splice(optionIdx, 1);
                                           updateProduct(index, 'variants', newVariants);
@@ -1676,10 +1645,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                   >
                                     + Add Option
-                                  </Button>
-                                </div>
-                              </div>
-                            ))}
+                            </Button>
+                          </div>
+                        </div>
+                      ))}
                             <Button
                               type="button"
                               variant="outline"
@@ -1693,7 +1662,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             >
                               + Add Variant
                             </Button>
-                          </div>
+                    </div>
                           <Button
                             type="button"
                             variant="outline"
@@ -2162,102 +2131,102 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             <div className="mt-3 sm:mt-4 border rounded-lg p-3 sm:p-4 bg-gray-50">
               <div className="space-y-3 sm:space-y-4">
                 {/* QR Code Colors */}
-                <div className="space-y-2">
+            <div className="space-y-2">
                   <Label htmlFor="foregroundColor" className="text-sm sm:text-base font-medium">{translations[language].foregroundColor}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
-                    <Input
-                      id="foregroundColor"
-                      type="color"
-                      value={foregroundColor}
-                      onChange={(e) => setForegroundColor(e.target.value)}
+                <Input
+                  id="foregroundColor"
+                  type="color"
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
                       className="w-full sm:w-20 h-10 sm:h-12"
+                />
+                <Input
+                  value={foregroundColor}
+                  onChange={(e) => setForegroundColor(e.target.value)}
+                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                />
+              </div>
+            </div>
+                
+            <div className="space-y-2">
+                  <Label htmlFor="backgroundColor" className="text-sm sm:text-base font-medium">{translations[language].backgroundColor}</Label>
+                  <div className="flex flex-col sm:flex-row gap-2">
+                <Input
+                  id="backgroundColor"
+                  type="color"
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="w-full sm:w-20 h-10 sm:h-12"
+                />
+                <Input
+                  value={backgroundColor}
+                  onChange={(e) => setBackgroundColor(e.target.value)}
+                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                />
+              </div>
+            </div>
+            
+            {/* Landing Page Colors */}
+                <div className="border-t pt-3 sm:pt-4">
+                  <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">Landing Page Colors</h3>
+              
+                  <div className="space-y-3 sm:space-y-4">
+                <div className="space-y-2">
+                      <Label htmlFor="primaryColor" className="text-sm sm:text-base font-medium">Primary Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
+                    <Input
+                      id="primaryColor"
+                      type="color"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="w-full sm:w-20 h-10 sm:h-12"
                     />
                     <Input
-                      value={foregroundColor}
-                      onChange={(e) => setForegroundColor(e.target.value)}
-                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                      value={primaryColor}
+                      onChange={(e) => setPrimaryColor(e.target.value)}
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor" className="text-sm sm:text-base font-medium">{translations[language].backgroundColor}</Label>
-                  <div className="flex flex-col sm:flex-row gap-2">
+                      <Label htmlFor="primaryHoverColor" className="text-sm sm:text-base font-medium">Primary Hover Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
                     <Input
-                      id="backgroundColor"
+                      id="primaryHoverColor"
                       type="color"
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="w-full sm:w-20 h-10 sm:h-12"
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="w-full sm:w-20 h-10 sm:h-12"
                     />
                     <Input
-                      value={backgroundColor}
-                      onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                      value={primaryHoverColor}
+                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 
-                {/* Landing Page Colors */}
-                <div className="border-t pt-3 sm:pt-4">
-                  <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">Landing Page Colors</h3>
-                  
-                  <div className="space-y-3 sm:space-y-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="primaryColor" className="text-sm sm:text-base font-medium">Primary Color</Label>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          id="primaryColor"
-                          type="color"
-                          value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="w-full sm:w-20 h-10 sm:h-12"
-                        />
-                        <Input
-                          value={primaryColor}
-                          onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="primaryHoverColor" className="text-sm sm:text-base font-medium">Primary Hover Color</Label>
-                      <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          id="primaryHoverColor"
-                          type="color"
-                          value={primaryHoverColor}
-                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="w-full sm:w-20 h-10 sm:h-12"
-                        />
-                        <Input
-                          value={primaryHoverColor}
-                          onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
+                <div className="space-y-2">
                       <Label htmlFor="accentColor" className="text-sm sm:text-base font-medium">Accent Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          id="accentColor"
-                          type="color"
-                          value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
+                    <Input
+                      id="accentColor"
+                      type="color"
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
                           className="w-full sm:w-20 h-10 sm:h-12"
-                        />
-                        <Input
-                          value={accentColor}
-                          onChange={(e) => setAccentColor(e.target.value)}
+                    />
+                    <Input
+                      value={accentColor}
+                      onChange={(e) => setAccentColor(e.target.value)}
                           className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
+                    />
+                  </div>
+                </div>
+                
+                <div className="space-y-2">
                       <Label className="text-sm sm:text-base font-medium">Background Gradient</Label>
                       <div className="p-2 sm:p-3 bg-gray-50 rounded-md border">
                         <p className="text-xs sm:text-sm text-gray-600 mb-2">
@@ -2270,40 +2239,40 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                           }}
                         ></div>
                       </div>
-                    </div>
-                    
-                    <div className="space-y-2">
+                </div>
+                
+                <div className="space-y-2">
                       <Label htmlFor="loadingSpinnerColor" className="text-sm sm:text-base font-medium">Loading Spinner Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
-                        <Input
-                          id="loadingSpinnerColor"
-                          type="color"
-                          value={loadingSpinnerColor}
-                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                    <Input
+                      id="loadingSpinnerColor"
+                      type="color"
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
                           className="w-full sm:w-20 h-10 sm:h-12"
-                        />
-                        <Input
-                          value={loadingSpinnerColor}
-                          onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                    />
+                    <Input
+                      value={loadingSpinnerColor}
+                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
                           className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                        />
-                      </div>
-                    </div>
-                    
-                    <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerBorderColor" className="text-sm sm:text-base font-medium">Loading Spinner Border Color</Label>
-                      <Input
-                        id="loadingSpinnerBorderColor"
-                        value={loadingSpinnerBorderColor}
-                        onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
-                        placeholder="rgba(139, 92, 246, 0.2)"
-                        className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                      />
-                    </div>
+                    />
                   </div>
+                </div>
+                
+                <div className="space-y-2">
+                      <Label htmlFor="loadingSpinnerBorderColor" className="text-sm sm:text-base font-medium">Loading Spinner Border Color</Label>
+                  <Input
+                    id="loadingSpinnerBorderColor"
+                    value={loadingSpinnerBorderColor}
+                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                    placeholder="rgba(139, 92, 246, 0.2)"
+                        className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                  />
                 </div>
               </div>
             </div>
+            </div>
+          </div>
           )}
           <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2">
             <Button 

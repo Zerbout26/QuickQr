@@ -449,23 +449,23 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
             relations: ['qrCodes']
           });
           if (user) {
-            // Count current QR codes by type
+            // Count current QR codes by type (excluding the one we're about to create)
             const vitrineCount = user.qrCodes.filter(qr => qr.type === 'vitrine').length;
             const menuCount = user.qrCodes.filter(qr => qr.type === 'menu').length;
             const productsCount = user.qrCodes.filter(qr => qr.type === 'products').length;
 
-            if (type === 'vitrine' && vitrineCount === 0) {
+            // Set flags to true when creating the first QR code of each type
+            if (type === 'vitrine') {
               user.hasVitrine = true;
-              await userRepository.save(user);
             }
-            if (type === 'menu' && menuCount === 0) {
+            if (type === 'menu') {
               user.hasMenu = true;
-              await userRepository.save(user);
             }
-            if (type === 'products' && productsCount === 0) {
+            if (type === 'products') {
               user.hasProducts = true;
-              await userRepository.save(user);
             }
+            
+            await userRepository.save(user);
           }
         }
         return res.status(201).json(finalQRCode);
@@ -487,23 +487,23 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
             relations: ['qrCodes']
           });
           if (user) {
-            // Count current QR codes by type
+            // Count current QR codes by type (excluding the one we're about to create)
             const vitrineCount = user.qrCodes.filter(qr => qr.type === 'vitrine').length;
             const menuCount = user.qrCodes.filter(qr => qr.type === 'menu').length;
             const productsCount = user.qrCodes.filter(qr => qr.type === 'products').length;
 
-            if (type === 'vitrine' && vitrineCount === 0) {
+            // Set flags to true when creating the first QR code of each type
+            if (type === 'vitrine') {
               user.hasVitrine = true;
-              await userRepository.save(user);
             }
-            if (type === 'menu' && menuCount === 0) {
+            if (type === 'menu') {
               user.hasMenu = true;
-              await userRepository.save(user);
             }
-            if (type === 'products' && productsCount === 0) {
+            if (type === 'products') {
               user.hasProducts = true;
-              await userRepository.save(user);
             }
+            
+            await userRepository.save(user);
           }
         }
         return res.status(201).json(finalQRCode);
