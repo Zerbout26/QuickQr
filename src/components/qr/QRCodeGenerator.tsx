@@ -180,6 +180,8 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
 interface QRCodeFormProps {
   onCreated?: (qrCode: QRCodeType) => void;
   selectedType?: string;
+  fromOnboarding?: boolean;
+  onAllowOtherTypes?: () => void;
 }
 
 // Translations object
@@ -388,7 +390,7 @@ const translations = {
   },
 };
 
-const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType }) => {
+const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, fromOnboarding, onAllowOtherTypes }) => {
   const { user, refreshUserProfile } = useAuth();
   const { language } = useLanguage();
   const [name, setName] = useState('');
@@ -851,13 +853,25 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
       }
 
       const createdQRCode = await response.json();
-      if (onCreated) onCreated(createdQRCode);
-      if (refreshUserProfile) await refreshUserProfile();
-      resetForm();
       toast({
-        title: translations[language].success,
-        description: translations[language].qrCreated,
+        title: "QR Code Created",
+        description: fromOnboarding 
+          ? "Congratulations! Your first QR code has been created successfully. You can now share it with your customers."
+          : "Your new QR code has been created successfully.",
       });
+      
+      if (onCreated) {
+        onCreated(createdQRCode);
+      }
+      
+      if (refreshUserProfile) await refreshUserProfile();
+      
+      // If coming from onboarding, clear the flag after successful creation
+      if (fromOnboarding && onAllowOtherTypes) {
+        onAllowOtherTypes();
+      }
+      
+      resetForm();
     } catch (error: any) {
       console.error('Error creating QR code:', error);
       setError(translations[language].errorCreatingQR);
@@ -874,7 +888,41 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
   return (
     <Card>
       <CardContent className="pt-6">
-        <form onSubmit={handleSubmit}>
+        <form onSubmit={handleSubmit} className="space-y-6">
+          {fromOnboarding && (
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-4 mb-6">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center">
+                  <div className="flex-shrink-0">
+                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold">1</span>
+                    </div>
+                  </div>
+                  <div className="ml-3">
+                    <h3 className="text-sm font-medium text-blue-800">
+                      Creating Your First QR Code
+                    </h3>
+                    <p className="text-sm text-blue-700 mt-1">
+                      You've chosen to create a {selectedType} QR code. Fill out the details below to get started.
+                    </p>
+                  </div>
+                </div>
+                {onAllowOtherTypes && (
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="sm"
+                    onClick={onAllowOtherTypes}
+                    className="text-blue-600 border-blue-300 hover:bg-blue-100"
+                  >
+                    Show Other Types
+                  </Button>
+                )}
+              </div>
+            </div>
+          )}
+          
+          {/* Basic Information */}
           <div className="space-y-4">
             <div className="space-y-2">
               <Label htmlFor="name">{translations[language].name}</Label>
@@ -888,7 +936,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType })
               />
             </div>
             {/* QR Type Selector as Buttons */}
-            {!selectedType && user && (
+            {!selectedType && user && !fromOnboarding && (
               <div className="mb-4">
                 <Label htmlFor="type">Type</Label>
                 <div className="flex gap-4 mt-2">

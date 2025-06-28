@@ -277,7 +277,33 @@ const Dashboard = () => {
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const selectedType = queryParams.get('type');
+  const openGenerator = queryParams.get('openGenerator');
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('manage');
+  const [fromOnboarding, setFromOnboarding] = useState(false);
+
+  // Check if user is coming from onboarding
+  useEffect(() => {
+    const onboardingFlag = sessionStorage.getItem('fromOnboarding');
+    if (onboardingFlag === 'true') {
+      setFromOnboarding(true);
+      // Don't clear the flag automatically - let user decide when to see other types
+    }
+  }, []);
+
+  // Function to allow user to see other types
+  const allowOtherTypes = () => {
+    setFromOnboarding(false);
+    sessionStorage.removeItem('fromOnboarding');
+  };
+
+  // Handle openGenerator parameter to automatically open the generator tab
+  useEffect(() => {
+    if (openGenerator === 'true') {
+      setActiveTab('create');
+      // Clear the URL parameters after setting the tab
+      navigate('/dashboard', { replace: true });
+    }
+  }, [openGenerator, navigate]);
 
   const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
@@ -954,7 +980,12 @@ const Dashboard = () => {
           {/* QR Code Creation Tab */}
           <TabsContent value="create" className="py-8 px-1">
             <div className="algerian-card p-6 animate-fade-in">
-              <QRCodeGenerator selectedType={selectedType} onCreated={handleQRCreated} />
+              <QRCodeGenerator 
+                selectedType={selectedType} 
+                onCreated={handleQRCreated} 
+                fromOnboarding={fromOnboarding}
+                onAllowOtherTypes={allowOtherTypes}
+              />
             </div>
           </TabsContent>
           
