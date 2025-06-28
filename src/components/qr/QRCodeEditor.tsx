@@ -632,10 +632,17 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         }
 
         if (type === 'products') {
+            // Create a copy of products data, preserving existing Cloudinary URLs
+            const cleanedProducts = products.map(product => ({
+                ...product,
+                // Keep existing Cloudinary URLs, only clear blob URLs
+                images: product.images?.filter(img => !img.startsWith('blob:')) || []
+            }));
+
             formData.append('products', JSON.stringify({
                 storeName: name || 'My Product Store',
                 description: '',
-                products: products,
+                products: cleanedProducts,
                 orderable: true,
                 codFormEnabled: true
             }));
