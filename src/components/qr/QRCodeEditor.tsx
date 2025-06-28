@@ -998,6 +998,14 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                         const newImages = [...(item.images || [])];
                                         newImages.splice(imgIdx, 1);
                                         updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                        
+                                        // Remove corresponding file from tempImages
+                                        const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
+                                        if (tempImages[key]) {
+                                          const newTempImages = { ...tempImages };
+                                          delete newTempImages[key];
+                                          setTempImages(newTempImages);
+                                        }
                                       }}
                                     >
                                       &times;
@@ -1224,6 +1232,14 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                   const newImages = [...(product.images || [])];
                                   newImages.splice(imgIdx, 1);
                                   updateProduct(productIndex, 'images', newImages);
+                                  
+                                  // Remove corresponding file from tempImages
+                                  const key = `product-${productIndex}-${imgIdx}`;
+                                  if (tempImages[key]) {
+                                    const newTempImages = { ...tempImages };
+                                    delete newTempImages[key];
+                                    setTempImages(newTempImages);
+                                  }
                                 }}
                               >
                                 &times;
