@@ -375,6 +375,7 @@ const Dashboard = () => {
   const handleQRCreated = (newQR: QRCode) => {
     setQrCodes(prev => [newQR, ...prev]);
     setShowOnboarding(false); // Clear onboarding state when QR is created
+    setActiveTab('manage'); // Redirect to "My QR Codes" tab
     toast({
       title: "QR Code Created",
       description: "Your new QR code has been created successfully.",

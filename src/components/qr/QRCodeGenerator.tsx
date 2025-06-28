@@ -982,10 +982,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   <Label className="text-sm sm:text-base font-medium">{translations[language].links}</Label>
                   <Button
                     type="button"
-                    variant="outline"
+                    variant="default"
                     size="sm"
                     onClick={addLink}
-                    className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                    className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                   >
                     <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                     {translations[language].addLink}
@@ -1168,7 +1168,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   ))}
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="default"
                                     size="sm"
                                     onClick={() => {
                                       const input = document.createElement('input');
@@ -1190,7 +1190,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                       };
                                       input.click();
                                     }}
-                                    className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                                    className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                                   >
                                     + {translations[language].addImage}
                                   </Button>
@@ -1268,14 +1268,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                       ))}
                                       <Button
                                         type="button"
-                                        variant="outline"
+                                        variant="default"
                                         size="sm"
                                         onClick={() => {
                                           const newVariants = [...(item.variants || [])];
                                           newVariants[variantIdx].options.push({ name: '' });
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
-                                        className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                                        className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                                       >
                                         + {translations[language].addVariant}
                                       </Button>
@@ -1291,17 +1291,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     newVariants.push({ name: '', options: [] });
                                     updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                   }}
-                                  className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                                  className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                                 >
                                   + {translations[language].addOption}
                                 </Button>
                               </div>
                               <Button
                                 type="button"
-                                variant="outline"
+                                variant="destructive"
                                 size="sm"
                                 onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                                className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                                className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                               >
                                 <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                 {translations[language].removeItem}
@@ -1311,8 +1311,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         })}
                         <Button
                           type="button"
-                          variant="outline"
-                          className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base"
+                          variant="default"
+                          className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                           onClick={() => addMenuItem(categoryIndex)}
                         >
                           <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
@@ -1323,8 +1323,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   ))}
                   <Button
                     type="button"
-                    variant="outline"
-                    className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base"
+                    variant="default"
+                    className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                     onClick={addCategory}
                   >
                     <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
@@ -1341,11 +1341,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     <Label className="text-sm sm:text-base font-medium">{translations[language].products}</Label>
                     <Button
                       type="button"
-                      variant="outline"
+                      variant="default"
                       size="sm"
                       onClick={addProduct}
                       disabled={products.length >= 1}
-                      className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                      className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                       {products.length === 0 ? translations[language].addProduct : '1 Product Maximum'}
@@ -1380,10 +1380,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         {/* Hide availability controls for products */}
                         {type !== 'products' && selectedType !== 'products' && (
                           <>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="sm"
                                 onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
                                 className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                               >
@@ -1444,7 +1444,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               ))}
                               <Button
                                 type="button"
-                                variant="outline"
+                                variant="default"
                                 size="sm"
                                 onClick={() => {
                                   const input = document.createElement('input');
@@ -1466,7 +1466,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   };
                                   input.click();
                                 }}
-                                className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                                className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm bg-gradient-to-r from-purple-500 to-purple-600 hover:from-purple-600 hover:to-purple-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                               >
                                 + {translations[language].addImage}
                         </Button>
@@ -1544,14 +1544,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   ))}
                                   <Button
                                     type="button"
-                                    variant="outline"
+                                    variant="default"
                                     size="sm"
                                     onClick={() => {
                                       const newVariants = [...(product.variants || [])];
                                       newVariants.push({ name: '', options: [] });
                                       updateProduct(index, 'variants', newVariants);
                                     }}
-                                    className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                                    className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                                   >
                                     + {translations[language].addVariant}
                             </Button>
@@ -1567,17 +1567,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 newVariants.push({ name: '', options: [] });
                                 updateProduct(index, 'variants', newVariants);
                               }}
-                              className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                              className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                             >
-                              + Add Variant
+                              + {translations[language].addVariant}
                             </Button>
                     </div>
                           <Button
                             type="button"
-                            variant="outline"
+                            variant="destructive"
                             size="sm"
                             onClick={() => removeProduct(index)}
-                            className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                            className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm bg-red-500 hover:bg-red-600 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
                           >
                             <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             {translations[language].removeProduct}
@@ -2185,8 +2185,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           )}
           <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2">
             <Button 
-              type="submit" 
-              className="w-full sm:w-auto text-sm sm:text-base py-3 sm:py-4 h-12 sm:h-14"
+              type="submit"
+              variant="default"
+              className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
               disabled={isLoading || (!canCreateMenu && !canCreateProducts && !canCreateVitrine)}
             >
               {isLoading ? translations[language].creating : translations[language].createQRCode}
