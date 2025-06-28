@@ -819,67 +819,48 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   );
 
   return (
-    <div className="max-w-2xl mx-auto w-full p-2 sm:p-6">
+    <div className="w-full p-2 sm:p-6">
       <form onSubmit={handleSubmit} className="space-y-6">
         <div className="space-y-4">
-          <div className="space-y-2">
-            <Label htmlFor="name">Name</Label>
+          <div className="space-y-3">
+            <Label htmlFor="name" className="text-base font-medium">Name</Label>
             <Input
               id="name"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              placeholder="My QR Code"
+              className="h-12 px-4 py-3 text-base"
+              dir={language === 'ar' ? 'rtl' : 'ltr'}
             />
           </div>
-
-          <div className="space-y-2">
-            <Label>Type</Label>
-            <div className="flex gap-2">
-              <Button
-                type="button"
-                variant={type === 'url' ? 'default' : 'outline'}
-                onClick={() => setType('url')}
-                className="flex-1"
-              >
-                URL
-              </Button>
-              <Button
-                type="button"
-                variant={type === 'menu' ? 'default' : 'outline'}
-                onClick={() => setType('menu')}
-                className="flex-1"
-              >
-                Menu
-              </Button>
-              <Button
-                type="button"
-                variant={type === 'both' ? 'default' : 'outline'}
-                onClick={() => setType('both')}
-                className="flex-1"
-              >
-                Both
-              </Button>
-              <Button
-                type="button"
-                variant={type === 'vitrine' ? 'default' : 'outline'}
-                onClick={() => setType('vitrine')}
-                className="flex-1"
-              >
-                Vitrine
-              </Button>
-            </div>
+          <div className="space-y-3">
+            <Label htmlFor="type" className="text-base font-medium">Type</Label>
+            <Select value={type} onValueChange={(value) => setType(value as EditorQrType)}>
+              <SelectTrigger className="h-12 px-4 py-3 text-base">
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="url">Direct URL</SelectItem>
+                <SelectItem value="menu">Menu</SelectItem>
+                <SelectItem value="products">Products</SelectItem>
+                <SelectItem value="vitrine">Vitrine</SelectItem>
+                <SelectItem value="links">Links</SelectItem>
+                <SelectItem value="both">Both</SelectItem>
+              </SelectContent>
+            </Select>
           </div>
+        </div>
 
+        <div className="mt-4">
           <Tabs defaultValue="basic" className="space-y-4">
-            <TabsList className="grid w-full grid-cols-2">
-              <TabsTrigger value="basic">{translations[language].basic}</TabsTrigger>
-              <TabsTrigger value="advanced">{translations[language].advanced}</TabsTrigger>
+            <TabsList className="grid w-full grid-cols-2 h-12">
+              <TabsTrigger value="basic" className="text-base">{translations[language].basic}</TabsTrigger>
+              <TabsTrigger value="advanced" className="text-base">{translations[language].advanced}</TabsTrigger>
             </TabsList>
 
             <TabsContent value="basic" className="space-y-4">
-              <div className="space-y-2">
-                <Label>{translations[language].qrCodeLogo}</Label>
-                <div className="flex items-center gap-4">
+              <div className="space-y-3">
+                <Label className="text-base font-medium">{translations[language].qrCodeLogo}</Label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                   {logoPreview && (
                     <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
                   )}
@@ -887,6 +868,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     type="button"
                     variant="outline"
                     onClick={() => fileInputRef.current?.click()}
+                    className="w-full sm:w-auto py-3 h-12 text-base"
                   >
                     <Upload className="h-4 w-4 mr-2" />
                     {logoPreview ? translations[language].changeLogo : translations[language].uploadLogo}
@@ -901,345 +883,184 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 </div>
               </div>
 
-              {(type === 'url' || type === 'both') && (
+              {type === 'menu' && (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
-                    <h3 className="text-lg font-medium">{translations[language].links}</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={addLink}
-                      className="flex items-center gap-2"
-                    >
-                      <Plus className="h-4 w-4" />
-                      {translations[language].addLink}
-                    </Button>
+                  <div className="space-y-4">
+                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                      <h3 className="text-lg font-medium">{translations[language].links}</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={addLink}
+                        className="w-full sm:w-auto py-3 h-12 text-base"
+                      >
+                        <Plus className="h-4 w-4" />
+                        {translations[language].addLink}
+                      </Button>
+                    </div>
+                    <div className="space-y-3">
+                      {links.map((link, index) => (
+                        <div key={index} className="flex flex-col sm:flex-row gap-2">
+                          <Select
+                            value={link.type}
+                            onValueChange={(value) => updateLink(index, 'type', value)}
+                          >
+                            <SelectTrigger className="w-full sm:w-[180px] h-12">
+                              <SelectValue placeholder={translations[language].selectPlatform} />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="website">{translations[language].website}</SelectItem>
+                              <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
+                              <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
+                              <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
+                              <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
+                              <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
+                              <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
+                              <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
+                              <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
+                              <SelectItem value="other">{translations[language].other}</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            placeholder={translations[language].url}
+                            type="url"
+                            value={link.url}
+                            onChange={(e) => updateLink(index, 'url', e.target.value)}
+                            className="flex-1 h-12 px-4 py-3"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeLink(index)}
+                            className="h-12 w-12"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                      ))}
+                    </div>
                   </div>
 
-                  <div className="space-y-2">
-                    {links.map((link, index) => (
-                      <div key={index} className="flex gap-2">
-                        <Select
-                          value={link.type}
-                          onValueChange={(value) => updateLink(index, 'type', value)}
-                        >
-                          <SelectTrigger className="w-[180px]">
-                            <SelectValue placeholder={translations[language].selectPlatform} />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value="website">{translations[language].website}</SelectItem>
-                            <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
-                            <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
-                            <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
-                            <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
-                            <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
-                            <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
-                            <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
-                            <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
-                            <SelectItem value="other">{translations[language].other}</SelectItem>
-                          </SelectContent>
-                        </Select>
-                        <Input
-                          placeholder={translations[language].url}
-                          type="url"
-                          value={link.url}
-                          onChange={(e) => updateLink(index, 'url', e.target.value)}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeLink(index)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {(type === 'menu' || type === 'both') && (
-                <div className="space-y-4">
-                  {/* Orderable and COD Form Toggles */}
+                  {/* Menu Settings */}
                   <div className="space-y-3">
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <Switch
                         checked={menuOrderable}
-                        onCheckedChange={setMenuOrderable}
+                        onCheckedChange={(checked) => {
+                          // Handle menu orderable toggle
+                        }}
                         id="orderable-menu-toggle"
                       />
-                      <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
+                      <Label htmlFor="orderable-menu-toggle" className="text-base">{translations[language].orderableMenuToggle}</Label>
                     </div>
-                    <div className="flex items-center gap-2">
+                    <div className="flex items-center gap-3">
                       <Switch
                         checked={codFormEnabled}
-                        onCheckedChange={setCodFormEnabled}
+                        onCheckedChange={(checked) => {
+                          // Handle COD form toggle
+                        }}
                         id="cod-form-toggle"
                       />
-                      <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle}</Label>
+                      <Label htmlFor="cod-form-toggle" className="text-base">{translations[language].codFormToggle}</Label>
                     </div>
                   </div>
-                  
-                  {menuCategories.map((category, categoryIndex) => (
-                    <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
-                      <div className="flex gap-2 items-center">
-                        <Input
-                          placeholder="Category Name"
-                          value={category.name}
-                          onChange={(e) => updateCategory(categoryIndex, e.target.value)}
-                        />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="icon"
-                          onClick={() => removeCategory(categoryIndex)}
-                        >
-                          <Trash2 className="h-4 w-4" />
-                        </Button>
-                      </div>
 
-                      <div className="space-y-2">
-                        {category.items.map((item, itemIndex) => (
-                          <div key={itemIndex} className="space-y-2 border p-2 rounded">
-                            <div className="flex items-center gap-4 mb-2">
-                              <div className="space-y-2">
-                                <Label>Images</Label>
-                                <div className="flex gap-2 flex-wrap mb-2">
-                                  {(item.images || []).map((imgUrl, imgIdx) => (
-                                    <div key={imgIdx} className="relative group">
-                                      <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
-                                      <button
-                                        type="button"
-                                        className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
-                                        onClick={() => {
-                                          const newImages = [...(item.images || [])];
-                                          newImages.splice(imgIdx, 1);
-                                          updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
-                                          
-                                          // Remove corresponding file from tempImages
-                                          const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
-                                          if (tempImages[key]) {
-                                            const newTempImages = { ...tempImages };
-                                            delete newTempImages[key];
-                                            setTempImages(newTempImages);
-                                          }
-                                        }}
-                                      >
-                                        &times;
-                                      </button>
-                                    </div>
-                                  ))}
-                                  <Button
-                                    type="button"
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => {
-                                      const input = document.createElement('input');
-                                      input.type = 'file';
-                                      input.accept = 'image/*';
-                                      input.multiple = true;
-                                      input.onchange = (e) => {
-                                        const files = Array.from((e.target as HTMLInputElement).files || []);
-                                        const newImages = [...(item.images || [])];
-                                        files.forEach((file, fileIndex) => {
-                                          // Store file in tempImages for upload
-                                          const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
-                                          setTempImages(prev => ({ ...prev, [key]: file }));
-                                          // Create temporary URL for preview
-                                          const url = URL.createObjectURL(file);
-                                          newImages.push(url);
-                                        });
-                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
-                                      };
-                                      input.click();
-                                    }}
-                                  >
-                                    + Add Image
-                                  </Button>
-                                </div>
-                              </div>
-                            </div>
-                            <Input
-                              placeholder="Item Name"
-                              value={item.name}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
-                            />
-                            <Input
-                              placeholder="Description"
-                              value={item.description || ''}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
-                            />
-                            <Input
-                              placeholder="Price"
-                              type="number"
-                              value={item.price}
-                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
-                            />
-                            <div className="space-y-1">
-                              <Label>Availability</Label>
-                              <div className="grid grid-cols-4 gap-2">
-                                {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                  <div key={day} className="flex items-center space-x-2">
-                                    <Checkbox
-                                      id={`edit-${categoryIndex}-${itemIndex}-${day}`}
-                                      checked={isAvailable}
-                                      onCheckedChange={(checked) => 
-                                        handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
-                                      }
-                                    />
-                                    <label
-                                      htmlFor={`edit-${categoryIndex}-${itemIndex}-${day}`}
-                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                      {day.charAt(0).toUpperCase() + day.slice(1)}
-                                    </label>
-                                  </div>
-                                ))}
-                              </div>
-                            </div>
-                            <div className="space-y-2">
-                              <Label>Variants</Label>
-                              {(item.variants || []).map((variant, variantIdx) => (
-                                <div key={variantIdx} className="border rounded p-2 mb-2">
-                                  <div className="flex items-center gap-2 mb-2">
-                                    <Input
-                                      value={variant.name}
-                                      onChange={e => {
-                                        const newVariants = [...(item.variants || [])];
-                                        newVariants[variantIdx].name = e.target.value;
-                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                      }}
-                                      placeholder="Variant name (e.g. Size, Color)"
-                                      className="flex-1"
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="destructive"
-                                      size="icon"
-                                      onClick={() => {
-                                        const newVariants = [...(item.variants || [])];
-                                        newVariants.splice(variantIdx, 1);
-                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                      }}
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                  <div className="space-y-1 ml-4">
-                                    {(variant.options || []).map((option, optionIdx) => (
-                                      <div key={optionIdx} className="flex items-center gap-2 mb-1">
-                                        <Input
-                                          value={option.name}
-                                          onChange={e => {
-                                            const newVariants = [...(item.variants || [])];
-                                            newVariants[variantIdx].options[optionIdx].name = e.target.value;
-                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                          }}
-                                          placeholder="Option (e.g. Small, Red)"
-                                          className="flex-1"
-                                        />
-                                        <Input
-                                          type="number"
-                                          value={option.price ?? ''}
-                                          onChange={e => {
-                                            const newVariants = [...(item.variants || [])];
-                                            newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
-                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                          }}
-                                          placeholder="Price adj."
-                                          className="w-24"
-                                        />
-                                        <Button
-                                          type="button"
-                                          variant="destructive"
-                                          size="icon"
-                                          onClick={() => {
-                                            const newVariants = [...(item.variants || [])];
-                                            newVariants[variantIdx].options.splice(optionIdx, 1);
-                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                          }}
-                                        >
-                                          <Trash2 className="h-4 w-4" />
-                                        </Button>
-                                      </div>
-                                    ))}
-                                    <Button
-                                      type="button"
-                                      variant="outline"
-                                      size="sm"
-                                      onClick={() => {
-                                        const newVariants = [...(item.variants || [])];
-                                        newVariants[variantIdx].options.push({ name: '' });
-                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                      }}
-                                    >
-                                      + Add Option
-                                    </Button>
-                                  </div>
-                                </div>
-                              ))}
+                  {/* Menu Categories */}
+                  <div className="space-y-4">
+                    {menuCategories.map((category, categoryIndex) => (
+                      <div key={categoryIndex} className="space-y-3 border p-4 rounded-lg">
+                        <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                          <Input
+                            placeholder="Category Name"
+                            value={category.name}
+                            onChange={(e) => updateCategory(categoryIndex, e.target.value)}
+                            className="flex-1 h-12 px-4 py-3"
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeCategory(categoryIndex)}
+                            className="h-12 w-12"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <div className="space-y-3 mt-4">
+                          {category.items.map((item, itemIndex) => (
+                            <div key={itemIndex} className="space-y-3 border p-3 rounded">
+                              <Input
+                                placeholder="Item Name"
+                                value={item.name}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                                className="h-12 px-4 py-3"
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
+                              />
+                              <Input
+                                placeholder="Description"
+                                value={item.description || ''}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                                className="h-12 px-4 py-3"
+                                dir={language === 'ar' ? 'rtl' : 'ltr'}
+                              />
+                              <Input
+                                placeholder="Price"
+                                type="number"
+                                value={item.price}
+                                onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
+                                className="h-12 px-4 py-3"
+                              />
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
-                                onClick={() => {
-                                  const newVariants = [...(item.variants || [])];
-                                  newVariants.push({ name: '', options: [] });
-                                  updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                }}
+                                onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                                className="w-full sm:w-auto py-3 h-12"
                               >
-                                + Add Variant
+                                <Trash2 className="h-4 w-4 mr-2" />
+                                Remove Item
                               </Button>
                             </div>
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="sm"
-                              onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                            >
-                              <Trash2 className="h-4 w-4 mr-2" />
-                              Remove Item
-                            </Button>
-                          </div>
-                        ))}
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="w-full"
-                          onClick={() => addMenuItem(categoryIndex)}
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          Add Menu Item
-                        </Button>
+                          ))}
+                          <Button
+                            type="button"
+                            variant="outline"
+                            className="w-full py-4 h-14"
+                            onClick={() => addMenuItem(categoryIndex)}
+                          >
+                            <Plus className="h-4 w-4 mr-2" />
+                            Add Menu Item
+                          </Button>
+                        </div>
                       </div>
-                    </div>
-                  ))}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full"
-                    onClick={addCategory}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add Category
-                  </Button>
+                    ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full py-4 h-14"
+                      onClick={addCategory}
+                    >
+                      <Plus className="h-4 w-4 mr-2" />
+                      Add Category
+                    </Button>
+                  </div>
                 </div>
               )}
 
               {type === 'products' && (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">Product Showcase</h3>
                     <p className="text-sm text-gray-600">E-commerce enabled by default</p>
                   </div>
                   
                   {products.map((product, productIndex) => (
-                    <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
-                      <div className="flex items-center gap-4 mb-2">
-                        <div className="space-y-2">
-                          <Label>Images</Label>
+                    <div key={productIndex} className="space-y-3 border p-4 rounded-lg">
+                      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 mb-2">
+                        <div className="space-y-2 w-full">
+                          <Label className="text-base font-medium">Images</Label>
                           <div className="flex gap-2 flex-wrap mb-2">
                             {(product.images || []).map((imgUrl, imgIdx) => (
                               <div key={imgIdx} className="relative group">
@@ -1289,6 +1110,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                 };
                                 input.click();
                               }}
+                              className="h-12 px-4 py-3"
                             >
                               + Add Image
                             </Button>
@@ -1299,23 +1121,29 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                         placeholder="Product Name"
                         value={product.name}
                         onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
+                        className="h-12 px-4 py-3"
+                        dir={language === 'ar' ? 'rtl' : 'ltr'}
                       />
                       <Input
                         placeholder="Description"
                         value={product.description || ''}
                         onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
+                        className="h-12 px-4 py-3"
+                        dir={language === 'ar' ? 'rtl' : 'ltr'}
                       />
                       <Input
                         placeholder="Price"
                         type="number"
                         value={product.price}
                         onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
+                        className="h-12 px-4 py-3"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="sm"
                         onClick={() => removeProduct(productIndex)}
+                        className="w-full sm:w-auto py-3 h-12"
                       >
                         <Trash2 className="h-4 w-4 mr-2" />
                         Remove Product
@@ -1325,7 +1153,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full py-4 h-14"
                     onClick={addProduct}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -1336,7 +1164,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
               {type === 'vitrine' && (
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">Vitrine</h3>
                     <p className="text-sm text-gray-600">E-commerce enabled by default</p>
                   </div>
@@ -1347,37 +1175,37 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             </TabsContent>
 
             <TabsContent value="advanced" className="space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label htmlFor="foregroundColor" className="text-base font-medium">{translations[language].foregroundColor}</Label>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="foregroundColor"
                     type="color"
                     value={foregroundColor}
                     onChange={(e) => setForegroundColor(e.target.value)}
-                    className="w-20"
+                    className="w-full sm:w-20 h-12"
                   />
                   <Input
                     value={foregroundColor}
                     onChange={(e) => setForegroundColor(e.target.value)}
-                    className="flex-1"
+                    className="flex-1 h-12 px-4 py-3"
                   />
                 </div>
               </div>
-              <div className="space-y-2">
-                <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
-                <div className="flex gap-2">
+              <div className="space-y-3">
+                <Label htmlFor="backgroundColor" className="text-base font-medium">{translations[language].backgroundColor}</Label>
+                <div className="flex flex-col sm:flex-row gap-2">
                   <Input
                     id="backgroundColor"
                     type="color"
                     value={backgroundColor}
                     onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="w-20"
+                    className="w-full sm:w-20 h-12"
                   />
                   <Input
                     value={backgroundColor}
                     onChange={(e) => setBackgroundColor(e.target.value)}
-                    className="flex-1"
+                    className="flex-1 h-12 px-4 py-3"
                   />
                 </div>
               </div>
@@ -1388,61 +1216,61 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <Label htmlFor="primaryColor">Primary Color</Label>
-                    <div className="flex gap-2">
+                    <Label htmlFor="primaryColor" className="text-base font-medium">Primary Color</Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="primaryColor"
                         type="color"
                         value={primaryColor}
                         onChange={(e) => setPrimaryColor(e.target.value)}
-                        className="w-20"
+                        className="w-full sm:w-20 h-12"
                       />
                       <Input
                         value={primaryColor}
                         onChange={(e) => setPrimaryColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 h-12 px-4 py-3"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
-                    <div className="flex gap-2">
+                    <Label htmlFor="primaryHoverColor" className="text-base font-medium">Primary Hover Color</Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="primaryHoverColor"
                         type="color"
                         value={primaryHoverColor}
                         onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                        className="w-20"
+                        className="w-full sm:w-20 h-12"
                       />
                       <Input
                         value={primaryHoverColor}
                         onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 h-12 px-4 py-3"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="accentColor">Accent Color</Label>
-                    <div className="flex gap-2">
+                    <Label htmlFor="accentColor" className="text-base font-medium">Accent Color</Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="accentColor"
                         type="color"
                         value={accentColor}
                         onChange={(e) => setAccentColor(e.target.value)}
-                        className="w-20"
+                        className="w-full sm:w-20 h-12"
                       />
                       <Input
                         value={accentColor}
                         onChange={(e) => setAccentColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 h-12 px-4 py-3"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label>Background Gradient</Label>
+                    <Label className="text-base font-medium">Background Gradient</Label>
                     <div className="p-3 bg-gray-50 rounded-md border">
                       <p className="text-sm text-gray-600 mb-2">
                         The background gradient is automatically generated based on your Primary and Accent colors.
@@ -1457,30 +1285,31 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
-                    <div className="flex gap-2">
+                    <Label htmlFor="loadingSpinnerColor" className="text-base font-medium">Loading Spinner Color</Label>
+                    <div className="flex flex-col sm:flex-row gap-2">
                       <Input
                         id="loadingSpinnerColor"
                         type="color"
                         value={loadingSpinnerColor}
                         onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                        className="w-20"
+                        className="w-full sm:w-20 h-12"
                       />
                       <Input
                         value={loadingSpinnerColor}
                         onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                        className="flex-1"
+                        className="flex-1 h-12 px-4 py-3"
                       />
                     </div>
                   </div>
                   
                   <div className="space-y-2">
-                    <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                    <Label htmlFor="loadingSpinnerBorderColor" className="text-base font-medium">Loading Spinner Border Color</Label>
                     <Input
                       id="loadingSpinnerBorderColor"
                       value={loadingSpinnerBorderColor}
                       onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
                       placeholder="rgba(139, 92, 246, 0.2)"
+                      className="h-12 px-4 py-3"
                     />
                   </div>
                 </div>
@@ -1488,9 +1317,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
             </TabsContent>
           </Tabs>
         </div>
-
-        <div className="mt-4 flex justify-end">
-          <Button type="submit" disabled={isLoading}>
+        <div className="mt-4 flex flex-col sm:flex-row justify-end gap-2">
+          <Button type="submit" disabled={isLoading} className="w-full sm:w-auto py-4 h-14 text-base">
             {isLoading ? translations[language].saving : translations[language].saveChanges}
           </Button>
         </div>

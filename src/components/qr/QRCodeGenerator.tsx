@@ -135,7 +135,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
     <div className="flex flex-col items-center mb-4">
       <div 
         ref={qrRef}
-        className="w-48 h-48 flex items-center justify-center border rounded-md p-2" 
+        className="w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center border rounded-md p-2" 
         style={{ backgroundColor: bgColor }}
       >
         <QRCodeSVG
@@ -155,11 +155,12 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
           } : undefined}
         />
       </div>
-      <div className="flex gap-2 mt-4">
+      <div className="flex flex-col sm:flex-row gap-2 mt-4 w-full">
         <Button
           type="button"
           variant="outline"
           onClick={() => handleDownload('png')}
+          className="w-full sm:w-auto py-3 h-12 text-base"
         >
           <Download className="h-4 w-4 mr-2" />
           Download QR Sticker
@@ -168,6 +169,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
           type="button"
           variant="outline"
           onClick={() => handleDownload('svg')}
+          className="w-full sm:w-auto py-3 h-12 text-base"
         >
           <Download className="h-4 w-4 mr-2" />
           Download QR Code
@@ -915,7 +917,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
   };
 
   return (
-    <Card className="max-w-2xl mx-auto w-full p-2 sm:p-6">
+    <Card className="w-full p-2 sm:p-6">
       <CardContent className="pt-4 sm:pt-6">
         <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
           {fromOnboarding && (
@@ -942,7 +944,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     variant="outline"
                     size="sm"
                     onClick={onAllowOtherTypes}
-                    className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0"
+                    className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0 w-full sm:w-auto"
                   >
                     {translations[language].showOtherTypes}
                   </Button>
@@ -950,23 +952,25 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             </div>
           )}
+          
           {/* Basic Information */}
           <div className="space-y-3 sm:space-y-4">
             <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-base">{translations[language].name}</Label>
+              <Label htmlFor="name" className="text-base font-medium">{translations[language].name}</Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={translations[language].myQRCode}
                 required
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-base px-3 py-2"
+                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-base px-4 py-3 h-12"
+                dir={language === 'ar' ? 'rtl' : 'ltr'}
               />
             </div>
             {/* QR Type Selector as Buttons */}
             {!selectedType && user && !fromOnboarding && (
               <div className="mb-2 sm:mb-4">
-                <Label htmlFor="type" className="text-base">Type</Label>
+                <Label htmlFor="type" className="text-base font-medium">Type</Label>
                 <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
                   {/* Show available options based on current limits */}
                   {canCreateMenu && (
@@ -974,7 +978,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant={type === 'menu' ? 'default' : 'outline'}
                       onClick={() => setType('menu')}
-                      className="flex-1 text-base py-3"
+                      className="flex-1 text-base py-4 h-14"
                     >
                       Menu
                     </Button>
@@ -984,7 +988,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant={type === 'products' ? 'default' : 'outline'}
                       onClick={() => setType('products')}
-                      className="flex-1 text-base py-3"
+                      className="flex-1 text-base py-4 h-14"
                     >
                       Products ({currentProductsCount}/10)
                     </Button>
@@ -994,7 +998,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant={type === 'vitrine' ? 'default' : 'outline'}
                       onClick={() => setType('vitrine')}
-                      className="flex-1 text-base py-3"
+                      className="flex-1 text-base py-4 h-14"
                     >
                       Vitrine
                     </Button>
@@ -1009,40 +1013,41 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             )}
             {type === 'direct' && (
-              <div className="space-y-2">
-                <Label htmlFor="directUrl">{translations[language].url}</Label>
+              <div className="space-y-1.5">
+                <Label htmlFor="directUrl" className="text-base font-medium">{translations[language].url}</Label>
                 <Input
                   id="directUrl"
                   type="url"
                   value={directUrl}
                   onChange={(e) => setDirectUrl(e.target.value)}
                   placeholder={translations[language].enterURL}
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-base px-4 py-3 h-12"
                 />
               </div>
             )}
             {(type === 'menu' || selectedType === 'menu') && (
               <div className="space-y-2">
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                  <Label>{translations[language].links}</Label>
+                  <Label className="text-base font-medium">{translations[language].links}</Label>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={addLink}
-                    className="flex items-center gap-2 w-full sm:w-auto"
+                    className="flex items-center gap-2 w-full sm:w-auto py-3 h-12"
                   >
                     <Plus className="h-4 w-4" />
                     {translations[language].addLink}
                   </Button>
                 </div>
-                <div className="space-y-2">
+                <div className="space-y-3">
                   {links.map((link, index) => (
                     <div key={index} className="flex flex-col sm:flex-row gap-2">
                       <Select
                         value={link.type || 'website'}
                         onValueChange={(value) => updateLink(index, 'type', value)}
                       >
-                        <SelectTrigger className="w-full sm:w-[180px]">
+                        <SelectTrigger className="w-full sm:w-[180px] h-12">
                           <SelectValue placeholder={translations[language].selectPlatform} />
                         </SelectTrigger>
                         <SelectContent>
@@ -1064,8 +1069,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         type="url"
                         value={link.url}
                         onChange={(e) => updateLink(index, 'url', e.target.value)}
-                        className="flex-1"
+                        className="flex-1 h-12 px-4 py-3"
                       />
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="icon"
+                        onClick={() => removeLink(index)}
+                        className="h-12 w-12"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
                     </div>
                   ))}
                 </div>
@@ -1075,79 +1089,85 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               <div className="space-y-4">
                 {/* Orderable and COD Form Toggles */}
                 <div className="space-y-3">
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Switch
                       checked={menuOrderable}
                       onCheckedChange={setMenuOrderable}
                       id="orderable-menu-toggle"
                     />
-                    <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle} (Optional)</Label>
+                    <Label htmlFor="orderable-menu-toggle" className="text-base">{translations[language].orderableMenuToggle} (Optional)</Label>
                   </div>
-                  <div className="flex items-center gap-2">
+                  <div className="flex items-center gap-3">
                     <Switch
                       checked={codFormEnabled}
                       onCheckedChange={setCodFormEnabled}
                       id="cod-form-toggle"
                     />
-                    <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle} (Optional)</Label>
+                    <Label htmlFor="cod-form-toggle" className="text-base">{translations[language].codFormToggle} (Optional)</Label>
                   </div>
                 </div>
                 
                 {/* Menu Categories */}
                 <div className="space-y-4">
                   {menuCategories.map((category, categoryIndex) => (
-                    <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
-                      <div className="flex gap-2 items-center">
+                    <div key={categoryIndex} className="space-y-3 border p-4 rounded-lg">
+                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
                         <Input
                           placeholder={translations[language].categoryName}
                           value={category.name}
                           onChange={(e) => updateCategory(categoryIndex, e.target.value)}
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
+                          className="flex-1 h-12 px-4 py-3"
                         />
                         <Button
                           type="button"
                           variant="outline"
                           size="icon"
                           onClick={() => removeCategory(categoryIndex)}
+                          className="h-12 w-12"
                         >
                           <Trash2 className="h-4 w-4" />
                         </Button>
                       </div>
-                      <div className="space-y-2 mt-4">
+                      <div className="space-y-3 mt-4">
                         {category.items.map((item, itemIndex) => {
                           const availKey = `${categoryIndex}-${itemIndex}`;
                           return (
-                            <div key={itemIndex} className="space-y-2 border p-2 rounded">
+                            <div key={itemIndex} className="space-y-3 border p-3 rounded">
                               <Input
                                 placeholder={translations[language].itemName}
                                 value={item.name}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
                                 dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                className="h-12 px-4 py-3"
                               />
                               <Textarea
                                 placeholder={translations[language].description}
                                 value={item.description}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
                                 dir={language === 'ar' ? 'rtl' : 'ltr'}
+                                className="min-h-[80px] px-4 py-3"
                               />
                               <Input
                                 placeholder={translations[language].price}
                                 type="number"
                                 value={item.price}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
+                                className="h-12 px-4 py-3"
                               />
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
+                                className="w-full sm:w-auto py-3 h-12"
                               >
                                 {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
                               </Button>
                               {editingAvailability[availKey] && (
-                                <div className="space-y-2">
-                                  <Label>{translations[language].availability}</Label>
-                                  <div className="grid grid-cols-4 gap-2">
+                                <div className="space-y-3">
+                                  <Label className="text-base font-medium">{translations[language].availability}</Label>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
                                     {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
                                       <div key={day} className="flex items-center space-x-2">
                                         <Checkbox
@@ -1169,7 +1189,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 </div>
                               )}
                               <div className="space-y-2">
-                                <Label>Images</Label>
+                                <Label className="text-base font-medium">Images</Label>
                                 <div className="flex gap-2 flex-wrap mb-2">
                                   {(item.images || []).map((imgUrl, imgIdx) => (
                                     <div key={imgIdx} className="relative group">
@@ -1219,6 +1239,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                       };
                                       input.click();
                                     }}
+                                    className="h-12 px-4 py-3"
                                   >
                                     + Add Image
                                   </Button>
@@ -1226,10 +1247,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               </div>
                               {/* Variants Section */}
                               <div className="space-y-2">
-                                <Label>Variants</Label>
+                                <Label className="text-base font-medium">Variants</Label>
                                 {(item.variants || []).map((variant, variantIdx) => (
-                                  <div key={variantIdx} className="border rounded p-2 mb-2">
-                                    <div className="flex items-center gap-2 mb-2">
+                                  <div key={variantIdx} className="border rounded p-3 mb-2">
+                                    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center mb-2">
                                       <Input
                                         value={variant.name}
                                         onChange={e => {
@@ -1238,7 +1259,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
                                         placeholder="Variant name (e.g. Size, Color)"
-                                        className="flex-1"
+                                        className="flex-1 h-12 px-4 py-3"
                                       />
                                       <Button
                                         type="button"
@@ -1249,14 +1270,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           newVariants.splice(variantIdx, 1);
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
+                                        className="h-12 w-12"
                                       >
                                         <Trash2 className="h-4 w-4" />
                                       </Button>
                                     </div>
                                     {/* Variant Options */}
-                                    <div className="space-y-1 ml-4">
+                                    <div className="space-y-2 ml-4">
                                       {(variant.options || []).map((option, optionIdx) => (
-                                        <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                        <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
                                           <Input
                                             value={option.name}
                                             onChange={e => {
@@ -1265,7 +1287,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
                                             placeholder="Option (e.g. Small, Red)"
-                                            className="flex-1"
+                                            className="flex-1 h-12 px-4 py-3"
                                           />
                                           <Input
                                             type="number"
@@ -1276,7 +1298,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
                                             placeholder="Price adj."
-                                            className="w-24"
+                                            className="w-full sm:w-24 h-12 px-4 py-3"
                                           />
                                           <Button
                                             type="button"
@@ -1287,6 +1309,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               newVariants[variantIdx].options.splice(optionIdx, 1);
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
+                                            className="h-12 w-12"
                                           >
                                             <Trash2 className="h-4 w-4" />
                                           </Button>
@@ -1301,6 +1324,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           newVariants[variantIdx].options.push({ name: '' });
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
+                                        className="w-full sm:w-auto py-3 h-12"
                                       >
                                         + Add Option
                                       </Button>
@@ -1316,6 +1340,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     newVariants.push({ name: '', options: [] });
                                     updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                   }}
+                                  className="w-full sm:w-auto py-3 h-12"
                                 >
                                   + Add Variant
                                 </Button>
@@ -1325,6 +1350,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 variant="outline"
                                 size="sm"
                                 onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                                className="w-full sm:w-auto py-3 h-12"
                               >
                                 <Trash2 className="h-4 w-4 mr-2" />
                                 {translations[language].removeItem}
@@ -1335,7 +1361,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full"
+                          className="w-full py-4 h-14"
                           onClick={() => addMenuItem(categoryIndex)}
                         >
                           <Plus className="h-4 w-4 mr-2" />
@@ -1347,7 +1373,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full py-4 h-14"
                     onClick={addCategory}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -1360,34 +1386,37 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               <div className="space-y-4">
                 {/* Products */}
                 <div className="space-y-4">
-                  <div className="flex justify-between items-center">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">Product Showcase</h3>
                     <p className="text-sm text-gray-600">Add products to your catalog</p>
                   </div>
                   {products.map((product, productIndex) => {
                     return (
-                      <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
+                      <div key={productIndex} className="space-y-3 border p-4 rounded-lg">
                         <Input
                           placeholder={translations[language].itemName}
                           value={product.name}
                           onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
+                          className="h-12 px-4 py-3"
                         />
                         <Textarea
                           placeholder={translations[language].description}
                           value={product.description}
                           onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
+                          className="min-h-[80px] px-4 py-3"
                         />
                         <Input
                           placeholder={translations[language].price}
                           type="number"
                           value={product.price}
                           onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
+                          className="h-12 px-4 py-3"
                         />
                         {/* Hide availability for products - only show for menu */}
                         <div className="space-y-2">
-                          <Label>Images</Label>
+                          <Label className="text-base font-medium">Images</Label>
                           <div className="flex gap-2 flex-wrap mb-2">
                             {(product.images || []).map((imgUrl, imgIdx) => (
                               <div key={imgIdx} className="relative group">
@@ -1437,6 +1466,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 };
                                 input.click();
                               }}
+                              className="h-12 px-4 py-3"
                             >
                               + Add Image
                             </Button>
@@ -1444,10 +1474,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         </div>
                         {/* Variants Section */}
                         <div className="space-y-2">
-                          <Label>Variants</Label>
+                          <Label className="text-base font-medium">Variants</Label>
                           {(product.variants || []).map((variant, variantIdx) => (
-                            <div key={variantIdx} className="border rounded p-2 mb-2">
-                              <div className="flex items-center gap-2 mb-2">
+                            <div key={variantIdx} className="border rounded p-3 mb-2">
+                              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center mb-2">
                                 <Input
                                   value={variant.name}
                                   onChange={e => {
@@ -1456,7 +1486,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     updateProduct(productIndex, 'variants', newVariants);
                                   }}
                                   placeholder="Variant name (e.g. Size, Color)"
-                                  className="flex-1"
+                                  className="flex-1 h-12 px-4 py-3"
                                 />
                                 <Button
                                   type="button"
@@ -1467,14 +1497,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     newVariants.splice(variantIdx, 1);
                                     updateProduct(productIndex, 'variants', newVariants);
                                   }}
+                                  className="h-12 w-12"
                                 >
                                   <Trash2 className="h-4 w-4" />
                                 </Button>
                               </div>
                               {/* Variant Options */}
-                              <div className="space-y-1 ml-4">
+                              <div className="space-y-2 ml-4">
                                 {(variant.options || []).map((option, optionIdx) => (
-                                  <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                  <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
                                     <Input
                                       value={option.name}
                                       onChange={e => {
@@ -1483,7 +1514,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         updateProduct(productIndex, 'variants', newVariants);
                                       }}
                                       placeholder="Option (e.g. Small, Red)"
-                                      className="flex-1"
+                                      className="flex-1 h-12 px-4 py-3"
                                     />
                                     <Input
                                       type="number"
@@ -1494,7 +1525,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         updateProduct(productIndex, 'variants', newVariants);
                                       }}
                                       placeholder="Price adj."
-                                      className="w-24"
+                                      className="w-full sm:w-24 h-12 px-4 py-3"
                                     />
                                     <Button
                                       type="button"
@@ -1505,6 +1536,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         newVariants[variantIdx].options.splice(optionIdx, 1);
                                         updateProduct(productIndex, 'variants', newVariants);
                                       }}
+                                      className="h-12 w-12"
                                     >
                                       <Trash2 className="h-4 w-4" />
                                     </Button>
@@ -1519,6 +1551,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     newVariants[variantIdx].options.push({ name: '' });
                                     updateProduct(productIndex, 'variants', newVariants);
                                   }}
+                                  className="w-full sm:w-auto py-3 h-12"
                                 >
                                   + Add Option
                                 </Button>
@@ -1534,6 +1567,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               newVariants.push({ name: '', options: [] });
                               updateProduct(productIndex, 'variants', newVariants);
                             }}
+                            className="w-full sm:w-auto py-3 h-12"
                           >
                             + Add Variant
                           </Button>
@@ -1543,6 +1577,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                           variant="outline"
                           size="sm"
                           onClick={() => removeProduct(productIndex)}
+                          className="w-full sm:w-auto py-3 h-12"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           {translations[language].removeItem}
@@ -1553,7 +1588,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full"
+                    className="w-full py-4 h-14"
                     onClick={addProduct}
                   >
                     <Plus className="h-4 w-4 mr-2" />
@@ -1565,9 +1600,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             {type === 'vitrine' && (
               <div className="space-y-4">
                 {/* Hero Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
+                <div className="space-y-3 border p-4 rounded-lg">
                   <h3 className="text-lg font-semibold">{translations[language].hero}</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Input
                       placeholder={translations[language].enterBusinessName}
                       value={vitrine.hero.businessName}
@@ -1575,6 +1610,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         hero: { ...vitrine.hero, businessName: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
                       placeholder={translations[language].enterTagline}
@@ -1583,10 +1620,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         hero: { ...vitrine.hero, tagline: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
-                    <div className="space-y-2">
-                      <div className="flex justify-between items-center">
-                        <Label>{translations[language].cta}</Label>
+                    <div className="space-y-3">
+                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                        <Label className="text-base font-medium">{translations[language].cta}</Label>
                         <Button
                           type="button"
                           variant="outline"
@@ -1598,13 +1637,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
                             }
                           })}
+                          className="w-full sm:w-auto py-3 h-12"
                         >
                           <Plus className="h-4 w-4 mr-2" />
                           {translations[language].addCta}
                         </Button>
                       </div>
                       {vitrine.hero.ctas.map((cta, index) => (
-                        <div key={index} className="space-y-2 border p-2 rounded">
+                        <div key={index} className="space-y-3 border p-3 rounded">
                           <Input
                             placeholder={translations[language].enterCtaText}
                             value={cta.text}
@@ -1616,8 +1656,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 hero: { ...vitrine.hero, ctas: newCtas }
                               });
                             }}
+                            className="h-12 px-4 py-3"
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
                           />
-                          <div className="flex gap-2">
+                          <div className="flex flex-col sm:flex-row gap-2">
                             <Select
                               value={cta.type || 'website'}
                               onValueChange={(value) => {
@@ -1629,7 +1671,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 });
                               }}
                             >
-                              <SelectTrigger className="w-[180px]">
+                              <SelectTrigger className="w-full sm:w-[180px] h-12">
                                 <SelectValue placeholder={translations[language].selectPlatform} />
                               </SelectTrigger>
                               <SelectContent>
@@ -1657,6 +1699,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   hero: { ...vitrine.hero, ctas: newCtas }
                                 });
                               }}
+                              className="flex-1 h-12 px-4 py-3"
                             />
                             <Button
                               type="button"
@@ -1669,6 +1712,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   hero: { ...vitrine.hero, ctas: newCtas }
                                 });
                               }}
+                              className="h-12 w-12"
                             >
                               <Trash2 className="h-4 w-4" />
                             </Button>
@@ -1680,9 +1724,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* About Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
+                <div className="space-y-3 border p-4 rounded-lg">
                   <h3 className="text-lg font-semibold">{translations[language].about}</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Textarea
                       placeholder={translations[language].enterDescription}
                       value={vitrine.about.description}
@@ -1690,6 +1734,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         about: { ...vitrine.about, description: e.target.value }
                       })}
+                      className="min-h-[80px] px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
                       placeholder={translations[language].enterCity}
@@ -1698,13 +1744,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         about: { ...vitrine.about, city: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 {/* Services Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
+                <div className="space-y-3 border p-4 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">{translations[language].services}</h3>
                     <Button
                       type="button"
@@ -1714,6 +1762,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         services: [...vitrine.services, { name: '', description: '', images: [], title: '', imageDescription: '' }]
                       })}
+                      className="w-full sm:w-auto py-3 h-12"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       {translations[language].addService}
@@ -1721,7 +1770,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                   <div className="space-y-4">
                     {vitrine.services.map((service, index) => (
-                      <div key={index} className="space-y-2 border p-2 rounded">
+                      <div key={index} className="space-y-3 border p-3 rounded">
                         <Input
                           placeholder={translations[language].enterServiceName}
                           value={service.name}
@@ -1730,6 +1779,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, name: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
+                          className="h-12 px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Textarea
                           placeholder={translations[language].enterServiceDescription}
@@ -1739,6 +1790,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, description: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
+                          className="min-h-[80px] px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
                           placeholder={translations[language].enterImageTitle}
@@ -1748,6 +1801,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, title: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
+                          className="h-12 px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Textarea
                           placeholder={translations[language].enterImageDescription}
@@ -1757,41 +1812,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, imageDescription: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
+                          className="min-h-[80px] px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <div className="flex items-center gap-4">
                           {service.images.length > 0 && (
-                            <div className="relative w-24 h-24">
-                              <img
-                                src={service.images[0]}
-                                alt={service.name}
-                                className="w-full h-full object-cover rounded"
-                                onError={(e) => {
-                                  const target = e.target as HTMLImageElement;
-                                  target.onerror = null;
-                                  target.src = 'https://via.placeholder.com/144?text=No+Image';
-                                }}
-                              />
-                              <Button
-                                type="button"
-                                variant="destructive"
-                                size="icon"
-                                className="absolute -top-2 -right-2 h-6 w-6 rounded-full"
-                                onClick={() => {
-                                  const newServices = [...vitrine.services];
-                                  newServices[index] = { ...service, images: [] };
-                                  setVitrine({ ...vitrine, services: newServices });
-                                  // Remove from tempImages if exists
-                                  const key = `service-${index}`;
-                                  if (tempImages[key]) {
-                                    const newTempImages = { ...tempImages };
-                                    delete newTempImages[key];
-                                    setTempImages(newTempImages);
-                                  }
-                                }}
-                              >
-                                <Trash2 className="h-3 w-3" />
-                              </Button>
-                            </div>
+                            <img src={service.images[0]} alt={service.name} className="w-16 h-16 object-cover rounded" />
                           )}
                           <Button
                             type="button"
@@ -1814,6 +1840,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               };
                               input.click();
                             }}
+                            className="py-3 h-12"
                           >
                             <Upload className="h-4 w-4 mr-2" />
                             {service.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
@@ -1834,6 +1861,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               setTempImages(newTempImages);
                             }
                           }}
+                          className="w-full sm:w-auto py-3 h-12"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           {translations[language].removeService}
@@ -1844,8 +1872,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Gallery Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
+                <div className="space-y-3 border p-4 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">{translations[language].gallery}</h3>
                     <Button
                       type="button"
@@ -1855,6 +1883,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         gallery: [...vitrine.gallery, { images: [], title: '', description: '' }]
                       })}
+                      className="w-full sm:w-auto py-3 h-12"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       {translations[language].addImage}
@@ -1862,7 +1891,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                   <div className="space-y-4">
                     {vitrine.gallery.map((item, index) => (
-                      <div key={index} className="space-y-2 border p-2 rounded">
+                      <div key={index} className="space-y-3 border p-3 rounded">
                         <Input
                           placeholder={translations[language].enterImageTitle}
                           value={item.title}
@@ -1871,6 +1900,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newGallery[index] = { ...item, title: e.target.value };
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
+                          className="h-12 px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Textarea
                           placeholder={translations[language].enterImageDescription}
@@ -1880,6 +1911,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newGallery[index] = { ...item, description: e.target.value };
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
+                          className="min-h-[80px] px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <div className="flex items-center gap-4">
                           {item.images.length > 0 && (
@@ -1906,6 +1939,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               };
                               input.click();
                             }}
+                            className="py-3 h-12"
                           >
                             <Upload className="h-4 w-4 mr-2" />
                             {item.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
@@ -1919,6 +1953,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             const newGallery = vitrine.gallery.filter((_, i) => i !== index);
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
+                          className="w-full sm:w-auto py-3 h-12"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           {translations[language].removeImage}
@@ -1929,8 +1964,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Testimonials Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
-                  <div className="flex justify-between items-center">
+                <div className="space-y-3 border p-4 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">{translations[language].testimonials}</h3>
                     <Button
                       type="button"
@@ -1940,6 +1975,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         testimonials: [...vitrine.testimonials, { text: '', author: '', city: '' }]
                       })}
+                      className="w-full sm:w-auto py-3 h-12"
                     >
                       <Plus className="h-4 w-4 mr-2" />
                       {translations[language].addTestimonial}
@@ -1947,7 +1983,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                   <div className="space-y-4">
                     {vitrine.testimonials.map((testimonial, index) => (
-                      <div key={index} className="space-y-2 border p-2 rounded">
+                      <div key={index} className="space-y-3 border p-3 rounded">
                         <Textarea
                           placeholder={translations[language].enterTestimonialText}
                           value={testimonial.text}
@@ -1956,6 +1992,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, text: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
+                          className="min-h-[80px] px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
                           placeholder={translations[language].enterAuthor}
@@ -1965,6 +2003,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, author: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
+                          className="h-12 px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
                           placeholder={translations[language].enterCity}
@@ -1974,6 +2014,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, city: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
+                          className="h-12 px-4 py-3"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Button
                           type="button"
@@ -1983,6 +2025,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             const newTestimonials = vitrine.testimonials.filter((_, i) => i !== index);
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
+                          className="w-full sm:w-auto py-3 h-12"
                         >
                           <Trash2 className="h-4 w-4 mr-2" />
                           {translations[language].removeTestimonial}
@@ -1993,9 +2036,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Contact Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
+                <div className="space-y-3 border p-4 rounded-lg">
                   <h3 className="text-lg font-semibold">{translations[language].contact}</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Input
                       placeholder={translations[language].enterAddress}
                       value={vitrine.contact.address}
@@ -2003,6 +2046,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, address: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
                       placeholder={translations[language].enterPhone}
@@ -2011,6 +2056,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, phone: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
                       placeholder={translations[language].enterEmail}
@@ -2020,14 +2067,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, email: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 {/* Footer Section */}
-                <div className="space-y-2 border p-4 rounded-lg">
+                <div className="space-y-3 border p-4 rounded-lg">
                   <h3 className="text-lg font-semibold">{translations[language].footer}</h3>
-                  <div className="space-y-2">
+                  <div className="space-y-3">
                     <Input
                       placeholder={translations[language].enterBusinessName}
                       value={vitrine.footer.businessName}
@@ -2035,6 +2084,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         footer: { ...vitrine.footer, businessName: e.target.value }
                       })}
+                      className="h-12 px-4 py-3"
+                      dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
@@ -2055,11 +2106,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               type="button"
               variant="outline"
               onClick={() => setShowBrandingSettings(!showBrandingSettings)}
-              className="w-full flex items-center justify-between"
+              className="w-full flex items-center justify-between py-4 h-14"
             >
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
-                <span>Branding & Appearance</span>
+                <span className="text-base">Branding & Appearance</span>
               </div>
               {showBrandingSettings ? (
                 <ChevronUp className="h-4 w-4" />
@@ -2075,8 +2126,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               <div className="space-y-4">
                 {/* Logo Upload */}
                 <div className="space-y-2">
-                  <Label>{translations[language].logo}</Label>
-                  <div className="flex items-center gap-4">
+                  <Label className="text-base font-medium">{translations[language].logo}</Label>
+                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
                     {logoPreview && (
                       <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
                     )}
@@ -2084,12 +2135,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant="outline"
                       onClick={() => fileInputRef.current?.click()}
+                      className="w-full sm:w-auto py-3 h-12"
                     >
                       <Upload className="h-4 w-4 mr-2" />
                       {logoPreview ? 'Change Logo' : 'Upload Logo'}
                     </Button>
                     {logoPreview && (
-                      <Button type="button" variant="destructive" size="icon" onClick={removeLogo}>
+                      <Button type="button" variant="destructive" size="icon" onClick={removeLogo} className="h-12 w-12">
                         <X className="h-4 w-4" />
                       </Button>
                     )}
@@ -2105,37 +2157,37 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 
                 {/* QR Code Colors */}
                 <div className="space-y-2">
-                  <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
-                  <div className="flex gap-2">
+                  <Label htmlFor="foregroundColor" className="text-base font-medium">{translations[language].foregroundColor}</Label>
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="foregroundColor"
                       type="color"
                       value={foregroundColor}
                       onChange={(e) => setForegroundColor(e.target.value)}
-                      className="w-20"
+                      className="w-full sm:w-20 h-12"
                     />
                     <Input
                       value={foregroundColor}
                       onChange={(e) => setForegroundColor(e.target.value)}
-                      className="flex-1"
+                      className="flex-1 h-12 px-4 py-3"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
-                  <div className="flex gap-2">
+                  <Label htmlFor="backgroundColor" className="text-base font-medium">{translations[language].backgroundColor}</Label>
+                  <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="backgroundColor"
                       type="color"
                       value={backgroundColor}
                       onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="w-20"
+                      className="w-full sm:w-20 h-12"
                     />
                     <Input
                       value={backgroundColor}
                       onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="flex-1"
+                      className="flex-1 h-12 px-4 py-3"
                     />
                   </div>
                 </div>
@@ -2146,61 +2198,61 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   
                   <div className="space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="primaryColor">Primary Color</Label>
-                      <div className="flex gap-2">
+                      <Label htmlFor="primaryColor" className="text-base font-medium">Primary Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="primaryColor"
                           type="color"
                           value={primaryColor}
                           onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="w-20"
+                          className="w-full sm:w-20 h-12"
                         />
                         <Input
                           value={primaryColor}
                           onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="flex-1"
+                          className="flex-1 h-12 px-4 py-3"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
-                      <div className="flex gap-2">
+                      <Label htmlFor="primaryHoverColor" className="text-base font-medium">Primary Hover Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="primaryHoverColor"
                           type="color"
                           value={primaryHoverColor}
                           onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="w-20"
+                          className="w-full sm:w-20 h-12"
                         />
                         <Input
                           value={primaryHoverColor}
                           onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="flex-1"
+                          className="flex-1 h-12 px-4 py-3"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="accentColor">Accent Color</Label>
-                      <div className="flex gap-2">
+                      <Label htmlFor="accentColor" className="text-base font-medium">Accent Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="accentColor"
                           type="color"
                           value={accentColor}
                           onChange={(e) => setAccentColor(e.target.value)}
-                          className="w-20"
+                          className="w-full sm:w-20 h-12"
                         />
                         <Input
                           value={accentColor}
                           onChange={(e) => setAccentColor(e.target.value)}
-                          className="flex-1"
+                          className="flex-1 h-12 px-4 py-3"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label>Background Gradient</Label>
+                      <Label className="text-base font-medium">Background Gradient</Label>
                       <div className="p-3 bg-gray-50 rounded-md border">
                         <p className="text-sm text-gray-600 mb-2">
                           The background gradient is automatically generated based on your Primary and Accent colors.
@@ -2215,30 +2267,31 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
-                      <div className="flex gap-2">
+                      <Label htmlFor="loadingSpinnerColor" className="text-base font-medium">Loading Spinner Color</Label>
+                      <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="loadingSpinnerColor"
                           type="color"
                           value={loadingSpinnerColor}
                           onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                          className="w-20"
+                          className="w-full sm:w-20 h-12"
                         />
                         <Input
                           value={loadingSpinnerColor}
                           onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                          className="flex-1"
+                          className="flex-1 h-12 px-4 py-3"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                      <Label htmlFor="loadingSpinnerBorderColor" className="text-base font-medium">Loading Spinner Border Color</Label>
                       <Input
                         id="loadingSpinnerBorderColor"
                         value={loadingSpinnerBorderColor}
                         onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
                         placeholder="rgba(139, 92, 246, 0.2)"
+                        className="h-12 px-4 py-3"
                       />
                     </div>
                   </div>
@@ -2249,7 +2302,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2">
             <Button 
               type="submit" 
-              className="w-full sm:w-auto text-base py-3"
+              className="w-full sm:w-auto text-base py-4 h-14"
               disabled={isLoading || (!canCreateMenu && !canCreateProducts && !canCreateVitrine)}
             >
               {isLoading ? translations[language].creating : translations[language].createQRCode}
