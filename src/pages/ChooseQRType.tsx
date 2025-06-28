@@ -19,7 +19,7 @@ import {
 
 const translations = {
   en: {
-    welcome: "Welcome to QuickQR!",
+    welcome: "Welcome to QrCreator!",
     chooseBusinessType: "What type of business do you want to create?",
     freeTrial: "Free Trial",
     businessPlan: "Business Plan",
@@ -45,7 +45,7 @@ const translations = {
     skip: "Skip and go to dashboard"
   },
   ar: {
-    welcome: "مرحباً بك في QuickQR!",
+    welcome: "مرحباً بك في QrCreator!",
     chooseBusinessType: "ما نوع العمل الذي تريد إنشاءه؟",
     freeTrial: "تجربة مجانية",
     businessPlan: "خطة تجارية",

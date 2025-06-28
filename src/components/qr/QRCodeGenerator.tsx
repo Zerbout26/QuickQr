@@ -1376,7 +1376,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     <p className="text-sm text-gray-600">Add products to your catalog</p>
                   </div>
                   {products.map((product, productIndex) => {
-                    const availKey = `product-${productIndex}`;
                     return (
                       <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
                         <Input
@@ -1397,38 +1396,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                           value={product.price}
                           onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
                         />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
-                        >
-                          {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
-                        </Button>
-                        {editingAvailability[availKey] && (
-                          <div className="space-y-2">
-                            <Label>{translations[language].availability}</Label>
-                            <div className="grid grid-cols-4 gap-2">
-                              {Object.entries(product.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                <div key={day} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`product-${productIndex}-${day}`}
-                                    checked={isAvailable}
-                                    onCheckedChange={(checked) => 
-                                      handleProductAvailabilityChange(productIndex, day, checked === true)
-                                    }
-                                  />
-                                  <label
-                                    htmlFor={`product-${productIndex}-${day}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {translations[language].days[day as keyof typeof translations.en.days]}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                        )}
+                        {/* Hide availability for products - only show for menu */}
                         <div className="space-y-2">
                           <Label>Images</Label>
                           <div className="flex gap-2 flex-wrap mb-2">
