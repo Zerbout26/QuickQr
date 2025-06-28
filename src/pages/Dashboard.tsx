@@ -980,14 +980,12 @@ const Dashboard = () => {
           
           {/* QR Code Creation Tab */}
           <TabsContent value="create" className="py-4 sm:py-8 px-1">
-            <div className="algerian-card p-4 sm:p-6 animate-fade-in">
-              <QRCodeGenerator 
-                selectedType={selectedType} 
-                onCreated={handleQRCreated} 
-                fromOnboarding={fromOnboarding || showOnboarding}
-                onAllowOtherTypes={allowOtherTypes}
-              />
-            </div>
+            <QRCodeGenerator 
+              selectedType={selectedType} 
+              onCreated={handleQRCreated} 
+              fromOnboarding={fromOnboarding || showOnboarding}
+              onAllowOtherTypes={allowOtherTypes}
+            />
           </TabsContent>
           
           {/* QR Code Management Tab */}
