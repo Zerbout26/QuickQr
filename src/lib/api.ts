@@ -511,6 +511,16 @@ export const adminApi = {
     return response.data;
   },
 
+  getUserQRCodes: async (userId: string, page = 1, limit = 100): Promise<{ data: QRCode[], totalPages: number, total: number }> => {
+    const response = await api.get(`/admin/users/${userId}/qrcodes`, { params: { page, limit } });
+    return response.data;
+  },
+
+  deleteUser: async (userId: string): Promise<{ message: string; deletedUser: { id: string; email: string; qrCodesCount: number } }> => {
+    const response = await api.delete(`/admin/users/${userId}`);
+    return response.data;
+  },
+
   updateUserStatus: async (userId: string, isActive: boolean): Promise<User> => {
     const response = await api.patch(`/users/admin/users/${userId}/status`, { isActive });
     return response.data;
