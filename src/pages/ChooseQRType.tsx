@@ -173,123 +173,141 @@ const ChooseQRType = () => {
 
   return (
     <MainLayout>
-      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white py-12 px-4">
-        <div className="max-w-4xl mx-auto">
-          {/* Header */}
-          <div className="text-center mb-12">
-            <div className="flex items-center justify-center mb-4">
-              <Sparkles className="w-8 h-8 text-primary mr-3" />
-              <h1 className="text-4xl font-bold text-gray-900">{t.welcome}</h1>
-            </div>
-            <p className="text-xl text-gray-600 mb-6">{t.chooseBusinessType}</p>
-            
-            {/* Plan Badge */}
-            <div className="inline-flex items-center gap-2 mb-8">
-              {isPaidUser ? (
-                <Badge className="bg-green-100 text-green-800 border-green-200 px-4 py-2">
-                  <Crown className="w-4 h-4 mr-2" />
-                  {t.businessPlan} - {t.unlimitedAccess}
-                </Badge>
-              ) : (
-                <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-4 py-2">
-                  <Calendar className="w-4 h-4 mr-2" />
-                  {t.freeTrial} - {trialDays} {t.daysLeft}
-                </Badge>
-              )}
-            </div>
-          </div>
-
-          {/* Business Type Cards */}
-          <div className="grid md:grid-cols-3 gap-6 mb-12">
-            {businessTypes.map((type) => {
-              const IconComponent = type.icon;
-              const isSelected = selectedType === type.id;
+      <div className="min-h-screen bg-gradient-to-br from-gray-50 to-white flex flex-col">
+        <div className="flex-1 py-6 sm:py-12 px-4 sm:px-6">
+          <div className="max-w-4xl mx-auto">
+            {/* Header */}
+            <div className="text-center mb-8 sm:mb-12">
+              <div className="flex items-center justify-center mb-4">
+                <Sparkles className="w-6 h-6 sm:w-8 sm:h-8 text-primary mr-2 sm:mr-3" />
+                <h1 className="text-2xl sm:text-4xl font-bold text-gray-900">{t.welcome}</h1>
+              </div>
+              <p className="text-lg sm:text-xl text-gray-600 mb-4 sm:mb-6 px-4">{t.chooseBusinessType}</p>
               
-              return (
-                <Card 
-                  key={type.id}
-                  className={`cursor-pointer transition-all duration-300 hover:shadow-lg border-2 ${
-                    isSelected 
-                      ? 'border-primary shadow-lg scale-105' 
-                      : 'border-gray-200 hover:border-gray-300'
-                  }`}
-                  onClick={() => setSelectedType(type.id)}
-                >
-                  <CardHeader className="text-center pb-4">
-                    <div className="flex items-center justify-center mb-4">
-                      <div className={`p-3 rounded-full ${type.color} text-white`}>
-                        <IconComponent className="w-8 h-8" />
+              {/* Plan Badge */}
+              <div className="inline-flex items-center gap-2 mb-6 sm:mb-8">
+                {isPaidUser ? (
+                  <Badge className="bg-green-100 text-green-800 border-green-200 px-3 py-1 sm:px-4 sm:py-2 text-sm">
+                    <Crown className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    {t.businessPlan} - {t.unlimitedAccess}
+                  </Badge>
+                ) : (
+                  <Badge className="bg-blue-100 text-blue-800 border-blue-200 px-3 py-1 sm:px-4 sm:py-2 text-sm">
+                    <Calendar className="w-3 h-3 sm:w-4 sm:h-4 mr-1 sm:mr-2" />
+                    {t.freeTrial} - {trialDays} {t.daysLeft}
+                  </Badge>
+                )}
+              </div>
+            </div>
+
+            {/* Business Type Cards */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 mb-20 sm:mb-24">
+              {businessTypes.map((type) => {
+                const IconComponent = type.icon;
+                const isSelected = selectedType === type.id;
+                
+                return (
+                  <Card 
+                    key={type.id}
+                    className={`cursor-pointer transition-all duration-300 hover:shadow-lg border-2 ${
+                      isSelected 
+                        ? 'border-primary shadow-lg scale-105' 
+                        : 'border-gray-200 hover:border-gray-300'
+                    }`}
+                    onClick={() => setSelectedType(type.id)}
+                  >
+                    <CardHeader className="text-center pb-3 sm:pb-4">
+                      <div className="flex items-center justify-center mb-3 sm:mb-4">
+                        <div className={`p-2 sm:p-3 rounded-full ${type.color} text-white`}>
+                          <IconComponent className="w-6 h-6 sm:w-8 sm:h-8" />
+                        </div>
                       </div>
-                    </div>
-                    <CardTitle className="text-xl font-bold">
-                      {type.name[language]}
-                      {type.recommended && (
-                        <Badge className="ml-2 bg-primary text-white text-xs">
-                          {t.recommended}
-                        </Badge>
-                      )}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className="text-center">
-                    <p className="text-gray-600 mb-4 leading-relaxed">
-                      {type.description[language]}
-                    </p>
-                    
-                    <div className="space-y-3">
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-2">{t.perfectFor}:</p>
-                        <div className="flex flex-wrap gap-1 justify-center">
-                          {type.perfectFor[language].map((item, index) => (
-                            <Badge key={index} variant="outline" className="text-xs">
-                              {item}
-                            </Badge>
-                          ))}
+                      <CardTitle className="text-lg sm:text-xl font-bold">
+                        {type.name[language]}
+                        {type.recommended && (
+                          <Badge className="ml-2 bg-primary text-white text-xs">
+                            {t.recommended}
+                          </Badge>
+                        )}
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent className="text-center px-3 sm:px-6">
+                      <p className="text-gray-600 mb-4 leading-relaxed text-sm sm:text-base">
+                        {type.description[language]}
+                      </p>
+                      
+                      <div className="space-y-3">
+                        <div>
+                          <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">{t.perfectFor}:</p>
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {type.perfectFor[language].slice(0, 3).map((item, index) => (
+                              <Badge key={index} variant="outline" className="text-xs">
+                                {item}
+                              </Badge>
+                            ))}
+                            {type.perfectFor[language].length > 3 && (
+                              <Badge variant="outline" className="text-xs">
+                                +{type.perfectFor[language].length - 3}
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                        
+                        <div>
+                          <p className="text-xs sm:text-sm font-medium text-gray-700 mb-2">
+                            {language === 'ar' ? 'الميزات:' : 'Features:'}
+                          </p>
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {type.features[language].slice(0, 3).map((feature, index) => (
+                              <Badge key={index} variant="secondary" className="text-xs bg-gray-100">
+                                {feature}
+                              </Badge>
+                            ))}
+                            {type.features[language].length > 3 && (
+                              <Badge variant="secondary" className="text-xs bg-gray-100">
+                                +{type.features[language].length - 3}
+                              </Badge>
+                            )}
+                          </div>
                         </div>
                       </div>
                       
-                      <div>
-                        <p className="text-sm font-medium text-gray-700 mb-2">
-                          {language === 'ar' ? 'الميزات:' : 'Features:'}
-                        </p>
-                        <div className="flex flex-wrap gap-1 justify-center">
-                          {type.features[language].map((feature, index) => (
-                            <Badge key={index} variant="secondary" className="text-xs bg-gray-100">
-                              {feature}
-                            </Badge>
-                          ))}
+                      {isSelected && (
+                        <div className="mt-4 flex items-center justify-center text-primary">
+                          <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 mr-2" />
+                          <span className="font-medium text-sm sm:text-base">
+                            {language === 'ar' ? 'محدد' : 'Selected'}
+                          </span>
                         </div>
-                      </div>
-                    </div>
-                    
-                    {isSelected && (
-                      <div className="mt-4 flex items-center justify-center text-primary">
-                        <CheckCircle className="w-5 h-5 mr-2" />
-                        <span className="font-medium">Selected</span>
-                      </div>
-                    )}
-                  </CardContent>
-                </Card>
-              );
-            })}
+                      )}
+                    </CardContent>
+                  </Card>
+                );
+              })}
+            </div>
           </div>
+        </div>
 
-          {/* Action Buttons */}
-          <div className="flex justify-center gap-4">
-            <Button 
-              variant="outline" 
-              onClick={() => navigate('/dashboard')}
-              className="px-8 py-3"
-            >
-              {t.skip}
-            </Button>
-            <Button 
-              onClick={handleContinue}
-              disabled={!selectedType}
-              className="px-8 py-3 bg-primary hover:bg-primary/90"
-            >
-              {t.continue}
-              <ArrowRight className="w-4 h-4 ml-2" />
-            </Button>
+        {/* Fixed Action Buttons - Always Visible */}
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-4 sm:py-6 z-50">
+          <div className="max-w-4xl mx-auto">
+            <div className="flex flex-col sm:flex-row justify-center gap-3 sm:gap-4">
+              <Button 
+                variant="outline" 
+                onClick={() => navigate('/dashboard')}
+                className="flex-1 sm:flex-none px-6 py-3 sm:px-8 sm:py-3 text-sm sm:text-base"
+              >
+                {t.skip}
+              </Button>
+              <Button 
+                onClick={handleContinue}
+                disabled={!selectedType}
+                className="flex-1 sm:flex-none px-6 py-3 sm:px-8 sm:py-3 bg-primary hover:bg-primary/90 text-sm sm:text-base"
+              >
+                {t.continue}
+                <ArrowRight className="w-4 h-4 ml-2" />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

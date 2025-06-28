@@ -78,66 +78,78 @@ const SignInForm = () => {
   };
 
   return (
-    <Card className="w-full max-w-md mx-auto">
-      <CardHeader>
-          <CardTitle>{translations[language].signIn}</CardTitle>
-        <CardDescription>
-          {translations[language].enterCredentials}
-        </CardDescription>
-      </CardHeader>
-      <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-4">
-          {error && (
-            <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-2 rounded-md text-sm">
-              {error}
-            </div>
-          )}
-          <div className="space-y-2">
-            <Label htmlFor="email">{translations[language].email}</Label>
-            <Input 
-              id="email"
-              type="email" 
-              placeholder={translations[language].emailPlaceholder}
-              value={email} 
-              onChange={(e) => setEmail(e.target.value)}
-              required
-              dir={language === 'ar' ? 'rtl' : 'ltr'}
-            />
-          </div>
-          <div className="space-y-2">
-            <Label htmlFor="password">{translations[language].password}</Label>
-            <Input 
-              id="password"
-              type="password" 
-              value={password} 
-              onChange={(e) => setPassword(e.target.value)}
-              required
-              dir={language === 'ar' ? 'rtl' : 'ltr'}
-            />
-            <div className="text-right">
-              <Link to="/forgot-password" className="text-sm text-qr-secondary hover:underline">
-                {translations[language].forgotPassword}
-              </Link>
-            </div>
-          </div>
-        </CardContent>
-        <CardFooter className="flex flex-col">
-          <Button 
-            type="submit" 
-            className="w-full qr-btn-primary" 
-            disabled={isLoading}
-          >
-            {isLoading ? translations[language].signingIn : translations[language].signInButton}
-          </Button>
-          <div className="text-center mt-4 text-sm text-gray-500">
-            {translations[language].noAccount}{' '}
-            <Link to="/signup" className="text-qr-secondary font-medium hover:underline">
-              {translations[language].signUp}
-            </Link>
-          </div>
-        </CardFooter>
-      </form>
-    </Card>
+    <div className="min-h-screen flex items-center justify-center px-4 py-6 sm:px-6 lg:px-8">
+      <div className="w-full max-w-sm sm:max-w-md">
+        <Card className="w-full shadow-lg border-0 sm:border">
+          <CardHeader className="text-center pb-6">
+            <CardTitle className="text-2xl sm:text-3xl font-bold text-gray-900">
+              {translations[language].signIn}
+            </CardTitle>
+            <CardDescription className="text-sm sm:text-base text-gray-600 mt-2">
+              {translations[language].enterCredentials}
+            </CardDescription>
+          </CardHeader>
+          <form onSubmit={handleSubmit}>
+            <CardContent className="space-y-6 px-6 sm:px-8">
+              {error && (
+                <div className="bg-destructive/10 border border-destructive/20 text-destructive px-4 py-3 rounded-lg text-sm">
+                  {error}
+                </div>
+              )}
+              <div className="space-y-3">
+                <Label htmlFor="email" className="text-sm font-medium text-gray-700">
+                  {translations[language].email}
+                </Label>
+                <Input 
+                  id="email"
+                  type="email" 
+                  placeholder={translations[language].emailPlaceholder}
+                  value={email} 
+                  onChange={(e) => setEmail(e.target.value)}
+                  required
+                  dir={language === 'ar' ? 'rtl' : 'ltr'}
+                  className="h-12 text-base border-gray-300 focus:border-primary focus:ring-primary"
+                />
+              </div>
+              <div className="space-y-3">
+                <Label htmlFor="password" className="text-sm font-medium text-gray-700">
+                  {translations[language].password}
+                </Label>
+                <Input 
+                  id="password"
+                  type="password" 
+                  value={password} 
+                  onChange={(e) => setPassword(e.target.value)}
+                  required
+                  dir={language === 'ar' ? 'rtl' : 'ltr'}
+                  className="h-12 text-base border-gray-300 focus:border-primary focus:ring-primary"
+                />
+                <div className="text-right">
+                  <Link to="/forgot-password" className="text-sm text-qr-secondary hover:underline">
+                    {translations[language].forgotPassword}
+                  </Link>
+                </div>
+              </div>
+            </CardContent>
+            <CardFooter className="flex flex-col px-6 sm:px-8 pb-6 sm:pb-8">
+              <Button 
+                type="submit" 
+                className="w-full h-12 text-base font-medium qr-btn-primary" 
+                disabled={isLoading}
+              >
+                {isLoading ? translations[language].signingIn : translations[language].signInButton}
+              </Button>
+              <div className="text-center mt-6 text-sm text-gray-500">
+                {translations[language].noAccount}{' '}
+                <Link to="/signup" className="text-qr-secondary font-medium hover:underline">
+                  {translations[language].signUp}
+                </Link>
+              </div>
+            </CardFooter>
+          </form>
+        </Card>
+      </div>
+    </div>
   );
 };
 

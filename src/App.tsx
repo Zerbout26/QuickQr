@@ -51,16 +51,12 @@ const App = () => (
               } />
               <Route path="/signin" element={
                 <MainLayout>
-                  <div className="container mx-auto px-4 py-12">
-                    <SignInForm />
-                  </div>
+                  <SignInForm />
                 </MainLayout>
               } />
               <Route path="/signup" element={
                 <MainLayout>
-                  <div className="container mx-auto px-4 py-12">
-                    <SignUpForm />
-                  </div>
+                  <SignUpForm />
                 </MainLayout>
               } />
               <Route path="/forgot-password" element={
