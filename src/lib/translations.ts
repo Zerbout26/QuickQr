@@ -156,7 +156,7 @@ export const translations = {
     menu: 'قائمة',
     both: 'قائمة',
     direct: 'رابط مباشر',
-    vitrine: 'فيتري',
+    vitrine: 'فيترين',
     enterUrl: 'أدخل الرابط',
     enterDirectUrl: 'أدخل الرابط المباشر',
     addLink: 'إضافة رابط',

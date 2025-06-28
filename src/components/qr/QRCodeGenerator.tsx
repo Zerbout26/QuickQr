@@ -36,105 +36,11 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
   bgColor: string; 
   logoUrl?: string;
 }) => {
-  const qrRef = useRef<HTMLDivElement>(null);
-
-  const handleDownload = async (format: 'png' | 'svg') => {
-    if (!qrRef.current) return;
-
-    try {
-      const svgString = renderToStaticMarkup(
-        <QRCodeSVG
-          value={url}
-          size={284}
-          bgColor={bgColor}
-          fgColor={color}
-          level="H"
-          includeMargin={true}
-          imageSettings={logoUrl ? {
-            src: logoUrl,
-            x: undefined,
-            y: undefined,
-            height: 56,
-            width: 56,
-            excavate: true,
-          } : undefined}
-        />
-      );
-
-      if (format === 'svg') {
-        const blob = new Blob([svgString], { type: 'image/svg+xml' });
-        const downloadUrl = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = downloadUrl;
-        a.download = `qr-code.svg`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(downloadUrl);
-      } else { // PNG
-        const canvas = document.createElement('canvas');
-        canvas.width = 300;
-        canvas.height = 300;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) return;
-        
-        ctx.fillStyle = bgColor;
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        const img = new Image();
-        
-        const svgBlob = new Blob([svgString], {type: 'image/svg+xml;charset=utf-8'});
-        const imgUrl = URL.createObjectURL(svgBlob);
-        
-        await new Promise<void>((resolve, reject) => {
-            img.onload = () => {
-                const x = (canvas.width - img.width) / 2;
-                const y = (canvas.height - img.height) / 2;
-                ctx.drawImage(img, x, y);
-                URL.revokeObjectURL(imgUrl);
-                resolve();
-            };
-            img.onerror = (err) => {
-                console.error("Failed to load SVG image for canvas drawing", err);
-                URL.revokeObjectURL(imgUrl);
-                reject(new Error("Failed to load SVG image for canvas drawing"));
-            };
-            img.src = imgUrl;
-        });
-
-        canvas.toBlob((blob) => {
-          if (!blob) return;
-          const downloadUrl = URL.createObjectURL(blob);
-          const a = document.createElement('a');
-          a.href = downloadUrl;
-          a.download = `qr-code.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-          URL.revokeObjectURL(downloadUrl);
-        }, 'image/png', 1.0);
-      }
-
-      toast({
-        title: "Success",
-        description: `QR code downloaded as ${format.toUpperCase()}`,
-      });
-    } catch (error) {
-      console.error('Error downloading QR code:', error);
-      toast({
-        variant: "destructive",
-        title: "Error",
-        description: "Failed to download QR code",
-      });
-    }
-  };
-
   if (!url) return null;
   
   return (
     <div className="flex flex-col items-center mb-4">
       <div 
-        ref={qrRef}
         className="w-48 h-48 sm:w-64 sm:h-64 flex items-center justify-center border rounded-md p-2" 
         style={{ backgroundColor: bgColor }}
       >
@@ -154,26 +60,6 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
             excavate: true,
           } : undefined}
         />
-      </div>
-      <div className="flex flex-col sm:flex-row gap-2 mt-4 w-full">
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => handleDownload('png')}
-          className="w-full sm:w-auto py-3 h-12 text-base"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Download QR Sticker
-        </Button>
-        <Button
-          type="button"
-          variant="outline"
-          onClick={() => handleDownload('svg')}
-          className="w-full sm:w-auto py-3 h-12 text-base"
-        >
-          <Download className="h-4 w-4 mr-2" />
-          Download QR Code
-        </Button>
       </div>
     </div>
   );
@@ -250,6 +136,8 @@ const translations = {
     enterImageTitle: 'Enter Image Title',
     enterImageDescription: 'Enter Image Description',
     removeImage: 'Remove Image',
+    addVariant: 'Add Variant',
+    addOption: 'Add Option',
     addTestimonial: 'Add Testimonial',
     enterTestimonialText: 'Enter Testimonial Text',
     enterAuthor: 'Enter Author',
@@ -355,6 +243,8 @@ const translations = {
     enterImageTitle: 'أدخل عنوان الصورة',
     enterImageDescription: 'أدخل وصف الصورة',
     removeImage: 'إزالة الصورة',
+    addVariant: 'إضافة نوع',
+    addOption: 'إضافة خيار',
     addTestimonial: 'إضافة توصية',
     enterTestimonialText: 'أدخل نص التوصية',
     enterAuthor: 'أدخل المؤلف',
@@ -1302,7 +1192,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     }}
                                     className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                                   >
-                                    + Add Image
+                                    + {translations[language].addImage}
                                   </Button>
                                 </div>
                               </div>
@@ -1387,7 +1277,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         }}
                                         className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                       >
-                                        + Add Option
+                                        + {translations[language].addVariant}
                                       </Button>
                                     </div>
                                   </div>
@@ -1403,7 +1293,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   }}
                                   className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                 >
-                                  + Add Variant
+                                  + {translations[language].addOption}
                                 </Button>
                               </div>
                               <Button
@@ -1487,39 +1377,44 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             onChange={(e) => updateProduct(index, 'price', e.target.value)}
                             className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           />
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                            onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
-                            className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
-                          >
-                            {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
-                          </Button>
-                          {editingAvailability[availKey] && (
-                            <div className="space-y-2">
-                              <Label className="text-sm sm:text-base font-medium">{translations[language].availability}</Label>
-                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
-                                {Object.entries(product.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                  <div key={day} className="flex items-center space-x-1 sm:space-x-2">
-                                    <Checkbox
-                                      id={`product-${index}-${day}`}
-                                      checked={isAvailable}
-                                      onCheckedChange={(checked) => 
-                                        handleProductAvailabilityChange(index, day, checked === true)
-                                      }
-                                    />
-                                    <label
-                                      htmlFor={`product-${index}-${day}`}
-                                      className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                    >
-                                      {translations[language].days[day as keyof typeof translations.en.days]}
-                                    </label>
+                        {/* Hide availability controls for products */}
+                        {type !== 'products' && selectedType !== 'products' && (
+                          <>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                                onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
+                                className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                              >
+                                {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
+                              </Button>
+                              {editingAvailability[availKey] && (
+                                <div className="space-y-2">
+                                  <Label className="text-sm sm:text-base font-medium">{translations[language].availability}</Label>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                                    {Object.entries(product.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                      <div key={day} className="flex items-center space-x-1 sm:space-x-2">
+                                        <Checkbox
+                                          id={`product-${index}-${day}`}
+                                          checked={isAvailable}
+                                          onCheckedChange={(checked) => 
+                                            handleProductAvailabilityChange(index, day, checked === true)
+                                          }
+                                        />
+                                        <label
+                                          htmlFor={`product-${index}-${day}`}
+                                          className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                        >
+                                          {translations[language].days[day as keyof typeof translations.en.days]}
+                                        </label>
+                                      </div>
+                                    ))}
                                   </div>
-                                ))}
-                              </div>
-                            </div>
-                          )}
+                                </div>
+                              )}
+                          </>
+                        )}
                           <div className="space-y-1 sm:space-y-2">
                             <Label className="text-sm sm:text-base font-medium">Images</Label>
                             <div className="flex gap-1 sm:gap-2 flex-wrap mb-1 sm:mb-2">
@@ -1573,7 +1468,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 }}
                                 className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                               >
-                                + Add Image
+                                + {translations[language].addImage}
                         </Button>
                       </div>
                           </div>
@@ -1653,12 +1548,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     size="sm"
                                     onClick={() => {
                                       const newVariants = [...(product.variants || [])];
-                                      newVariants[variantIdx].options.push({ name: '' });
+                                      newVariants.push({ name: '', options: [] });
                                       updateProduct(index, 'variants', newVariants);
                                     }}
                                     className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                   >
-                                    + Add Option
+                                    + {translations[language].addVariant}
                             </Button>
                           </div>
                         </div>
