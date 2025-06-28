@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { useAuth } from "@/context/AuthContext";
@@ -30,6 +30,8 @@ import {
   Lock,
   Globe,
   UserCircle,
+  ShoppingCart,
+  Bell,
 } from "lucide-react";
 
 // Translations object
@@ -38,6 +40,8 @@ const translations = {
     signIn: "Sign In",
     signUp: "Sign Up",
     dashboard: "Dashboard",
+    orders: "Orders",
+    pendingOrders: "Pending Orders",
     adminPanel: "Admin Panel",
     signedInAs: "Signed in as",
     subscription: "Subscription",
@@ -55,6 +59,8 @@ const translations = {
     signIn: "تسجيل الدخول",
     signUp: "إنشاء حساب",
     dashboard: "لوحة التحكم",
+    orders: "الطلبات",
+    pendingOrders: "الطلبات المعلقة",
     adminPanel: "لوحة الإدارة",
     signedInAs: "تم تسجيل الدخول باسم",
     subscription: "الاشتراك",
@@ -74,6 +80,35 @@ const Navbar = () => {
   const { user, signOut, isAdmin, daysLeftInTrial, isTrialActive, isTrialExpired } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { language, toggleLanguage } = useLanguage();
+  const [pendingOrdersCount, setPendingOrdersCount] = useState(0);
+
+  // Fetch pending orders count
+  useEffect(() => {
+    if (user) {
+      const fetchPendingOrders = async () => {
+        try {
+          const token = localStorage.getItem('qr-generator-token');
+          const response = await fetch('https://quickqr-heyg.onrender.com/api/orders/stats', {
+            headers: {
+              'Authorization': `Bearer ${token}`,
+            }
+          });
+          if (response.ok) {
+            const data = await response.json();
+            const pendingCount = data.stats?.find((s: any) => s.order_status === 'pending')?.count || 0;
+            setPendingOrdersCount(pendingCount);
+          }
+        } catch (error) {
+          console.error('Error fetching pending orders:', error);
+        }
+      };
+
+      fetchPendingOrders();
+      // Refresh every 30 seconds
+      const interval = setInterval(fetchPendingOrders, 30000);
+      return () => clearInterval(interval);
+    }
+  }, [user]);
 
   return (
     <nav className="border-b shadow-sm bg-white sticky top-0 z-40" dir={language === 'ar' ? 'rtl' : 'ltr'}>
@@ -93,9 +128,20 @@ const Navbar = () => {
                   <LayoutDashboard className="w-4 h-4" /> {translations[language].dashboard}
                 </Button>
               </Link>
+              
+              {/* Orders with notification badge */}
               <Link to="/orders">
-                <Button variant="ghost" className="font-medium hover:bg-gray-100 flex items-center gap-1.5">
-                  <Menu className="w-4 h-4" /> {language === 'ar' ? 'الطلبات' : 'Orders'}
+                <Button 
+                  variant="ghost" 
+                  className="font-medium hover:bg-gray-100 flex items-center gap-1.5 relative"
+                >
+                  <ShoppingCart className="w-4 h-4" /> 
+                  {translations[language].orders}
+                  {pendingOrdersCount > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                      {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
+                    </span>
+                  )}
                 </Button>
               </Link>
               
@@ -151,6 +197,17 @@ const Navbar = () => {
                   <DropdownMenuItem asChild>
                     <Link to="/dashboard" className="flex items-center cursor-pointer">
                       <LayoutDashboard className="w-4 h-4 mr-2" /> {translations[language].dashboard}
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link to="/orders" className="flex items-center cursor-pointer relative">
+                      <ShoppingCart className="w-4 h-4 mr-2" /> 
+                      {translations[language].orders}
+                      {pendingOrdersCount > 0 && (
+                        <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-4 w-4 flex items-center justify-center font-bold">
+                          {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
+                        </span>
+                      )}
                     </Link>
                   </DropdownMenuItem>
                   <DropdownMenuItem asChild>
@@ -261,6 +318,22 @@ const Navbar = () => {
                         onClick={() => setMobileMenuOpen(false)}
                       >
                         <LayoutDashboard className="h-5 w-5 mr-3 text-gray-500" /> {translations[language].dashboard}
+                      </Link>
+                    )}
+                    
+                    {user && (
+                      <Link 
+                        to="/orders" 
+                        className="flex items-center px-3 py-2 text-base font-medium rounded-md hover:bg-gray-100 relative"
+                        onClick={() => setMobileMenuOpen(false)}
+                      >
+                        <ShoppingCart className="h-5 w-5 mr-3 text-gray-500" /> 
+                        {translations[language].orders}
+                        {pendingOrdersCount > 0 && (
+                          <span className="ml-auto bg-red-500 text-white text-xs rounded-full h-5 w-5 flex items-center justify-center font-bold">
+                            {pendingOrdersCount > 99 ? '99+' : pendingOrdersCount}
+                          </span>
+                        )}
                       </Link>
                     )}
                     

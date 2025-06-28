@@ -877,42 +877,32 @@ const Dashboard = () => {
 
   return (
     <MainLayout>
-      <div className={`container mx-auto px-4 py-8 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-3xl font-bold text-gray-900">
-            {translations[language].dashboard}
-          </h1>
-          <div className="flex items-center gap-4">
-            <Button onClick={() => navigate('/create')}>
-              {translations[language].createNewQR}
-            </Button>
-          </div>
-        </div>
-        {/* Header with welcome message */}
-        <div className="mb-8">
-          <div className="flex flex-wrap items-center justify-between">
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900 mb-1 font-cairo">
+      <div className={`container mx-auto px-4 py-4 sm:py-8 ${language === 'ar' ? 'rtl' : 'ltr'}`}>
+        {/* Header with welcome message - Mobile optimized */}
+        <div className="mb-6 sm:mb-8">
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+            <div className="text-center sm:text-left">
+              <h1 className="text-2xl sm:text-3xl font-bold text-gray-900 mb-1 font-cairo">
                 <span className="text-primary">{translations[language].welcome}</span>
                 <span>, {user.name || user.email.split('@')[0]}</span>
               </h1>
-              <p className="text-gray-600 mb-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              <p className="text-sm sm:text-base text-gray-600 mb-4" dir={language === 'ar' ? 'rtl' : 'ltr'}>
                 {translations[language].dashboardDescription}
               </p>
             </div>
-            <div className="flex items-center gap-4">
+            <div className="flex items-center justify-center sm:justify-end gap-3 sm:gap-4">
               <Button
                 variant="ghost"
                 onClick={toggleLanguage}
-                className="flex items-center gap-2"
+                className="flex items-center gap-2 text-sm sm:text-base"
               >
                 <Globe className="w-4 h-4" />
-                {translations[language].language}
+                <span className="hidden sm:inline">{translations[language].language}</span>
               </Button>
               <img 
                 src="/algeria-flag-icon.png" 
                 alt="Algeria"
-                className="w-8 h-8 rounded shadow-sm"
+                className="w-6 h-6 sm:w-8 sm:h-8 rounded shadow-sm"
                 onError={(e) => {
                   e.currentTarget.style.display = 'none';
                 }}
@@ -920,41 +910,41 @@ const Dashboard = () => {
             </div>
           </div>
           
-          {/* Subscription status badges */}
-          <div className="flex flex-wrap gap-4 mt-4">
+          {/* Subscription status badges - Mobile optimized */}
+          <div className="flex flex-wrap justify-center sm:justify-start gap-2 sm:gap-4 mt-4">
             {isTrialActive() && (
-              <div className="text-sm text-blue-600 bg-blue-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                <Calendar className="w-4 h-4" /> {translations[language].trial}: {daysLeftInTrial()} {translations[language].daysLeft}
+              <div className="text-xs sm:text-sm text-blue-600 bg-blue-100 px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-1.5">
+                <Calendar className="w-3 h-3 sm:w-4 sm:h-4" /> {translations[language].trial}: {daysLeftInTrial()} {translations[language].daysLeft}
               </div>
             )}
             {isTrialExpired() && !user.hasActiveSubscription && (
-              <div className="text-sm text-red-600 bg-red-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                <AlertCircle className="w-4 h-4" /> {translations[language].trialExpired}
+              <div className="text-xs sm:text-sm text-red-600 bg-red-100 px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-1.5">
+                <AlertCircle className="w-3 h-3 sm:w-4 sm:h-4" /> {translations[language].trialExpired}
               </div>
             )}
             {user.hasActiveSubscription && (
-              <div className="text-sm text-green-600 bg-green-100 px-3 py-1 rounded-full flex items-center gap-1.5">
-                <CheckCircle className="w-4 h-4" /> {translations[language].activeSubscription}
+              <div className="text-xs sm:text-sm text-green-600 bg-green-100 px-2 sm:px-3 py-1 rounded-full flex items-center gap-1 sm:gap-1.5">
+                <CheckCircle className="w-3 h-3 sm:w-4 sm:h-4" /> {translations[language].activeSubscription}
               </div>
             )}
           </div>
         </div>
         
-        {/* Account Status Alerts */}
+        {/* Account Status Alerts - Mobile optimized */}
         {!user.isActive && (
-          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
+          <Alert variant="destructive" className="mb-6 sm:mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <AlertTitle className="text-lg mb-2 flex items-center gap-2 font-cairo">
-                  <AlertCircle className="w-5 h-5" /> Account Not Activated
+                <AlertTitle className="text-base sm:text-lg mb-2 flex items-center gap-2 font-cairo">
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" /> Account Not Activated
                 </AlertTitle>
-                <AlertDescription className="text-base">
+                <AlertDescription className="text-sm sm:text-base">
                   Your account is pending activation. Please complete the payment process to activate your account.
                 </AlertDescription>
               </div>
               <Button 
                 onClick={() => navigate('/payment-instructions')} 
-                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 min-w-[200px] h-12 text-base font-medium"
+                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 w-full sm:w-auto h-10 sm:h-12 text-sm sm:text-base font-medium"
               >
                 View Payment Instructions
               </Button>
@@ -963,19 +953,19 @@ const Dashboard = () => {
         )}
         
         {isTrialExpired() && !user.hasActiveSubscription && (
-          <Alert variant="destructive" className="mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
+          <Alert variant="destructive" className="mb-6 sm:mb-8 animate-fade-in shadow-sm border-primary/20 bg-primary/5">
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
               <div className="flex-1">
-                <AlertTitle className="text-lg mb-2 flex items-center gap-2 font-cairo">
-                  <AlertCircle className="w-5 h-5" /> Your trial has expired
+                <AlertTitle className="text-base sm:text-lg mb-2 flex items-center gap-2 font-cairo">
+                  <AlertCircle className="w-4 h-4 sm:w-5 sm:h-5" /> Your trial has expired
                 </AlertTitle>
-                <AlertDescription className="text-base">
+                <AlertDescription className="text-sm sm:text-base">
                   Your 14-day free trial has ended. Please subscribe to continue using our service.
                 </AlertDescription>
               </div>
               <Button 
                 onClick={() => navigate('/payment-instructions')} 
-                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 min-w-[200px] h-12 text-base font-medium"
+                className="bg-white hover:bg-gray-50 text-primary border-primary/20 hover:border-primary/40 w-full sm:w-auto h-10 sm:h-12 text-sm sm:text-base font-medium"
               >
                 View Payment Instructions
               </Button>
@@ -984,45 +974,49 @@ const Dashboard = () => {
         )}
         
         {isTrialActive() && (
-          <Alert className="mb-8 border-primary/30 bg-primary/5 shadow-sm animate-fade-in">
-            <AlertTitle className="flex items-center gap-2 font-cairo">
-              <Calendar className="w-5 h-5 text-primary" /> Free Trial Active
+          <Alert className="mb-6 sm:mb-8 border-primary/30 bg-primary/5 shadow-sm animate-fade-in">
+            <AlertTitle className="flex items-center gap-2 font-cairo text-sm sm:text-base">
+              <Calendar className="w-4 h-4 sm:w-5 sm:h-5 text-primary" /> Free Trial Active
             </AlertTitle>
-            <AlertDescription>
+            <AlertDescription className="text-sm sm:text-base">
               You have {daysLeftInTrial()} days left in your free trial. Enjoy full access to all features!
             </AlertDescription>
           </Alert>
         )}
         
         {user.hasActiveSubscription && (
-          <Alert className="mb-8 border-secondary/30 bg-secondary/5 shadow-sm animate-fade-in">
-            <AlertTitle className="flex items-center gap-2 font-cairo">
-              <CheckCircle className="w-5 h-5 text-secondary" /> Active Subscription
+          <Alert className="mb-6 sm:mb-8 border-secondary/30 bg-secondary/5 shadow-sm animate-fade-in">
+            <AlertTitle className="flex items-center gap-2 font-cairo text-sm sm:text-base">
+              <CheckCircle className="w-4 h-4 sm:w-5 sm:h-5 text-secondary" /> Active Subscription
             </AlertTitle>
-            <AlertDescription>
+            <AlertDescription className="text-sm sm:text-base">
               Thank you for your subscription! You have full access to all QRCreator features.
             </AlertDescription>
           </Alert>
         )}
         
-        {/* Main tabs navigation */}
-        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as 'create' | 'manage')} defaultValue="manage" className="mb-8">
-          <TabsList className="grid w-full max-w-md grid-cols-2 p-1 rounded-xl bg-gray-100">
-            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm">
-              <div className="flex items-center gap-2">
-                <Plus className="w-4 h-4" /> {translations[language].createNewQR}
+        {/* Main tabs navigation - Mobile optimized */}
+        <Tabs value={activeTab} onValueChange={v => setActiveTab(v as 'create' | 'manage')} defaultValue="manage" className="mb-6 sm:mb-8">
+          <TabsList className="grid w-full max-w-md mx-auto sm:mx-0 grid-cols-2 p-1 rounded-xl bg-gray-100">
+            <TabsTrigger value="create" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-primary data-[state=active]:shadow-sm text-sm sm:text-base">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Plus className="w-3 h-3 sm:w-4 sm:h-4" /> 
+                <span className="hidden sm:inline">{translations[language].createNewQR}</span>
+                <span className="sm:hidden">Create</span>
               </div>
             </TabsTrigger>
-            <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm">
-              <div className="flex items-center gap-2">
-                <Edit className="w-4 h-4" /> {translations[language].myQRCodes}
+            <TabsTrigger value="manage" className="rounded-lg data-[state=active]:bg-white data-[state=active]:text-secondary data-[state=active]:shadow-sm text-sm sm:text-base">
+              <div className="flex items-center gap-1 sm:gap-2">
+                <Edit className="w-3 h-3 sm:w-4 sm:h-4" /> 
+                <span className="hidden sm:inline">{translations[language].myQRCodes}</span>
+                <span className="sm:hidden">Manage</span>
               </div>
             </TabsTrigger>
           </TabsList>
           
           {/* QR Code Creation Tab */}
-          <TabsContent value="create" className="py-8 px-1">
-            <div className="algerian-card p-6 animate-fade-in">
+          <TabsContent value="create" className="py-4 sm:py-8 px-1">
+            <div className="algerian-card p-4 sm:p-6 animate-fade-in">
               <QRCodeGenerator 
                 selectedType={selectedType} 
                 onCreated={handleQRCreated} 
@@ -1033,12 +1027,12 @@ const Dashboard = () => {
           </TabsContent>
           
           {/* QR Code Management Tab */}
-          <TabsContent value="manage" className="py-6">
-            <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold font-cairo">{translations[language].myQRCodes}</h2>
+          <TabsContent value="manage" className="py-4 sm:py-6">
+            <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+              <h2 className="text-xl sm:text-2xl font-semibold font-cairo text-center sm:text-left">{translations[language].myQRCodes}</h2>
               <Button 
                 onClick={() => setActiveTab('create')}
-                className="dz-button flex items-center gap-2"
+                className="dz-button flex items-center gap-2 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4" /> {translations[language].createNewQR}
               </Button>
@@ -1052,70 +1046,71 @@ const Dashboard = () => {
                   setSearchTerm(e.target.value);
                   setCurrentPage(1); // Reset to first page on search
                 }}
-                className="max-w-sm"
+                className="w-full sm:max-w-sm"
               />
-                </div>
+            </div>
             
             {isLoading ? (
               <div className="text-center py-8">Loading...</div>
             ) : qrCodes.length === 0 ? (
-              <div className="text-center py-16 border-2 border-dashed rounded-lg">
-                <p className="text-lg font-medium text-gray-700">{translations[language].noQRCodes}</p>
-                <p className="text-gray-500 mt-2">{translations[language].createNewQR} to get started.</p>
+              <div className="text-center py-12 sm:py-16 border-2 border-dashed rounded-lg">
+                <p className="text-base sm:text-lg font-medium text-gray-700">{translations[language].noQRCodes}</p>
+                <p className="text-sm sm:text-base text-gray-500 mt-2">{translations[language].createNewQR} to get started.</p>
               </div>
             ) : (
-              <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6">
                 {qrCodes.map((qr) => (
                   <Card key={qr.id} className="algerian-card shadow-lg hover:shadow-xl transition-all duration-300">
                     <CardHeader className="pb-2 dz-card-header rounded-t-xl">
-                      <CardTitle className="text-lg flex items-center justify-between font-cairo">
+                      <CardTitle className="text-base sm:text-lg flex items-center justify-between font-cairo">
                         <span className="truncate">{qr.name}</span>
-                        <div className="flex items-center gap-2">
-                          <span className="text-xs px-2 py-1 bg-white/50 rounded-full flex items-center gap-1">
+                        <div className="flex items-center gap-1 sm:gap-2">
+                          <span className="text-xs px-1.5 sm:px-2 py-1 bg-white/50 rounded-full flex items-center gap-1">
                             <Eye className="w-3 h-3" />
-                            {qr.scanCount || 0}
+                            <span className="hidden sm:inline">{qr.scanCount || 0}</span>
+                            <span className="sm:hidden">{qr.scanCount || 0}</span>
                           </span>
-                          <span className="text-xs px-2 py-1 bg-white/50 rounded-full">{qr.type}</span>
+                          <span className="text-xs px-1.5 sm:px-2 py-1 bg-white/50 rounded-full">{qr.type}</span>
                         </div>
                       </CardTitle>
                     </CardHeader>
                     <CardContent className="pt-4">
                       {/* QR Code Display */}
                       <div 
-                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-lg p-3 relative shadow-inner" 
+                        className="w-full aspect-square mb-4 flex items-center justify-center border rounded-lg p-2 sm:p-3 relative shadow-inner" 
                         style={{ backgroundColor: qr.backgroundColor }}
                         data-qr-id={qr.id}
                       >
                         {!user?.isActive && (
                           <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg pointer-events-none z-10">
-                            <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-3">
-                              <Lock className="w-6 h-6 text-gray-600 mb-2 mx-auto" />
-                              <p className="text-gray-700 text-sm font-medium">{translations[language].previewMode}</p>
+                            <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-2 sm:p-3">
+                              <Lock className="w-4 h-4 sm:w-6 sm:h-6 text-gray-600 mb-1 sm:mb-2 mx-auto" />
+                              <p className="text-gray-700 text-xs sm:text-sm font-medium">{translations[language].previewMode}</p>
                             </div>
                           </div>
                         )}
                         <div className="flex flex-col items-center">
                           {qr.textAbove && (
-                            <div className="text-center mb-2 font-medium text-gray-700">
+                            <div className="text-center mb-2 font-medium text-gray-700 text-xs sm:text-sm">
                               {qr.textAbove}
                             </div>
                           )}
                           <QRCodeSVG
                             value={qr.url}
-                            size={160}
+                            size={120}
                             bgColor={qr.backgroundColor}
                             fgColor={qr.foregroundColor}
                             level="H"
                             includeMargin={false}
                             imageSettings={qr.logoUrl ? {
                               src: qr.logoUrl,
-                              height: 40,
-                              width: 40,
+                              height: 30,
+                              width: 30,
                               excavate: true,
                             } : undefined}
                           />
                           {qr.textBelow && (
-                            <div className="text-center mt-2 font-medium text-gray-700">
+                            <div className="text-center mt-2 font-medium text-gray-700 text-xs sm:text-sm">
                               {qr.textBelow}
                             </div>
                           )}
@@ -1126,20 +1121,20 @@ const Dashboard = () => {
                         <div>
                           <Label className="text-xs text-gray-500">{translations[language].url}</Label>
                           <div className="flex items-center gap-1">
-                            <p className="text-sm truncate font-medium">{qr.url}</p>
+                            <p className="text-xs sm:text-sm truncate font-medium">{qr.url}</p>
                             <a 
                               href={qr.url} 
                               target="_blank" 
                               rel="noopener noreferrer" 
-                              className="text-primary hover:text-primary/80"
+                              className="text-primary hover:text-primary/80 flex-shrink-0"
                             >
-                              <ExternalLink className="w-3.5 h-3.5" />
+                              <ExternalLink className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                             </a>
                           </div>
                         </div>
                         <div>
                           <Label className="text-xs text-gray-500">{translations[language].created}</Label>
-                          <p className="text-sm">{new Date(qr.createdAt).toLocaleDateString(undefined, { 
+                          <p className="text-xs sm:text-sm">{new Date(qr.createdAt).toLocaleDateString(undefined, { 
                             year: 'numeric', 
                             month: 'short', 
                             day: 'numeric' 
@@ -1147,23 +1142,23 @@ const Dashboard = () => {
                         </div>
                       </div>
                       
-                      <div className="space-y-3">
+                      <div className="space-y-2 sm:space-y-3">
                         <div className="grid grid-cols-2 gap-2">
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
-                            className="w-full hover:bg-gray-50 font-cairo"
+                            className="w-full hover:bg-gray-50 font-cairo text-xs sm:text-sm h-8 sm:h-9"
                           >
-                            <Edit className="w-3.5 h-3.5 mr-1.5" /> {translations[language].edit}
+                            <Edit className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" /> {translations[language].edit}
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleCopyLink(qr)}
-                            className="w-full hover:bg-gray-50 font-cairo"
+                            className="w-full hover:bg-gray-50 font-cairo text-xs sm:text-sm h-8 sm:h-9"
                           >
-                            <Copy className="w-3.5 h-3.5 mr-1.5" /> {translations[language].copyLink}
+                            <Copy className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" /> {translations[language].copyLink}
                           </Button>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
@@ -1171,17 +1166,17 @@ const Dashboard = () => {
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDownload(qr, 'png')}
-                            className="w-full hover:bg-gray-50 font-cairo"
+                            className="w-full hover:bg-gray-50 font-cairo text-xs sm:text-sm h-8 sm:h-9"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[language].downloadPNG}
+                            <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" /> {translations[language].downloadPNG}
                           </Button>
                           <Button 
                             variant="outline" 
                             size="sm" 
                             onClick={() => handleDownload(qr, 'svg')}
-                            className="w-full hover:bg-gray-50 font-cairo"
+                            className="w-full hover:bg-gray-50 font-cairo text-xs sm:text-sm h-8 sm:h-9"
                           >
-                            <Download className="w-3.5 h-3.5 mr-1.5" /> {translations[language].downloadSVG}
+                            <Download className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" /> {translations[language].downloadSVG}
                           </Button>
                         </div>
 
@@ -1190,31 +1185,32 @@ const Dashboard = () => {
                             <Button 
                               variant="outline" 
                               size="sm"
-                              className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive font-cairo"
+                              className="w-full border-destructive/30 text-destructive hover:bg-destructive/10 hover:text-destructive font-cairo text-xs sm:text-sm h-8 sm:h-9"
                               onClick={() => setDeleteConfirmQR(qr)}
                             >
-                              <Trash2 className="w-3.5 h-3.5 mr-1.5" />
+                              <Trash2 className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" />
                               {translations[language].deleteQRCode}
                             </Button>
                           </DialogTrigger>
                           {deleteConfirmQR && (
-                            <DialogContent aria-describedby="delete-dialog-description">
+                            <DialogContent aria-describedby="delete-dialog-description" className="max-w-sm sm:max-w-md">
                               <DialogHeader>
-                                <DialogTitle className="font-cairo">{translations[language].confirmDeletion}</DialogTitle>
-                                <DialogDescription id="delete-dialog-description">
+                                <DialogTitle className="font-cairo text-base sm:text-lg">{translations[language].confirmDeletion}</DialogTitle>
+                                <DialogDescription id="delete-dialog-description" className="text-sm sm:text-base">
                                   {translations[language].thisActionCannotBeUndone}
                                 </DialogDescription>
                               </DialogHeader>
                               <div className="py-4">
-                                <p>{translations[language].areYouSureYouWantToDelete} "{deleteConfirmQR.name}"?</p>
+                                <p className="text-sm sm:text-base">{translations[language].areYouSureYouWantToDelete} "{deleteConfirmQR.name}"?</p>
                               </div>
-                              <div className="flex justify-end space-x-2">
-                                <Button variant="outline" onClick={() => setDeleteConfirmQR(null)}>
+                              <div className="flex flex-col sm:flex-row justify-end gap-2 sm:space-x-2">
+                                <Button variant="outline" onClick={() => setDeleteConfirmQR(null)} className="w-full sm:w-auto">
                                   {translations[language].cancel}
                                 </Button>
                                 <Button 
                                   variant="destructive" 
                                   onClick={() => handleDeleteQR(deleteConfirmQR.id)}
+                                  className="w-full sm:w-auto"
                                 >
                                   {translations[language].delete}
                                 </Button>
@@ -1229,8 +1225,8 @@ const Dashboard = () => {
               </div>
             )}
             {qrCodes.length > 0 && (
-              <div className="flex justify-between items-center mt-6">
-                <div className="text-sm text-gray-500">
+              <div className="flex flex-col sm:flex-row justify-between items-center gap-4 mt-6">
+                <div className="text-xs sm:text-sm text-gray-500 text-center sm:text-left">
                   Showing {qrCodes.length} of {totalQRCodes} QR Codes
                 </div>
                 <div className="flex gap-2">
@@ -1239,6 +1235,7 @@ const Dashboard = () => {
                     size="sm"
                     onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
                     disabled={currentPage === 1}
+                    className="h-8 sm:h-9 text-xs sm:text-sm"
                   >
                     {translations[language].previous}
                   </Button>
@@ -1247,6 +1244,7 @@ const Dashboard = () => {
                     size="sm"
                     onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
                     disabled={currentPage === totalPages}
+                    className="h-8 sm:h-9 text-xs sm:text-sm"
                   >
                     {translations[language].next}
                   </Button>
@@ -1257,46 +1255,46 @@ const Dashboard = () => {
         </Tabs>
       </div>
 
-      {/* Preview Dialog */}
+      {/* Preview Dialog - Mobile optimized */}
       <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
-        <DialogContent className="max-w-2xl">
+        <DialogContent className="max-w-sm sm:max-w-2xl">
           <DialogHeader>
-            <DialogTitle className="font-cairo">{translations[language].qrCodePreview}</DialogTitle>
+            <DialogTitle className="font-cairo text-base sm:text-lg">{translations[language].qrCodePreview}</DialogTitle>
           </DialogHeader>
           <div className="py-4">
             {previewQR && (
               <div className="flex flex-col items-center">
                 <div 
-                  className="w-64 h-64 mb-4 flex items-center justify-center border rounded-lg p-2 relative shadow-inner" 
+                  className="w-48 h-48 sm:w-64 sm:h-64 mb-4 flex items-center justify-center border rounded-lg p-2 relative shadow-inner" 
                   style={{ backgroundColor: previewQR.backgroundColor }}
                 >
                   <div className="absolute inset-0 bg-black/10 backdrop-blur-sm flex items-center justify-center rounded-lg">
-                    <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-4">
-                      <Lock className="w-8 h-8 text-gray-600 mb-2" />
-                      <p className="text-gray-700 font-medium">{translations[language].previewMode}</p>
+                    <div className="text-center bg-white/20 backdrop-blur-md rounded-lg p-3 sm:p-4">
+                      <Lock className="w-6 h-6 sm:w-8 sm:h-8 text-gray-600 mb-2" />
+                      <p className="text-gray-700 font-medium text-sm sm:text-base">{translations[language].previewMode}</p>
                     </div>
                   </div>
                   <QRCodeSVG
                     value={previewQR.url}
-                    size={240}
+                    size={180}
                     bgColor={previewQR.backgroundColor}
                     fgColor={previewQR.foregroundColor}
                     level="H"
                     includeMargin={false}
                     imageSettings={previewQR.logoUrl ? {
                       src: previewQR.logoUrl,
-                      height: 60,
-                      width: 60,
+                      height: 45,
+                      width: 45,
                       excavate: true,
                     } : undefined}
                   />
                 </div>
-                <p className="text-sm text-gray-600 mb-4">
+                <p className="text-xs sm:text-sm text-gray-600 mb-4 text-center">
                   {translations[language].activateAccountToDownloadHighResolutionQR}
                 </p>
                 <Button 
                   onClick={() => navigate('/payment-instructions')}
-                  className="dz-button flex items-center gap-2"
+                  className="dz-button flex items-center gap-2 w-full sm:w-auto"
                 >
                   <CheckCircle className="w-4 h-4" /> {translations[language].activateAccount}
                 </Button>
