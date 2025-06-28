@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 
 interface ProductsSectionProps {
-  product: MenuItem;
+  products: MenuItem[];
   storeName: string;
   menuLanguage: 'en' | 'ar';
   colors: {
@@ -45,7 +45,7 @@ const translations = {
 };
 
 const ProductsSection: React.FC<ProductsSectionProps> = ({
-  product,
+  products,
   storeName,
   menuLanguage,
   colors,
@@ -53,10 +53,13 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   onAddToBasket,
   onDirectOrder
 }) => {
-  // Early return if product is not available
-  if (!product) {
+  // Early return if products are not available
+  if (!products || products.length === 0) {
     return null;
   }
+
+  // For now, we'll display the first product
+  const product = products[0];
 
   const [quantity, setQuantity] = useState(1);
   const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
