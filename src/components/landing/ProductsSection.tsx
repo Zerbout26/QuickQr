@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 
 interface ProductsSectionProps {
-  products: MenuItem[];
+  product: MenuItem;
   storeName: string;
   menuLanguage: 'en' | 'ar';
   colors: {
@@ -21,21 +21,31 @@ type SelectedVariants = { [variantName: string]: string };
 
 const translations = {
   en: {
-    products: 'Our Products',
+    products: 'Product Details',
     orderNow: 'Order Now',
     quantity: 'Quantity',
     viewDetails: 'View Details',
+    addToCart: 'Add to Cart',
+    buyNow: 'Buy Now',
+    description: 'Description',
+    features: 'Key Features',
+    specifications: 'Specifications'
   },
   ar: {
-    products: 'منتجاتنا',
+    products: 'تفاصيل المنتج',
     orderNow: 'اطلب الآن',
     quantity: 'الكمية',
     viewDetails: 'عرض التفاصيل',
+    addToCart: 'أضف إلى السلة',
+    buyNow: 'اشتري الآن',
+    description: 'الوصف',
+    features: 'الميزات الرئيسية',
+    specifications: 'المواصفات'
   },
 };
 
 const ProductsSection: React.FC<ProductsSectionProps> = ({
-  products,
+  product,
   storeName,
   menuLanguage,
   colors,
@@ -43,411 +53,317 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   onAddToBasket,
   onDirectOrder
 }) => {
-  const [selectedVariants, setSelectedVariants] = useState<{ [key: string]: SelectedVariants }>({});
-  const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
-  const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({});
-  const [dialogProduct, setDialogProduct] = useState<{
-    product: MenuItem;
-    productIndex: number;
-  } | null>(null);
+  const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
+  const [quantity, setQuantity] = useState(1);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
 
-  const handleVariantChange = (productId: string, variantName: string, optionName: string) => {
+  const handleVariantChange = (variantName: string, optionName: string) => {
     setSelectedVariants(prev => ({
       ...prev,
-      [productId]: {
-        ...prev[productId],
-        [variantName]: optionName
-      }
+      [variantName]: optionName
     }));
   };
 
-  const handleQuantityChange = (productId: string, delta: number) => {
-    setQuantities(prev => ({
-      ...prev,
-      [productId]: Math.max(1, (prev[productId] || 1) + delta)
-    }));
+  const handleQuantityChange = (delta: number) => {
+    setQuantity(prev => Math.max(1, prev + delta));
   };
 
-  const getVariantPriceAdjustment = (item: MenuItem, selectedVariants?: SelectedVariants) => {
-    if (!item.variants || !selectedVariants) return 0;
-    return item.variants.reduce((sum, variant) => {
+  const getVariantPriceAdjustment = () => {
+    if (!product.variants) return 0;
+    return product.variants.reduce((sum, variant) => {
       const selectedOptionName = selectedVariants[variant.name];
       const option = variant.options.find(opt => opt.name === selectedOptionName);
       return sum + (option?.price || 0);
     }, 0);
   };
 
-  const handleOrderNow = (product: MenuItem, productId: string) => {
-    const quantity = quantities[productId] || 1;
-    const variants = selectedVariants[productId];
-    const priceAdjustment = getVariantPriceAdjustment(product, variants);
+  const handleOrderNow = (isDirectOrder: boolean) => {
+    const priceAdjustment = getVariantPriceAdjustment();
     const finalPrice = product.price + priceAdjustment;
+    const productId = `${product.name}-0`;
     
-    // Use direct order if available, otherwise fall back to basket
-    if (onDirectOrder) {
-      onDirectOrder(product, quantity, productId, 'Products', finalPrice, variants);
+    if (isDirectOrder && onDirectOrder) {
+      onDirectOrder(product, quantity, productId, 'Products', finalPrice, selectedVariants);
     } else {
-      onAddToBasket(product, quantity, productId, 'Products', finalPrice, variants);
+      onAddToBasket(product, quantity, productId, 'Products', finalPrice, selectedVariants);
     }
   };
 
-  const handleImageNav = (key: string, images: string[], dir: 1 | -1) => {
-    console.log('handleImageNav called:', { key, dir, imagesLength: images.length });
-    setImageIndexes(prev => {
-      const current = prev[key] || 0;
-      const next = (current + dir + images.length) % images.length;
-      console.log('Image navigation:', { current, next, key });
-      return { ...prev, [key]: next };
-    });
+  const handleImageNav = (images: string[], dir: 1 | -1) => {
+    setCurrentImageIndex(prev => (prev + dir + images.length) % images.length);
   };
 
-  const getValidImages = (item: MenuItem) => {
-    const imgs = (item.images || []).filter(url => !url.startsWith('blob:'));
+  const getValidImages = () => {
+    const imgs = (product.images || []).filter(url => !url.startsWith('blob:'));
     if (imgs.length > 0) return imgs;
-    if (item.imageUrl) return [item.imageUrl];
+    if (product.imageUrl) return [product.imageUrl];
     return [];
   };
 
-  if (!products || products.length === 0) return null;
+  const images = getValidImages();
+  const priceAdjustment = getVariantPriceAdjustment();
+  const finalPrice = product.price + priceAdjustment;
 
   return (
-    <div className="px-4 pb-16 max-w-7xl mx-auto" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
-      {/* Header */}
-      <motion.div 
-        className="text-center mb-8"
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-      >
-        <h2 className="text-3xl font-bold mb-2" style={{ color: colors.primaryColor }}>
-          {translations[menuLanguage].products}
-        </h2>
-        <p className="text-gray-600">
-          {menuLanguage === 'ar' ? 'اكتشف مجموعتنا المميزة من المنتجات' : 'Discover our amazing collection of products'}
-        </p>
-      </motion.div>
-
-      {/* Single Centered Product */}
-      <div className="flex justify-center">
-        <div className="max-w-2xl w-full">
-          {products.map((product, index) => {
-            const productId = `${product.name}-${index}`;
-            const quantity = quantities[productId] || 1;
-            const variants = selectedVariants[productId];
-            const priceAdjustment = getVariantPriceAdjustment(product, variants);
-            const finalPrice = product.price + priceAdjustment;
-            const validImages = getValidImages(product);
-
-            return (
-              <motion.div
-                key={productId}
-                className="bg-white rounded-xl shadow-sm border border-gray-100 overflow-hidden transition-all duration-200 hover:shadow-md"
-                whileHover={{ y: -4 }}
-                initial={{ opacity: 0, y: 10 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: index * 0.05 }}
+    <div className="px-4 py-12 max-w-7xl mx-auto" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+      {/* Hero Product Section */}
+      <div className="flex flex-col lg:flex-row gap-12 items-center">
+        {/* Product Images */}
+        {images.length > 0 && (
+          <div className="w-full lg:w-1/2">
+            <div className="relative rounded-xl overflow-hidden bg-gray-100 aspect-square">
+              <img
+                src={images[currentImageIndex]}
+                alt={product.name}
+                className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                loading="eager"
+              />
+              
+              {images.length > 1 && (
+                <>
+                  <button
+                    className="absolute left-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-3 shadow-lg z-10 hover:bg-white transition-all"
+                    onClick={() => handleImageNav(images, -1)}
+                    type="button"
+                  >
+                    {menuLanguage === 'ar' ? '→' : '←'}
+                  </button>
+                  <button
+                    className="absolute right-4 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-3 shadow-lg z-10 hover:bg-white transition-all"
+                    onClick={() => handleImageNav(images, 1)}
+                    type="button"
+                  >
+                    {menuLanguage === 'ar' ? '←' : '→'}
+                  </button>
+                  <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                    {images.map((_, idx) => (
+                      <button
+                        key={idx}
+                        onClick={() => setCurrentImageIndex(idx)}
+                        className={`w-3 h-3 rounded-full transition-colors ${idx === currentImageIndex ? 'bg-primary' : 'bg-gray-300'}`}
+                        style={idx === currentImageIndex ? { backgroundColor: colors.primaryColor } : {}}
+                        aria-label={`Go to image ${idx + 1}`}
+                      />
+                    ))}
+                  </div>
+                </>
+              )}
+              
+              {/* Badge for featured product */}
+              <div 
+                className="absolute top-4 left-4 bg-red-500 text-white px-3 py-1 rounded-full text-sm font-bold"
+                style={{ backgroundColor: colors.accentColor }}
               >
-                {/* Product Images - Single Image with Navigation */}
-                {validImages.length > 0 && (
-                  <div className="relative h-80 w-full overflow-hidden">
-                    <img
-                      src={validImages[imageIndexes[productId] || 0]}
-                      alt={product.name}
-                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                      loading="lazy"
+                {menuLanguage === 'ar' ? 'مميز' : 'Featured'}
+              </div>
+            </div>
+            
+            {/* Thumbnail Gallery */}
+            {images.length > 1 && (
+              <div className="flex gap-3 mt-4 overflow-x-auto py-2">
+                {images.map((img, idx) => (
+                  <button
+                    key={idx}
+                    onClick={() => setCurrentImageIndex(idx)}
+                    className={`flex-shrink-0 w-16 h-16 rounded-md overflow-hidden border-2 transition-all ${idx === currentImageIndex ? 'border-primary scale-105' : 'border-transparent'}`}
+                    style={idx === currentImageIndex ? { borderColor: colors.primaryColor } : {}}
+                  >
+                    <img 
+                      src={img} 
+                      alt={`Thumbnail ${idx + 1}`} 
+                      className="w-full h-full object-cover"
                     />
-                    {validImages.length > 1 && (
-                      <>
-                        <button
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
-                          onClick={(e) => { 
-                            e.preventDefault();
-                            e.stopPropagation(); 
-                            console.log('Left arrow clicked for', productId);
-                            handleImageNav(productId, validImages, -1); 
-                          }}
-                          type="button"
-                        >
-                          &#8592;
-                        </button>
-                        <button
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
-                          onClick={(e) => { 
-                            e.preventDefault();
-                            e.stopPropagation(); 
-                            console.log('Right arrow clicked for', productId);
-                            handleImageNav(productId, validImages, 1); 
-                          }}
-                          type="button"
-                        >
-                          &#8594;
-                        </button>
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
-                          {validImages.map((_, idx) => (
-                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[productId] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
-                  </div>
-                )}
-
-                {/* Product Info */}
-                <div className="p-8">
-                  <div className="text-center mb-4">
-                    <h3 className="text-2xl font-bold text-gray-800">{product.name}</h3>
-                  </div>
-                  
-                  {product.description && (
-                    <p className="text-gray-600 mb-6 text-lg leading-relaxed text-center">
-                      {product.description}
-                    </p>
-                  )}
-
-                  {/* Variants */}
-                  {product.variants && product.variants.length > 0 && (
-                    <div className="space-y-4 mb-6">
-                      {product.variants.map((variant) => (
-                        <div key={variant.name} className="flex flex-col gap-2">
-                          <span className="font-medium text-base text-gray-700 text-center">
-                            {variant.name}:
-                          </span>
-                          <div className="flex flex-wrap gap-2 justify-center">
-                            {variant.options.map(option => {
-                              const isSelected = variants?.[variant.name] === option.name;
-                              return (
-                                <button
-                                  key={option.name}
-                                  type="button"
-                                  className={`px-4 py-2 rounded-full border text-base font-medium transition-all ${
-                                    isSelected
-                                      ? 'text-white border-primary shadow'
-                                      : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                                  }`}
-                                  style={isSelected ? {
-                                    backgroundColor: colors.primaryColor,
-                                    borderColor: colors.primaryColor
-                                  } : {}}
-                                  onClick={() => handleVariantChange(
-                                    productId, 
-                                    variant.name, 
-                                    isSelected ? '' : option.name
-                                  )}
-                                >
-                                  {option.name}
-                                  {option.price ? ` (+${option.price} ${currency || 'DZD'})` : ''}
-                                </button>
-                              );
-                            })}
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-
-                  {/* Price and Order Now */}
-                  <div className="space-y-6">
-                    <div className="text-center">
-                      <span className="text-4xl font-bold text-gray-800">
-                        {finalPrice} {currency || 'DZD'}
-                      </span>
-                    </div>
-                    
-                    {/* Quantity Selector */}
-                    <div className="flex items-center justify-center gap-4">
-                      <span className="text-lg font-medium text-gray-700">
-                        {translations[menuLanguage].quantity}:
-                      </span>
-                      <div className="flex items-center border-2 border-gray-300 rounded-lg">
-                        <button
-                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition text-lg font-medium"
-                          onClick={() => handleQuantityChange(productId, -1)}
-                          type="button"
-                        >
-                          -
-                        </button>
-                        <span className="px-6 py-2 w-12 text-center text-lg font-bold border-x-2 border-gray-300">
-                          {quantity}
-                        </span>
-                        <button
-                          className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition text-lg font-medium"
-                          onClick={() => handleQuantityChange(productId, 1)}
-                          type="button"
-                        >
-                          +
-                        </button>
-                      </div>
-                    </div>
-
-                    {/* Action Buttons */}
-                    <div className="flex flex-col gap-3">
-                      {/* View Details Button */}
-                      <button
-                        className="w-full py-3 px-6 rounded-xl text-lg font-semibold border-2 transition-all duration-200 hover:scale-105"
-                        style={{ 
-                          borderColor: colors.primaryColor,
-                          color: colors.primaryColor
-                        }}
-                        onClick={() => setDialogProduct({ product, productIndex: index })}
-                        type="button"
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = colors.primaryColor;
-                          e.currentTarget.style.color = 'white';
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = 'transparent';
-                          e.currentTarget.style.color = colors.primaryColor;
-                        }}
-                      >
-                        <svg className="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
-                        </svg>
-                        {translations[menuLanguage].viewDetails}
-                      </button>
-
-                      {/* Big Order Now Button */}
-                      <button
-                        className="w-full py-5 px-8 rounded-xl text-2xl font-bold text-white transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                        style={{ backgroundColor: colors.primaryColor }}
-                        onClick={() => handleOrderNow(product, productId)}
-                        type="button"
-                        onMouseEnter={(e) => {
-                          e.currentTarget.style.backgroundColor = colors.primaryHoverColor;
-                        }}
-                        onMouseLeave={(e) => {
-                          e.currentTarget.style.backgroundColor = colors.primaryColor;
-                        }}
-                      >
-                        <svg className="w-7 h-7 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                        </svg>
-                        {translations[menuLanguage].orderNow}
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-
-      {/* Dialog for product details */}
-      <Dialog open={!!dialogProduct} onOpenChange={open => !open && setDialogProduct(null)}>
-        <DialogContent className="max-w-md w-full">
-          {dialogProduct && (
-            <>
-              <DialogHeader>
-                <DialogTitle>{dialogProduct.product.name}</DialogTitle>
-              </DialogHeader>
-              {(() => {
-                const dialogImages = getValidImages(dialogProduct.product);
-                return dialogImages.length > 0 && (
-                  <div className="relative w-full h-64 mb-4">
-                    <img
-                      src={dialogImages[imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0]}
-                      alt={dialogProduct.product.name}
-                      className="w-full h-full object-cover rounded"
-                    />
-                    {dialogImages.length > 1 && (
-                      <>
-                        <button
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
-                          onClick={(e) => { 
-                            e.preventDefault();
-                            e.stopPropagation(); 
-                            console.log('Dialog left arrow clicked');
-                            handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, -1); 
-                          }}
-                          type="button"
-                        >
-                          &#8592;
-                        </button>
-                        <button
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
-                          onClick={(e) => { 
-                            e.preventDefault();
-                            e.stopPropagation(); 
-                            console.log('Dialog right arrow clicked');
-                            handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, 1); 
-                          }}
-                          type="button"
-                        >
-                          &#8594;
-                        </button>
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
-                          {dialogImages.map((_, idx) => (
-                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
-                          ))}
-                        </div>
-                      </>
-                    )}
-                  </div>
-                );
-              })()}
-              {dialogProduct.product.description && (
-                <p className="mb-3 text-gray-700 text-sm">{dialogProduct.product.description}</p>
-              )}
-              {dialogProduct.product.variants && dialogProduct.product.variants.length > 0 && (
-                <div className="space-y-2 mb-3">
-                  {dialogProduct.product.variants.map((variant) => (
-                    <div key={variant.name} className="flex flex-col gap-1">
-                      <span className="font-medium text-sm text-gray-700">{variant.name}:</span>
-                      <div className="flex flex-wrap gap-1">
-                        {variant.options.map(option => {
-                          const key = `${dialogProduct.product.name}-${dialogProduct.productIndex}`;
-                          const selected = selectedVariants[key] || {};
-                          const isSelected = selected[variant.name] === option.name;
-                          return (
-                            <button
-                              key={option.name}
-                              type="button"
-                              className={`px-2 py-1 rounded-full border text-xs font-medium transition-all ${
-                                isSelected
-                                  ? 'text-white border-primary shadow'
-                                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
-                              }`}
-                              style={isSelected ? {
-                                backgroundColor: colors.primaryColor,
-                                borderColor: colors.primaryColor
-                              } : {}}
-                              onClick={() => handleVariantChange(key, variant.name, isSelected ? '' : option.name)}
-                            >
-                              {option.name}
-                              {option.price ? ` (+${option.price} ${currency || 'DZD'})` : ''}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <div className="flex justify-between items-center mt-4">
-                <span className="text-lg font-bold text-gray-800">
-                  {(dialogProduct.product.price + getVariantPriceAdjustment(dialogProduct.product, selectedVariants[`${dialogProduct.product.name}-${dialogProduct.productIndex}`]))} {currency || 'DZD'}
+                  </button>
+                ))}
+              </div>
+            )}
+          </div>
+        )}
+        
+        {/* Product Info */}
+        <div className="w-full lg:w-1/2 space-y-6">
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+          >
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+              {product.name}
+            </h1>
+            
+            {/* Price */}
+            <div className="flex items-center gap-3 mb-4">
+              <span className="text-3xl font-bold" style={{ color: colors.primaryColor }}>
+                {finalPrice} {currency || 'DZD'}
+              </span>
+              {priceAdjustment > 0 && (
+                <span className="text-lg text-gray-500 line-through">
+                  {product.price} {currency || 'DZD'}
                 </span>
+              )}
+            </div>
+            
+            {/* Rating */}
+            <div className="flex items-center gap-1 mb-6">
+              {[...Array(5)].map((_, i) => (
+                <svg key={i} className="w-5 h-5 text-yellow-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              ))}
+              <span className="text-gray-600 ml-2">(24 {menuLanguage === 'ar' ? 'تقييم' : 'reviews'})</span>
+            </div>
+            
+            {/* Variants */}
+            {product.variants && product.variants.length > 0 && (
+              <div className="space-y-4 mb-6">
+                {product.variants.map((variant) => (
+                  <div key={variant.name} className="space-y-2">
+                    <h3 className="text-lg font-medium text-gray-800">
+                      {variant.name}:
+                    </h3>
+                    <div className="flex flex-wrap gap-2">
+                      {variant.options.map(option => {
+                        const isSelected = selectedVariants[variant.name] === option.name;
+                        return (
+                          <button
+                            key={option.name}
+                            type="button"
+                            className={`px-4 py-2 rounded-lg border text-base font-medium transition-all ${
+                              isSelected
+                                ? 'text-white shadow-md'
+                                : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                            }`}
+                            style={isSelected ? {
+                              backgroundColor: colors.primaryColor,
+                              borderColor: colors.primaryColor
+                            } : {}}
+                            onClick={() => handleVariantChange(
+                              variant.name, 
+                              isSelected ? '' : option.name
+                            )}
+                          >
+                            {option.name}
+                            {option.price ? ` (+${option.price} ${currency || 'DZD'})` : ''}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
+            
+            {/* Quantity Selector */}
+            <div className="flex items-center gap-4 mb-8">
+              <h3 className="text-lg font-medium text-gray-800">
+                {translations[menuLanguage].quantity}:
+              </h3>
+              <div className="flex items-center border-2 border-gray-300 rounded-lg">
                 <button
-                  className="px-3 py-1 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition"
-                  style={{ backgroundColor: colors.primaryColor }}
-                  onClick={() => {
-                    handleOrderNow(dialogProduct.product, `${dialogProduct.product.name}-${dialogProduct.productIndex}`);
-                    setDialogProduct(null);
-                  }}
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition text-lg font-medium"
+                  onClick={() => handleQuantityChange(-1)}
                   type="button"
                 >
-                  {translations[menuLanguage].orderNow}
+                  -
+                </button>
+                <span className="px-6 py-2 w-12 text-center text-lg font-bold border-x-2 border-gray-300">
+                  {quantity}
+                </span>
+                <button
+                  className="px-4 py-2 bg-gray-100 hover:bg-gray-200 transition text-lg font-medium"
+                  onClick={() => handleQuantityChange(1)}
+                  type="button"
+                >
+                  +
                 </button>
               </div>
-              <DialogClose asChild>
-                <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">&times;</button>
-              </DialogClose>
-            </>
+            </div>
+            
+            {/* Call-to-Action Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4">
+              <button
+                className="flex-1 py-4 px-6 rounded-xl text-lg font-semibold text-white transition-all duration-200 hover:opacity-90"
+                style={{ backgroundColor: colors.primaryColor }}
+                onClick={() => handleOrderNow(true)}
+                type="button"
+              >
+                <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+                </svg>
+                {translations[menuLanguage].addToCart}
+              </button>
+              
+              <button
+                className="flex-1 py-4 px-6 rounded-xl text-lg font-semibold border-2 transition-all duration-200 hover:bg-gray-50"
+                style={{ 
+                  borderColor: colors.primaryColor,
+                  color: colors.primaryColor
+                }}
+                onClick={() => handleOrderNow(false)}
+                type="button"
+              >
+                <svg className="w-6 h-6 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                {translations[menuLanguage].buyNow}
+              </button>
+            </div>
+          </motion.div>
+        </div>
+      </div>
+      
+      {/* Product Details Tabs */}
+      <div className="mt-16 border-t pt-8">
+        <div className="flex border-b">
+          <button 
+            className="px-4 py-2 font-medium border-b-2"
+            style={{ borderColor: colors.primaryColor, color: colors.primaryColor }}
+          >
+            {translations[menuLanguage].description}
+          </button>
+        </div>
+        
+        <div className="py-6">
+          {product.description ? (
+            <p className="text-gray-700 leading-relaxed whitespace-pre-line">
+              {product.description}
+            </p>
+          ) : (
+            <p className="text-gray-500 italic">
+              {menuLanguage === 'ar' ? 'لا يوجد وصف متوفر' : 'No description available'}
+            </p>
           )}
-        </DialogContent>
-      </Dialog>
+        </div>
+      </div>
+      
+      {/* Trust Badges */}
+      <div className="mt-12 grid grid-cols-2 md:grid-cols-4 gap-6">
+        <div className="flex flex-col items-center text-center p-4 rounded-lg bg-gray-50">
+          <svg className="w-10 h-10 mb-2 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+          </svg>
+          <h4 className="font-medium">{menuLanguage === 'ar' ? 'ضمان الجودة' : 'Quality Guarantee'}</h4>
+        </div>
+        <div className="flex flex-col items-center text-center p-4 rounded-lg bg-gray-50">
+          <svg className="w-10 h-10 mb-2 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          </svg>
+          <h4 className="font-medium">{menuLanguage === 'ar' ? 'شحن سريع' : 'Fast Shipping'}</h4>
+        </div>
+        <div className="flex flex-col items-center text-center p-4 rounded-lg bg-gray-50">
+          <svg className="w-10 h-10 mb-2 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+          </svg>
+          <h4 className="font-medium">{menuLanguage === 'ar' ? 'دفع آمن' : 'Secure Payment'}</h4>
+        </div>
+        <div className="flex flex-col items-center text-center p-4 rounded-lg bg-gray-50">
+          <svg className="w-10 h-10 mb-2 text-orange-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 5.636l-3.536 3.536m0 5.656l3.536 3.536M9.172 9.172L5.636 5.636m3.536 9.192l-3.536 3.536M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-5 0a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <h4 className="font-medium">{menuLanguage === 'ar' ? 'دعم 24/7' : '24/7 Support'}</h4>
+        </div>
+      </div>
     </div>
   );
 };
