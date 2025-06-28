@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { MenuItem } from '@/types';
 import { motion } from 'framer-motion';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogClose } from '@/components/ui/dialog';
 
 interface ProductsSectionProps {
   products: MenuItem[];
@@ -13,6 +14,7 @@ interface ProductsSectionProps {
   };
   currency?: string;
   onAddToBasket: (item: MenuItem, quantity: number, key: string, categoryName: string, price: number, selectedVariants?: { [variantName: string]: string }) => void;
+  onDirectOrder?: (item: MenuItem, quantity: number, key: string, categoryName: string, price: number, selectedVariants?: { [variantName: string]: string }) => void;
 }
 
 type SelectedVariants = { [variantName: string]: string };
@@ -22,11 +24,13 @@ const translations = {
     products: 'Our Products',
     orderNow: 'Order Now',
     quantity: 'Quantity',
+    viewDetails: 'View Details',
   },
   ar: {
     products: 'منتجاتنا',
     orderNow: 'اطلب الآن',
     quantity: 'الكمية',
+    viewDetails: 'عرض التفاصيل',
   },
 };
 
@@ -36,11 +40,16 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   menuLanguage,
   colors,
   currency,
-  onAddToBasket
+  onAddToBasket,
+  onDirectOrder
 }) => {
   const [selectedVariants, setSelectedVariants] = useState<{ [key: string]: SelectedVariants }>({});
   const [quantities, setQuantities] = useState<{ [key: string]: number }>({});
   const [imageIndexes, setImageIndexes] = useState<{ [key: string]: number }>({});
+  const [dialogProduct, setDialogProduct] = useState<{
+    product: MenuItem;
+    productIndex: number;
+  } | null>(null);
 
   const handleVariantChange = (productId: string, variantName: string, optionName: string) => {
     setSelectedVariants(prev => ({
@@ -74,8 +83,12 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
     const priceAdjustment = getVariantPriceAdjustment(product, variants);
     const finalPrice = product.price + priceAdjustment;
     
-    // Add to basket and trigger COD form directly
-    onAddToBasket(product, quantity, productId, 'Products', finalPrice, variants);
+    // Use direct order if available, otherwise fall back to basket
+    if (onDirectOrder) {
+      onDirectOrder(product, quantity, productId, 'Products', finalPrice, variants);
+    } else {
+      onAddToBasket(product, quantity, productId, 'Products', finalPrice, variants);
+    }
   };
 
   const handleImageNav = (key: string, images: string[], dir: 1 | -1) => {
@@ -255,24 +268,52 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                       </div>
                     </div>
 
-                    {/* Big Order Now Button */}
-                    <button
-                      className="w-full py-5 px-8 rounded-xl text-2xl font-bold text-white transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
-                      style={{ backgroundColor: colors.primaryColor }}
-                      onClick={() => handleOrderNow(product, productId)}
-                      type="button"
-                      onMouseEnter={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.primaryHoverColor;
-                      }}
-                      onMouseLeave={(e) => {
-                        e.currentTarget.style.backgroundColor = colors.primaryColor;
-                      }}
-                    >
-                      <svg className="w-7 h-7 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                      </svg>
-                      {translations[menuLanguage].orderNow}
-                    </button>
+                    {/* Action Buttons */}
+                    <div className="flex flex-col gap-3">
+                      {/* View Details Button */}
+                      <button
+                        className="w-full py-3 px-6 rounded-xl text-lg font-semibold border-2 transition-all duration-200 hover:scale-105"
+                        style={{ 
+                          borderColor: colors.primaryColor,
+                          color: colors.primaryColor
+                        }}
+                        onClick={() => setDialogProduct({ product, productIndex: index })}
+                        type="button"
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = colors.primaryColor;
+                          e.currentTarget.style.color = 'white';
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = 'transparent';
+                          e.currentTarget.style.color = colors.primaryColor;
+                        }}
+                      >
+                        <svg className="w-5 h-5 inline-block mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                        </svg>
+                        {translations[menuLanguage].viewDetails}
+                      </button>
+
+                      {/* Big Order Now Button */}
+                      <button
+                        className="w-full py-5 px-8 rounded-xl text-2xl font-bold text-white transition-all duration-200 transform hover:scale-105 hover:shadow-lg"
+                        style={{ backgroundColor: colors.primaryColor }}
+                        onClick={() => handleOrderNow(product, productId)}
+                        type="button"
+                        onMouseEnter={(e) => {
+                          e.currentTarget.style.backgroundColor = colors.primaryHoverColor;
+                        }}
+                        onMouseLeave={(e) => {
+                          e.currentTarget.style.backgroundColor = colors.primaryColor;
+                        }}
+                      >
+                        <svg className="w-7 h-7 inline-block mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                        </svg>
+                        {translations[menuLanguage].orderNow}
+                      </button>
+                    </div>
                   </div>
                 </div>
               </motion.div>
@@ -280,6 +321,111 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
           })}
         </div>
       </div>
+
+      {/* Dialog for product details */}
+      <Dialog open={!!dialogProduct} onOpenChange={open => !open && setDialogProduct(null)}>
+        <DialogContent className="max-w-md w-full">
+          {dialogProduct && (
+            <>
+              <DialogHeader>
+                <DialogTitle>{dialogProduct.product.name}</DialogTitle>
+              </DialogHeader>
+              {(() => {
+                const dialogImages = getValidImages(dialogProduct.product);
+                return dialogImages.length > 0 && (
+                  <div className="relative w-full h-64 mb-4">
+                    <img
+                      src={dialogImages[imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0]}
+                      alt={dialogProduct.product.name}
+                      className="w-full h-full object-cover rounded"
+                    />
+                    {dialogImages.length > 1 && (
+                      <>
+                        <button
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, -1); }}
+                          type="button"
+                        >
+                          &#8592;
+                        </button>
+                        <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, 1); }}
+                          type="button"
+                        >
+                          &#8594;
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {dialogImages.map((_, idx) => (
+                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                );
+              })()}
+              {dialogProduct.product.description && (
+                <p className="mb-3 text-gray-700 text-sm">{dialogProduct.product.description}</p>
+              )}
+              {dialogProduct.product.variants && dialogProduct.product.variants.length > 0 && (
+                <div className="space-y-2 mb-3">
+                  {dialogProduct.product.variants.map((variant) => (
+                    <div key={variant.name} className="flex flex-col gap-1">
+                      <span className="font-medium text-sm text-gray-700">{variant.name}:</span>
+                      <div className="flex flex-wrap gap-1">
+                        {variant.options.map(option => {
+                          const key = `${dialogProduct.product.name}-${dialogProduct.productIndex}`;
+                          const selected = selectedVariants[key] || {};
+                          const isSelected = selected[variant.name] === option.name;
+                          return (
+                            <button
+                              key={option.name}
+                              type="button"
+                              className={`px-2 py-1 rounded-full border text-xs font-medium transition-all ${
+                                isSelected
+                                  ? 'text-white border-primary shadow'
+                                  : 'bg-gray-50 text-gray-700 border-gray-200 hover:bg-gray-100'
+                              }`}
+                              style={isSelected ? {
+                                backgroundColor: colors.primaryColor,
+                                borderColor: colors.primaryColor
+                              } : {}}
+                              onClick={() => handleVariantChange(key, variant.name, isSelected ? '' : option.name)}
+                            >
+                              {option.name}
+                              {option.price ? ` (+${option.price} ${currency || 'DZD'})` : ''}
+                            </button>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+              <div className="flex justify-between items-center mt-4">
+                <span className="text-lg font-bold text-gray-800">
+                  {(dialogProduct.product.price + getVariantPriceAdjustment(dialogProduct.product, selectedVariants[`${dialogProduct.product.name}-${dialogProduct.productIndex}`]))} {currency || 'DZD'}
+                </span>
+                <button
+                  className="px-3 py-1 rounded-lg text-white font-semibold text-sm hover:opacity-90 transition"
+                  style={{ backgroundColor: colors.primaryColor }}
+                  onClick={() => {
+                    handleOrderNow(dialogProduct.product, `${dialogProduct.product.name}-${dialogProduct.productIndex}`);
+                    setDialogProduct(null);
+                  }}
+                  type="button"
+                >
+                  {translations[menuLanguage].orderNow}
+                </button>
+              </div>
+              <DialogClose asChild>
+                <button className="absolute top-2 right-2 text-gray-400 hover:text-gray-600">&times;</button>
+              </DialogClose>
+            </>
+          )}
+        </DialogContent>
+      </Dialog>
     </div>
   );
 };

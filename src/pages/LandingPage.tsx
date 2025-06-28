@@ -342,6 +342,15 @@ const LandingPage = () => {
     });
   };
 
+  // Direct order function for products (bypasses basket)
+  const handleDirectOrder = (item: MenuItem, quantity: number, key: string, categoryName: string, price: number, selectedVariants?: SelectedVariants) => {
+    // Clear any existing basket items and add only this product
+    setBasket([{ key, item, quantity, categoryName, price, selectedVariants }]);
+    
+    // Show COD form directly
+    setShowCodForm(true);
+  };
+
   // Remove item from basket
   const removeFromBasket = (key: string) => {
     setBasket(prev => prev.filter(b => b.key !== key));
@@ -354,6 +363,10 @@ const LandingPage = () => {
 
   // Calculate total items in basket
   const totalItems = basket.reduce((sum, item) => sum + item.quantity, 0);
+
+  // Check if basket contains only products (should hide basket for products)
+  const basketContainsOnlyProducts = basket.length > 0 && basket.every(item => item.categoryName === 'Products');
+  const shouldShowBasket = qrCode?.menu?.orderable && !basketContainsOnlyProducts;
 
   // Handle COD form submission
   const handleCodFormSubmit = async (e: React.FormEvent) => {
@@ -520,6 +533,7 @@ const LandingPage = () => {
                 colors={landingPageColors}
                 currency={qrCode.products.currency}
                 onAddToBasket={addToBasket}
+                onDirectOrder={handleDirectOrder}
               />
             </Suspense>
           )}
@@ -554,7 +568,7 @@ const LandingPage = () => {
         </div>
 
         {/* Floating Basket Toggle Button */}
-        {isOrderable && (
+        {shouldShowBasket && (
           <div className="fixed bottom-6 right-6 z-50">
             <button
               onClick={() => setIsBasketOpen(!isBasketOpen)}
@@ -574,7 +588,7 @@ const LandingPage = () => {
         )}
 
         {/* Side Basket */}
-        {isOrderable && (
+        {shouldShowBasket && (
           <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 ${isBasketOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex flex-col h-full">
               {/* Basket Header */}
@@ -865,7 +879,7 @@ const LandingPage = () => {
         )}
 
         {/* Backdrop */}
-        {isBasketOpen && (
+        {isBasketOpen && shouldShowBasket && (
           <div
             className="fixed inset-0 bg-black bg-opacity-50 z-30"
             onClick={() => setIsBasketOpen(false)}
