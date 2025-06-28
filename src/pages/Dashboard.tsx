@@ -17,7 +17,7 @@ import ReactDOM from 'react-dom/client';
 import { qrCodeApi } from '@/lib/api';
 import { 
   Lock, Download, Eye, Edit, Trash2, ExternalLink, 
-  Plus, Calendar, CheckCircle, AlertCircle, Globe
+  Plus, Calendar, CheckCircle, AlertCircle, Globe, Copy
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
@@ -138,7 +138,9 @@ const translations = {
     activeSubscription: "Active Subscription",
     language: "Language",
     previous: "Previous",
-    next: "Next"
+    next: "Next",
+    copyLink: "Copy Link",
+    linkCopied: "Link copied to clipboard!"
   },
   ar: {
     dashboard: "لوحة التحكم",
@@ -255,7 +257,9 @@ const translations = {
     activeSubscription: "اشتراك نشط",
     language: "اللغة",
     previous: "السابق",
-    next: "التالي"
+    next: "التالي",
+    copyLink: "نسخ الرابط",
+    linkCopied: "تم نسخ الرابط إلى الملف الملحق!"
   }
 };
 
@@ -429,6 +433,23 @@ const Dashboard = () => {
 
   const handlePreview = (qr: QRCode) => {
     setPreviewQR(qr);
+  };
+
+  const handleCopyLink = async (qr: QRCode) => {
+    try {
+      await navigator.clipboard.writeText(qr.url);
+      toast({
+        title: translations[language].success,
+        description: translations[language].linkCopied,
+      });
+    } catch (error) {
+      console.error('Failed to copy link:', error);
+      toast({
+        variant: "destructive",
+        title: translations[language].error,
+        description: "Failed to copy link to clipboard",
+      });
+    }
   };
 
   const handleDownload = (qr: QRCode, format: 'png' | 'svg') => {
@@ -1114,38 +1135,14 @@ const Dashboard = () => {
                           >
                             <Edit className="w-3.5 h-3.5 mr-1.5" /> {translations[language].edit}
                           </Button>
-                          <Dialog>
-                            <DialogTrigger asChild>
-                              <Button variant="outline" size="sm" onClick={() => handleEditQR(qr)} className="w-full hover:bg-gray-50 font-cairo">
-                                <ExternalLink className="w-3.5 h-3.5 mr-1.5" /> {translations[language].edit}
-                              </Button>
-                            </DialogTrigger>
-                            <DialogContent>
-                              <DialogHeader>
-                                <DialogTitle className="font-cairo">{translations[language].editQRCodeURL}</DialogTitle>
-                              </DialogHeader>
-                              <div className="space-y-4">
-                                <div>
-                                  <Label htmlFor="newUrl">{translations[language].newURL}</Label>
-                                  <Input
-                                    id="newUrl"
-                                    value={newUrl}
-                                    onChange={(e) => setNewUrl(e.target.value)}
-                                    placeholder={translations[language].enterNewURL}
-                                    className="border-primary/20 focus:border-primary"
-                                  />
-                                </div>
-                                <div className="flex justify-end gap-2">
-                                  <Button variant="outline" onClick={() => setEditingQR(null)}>
-                                    {translations[language].cancel}
-                                  </Button>
-                                  <Button onClick={handleUpdateQR} className="dz-button">
-                                    {translations[language].updateURL}
-                                  </Button>
-                                </div>
-                              </div>
-                            </DialogContent>
-                          </Dialog>
+                          <Button 
+                            variant="outline" 
+                            size="sm" 
+                            onClick={() => handleCopyLink(qr)}
+                            className="w-full hover:bg-gray-50 font-cairo"
+                          >
+                            <Copy className="w-3.5 h-3.5 mr-1.5" /> {translations[language].copyLink}
+                          </Button>
                         </div>
                         <div className="grid grid-cols-2 gap-2">
                           <Button 
