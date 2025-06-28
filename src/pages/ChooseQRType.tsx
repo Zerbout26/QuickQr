@@ -149,7 +149,7 @@ const ChooseQRType = () => {
   const t = translations[language];
 
   useEffect(() => {
-    if (!loading && user && user.hasVitrine && user.hasMenu) {
+    if (!loading && user && (user.hasVitrine || user.hasMenu || user.hasProducts)) {
       navigate('/dashboard');
     }
   }, [user, loading, navigate]);

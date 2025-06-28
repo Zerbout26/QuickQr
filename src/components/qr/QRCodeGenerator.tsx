@@ -285,6 +285,13 @@ const translations = {
     addLogo: 'Add Logo',
     errorCreatingQR: 'Failed to create QR code',
     showOtherTypes: 'Show Other Types',
+    menu: 'Menu',
+    maxLimitReached: 'You have reached the maximum limit for all QR code types.',
+    creatingFirstQR: 'Creating Your First QR Code',
+    chosenToCreate: 'You\'ve chosen to create a {type} QR code. Fill out the details below to get started.',
+    businessName: 'Business Name',
+    myBusiness: 'My Business',
+    myProduct: 'My Product',
   },
   ar: {
     success: 'نجح',
@@ -383,6 +390,13 @@ const translations = {
     addLogo: 'إضافة شعار',
     errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
     showOtherTypes: 'عرض الأنواع الأخرى',
+    menu: 'قائمة',
+    maxLimitReached: 'لقد وصلت إلى الحد الأقصى لجميع أنواع رموز الاستجابة.',
+    creatingFirstQR: 'إنشاء رمز الاستجابة السريعة الأول',
+    chosenToCreate: 'لقد اخترت إنشاء {type} QR code. يمكنك الآن ملء تفاصيل الصفحة التالية للبدء.',
+    businessName: 'اسم العمل',
+    myBusiness: 'اسم العمل',
+    myProduct: 'اسم المنتج',
   },
 };
 
@@ -934,14 +948,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                   <div className="ml-2 sm:ml-3">
                     <h3 className="text-sm font-medium text-blue-800">
-                      Creating Your First QR Code
+                      {translations[language].creatingFirstQR}
                     </h3>
                     <p className="text-xs sm:text-sm text-blue-700 mt-1">
-                      You've chosen to create a {selectedType} QR code. Fill out the details below to get started.
+                      {translations[language].chosenToCreate.replace('{type}', translations[language][type])}
                     </p>
                   </div>
                 </div>
-                {onAllowOtherTypes && (
+                {/* {onAllowOtherTypes && (
                   <Button
                     type="button"
                     variant="outline"
@@ -955,7 +969,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   >
                     {translations[language].showOtherTypes}
                   </Button>
-                )}
+                )} */}
               </div>
             </div>
           )}
@@ -964,8 +978,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           <div className="space-y-2 sm:space-y-3">
             <div className="space-y-1">
               <Label htmlFor="name" className="text-sm sm:text-base font-medium">
-                {type === 'menu' || selectedType === 'menu' ? 'Business Name' : 
-                 type === 'products' || selectedType === 'products' ? 'Product Name' : 
+                {type === 'menu' || selectedType === 'menu' ? translations[language].businessName : 
+                 type === 'products' || selectedType === 'products' ? translations[language].productName : 
                  translations[language].name}
               </Label>
               <Input
@@ -973,8 +987,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 value={name}
                 onChange={(e) => setName(e.target.value)}
                 placeholder={
-                  type === 'menu' || selectedType === 'menu' ? 'My Business' : 
-                  type === 'products' || selectedType === 'products' ? 'My Product' : 
+                  type === 'menu' || selectedType === 'menu' ? translations[language].myBusiness : 
+                  type === 'products' || selectedType === 'products' ? translations[language].myProduct : 
                   translations[language].myQRCode
                 }
                 required
@@ -1015,21 +1029,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             </div>
             
             {/* QR Type Selector as Buttons */}
-            {(!selectedType && user && !fromOnboarding && userQRCodes.length === 0) ? (
+            {(!selectedType && user) ? (
               <div className="mb-2">
                 <Label htmlFor="type" className="text-sm sm:text-base font-medium">Type</Label>
                 <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-1">
                   {/* Show available options based on current limits for new users */}
-                  {canCreateMenu && (
-                    <Button
-                      type="button"
-                      variant={type === 'menu' ? 'default' : 'outline'}
-                      onClick={() => setType('menu')}
-                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
-                    >
-                      Menu
-                    </Button>
-                  )}
                   {canCreateProducts && (
                     <Button
                       type="button"
@@ -1037,7 +1041,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       onClick={() => setType('products')}
                       className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
                     >
-                      Products ({currentProductsCount}/10)
+                      {translations[language].products} ({currentProductsCount}/10)
+                    </Button>
+                  )}
+                  {canCreateMenu && (
+                    <Button
+                      type="button"
+                      variant={type === 'menu' ? 'default' : 'outline'}
+                      onClick={() => setType('menu')}
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
+                    >
+                      {translations[language].menu}
                     </Button>
                   )}
                   {canCreateVitrine && (
@@ -1047,13 +1061,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       onClick={() => setType('vitrine')}
                       className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
                     >
-                      Vitrine
+                      {translations[language].vitrine}
                     </Button>
                   )}
                   {/* Show message if no options available */}
                   {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
                     <div className="text-center text-gray-500 py-2 text-sm">
-                      You have reached the maximum limit for all QR code types.
+                      {translations[language].maxLimitReached}
                     </div>
                   )}
                 </div>
