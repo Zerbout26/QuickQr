@@ -215,16 +215,57 @@ const translations = {
     telegram: 'Telegram',
     location: 'Location',
     other: 'Other',
+    categories: 'Categories',
+    addCategory: 'Add Category',
     categoryName: 'Category Name',
+    items: 'Items',
+    addMenuItem: 'Add Menu Item',
     itemName: 'Item Name',
     description: 'Description',
     price: 'Price',
-    itemImage: 'Item Image',
+    removeItem: 'Remove Item',
+    createQRCode: 'Create QR Code',
+    creating: 'Creating...',
+    logo: 'Logo',
+    foregroundColor: 'Foreground Color',
+    backgroundColor: 'Background Color',
+    hero: 'Hero',
+    about: 'About',
+    services: 'Services',
+    gallery: 'Gallery',
+    testimonials: 'Testimonials',
+    contact: 'Contact',
+    footer: 'Footer',
+    enterBusinessName: 'Enter Business Name',
+    enterTagline: 'Enter Tagline',
+    enterDescription: 'Enter Description',
+    enterCity: 'Enter City',
+    addService: 'Add Service',
+    enterServiceName: 'Enter Service Name',
+    enterServiceTitle: 'Enter Service Title',
+    enterServiceDescription: 'Enter Service Description',
+    removeService: 'Remove Service',
     addImage: 'Add Image',
     changeImage: 'Change Image',
+    enterImageTitle: 'Enter Image Title',
+    enterImageDescription: 'Enter Image Description',
+    removeImage: 'Remove Image',
+    addTestimonial: 'Add Testimonial',
+    enterTestimonialText: 'Enter Testimonial Text',
+    enterAuthor: 'Enter Author',
+    removeTestimonial: 'Remove Testimonial',
+    enterAddress: 'Enter Address',
+    enterPhone: 'Enter Phone',
+    enterEmail: 'Enter Email',
+    cta: 'Call to Action',
+    addCta: 'Add CTA',
+    enterCtaText: 'Enter CTA Text',
+    enterCtaLink: 'Enter CTA Link',
     availability: 'Availability',
     editAvailability: 'Edit Availability',
     hideAvailability: 'Hide Availability',
+    orderableMenuToggle: 'Make menu orderable',
+    codFormToggle: 'Enable Cash on Delivery form',
     days: {
       monday: 'Monday',
       tuesday: 'Tuesday',
@@ -232,79 +273,21 @@ const translations = {
       thursday: 'Thursday',
       friday: 'Friday',
       saturday: 'Saturday',
-      sunday: 'Sunday',
+      sunday: 'Sunday'
     },
-    removeItem: 'Remove Item',
-    addMenuItem: 'Add Menu Item',
-    addCategory: 'Add Category',
-    hero: 'Hero',
-    enterBusinessName: 'Enter Business Name',
-    enterTagline: 'Enter Tagline',
-    cta: 'Call to Action',
-    addCta: 'Add CTA',
-    enterCtaText: 'Enter CTA Text',
-    enterCtaLink: 'Enter CTA Link',
-    removeCta: 'Remove CTA',
-    about: 'About',
-    enterDescription: 'Enter Description',
-    enterCity: 'Enter City',
-    services: 'Services',
-    addService: 'Add Service',
-    enterServiceName: 'Enter Service Name',
-    enterServiceDescription: 'Enter Service Description',
-    enterImageTitle: 'Enter Image Title',
-    enterImageDescription: 'Enter Image Description',
-    removeService: 'Remove Service',
-    gallery: 'Gallery',
-    removeImage: 'Remove Image',
-    testimonials: 'Testimonials',
-    addTestimonial: 'Add Testimonial',
-    enterTestimonialText: 'Enter Testimonial Text',
-    enterAuthor: 'Enter Author',
-    removeTestimonial: 'Remove Testimonial',
-    contact: 'Contact',
-    enterAddress: 'Enter Address',
-    enterPhone: 'Enter Phone',
-    enterEmail: 'Enter Email',
-    socialMedia: 'Social Media',
-    enterFacebook: 'Enter Facebook URL',
-    enterInstagram: 'Enter Instagram URL',
-    enterTwitter: 'Enter Twitter URL',
-    enterLinkedin: 'Enter LinkedIn URL',
-    enterYoutube: 'Enter YouTube URL',
-    enterTiktok: 'Enter TikTok URL',
-    enableContactForm: 'Enable Contact Form',
-    formFields: 'Form Fields',
-    addField: 'Add Field',
-    enterFieldName: 'Enter Field Name',
-    fieldType: 'Field Type',
-    textField: 'Text Field',
-    emailField: 'Email Field',
-    phoneField: 'Phone Field',
-    textareaField: 'Textarea Field',
-    required: 'Required',
-    footer: 'Footer',
-    quickLinks: 'Quick Links',
-    addQuickLink: 'Add Quick Link',
-    enterQuickLinkLabel: 'Enter Quick Link Label',
-    enterQuickLinkUrl: 'Enter Quick Link URL',
-    socialIcons: 'Social Icons',
-    foregroundColor: 'Foreground Color',
-    backgroundColor: 'Background Color',
-    logo: 'Logo',
-    createQRCode: 'Create QR Code',
-    updateQRCode: 'Update QR Code',
-    creating: 'Creating...',
-    orderableMenuToggle: "Enable Orderable Menu",
-    codFormToggle: "Enable COD Form",
-    showOtherTypes: "Show Other Types",
-    qrCreated: 'QR code created successfully',
-    errorCreatingQR: 'Failed to create QR code',
     downloadQRCode: 'Download the QR Code',
     downloadQRCodeSticker: 'Download the QR Code on Ready Sticker',
+    products: 'Products',
+    addProduct: 'Add Product',
+    productName: 'Product Name',
+    removeProduct: 'Remove Product',
+    changeLogo: 'Change Logo',
+    addLogo: 'Add Logo',
+    errorCreatingQR: 'Failed to create QR code',
+    showOtherTypes: 'Show Other Types',
   },
   ar: {
-    success: 'نجاح',
+    success: 'نجح',
     error: 'خطأ',
     basic: 'أساسي',
     advanced: 'متقدم',
@@ -312,34 +295,75 @@ const translations = {
     myQRCode: 'رمز الاستجابة السريعة الخاص بي',
     type: 'النوع',
     directLink: 'رابط مباشر',
-    url: 'رابط',
-    both: 'قائمة',
-    vitrine: 'فترينة',
+    url: 'الرابط',
+    both: 'كلاهما',
+    vitrine: 'فيتري',
     enterURL: 'أدخل الرابط',
     links: 'الروابط',
     addLink: 'إضافة رابط',
     selectPlatform: 'اختر المنصة',
-    website: 'موقع إلكتروني',
+    website: 'الموقع الإلكتروني',
     facebook: 'فيسبوك',
-    instagram: 'انستغرام',
+    instagram: 'إنستغرام',
     twitter: 'تويتر',
     linkedin: 'لينكد إن',
     youtube: 'يوتيوب',
     tiktok: 'تيك توك',
     whatsapp: 'واتساب',
-    telegram: 'تيليجرام',
-    location: 'موقع',
-    other: 'آخر',
+    telegram: 'تليجرام',
+    location: 'الموقع',
+    other: 'أخرى',
+    categories: 'الفئات',
+    addCategory: 'إضافة فئة',
     categoryName: 'اسم الفئة',
+    items: 'العناصر',
+    addMenuItem: 'إضافة عنصر قائمة',
     itemName: 'اسم العنصر',
     description: 'الوصف',
     price: 'السعر',
-    itemImage: 'صورة العنصر',
+    removeItem: 'إزالة العنصر',
+    createQRCode: 'إنشاء رمز الاستجابة السريعة',
+    creating: 'جاري الإنشاء...',
+    logo: 'الشعار',
+    foregroundColor: 'لون المقدمة',
+    backgroundColor: 'لون الخلفية',
+    hero: 'البطل',
+    about: 'حول',
+    services: 'الخدمات',
+    gallery: 'المعرض',
+    testimonials: 'التوصيات',
+    contact: 'اتصل بنا',
+    footer: 'التذييل',
+    enterBusinessName: 'أدخل اسم العمل',
+    enterTagline: 'أدخل الشعار',
+    enterDescription: 'أدخل الوصف',
+    enterCity: 'أدخل المدينة',
+    addService: 'إضافة خدمة',
+    enterServiceName: 'أدخل اسم الخدمة',
+    enterServiceTitle: 'أدخل عنوان الخدمة',
+    enterServiceDescription: 'أدخل وصف الخدمة',
+    removeService: 'إزالة الخدمة',
     addImage: 'إضافة صورة',
     changeImage: 'تغيير الصورة',
+    enterImageTitle: 'أدخل عنوان الصورة',
+    enterImageDescription: 'أدخل وصف الصورة',
+    removeImage: 'إزالة الصورة',
+    addTestimonial: 'إضافة توصية',
+    enterTestimonialText: 'أدخل نص التوصية',
+    enterAuthor: 'أدخل المؤلف',
+    removeTestimonial: 'إزالة التوصية',
+    enterAddress: 'أدخل العنوان',
+    enterPhone: 'أدخل الهاتف',
+    enterEmail: 'أدخل البريد الإلكتروني',
+    cta: 'دعوة للعمل',
+    addCta: 'إضافة دعوة للعمل',
+    enterCtaText: 'أدخل نص دعوة العمل',
+    enterCtaLink: 'أدخل رابط دعوة العمل',
     availability: 'التوفر',
     editAvailability: 'تعديل التوفر',
     hideAvailability: 'إخفاء التوفر',
+    orderableMenuToggle: 'جعل القائمة قابلة للطلب',
+    codFormToggle: 'تمكين نموذج الدفع عند الاستلام',
     days: {
       monday: 'الاثنين',
       tuesday: 'الثلاثاء',
@@ -347,54 +371,18 @@ const translations = {
       thursday: 'الخميس',
       friday: 'الجمعة',
       saturday: 'السبت',
-      sunday: 'الأحد',
+      sunday: 'الأحد'
     },
-    removeItem: 'إزالة العنصر',
-    addMenuItem: 'إضافة عنصر قائمة',
-    addCategory: 'إضافة فئة',
-    hero: 'البطل',
-    enterBusinessName: 'أدخل اسم العمل',
-    enterTagline: 'أدخل الشعار',
-    cta: 'دعوة للعمل',
-    addCta: 'إضافة CTA',
-    enterCtaText: 'أدخل نص CTA',
-    enterCtaLink: 'أدخل رابط CTA',
-    removeCta: 'إزالة CTA',
-    about: 'حول',
-    enterDescription: 'أدخل الوصف',
-    enterCity: 'أدخل المدينة',
-    services: 'الخدمات',
-    addService: 'إضافة خدمة',
-    enterServiceName: 'أدخل اسم الخدمة',
-    enterServiceDescription: 'أدخل وصف الخدمة',
-    enterImageTitle: 'أدخل عنوان الصورة',
-    enterImageDescription: 'أدخل وصف الصورة',
-    removeService: 'إزالة الخدمة',
-    gallery: 'المعرض',
-    removeImage: 'إزالة الصورة',
-    testimonials: 'الشهادات',
-    addTestimonial: 'إضافة شهادة',
-    enterTestimonialText: 'أدخل نص الشهادة',
-    enterAuthor: 'أدخل المؤلف',
-    removeTestimonial: 'إزالة الشهادة',
-    contact: 'الاتصال',
-    enterAddress: 'أدخل العنوان',
-    enterPhone: 'أدخل الهاتف',
-    enterEmail: 'أدخل البريد الإلكتروني',
-    footer: 'التذييل',
-    foregroundColor: 'لون المقدمة',
-    backgroundColor: 'لون الخلفية',
-    logo: 'الشعار',
-    createQRCode: 'إنشاء رمز الاستجابة السريعة',
-    updateQRCode: 'تحديث رمز الاستجابة السريعة',
-    creating: 'جاري الإنشاء...',
-    orderableMenuToggle: "تفعيل قائمة الطلبات",
-    codFormToggle: "تفعيل نموذج الدفع عند الاستلام",
-    showOtherTypes: "عرض الأنواع الأخرى",
-    qrCreated: 'تم إنشاء رمز الاستجابة السريعة بنجاح',
-    errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
     downloadQRCode: 'تحميل رمز الاستجابة السريعة',
     downloadQRCodeSticker: 'تحميل رمز الاستجابة السريعة على ملصق جاهز',
+    products: 'المنتجات',
+    addProduct: 'إضافة منتج',
+    productName: 'اسم المنتج',
+    removeProduct: 'إزالة المنتج',
+    changeLogo: 'تغيير الشعار',
+    addLogo: 'إضافة شعار',
+    errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
+    showOtherTypes: 'عرض الأنواع الأخرى',
   },
 };
 
@@ -917,23 +905,23 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
   };
 
   return (
-    <Card className="w-full p-2 sm:p-6">
-      <CardContent className="pt-4 sm:pt-6">
-        <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-6">
+    <Card className="w-full p-1 sm:p-4">
+      <CardContent className="pt-2 sm:pt-4">
+        <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {fromOnboarding && (
-            <div className="bg-blue-50 border border-blue-200 rounded-lg p-3 sm:p-4 mb-4 sm:mb-6">
+            <div className="bg-blue-50 border border-blue-200 rounded-lg p-2 sm:p-3 mb-3 sm:mb-4">
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2">
                 <div className="flex items-center">
                   <div className="flex-shrink-0">
-                    <div className="w-8 h-8 bg-blue-100 rounded-full flex items-center justify-center">
-                      <span className="text-blue-600 font-semibold">1</span>
+                    <div className="w-6 h-6 sm:w-8 sm:h-8 bg-blue-100 rounded-full flex items-center justify-center">
+                      <span className="text-blue-600 font-semibold text-sm sm:text-base">1</span>
                     </div>
                   </div>
-                  <div className="ml-3">
+                  <div className="ml-2 sm:ml-3">
                     <h3 className="text-sm font-medium text-blue-800">
                       Creating Your First QR Code
                     </h3>
-                    <p className="text-sm text-blue-700 mt-1">
+                    <p className="text-xs sm:text-sm text-blue-700 mt-1">
                       You've chosen to create a {selectedType} QR code. Fill out the details below to get started.
                     </p>
                   </div>
@@ -944,7 +932,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     variant="outline"
                     size="sm"
                     onClick={onAllowOtherTypes}
-                    className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0 w-full sm:w-auto"
+                    className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"
                   >
                     {translations[language].showOtherTypes}
                   </Button>
@@ -954,31 +942,71 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           )}
           
           {/* Basic Information */}
-          <div className="space-y-3 sm:space-y-4">
-            <div className="space-y-1.5">
-              <Label htmlFor="name" className="text-base font-medium">{translations[language].name}</Label>
+          <div className="space-y-2 sm:space-y-3">
+            <div className="space-y-1">
+              <Label htmlFor="name" className="text-sm sm:text-base font-medium">
+                {type === 'menu' || selectedType === 'menu' ? 'Business Name' : 
+                 type === 'products' || selectedType === 'products' ? 'Product Name' : 
+                 translations[language].name}
+              </Label>
               <Input
                 id="name"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
-                placeholder={translations[language].myQRCode}
+                placeholder={
+                  type === 'menu' || selectedType === 'menu' ? 'My Business' : 
+                  type === 'products' || selectedType === 'products' ? 'My Product' : 
+                  translations[language].myQRCode
+                }
                 required
-                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-base px-4 py-3 h-12"
+                className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-sm sm:text-base px-3 py-2 h-10 sm:h-12"
                 dir={language === 'ar' ? 'rtl' : 'ltr'}
               />
             </div>
+            
+            {/* Logo Upload */}
+            <div className="space-y-2">
+              <Label className="text-sm sm:text-base font-medium">{translations[language].logo}</Label>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                {logoPreview && (
+                  <img src={logoPreview} alt="QR Code Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain border rounded" />
+                )}
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="w-full sm:w-auto py-2 sm:py-3 h-10 sm:h-12 text-xs sm:text-sm"
+                >
+                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                  {logoPreview ? 'Change Logo' : 'Upload Logo'}
+                </Button>
+                {logoPreview && (
+                  <Button type="button" variant="destructive" size="icon" onClick={removeLogo} className="h-10 w-10 sm:h-12 sm:w-12">
+                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                  </Button>
+                )}
+                <input
+                  type="file"
+                  ref={fileInputRef}
+                  onChange={handleLogoUpload}
+                  accept="image/*"
+                  className="hidden"
+                />
+              </div>
+            </div>
+            
             {/* QR Type Selector as Buttons */}
             {!selectedType && user && !fromOnboarding && (
-              <div className="mb-2 sm:mb-4">
-                <Label htmlFor="type" className="text-base font-medium">Type</Label>
-                <div className="flex flex-col sm:flex-row gap-2 sm:gap-4 mt-2">
+              <div className="mb-2">
+                <Label htmlFor="type" className="text-sm sm:text-base font-medium">Type</Label>
+                <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 mt-1">
                   {/* Show available options based on current limits */}
                   {canCreateMenu && (
                     <Button
                       type="button"
                       variant={type === 'menu' ? 'default' : 'outline'}
                       onClick={() => setType('menu')}
-                      className="flex-1 text-base py-4 h-14"
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
                     >
                       Menu
                     </Button>
@@ -988,7 +1016,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant={type === 'products' ? 'default' : 'outline'}
                       onClick={() => setType('products')}
-                      className="flex-1 text-base py-4 h-14"
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
                     >
                       Products ({currentProductsCount}/10)
                     </Button>
@@ -998,14 +1026,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       type="button"
                       variant={type === 'vitrine' ? 'default' : 'outline'}
                       onClick={() => setType('vitrine')}
-                      className="flex-1 text-base py-4 h-14"
+                      className="flex-1 text-sm sm:text-base py-2 sm:py-3 h-10 sm:h-12"
                     >
                       Vitrine
                     </Button>
                   )}
                   {/* Show message if no options available */}
                   {!canCreateMenu && !canCreateProducts && !canCreateVitrine && (
-                    <div className="text-center text-gray-500 py-4">
+                    <div className="text-center text-gray-500 py-2 text-sm">
                       You have reached the maximum limit for all QR code types.
                     </div>
                   )}
@@ -1013,41 +1041,41 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             )}
             {type === 'direct' && (
-              <div className="space-y-1.5">
-                <Label htmlFor="directUrl" className="text-base font-medium">{translations[language].url}</Label>
+              <div className="space-y-1">
+                <Label htmlFor="directUrl" className="text-sm sm:text-base font-medium">{translations[language].url}</Label>
                 <Input
                   id="directUrl"
                   type="url"
                   value={directUrl}
                   onChange={(e) => setDirectUrl(e.target.value)}
                   placeholder={translations[language].enterURL}
-                  className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-base px-4 py-3 h-12"
+                  className="w-full border-gray-300 rounded-md shadow-sm focus:border-primary focus:ring focus:ring-primary focus:ring-opacity-50 text-sm sm:text-base px-3 py-2 h-10 sm:h-12"
                 />
               </div>
             )}
             {(type === 'menu' || selectedType === 'menu') && (
               <div className="space-y-2">
-                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                  <Label className="text-base font-medium">{translations[language].links}</Label>
+                <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                  <Label className="text-sm sm:text-base font-medium">{translations[language].links}</Label>
                   <Button
                     type="button"
                     variant="outline"
                     size="sm"
                     onClick={addLink}
-                    className="flex items-center gap-2 w-full sm:w-auto py-3 h-12"
+                    className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                   >
-                    <Plus className="h-4 w-4" />
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
                     {translations[language].addLink}
                   </Button>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-2">
                   {links.map((link, index) => (
-                    <div key={index} className="flex flex-col sm:flex-row gap-2">
+                    <div key={index} className="flex flex-col sm:flex-row gap-1 sm:gap-2">
                       <Select
                         value={link.type || 'website'}
                         onValueChange={(value) => updateLink(index, 'type', value)}
                       >
-                        <SelectTrigger className="w-full sm:w-[180px] h-12">
+                        <SelectTrigger className="w-full sm:w-[160px] h-10 sm:h-12 text-xs sm:text-sm">
                           <SelectValue placeholder={translations[language].selectPlatform} />
                         </SelectTrigger>
                         <SelectContent>
@@ -1069,16 +1097,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         type="url"
                         value={link.url}
                         onChange={(e) => updateLink(index, 'url', e.target.value)}
-                        className="flex-1 h-12 px-4 py-3"
+                        className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       />
                       <Button
                         type="button"
                         variant="outline"
                         size="icon"
                         onClick={() => removeLink(index)}
-                        className="h-12 w-12"
+                        className="h-10 w-10 sm:h-12 sm:w-12"
                       >
-                        <Trash2 className="h-4 w-4" />
+                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                       </Button>
                     </div>
                   ))}
@@ -1086,90 +1114,90 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             )}
             {(type === 'menu' || type === 'both') && (
-              <div className="space-y-4">
+              <div className="space-y-3">
                 {/* Orderable and COD Form Toggles */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-3">
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Switch
                       checked={menuOrderable}
                       onCheckedChange={setMenuOrderable}
                       id="orderable-menu-toggle"
                     />
-                    <Label htmlFor="orderable-menu-toggle" className="text-base">{translations[language].orderableMenuToggle} (Optional)</Label>
+                    <Label htmlFor="orderable-menu-toggle" className="text-sm sm:text-base">{translations[language].orderableMenuToggle} (Optional)</Label>
                   </div>
-                  <div className="flex items-center gap-3">
+                  <div className="flex items-center gap-2 sm:gap-3">
                     <Switch
                       checked={codFormEnabled}
                       onCheckedChange={setCodFormEnabled}
                       id="cod-form-toggle"
                     />
-                    <Label htmlFor="cod-form-toggle" className="text-base">{translations[language].codFormToggle} (Optional)</Label>
+                    <Label htmlFor="cod-form-toggle" className="text-sm sm:text-base">{translations[language].codFormToggle} (Optional)</Label>
                   </div>
                 </div>
                 
                 {/* Menu Categories */}
-                <div className="space-y-4">
+                <div className="space-y-3">
                   {menuCategories.map((category, categoryIndex) => (
-                    <div key={categoryIndex} className="space-y-3 border p-4 rounded-lg">
-                      <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center">
+                    <div key={categoryIndex} className="space-y-2 border p-3 sm:p-4 rounded-lg">
+                      <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-start sm:items-center">
                         <Input
                           placeholder={translations[language].categoryName}
                           value={category.name}
                           onChange={(e) => updateCategory(categoryIndex, e.target.value)}
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          className="flex-1 h-12 px-4 py-3"
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                         />
                         <Button
                           type="button"
                           variant="outline"
                           size="icon"
                           onClick={() => removeCategory(categoryIndex)}
-                          className="h-12 w-12"
+                          className="h-10 w-10 sm:h-12 sm:w-12"
                         >
-                          <Trash2 className="h-4 w-4" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                         </Button>
                       </div>
-                      <div className="space-y-3 mt-4">
+                      <div className="space-y-2 mt-3">
                         {category.items.map((item, itemIndex) => {
                           const availKey = `${categoryIndex}-${itemIndex}`;
                           return (
-                            <div key={itemIndex} className="space-y-3 border p-3 rounded">
+                            <div key={itemIndex} className="space-y-2 border p-2 sm:p-3 rounded">
                               <Input
                                 placeholder={translations[language].itemName}
                                 value={item.name}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
                                 dir={language === 'ar' ? 'rtl' : 'ltr'}
-                                className="h-12 px-4 py-3"
+                                className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                               />
                               <Textarea
                                 placeholder={translations[language].description}
                                 value={item.description}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
                                 dir={language === 'ar' ? 'rtl' : 'ltr'}
-                                className="min-h-[80px] px-4 py-3"
+                                className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                               />
                               <Input
                                 placeholder={translations[language].price}
                                 type="number"
                                 value={item.price}
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
-                                className="h-12 px-4 py-3"
+                                className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                               />
                               <Button
                                 type="button"
                                 variant="outline"
                                 size="sm"
                                 onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
-                                className="w-full sm:w-auto py-3 h-12"
+                                className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                               >
                                 {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
                               </Button>
                               {editingAvailability[availKey] && (
-                                <div className="space-y-3">
-                                  <Label className="text-base font-medium">{translations[language].availability}</Label>
-                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
+                                <div className="space-y-2">
+                                  <Label className="text-sm sm:text-base font-medium">{translations[language].availability}</Label>
+                                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
                                     {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                      <div key={day} className="flex items-center space-x-2">
+                                      <div key={day} className="flex items-center space-x-1 sm:space-x-2">
                                         <Checkbox
                                           id={`new-${categoryIndex}-${itemIndex}-${day}`}
                                           checked={isAvailable}
@@ -1179,7 +1207,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                         />
                                         <label
                                           htmlFor={`new-${categoryIndex}-${itemIndex}-${day}`}
-                                          className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                          className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
                                         >
                                           {translations[language].days[day as keyof typeof translations.en.days]}
                                         </label>
@@ -1188,15 +1216,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                   </div>
                                 </div>
                               )}
-                              <div className="space-y-2">
-                                <Label className="text-base font-medium">Images</Label>
-                                <div className="flex gap-2 flex-wrap mb-2">
+                              <div className="space-y-1 sm:space-y-2">
+                                <Label className="text-sm sm:text-base font-medium">Images</Label>
+                                <div className="flex gap-1 sm:gap-2 flex-wrap mb-1 sm:mb-2">
                                   {(item.images || []).map((imgUrl, imgIdx) => (
                                     <div key={imgIdx} className="relative group">
-                                      <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
+                                      <img src={imgUrl} alt={item.name} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded border" />
                                       <button
                                         type="button"
-                                        className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                        className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-white border border-gray-300 rounded-full p-0.5 sm:p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
                                         onClick={() => {
                                           const newImages = [...(item.images || [])];
                                           newImages.splice(imgIdx, 1);
@@ -1239,18 +1267,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                       };
                                       input.click();
                                     }}
-                                    className="h-12 px-4 py-3"
+                                    className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                                   >
                                     + Add Image
                                   </Button>
                                 </div>
                               </div>
                               {/* Variants Section */}
-                              <div className="space-y-2">
-                                <Label className="text-base font-medium">Variants</Label>
+                              <div className="space-y-1 sm:space-y-2">
+                                <Label className="text-sm sm:text-base font-medium">Variants</Label>
                                 {(item.variants || []).map((variant, variantIdx) => (
-                                  <div key={variantIdx} className="border rounded p-3 mb-2">
-                                    <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center mb-2">
+                                  <div key={variantIdx} className="border rounded p-2 sm:p-3 mb-1 sm:mb-2">
+                                    <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-start sm:items-center mb-1 sm:mb-2">
                                       <Input
                                         value={variant.name}
                                         onChange={e => {
@@ -1259,7 +1287,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
                                         placeholder="Variant name (e.g. Size, Color)"
-                                        className="flex-1 h-12 px-4 py-3"
+                                        className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                                       />
                                       <Button
                                         type="button"
@@ -1270,15 +1298,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           newVariants.splice(variantIdx, 1);
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
-                                        className="h-12 w-12"
+                                        className="h-10 w-10 sm:h-12 sm:w-12"
                                       >
-                                        <Trash2 className="h-4 w-4" />
+                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                       </Button>
                                     </div>
                                     {/* Variant Options */}
-                                    <div className="space-y-2 ml-4">
+                                    <div className="space-y-1 sm:space-y-2 ml-2 sm:ml-4">
                                       {(variant.options || []).map((option, optionIdx) => (
-                                        <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
+                                        <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
                                           <Input
                                             value={option.name}
                                             onChange={e => {
@@ -1287,7 +1315,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
                                             placeholder="Option (e.g. Small, Red)"
-                                            className="flex-1 h-12 px-4 py-3"
+                                            className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                                           />
                                           <Input
                                             type="number"
@@ -1298,7 +1326,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
                                             placeholder="Price adj."
-                                            className="w-full sm:w-24 h-12 px-4 py-3"
+                                            className="w-full sm:w-20 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                                           />
                                           <Button
                                             type="button"
@@ -1309,9 +1337,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                               newVariants[variantIdx].options.splice(optionIdx, 1);
                                               updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                             }}
-                                            className="h-12 w-12"
+                                            className="h-10 w-10 sm:h-12 sm:w-12"
                                           >
-                                            <Trash2 className="h-4 w-4" />
+                                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
                                           </Button>
                                         </div>
                                       ))}
@@ -1324,7 +1352,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                           newVariants[variantIdx].options.push({ name: '' });
                                           updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                         }}
-                                        className="w-full sm:w-auto py-3 h-12"
+                                        className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                       >
                                         + Add Option
                                       </Button>
@@ -1340,7 +1368,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                     newVariants.push({ name: '', options: [] });
                                     updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
                                   }}
-                                  className="w-full sm:w-auto py-3 h-12"
+                                  className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                                 >
                                   + Add Variant
                                 </Button>
@@ -1350,9 +1378,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                                 variant="outline"
                                 size="sm"
                                 onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                                className="w-full sm:w-auto py-3 h-12"
+                                className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                               >
-                                <Trash2 className="h-4 w-4 mr-2" />
+                                <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                                 {translations[language].removeItem}
                               </Button>
                             </div>
@@ -1361,10 +1389,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         <Button
                           type="button"
                           variant="outline"
-                          className="w-full py-4 h-14"
+                          className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base"
                           onClick={() => addMenuItem(categoryIndex)}
                         >
-                          <Plus className="h-4 w-4 mr-2" />
+                          <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           {translations[language].addMenuItem}
                         </Button>
                       </div>
@@ -1373,73 +1401,232 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   <Button
                     type="button"
                     variant="outline"
-                    className="w-full py-4 h-14"
+                    className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base"
                     onClick={addCategory}
                   >
-                    <Plus className="h-4 w-4 mr-2" />
+                    <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                     {translations[language].addCategory}
                   </Button>
                 </div>
               </div>
             )}
-            {type === 'products' && (
-              <div className="space-y-4">
-                {/* Products */}
-                <div className="space-y-4">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h3 className="text-lg font-semibold">Product Showcase</h3>
-                    <p className="text-sm text-gray-600">Add products to your catalog</p>
+            {(type === 'products' || selectedType === 'products') && (
+              <div className="space-y-3">
+                {/* Products Section */}
+                <div className="space-y-2">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                    <Label className="text-sm sm:text-base font-medium">{translations[language].products}</Label>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addProduct}
+                      className="flex items-center gap-1 sm:gap-2 w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4" />
+                      {translations[language].addProduct}
+                    </Button>
                   </div>
-                  {products.map((product, productIndex) => {
-                    return (
-                      <div key={productIndex} className="space-y-3 border p-4 rounded-lg">
-                        <Input
-                          placeholder={translations[language].itemName}
-                          value={product.name}
-                          onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          className="h-12 px-4 py-3"
-                        />
-                        <Textarea
-                          placeholder={translations[language].description}
-                          value={product.description}
-                          onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          className="min-h-[80px] px-4 py-3"
-                        />
-                        <Input
-                          placeholder={translations[language].price}
-                          type="number"
-                          value={product.price}
-                          onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
-                          className="h-12 px-4 py-3"
-                        />
-                        {/* Hide availability for products - only show for menu */}
-                        <div className="space-y-2">
-                          <Label className="text-base font-medium">Images</Label>
-                          <div className="flex gap-2 flex-wrap mb-2">
-                            {(product.images || []).map((imgUrl, imgIdx) => (
-                              <div key={imgIdx} className="relative group">
-                                <img src={imgUrl} alt={product.name} className="w-16 h-16 object-cover rounded border" />
-                                <button
-                                  type="button"
-                                  className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
-                                  onClick={() => {
+                  <div className="space-y-2">
+                    {products.map((product, index) => {
+                      const availKey = `product-${index}`;
+                      return (
+                        <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
+                          <Input
+                            placeholder={translations[language].productName}
+                            value={product.name}
+                            onChange={(e) => updateProduct(index, 'name', e.target.value)}
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                          />
+                          <Textarea
+                            placeholder={translations[language].description}
+                            value={product.description}
+                            onChange={(e) => updateProduct(index, 'description', e.target.value)}
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                            className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
+                          />
+                          <Input
+                            placeholder={translations[language].price}
+                            type="number"
+                            value={product.price}
+                            onChange={(e) => updateProduct(index, 'price', e.target.value)}
+                            className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                          />
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => setEditingAvailability(prev => ({ ...prev, [availKey]: !prev[availKey] }))}
+                            className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                          >
+                            {editingAvailability[availKey] ? translations[language].hideAvailability || 'Hide Availability' : translations[language].editAvailability || 'Edit Availability'}
+                          </Button>
+                          {editingAvailability[availKey] && (
+                            <div className="space-y-2">
+                              <Label className="text-sm sm:text-base font-medium">{translations[language].availability}</Label>
+                              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 sm:gap-3">
+                                {Object.entries(product.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                  <div key={day} className="flex items-center space-x-1 sm:space-x-2">
+                                    <Checkbox
+                                      id={`product-${index}-${day}`}
+                                      checked={isAvailable}
+                                      onCheckedChange={(checked) => 
+                                        handleProductAvailabilityChange(index, day, checked === true)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`product-${index}-${day}`}
+                                      className="text-xs sm:text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      {translations[language].days[day as keyof typeof translations.en.days]}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                          )}
+                          <div className="space-y-1 sm:space-y-2">
+                            <Label className="text-sm sm:text-base font-medium">Images</Label>
+                            <div className="flex gap-1 sm:gap-2 flex-wrap mb-1 sm:mb-2">
+                              {(product.images || []).map((imgUrl, imgIdx) => (
+                                <div key={imgIdx} className="relative group">
+                                  <img src={imgUrl} alt={product.name} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded border" />
+                                  <button
+                                    type="button"
+                                    className="absolute -top-1 -right-1 sm:-top-2 sm:-right-2 bg-white border border-gray-300 rounded-full p-0.5 sm:p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                    onClick={() => {
+                                      const newImages = [...(product.images || [])];
+                                      newImages.splice(imgIdx, 1);
+                                      updateProduct(index, 'images', newImages);
+                                      
+                                      // Remove corresponding file from tempImages
+                                      const key = `product-${index}-${imgIdx}`;
+                                      if (tempImages[key]) {
+                                        const newTempImages = { ...tempImages };
+                                        delete newTempImages[key];
+                                        setTempImages(newTempImages);
+                                      }
+                                    }}
+                                  >
+                                    &times;
+                                  </button>
+                                </div>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const input = document.createElement('input');
+                                  input.type = 'file';
+                                  input.accept = 'image/*';
+                                  input.multiple = true;
+                                  input.onchange = (e) => {
+                                    const files = Array.from((e.target as HTMLInputElement).files || []);
                                     const newImages = [...(product.images || [])];
-                                    newImages.splice(imgIdx, 1);
-                                    updateProduct(productIndex, 'images', newImages);
-                                    
-                                    // Remove corresponding file from tempImages
-                                    const key = `product-${productIndex}-${imgIdx}`;
-                                    if (tempImages[key]) {
-                                      const newTempImages = { ...tempImages };
-                                      delete newTempImages[key];
-                                      setTempImages(newTempImages);
-                                    }
-                                  }}
-                                >
-                                  &times;
-                                </button>
+                                    files.forEach((file, fileIndex) => {
+                                      // Store file in tempImages for upload
+                                      const key = `product-${index}-${newImages.length + fileIndex}`;
+                                      setTempImages(prev => ({ ...prev, [key]: file }));
+                                      // Create temporary URL for preview
+                                      const url = URL.createObjectURL(file);
+                                      newImages.push(url);
+                                    });
+                                    updateProduct(index, 'images', newImages);
+                                  };
+                                  input.click();
+                                }}
+                                className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                              >
+                                + Add Image
+                              </Button>
+                            </div>
+                          </div>
+                          {/* Variants Section */}
+                          <div className="space-y-1 sm:space-y-2">
+                            <Label className="text-sm sm:text-base font-medium">Variants</Label>
+                            {(product.variants || []).map((variant, variantIdx) => (
+                              <div key={variantIdx} className="border rounded p-2 sm:p-3 mb-1 sm:mb-2">
+                                <div className="flex flex-col sm:flex-row gap-1 sm:gap-2 items-start sm:items-center mb-1 sm:mb-2">
+                                  <Input
+                                    value={variant.name}
+                                    onChange={e => {
+                                      const newVariants = [...(product.variants || [])];
+                                      newVariants[variantIdx].name = e.target.value;
+                                      updateProduct(index, 'variants', newVariants);
+                                    }}
+                                    placeholder="Variant name (e.g. Size, Color)"
+                                    className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                                  />
+                                  <Button
+                                    type="button"
+                                    variant="destructive"
+                                    size="icon"
+                                    onClick={() => {
+                                      const newVariants = [...(product.variants || [])];
+                                      newVariants.splice(variantIdx, 1);
+                                      updateProduct(index, 'variants', newVariants);
+                                    }}
+                                    className="h-10 w-10 sm:h-12 sm:w-12"
+                                  >
+                                    <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                  </Button>
+                                </div>
+                                {/* Variant Options */}
+                                <div className="space-y-1 sm:space-y-2 ml-2 sm:ml-4">
+                                  {(variant.options || []).map((option, optionIdx) => (
+                                    <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-1 sm:gap-2 mb-1 sm:mb-2">
+                                      <Input
+                                        value={option.name}
+                                        onChange={e => {
+                                          const newVariants = [...(product.variants || [])];
+                                          newVariants[variantIdx].options[optionIdx].name = e.target.value;
+                                          updateProduct(index, 'variants', newVariants);
+                                        }}
+                                        placeholder="Option (e.g. Small, Red)"
+                                        className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                                      />
+                                      <Input
+                                        type="number"
+                                        value={option.price ?? ''}
+                                        onChange={e => {
+                                          const newVariants = [...(product.variants || [])];
+                                          newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
+                                          updateProduct(index, 'variants', newVariants);
+                                        }}
+                                        placeholder="Price adj."
+                                        className="w-full sm:w-20 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                                      />
+                                      <Button
+                                        type="button"
+                                        variant="destructive"
+                                        size="icon"
+                                        onClick={() => {
+                                          const newVariants = [...(product.variants || [])];
+                                          newVariants[variantIdx].options.splice(optionIdx, 1);
+                                          updateProduct(index, 'variants', newVariants);
+                                        }}
+                                        className="h-10 w-10 sm:h-12 sm:w-12"
+                                      >
+                                        <Trash2 className="h-3 w-3 sm:h-4 sm:w-4" />
+                                      </Button>
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const newVariants = [...(product.variants || [])];
+                                      newVariants[variantIdx].options.push({ name: '' });
+                                      updateProduct(index, 'variants', newVariants);
+                                    }}
+                                    className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                                  >
+                                    + Add Option
+                                  </Button>
+                                </div>
                               </div>
                             ))}
                             <Button
@@ -1447,162 +1634,38 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                const input = document.createElement('input');
-                                input.type = 'file';
-                                input.accept = 'image/*';
-                                input.multiple = true;
-                                input.onchange = (e) => {
-                                  const files = Array.from((e.target as HTMLInputElement).files || []);
-                                  const newImages = [...(product.images || [])];
-                                  files.forEach((file, fileIndex) => {
-                                    // Store file in tempImages for upload
-                                    const key = `product-${productIndex}-${newImages.length + fileIndex}`;
-                                    setTempImages(prev => ({ ...prev, [key]: file }));
-                                    // Create temporary URL for preview
-                                    const url = URL.createObjectURL(file);
-                                    newImages.push(url);
-                                  });
-                                  updateProduct(productIndex, 'images', newImages);
-                                };
-                                input.click();
+                                const newVariants = [...(product.variants || [])];
+                                newVariants.push({ name: '', options: [] });
+                                updateProduct(index, 'variants', newVariants);
                               }}
-                              className="h-12 px-4 py-3"
+                              className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                             >
-                              + Add Image
+                              + Add Variant
                             </Button>
                           </div>
-                        </div>
-                        {/* Variants Section */}
-                        <div className="space-y-2">
-                          <Label className="text-base font-medium">Variants</Label>
-                          {(product.variants || []).map((variant, variantIdx) => (
-                            <div key={variantIdx} className="border rounded p-3 mb-2">
-                              <div className="flex flex-col sm:flex-row gap-2 items-start sm:items-center mb-2">
-                                <Input
-                                  value={variant.name}
-                                  onChange={e => {
-                                    const newVariants = [...(product.variants || [])];
-                                    newVariants[variantIdx].name = e.target.value;
-                                    updateProduct(productIndex, 'variants', newVariants);
-                                  }}
-                                  placeholder="Variant name (e.g. Size, Color)"
-                                  className="flex-1 h-12 px-4 py-3"
-                                />
-                                <Button
-                                  type="button"
-                                  variant="destructive"
-                                  size="icon"
-                                  onClick={() => {
-                                    const newVariants = [...(product.variants || [])];
-                                    newVariants.splice(variantIdx, 1);
-                                    updateProduct(productIndex, 'variants', newVariants);
-                                  }}
-                                  className="h-12 w-12"
-                                >
-                                  <Trash2 className="h-4 w-4" />
-                                </Button>
-                              </div>
-                              {/* Variant Options */}
-                              <div className="space-y-2 ml-4">
-                                {(variant.options || []).map((option, optionIdx) => (
-                                  <div key={optionIdx} className="flex flex-col sm:flex-row items-start sm:items-center gap-2 mb-2">
-                                    <Input
-                                      value={option.name}
-                                      onChange={e => {
-                                        const newVariants = [...(product.variants || [])];
-                                        newVariants[variantIdx].options[optionIdx].name = e.target.value;
-                                        updateProduct(productIndex, 'variants', newVariants);
-                                      }}
-                                      placeholder="Option (e.g. Small, Red)"
-                                      className="flex-1 h-12 px-4 py-3"
-                                    />
-                                    <Input
-                                      type="number"
-                                      value={option.price ?? ''}
-                                      onChange={e => {
-                                        const newVariants = [...(product.variants || [])];
-                                        newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
-                                        updateProduct(productIndex, 'variants', newVariants);
-                                      }}
-                                      placeholder="Price adj."
-                                      className="w-full sm:w-24 h-12 px-4 py-3"
-                                    />
-                                    <Button
-                                      type="button"
-                                      variant="destructive"
-                                      size="icon"
-                                      onClick={() => {
-                                        const newVariants = [...(product.variants || [])];
-                                        newVariants[variantIdx].options.splice(optionIdx, 1);
-                                        updateProduct(productIndex, 'variants', newVariants);
-                                      }}
-                                      className="h-12 w-12"
-                                    >
-                                      <Trash2 className="h-4 w-4" />
-                                    </Button>
-                                  </div>
-                                ))}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const newVariants = [...(product.variants || [])];
-                                    newVariants[variantIdx].options.push({ name: '' });
-                                    updateProduct(productIndex, 'variants', newVariants);
-                                  }}
-                                  className="w-full sm:w-auto py-3 h-12"
-                                >
-                                  + Add Option
-                                </Button>
-                              </div>
-                            </div>
-                          ))}
                           <Button
                             type="button"
                             variant="outline"
                             size="sm"
-                            onClick={() => {
-                              const newVariants = [...(product.variants || [])];
-                              newVariants.push({ name: '', options: [] });
-                              updateProduct(productIndex, 'variants', newVariants);
-                            }}
-                            className="w-full sm:w-auto py-3 h-12"
+                            onClick={() => removeProduct(index)}
+                            className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                           >
-                            + Add Variant
+                            <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                            {translations[language].removeProduct}
                           </Button>
                         </div>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => removeProduct(productIndex)}
-                          className="w-full sm:w-auto py-3 h-12"
-                        >
-                          <Trash2 className="h-4 w-4 mr-2" />
-                          {translations[language].removeItem}
-                        </Button>
-                      </div>
-                    );
-                  })}
-                  <Button
-                    type="button"
-                    variant="outline"
-                    className="w-full py-4 h-14"
-                    onClick={addProduct}
-                  >
-                    <Plus className="h-4 w-4 mr-2" />
-                    Add New Product
-                  </Button>
+                      );
+                    })}
+                  </div>
                 </div>
               </div>
             )}
-            {type === 'vitrine' && (
-              <div className="space-y-4">
+            {(type === 'vitrine' || selectedType === 'vitrine') && (
+              <div className="space-y-3">
                 {/* Hero Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold">{translations[language].hero}</h3>
-                  <div className="space-y-3">
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].hero}</h3>
+                  <div className="space-y-2">
                     <Input
                       placeholder={translations[language].enterBusinessName}
                       value={vitrine.hero.businessName}
@@ -1610,8 +1673,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         hero: { ...vitrine.hero, businessName: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                     <Input
                       placeholder={translations[language].enterTagline}
@@ -1620,113 +1683,47 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         hero: { ...vitrine.hero, tagline: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
-                    <div className="space-y-3">
-                      <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                        <Label className="text-base font-medium">{translations[language].cta}</Label>
-                        <Button
-                          type="button"
-                          variant="outline"
-                          size="sm"
-                          onClick={() => setVitrine({
-                            ...vitrine,
-                            hero: {
-                              ...vitrine.hero,
-                              ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
-                            }
-                          })}
-                          className="w-full sm:w-auto py-3 h-12"
-                        >
-                          <Plus className="h-4 w-4 mr-2" />
-                          {translations[language].addCta}
-                        </Button>
-                      </div>
-                      {vitrine.hero.ctas.map((cta, index) => (
-                        <div key={index} className="space-y-3 border p-3 rounded">
-                          <Input
-                            placeholder={translations[language].enterCtaText}
-                            value={cta.text}
-                            onChange={(e) => {
-                              const newCtas = [...vitrine.hero.ctas];
-                              newCtas[index] = { ...cta, text: e.target.value };
+                    <div className="flex items-center gap-2 sm:gap-3">
+                      {vitrine.hero.logo && (
+                        <img src={vitrine.hero.logo} alt="Business Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain border rounded" />
+                      )}
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => {
+                          const input = document.createElement('input');
+                          input.type = 'file';
+                          input.accept = 'image/*';
+                          input.onchange = (e) => {
+                            const file = (e.target as HTMLInputElement).files?.[0];
+                            if (file) {
+                              setTempImages(prev => ({ ...prev, 'hero-logo': file }));
+                              const tempUrl = URL.createObjectURL(file);
                               setVitrine({
                                 ...vitrine,
-                                hero: { ...vitrine.hero, ctas: newCtas }
+                                hero: { ...vitrine.hero, logo: tempUrl }
                               });
-                            }}
-                            className="h-12 px-4 py-3"
-                            dir={language === 'ar' ? 'rtl' : 'ltr'}
-                          />
-                          <div className="flex flex-col sm:flex-row gap-2">
-                            <Select
-                              value={cta.type || 'website'}
-                              onValueChange={(value) => {
-                                const newCtas = [...vitrine.hero.ctas];
-                                newCtas[index] = { ...cta, type: value };
-                                setVitrine({
-                                  ...vitrine,
-                                  hero: { ...vitrine.hero, ctas: newCtas }
-                                });
-                              }}
-                            >
-                              <SelectTrigger className="w-full sm:w-[180px] h-12">
-                                <SelectValue placeholder={translations[language].selectPlatform} />
-                              </SelectTrigger>
-                              <SelectContent>
-                                <SelectItem value="website">{translations[language].website}</SelectItem>
-                                <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
-                                <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
-                                <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
-                                <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
-                                <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
-                                <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
-                                <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
-                                <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
-                                <SelectItem value="location">{translations[language].location}</SelectItem>
-                                <SelectItem value="other">{translations[language].other}</SelectItem>
-                              </SelectContent>
-                            </Select>
-                            <Input
-                              placeholder={translations[language].enterCtaLink}
-                              value={cta.link}
-                              onChange={(e) => {
-                                const newCtas = [...vitrine.hero.ctas];
-                                newCtas[index] = { ...cta, link: e.target.value };
-                                setVitrine({
-                                  ...vitrine,
-                                  hero: { ...vitrine.hero, ctas: newCtas }
-                                });
-                              }}
-                              className="flex-1 h-12 px-4 py-3"
-                            />
-                            <Button
-                              type="button"
-                              variant="outline"
-                              size="icon"
-                              onClick={() => {
-                                const newCtas = vitrine.hero.ctas.filter((_, i) => i !== index);
-                                setVitrine({
-                                  ...vitrine,
-                                  hero: { ...vitrine.hero, ctas: newCtas }
-                                });
-                              }}
-                              className="h-12 w-12"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </Button>
-                          </div>
-                        </div>
-                      ))}
+                            }
+                          };
+                          input.click();
+                        }}
+                        className="py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                      >
+                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                        {vitrine.hero.logo ? translations[language].changeLogo : translations[language].addLogo}
+                      </Button>
                     </div>
                   </div>
                 </div>
 
                 {/* About Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold">{translations[language].about}</h3>
-                  <div className="space-y-3">
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].about}</h3>
+                  <div className="space-y-2">
                     <Textarea
                       placeholder={translations[language].enterDescription}
                       value={vitrine.about.description}
@@ -1734,8 +1731,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         about: { ...vitrine.about, description: e.target.value }
                       })}
-                      className="min-h-[80px] px-4 py-3"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                      className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                     />
                     <Input
                       placeholder={translations[language].enterCity}
@@ -1744,33 +1741,33 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         about: { ...vitrine.about, city: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
 
                 {/* Services Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h3 className="text-lg font-semibold">{translations[language].services}</h3>
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].services}</h3>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => setVitrine({
                         ...vitrine,
-                        services: [...vitrine.services, { name: '', description: '', images: [], title: '', imageDescription: '' }]
+                        services: [...vitrine.services, { name: '', title: '', imageDescription: '', images: [] }]
                       })}
-                      className="w-full sm:w-auto py-3 h-12"
+                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       {translations[language].addService}
                     </Button>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {vitrine.services.map((service, index) => (
-                      <div key={index} className="space-y-3 border p-3 rounded">
+                      <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
                         <Input
                           placeholder={translations[language].enterServiceName}
                           value={service.name}
@@ -1779,29 +1776,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, name: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
-                          className="h-12 px-4 py-3"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                        <Textarea
-                          placeholder={translations[language].enterServiceDescription}
-                          value={service.description}
-                          onChange={(e) => {
-                            const newServices = [...vitrine.services];
-                            newServices[index] = { ...service, description: e.target.value };
-                            setVitrine({ ...vitrine, services: newServices });
-                          }}
-                          className="min-h-[80px] px-4 py-3"
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
-                          placeholder={translations[language].enterImageTitle}
+                          placeholder={translations[language].enterServiceTitle}
                           value={service.title}
                           onChange={(e) => {
                             const newServices = [...vitrine.services];
                             newServices[index] = { ...service, title: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
-                          className="h-12 px-4 py-3"
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Textarea
@@ -1812,12 +1798,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newServices[index] = { ...service, imageDescription: e.target.value };
                             setVitrine({ ...vitrine, services: newServices });
                           }}
-                          className="min-h-[80px] px-4 py-3"
+                          className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           {service.images.length > 0 && (
-                            <img src={service.images[0]} alt={service.name} className="w-16 h-16 object-cover rounded" />
+                            <img src={service.images[0]} alt={service.name} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded" />
                           )}
                           <Button
                             type="button"
@@ -1840,9 +1826,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               };
                               input.click();
                             }}
-                            className="py-3 h-12"
+                            className="py-2 h-10 sm:h-12 text-xs sm:text-sm"
                           >
-                            <Upload className="h-4 w-4 mr-2" />
+                            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             {service.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
                           </Button>
                         </div>
@@ -1861,9 +1847,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               setTempImages(newTempImages);
                             }
                           }}
-                          className="w-full sm:w-auto py-3 h-12"
+                          className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           {translations[language].removeService}
                         </Button>
                       </div>
@@ -1872,9 +1858,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Gallery Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h3 className="text-lg font-semibold">{translations[language].gallery}</h3>
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].gallery}</h3>
                     <Button
                       type="button"
                       variant="outline"
@@ -1883,15 +1869,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         gallery: [...vitrine.gallery, { images: [], title: '', description: '' }]
                       })}
-                      className="w-full sm:w-auto py-3 h-12"
+                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       {translations[language].addImage}
                     </Button>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {vitrine.gallery.map((item, index) => (
-                      <div key={index} className="space-y-3 border p-3 rounded">
+                      <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
                         <Input
                           placeholder={translations[language].enterImageTitle}
                           value={item.title}
@@ -1900,7 +1886,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newGallery[index] = { ...item, title: e.target.value };
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
-                          className="h-12 px-4 py-3"
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Textarea
@@ -1911,12 +1897,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newGallery[index] = { ...item, description: e.target.value };
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
-                          className="min-h-[80px] px-4 py-3"
+                          className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
-                        <div className="flex items-center gap-4">
+                        <div className="flex items-center gap-2 sm:gap-3">
                           {item.images.length > 0 && (
-                            <img src={item.images[0]} alt={item.title} className="w-16 h-16 object-cover rounded" />
+                            <img src={item.images[0]} alt={item.title} className="w-12 h-12 sm:w-16 sm:h-16 object-cover rounded" />
                           )}
                           <Button
                             type="button"
@@ -1939,9 +1925,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               };
                               input.click();
                             }}
-                            className="py-3 h-12"
+                            className="py-2 h-10 sm:h-12 text-xs sm:text-sm"
                           >
-                            <Upload className="h-4 w-4 mr-2" />
+                            <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                             {item.images.length > 0 ? translations[language].changeImage : translations[language].addImage}
                           </Button>
                         </div>
@@ -1953,9 +1939,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             const newGallery = vitrine.gallery.filter((_, i) => i !== index);
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
-                          className="w-full sm:w-auto py-3 h-12"
+                          className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           {translations[language].removeImage}
                         </Button>
                       </div>
@@ -1964,9 +1950,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Testimonials Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                    <h3 className="text-lg font-semibold">{translations[language].testimonials}</h3>
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].testimonials}</h3>
                     <Button
                       type="button"
                       variant="outline"
@@ -1975,15 +1961,15 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         testimonials: [...vitrine.testimonials, { text: '', author: '', city: '' }]
                       })}
-                      className="w-full sm:w-auto py-3 h-12"
+                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
-                      <Plus className="h-4 w-4 mr-2" />
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                       {translations[language].addTestimonial}
                     </Button>
                   </div>
-                  <div className="space-y-4">
+                  <div className="space-y-2">
                     {vitrine.testimonials.map((testimonial, index) => (
-                      <div key={index} className="space-y-3 border p-3 rounded">
+                      <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
                         <Textarea
                           placeholder={translations[language].enterTestimonialText}
                           value={testimonial.text}
@@ -1992,7 +1978,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, text: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
-                          className="min-h-[80px] px-4 py-3"
+                          className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
@@ -2003,7 +1989,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, author: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
-                          className="h-12 px-4 py-3"
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Input
@@ -2014,7 +2000,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             newTestimonials[index] = { ...testimonial, city: e.target.value };
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
-                          className="h-12 px-4 py-3"
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <Button
@@ -2025,9 +2011,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             const newTestimonials = vitrine.testimonials.filter((_, i) => i !== index);
                             setVitrine({ ...vitrine, testimonials: newTestimonials });
                           }}
-                          className="w-full sm:w-auto py-3 h-12"
+                          className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
                         >
-                          <Trash2 className="h-4 w-4 mr-2" />
+                          <Trash2 className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
                           {translations[language].removeTestimonial}
                         </Button>
                       </div>
@@ -2036,9 +2022,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                 </div>
 
                 {/* Contact Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold">{translations[language].contact}</h3>
-                  <div className="space-y-3">
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].contact}</h3>
+                  <div className="space-y-2">
                     <Input
                       placeholder={translations[language].enterAddress}
                       value={vitrine.contact.address}
@@ -2046,7 +2032,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, address: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
@@ -2056,7 +2042,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, phone: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                     <Input
@@ -2067,16 +2053,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         contact: { ...vitrine.contact, email: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
 
                 {/* Footer Section */}
-                <div className="space-y-3 border p-4 rounded-lg">
-                  <h3 className="text-lg font-semibold">{translations[language].footer}</h3>
-                  <div className="space-y-3">
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].footer}</h3>
+                  <div className="space-y-2">
                     <Input
                       placeholder={translations[language].enterBusinessName}
                       value={vitrine.footer.businessName}
@@ -2084,14 +2070,14 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         ...vitrine,
                         footer: { ...vitrine.footer, businessName: e.target.value }
                       })}
-                      className="h-12 px-4 py-3"
+                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                     />
                   </div>
                 </div>
               </div>
             )}
-            <div className="mt-4">
+            <div className="mt-3 sm:mt-4">
               <QRPreview 
                 url={type === 'direct' ? `https://quickqr-heyg.onrender.com/api/qrcodes/redirect/${encodeURIComponent(directUrl)}` : name ? `https://qrcreator.xyz/landing/preview` : ''}
                 color={foregroundColor}
@@ -2101,16 +2087,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             </div>
           </div>
           {/* Branding & Appearance Toggle Button */}
-          <div className="mt-6">
+          <div className="mt-4 sm:mt-6">
             <Button
               type="button"
               variant="outline"
               onClick={() => setShowBrandingSettings(!showBrandingSettings)}
-              className="w-full flex items-center justify-between py-4 h-14"
+              className="w-full flex items-center justify-between py-3 sm:py-4 h-12 sm:h-14"
             >
               <div className="flex items-center gap-2">
                 <Settings className="h-4 w-4" />
-                <span className="text-base">Branding & Appearance</span>
+                <span className="text-sm sm:text-base">Branding & Appearance</span>
               </div>
               {showBrandingSettings ? (
                 <ChevronUp className="h-4 w-4" />
@@ -2122,143 +2108,112 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
 
           {/* Branding & Appearance Section */}
           {showBrandingSettings && (
-            <div className="mt-4 border rounded-lg p-4 bg-gray-50">
-              <div className="space-y-4">
-                {/* Logo Upload */}
-                <div className="space-y-2">
-                  <Label className="text-base font-medium">{translations[language].logo}</Label>
-                  <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4">
-                    {logoPreview && (
-                      <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
-                    )}
-                    <Button
-                      type="button"
-                      variant="outline"
-                      onClick={() => fileInputRef.current?.click()}
-                      className="w-full sm:w-auto py-3 h-12"
-                    >
-                      <Upload className="h-4 w-4 mr-2" />
-                      {logoPreview ? 'Change Logo' : 'Upload Logo'}
-                    </Button>
-                    {logoPreview && (
-                      <Button type="button" variant="destructive" size="icon" onClick={removeLogo} className="h-12 w-12">
-                        <X className="h-4 w-4" />
-                      </Button>
-                    )}
-                    <input
-                      type="file"
-                      ref={fileInputRef}
-                      onChange={handleLogoUpload}
-                      accept="image/*"
-                      className="hidden"
-                    />
-                  </div>
-                </div>
-                
+            <div className="mt-3 sm:mt-4 border rounded-lg p-3 sm:p-4 bg-gray-50">
+              <div className="space-y-3 sm:space-y-4">
                 {/* QR Code Colors */}
                 <div className="space-y-2">
-                  <Label htmlFor="foregroundColor" className="text-base font-medium">{translations[language].foregroundColor}</Label>
+                  <Label htmlFor="foregroundColor" className="text-sm sm:text-base font-medium">{translations[language].foregroundColor}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="foregroundColor"
                       type="color"
                       value={foregroundColor}
                       onChange={(e) => setForegroundColor(e.target.value)}
-                      className="w-full sm:w-20 h-12"
+                      className="w-full sm:w-20 h-10 sm:h-12"
                     />
                     <Input
                       value={foregroundColor}
                       onChange={(e) => setForegroundColor(e.target.value)}
-                      className="flex-1 h-12 px-4 py-3"
+                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 
                 <div className="space-y-2">
-                  <Label htmlFor="backgroundColor" className="text-base font-medium">{translations[language].backgroundColor}</Label>
+                  <Label htmlFor="backgroundColor" className="text-sm sm:text-base font-medium">{translations[language].backgroundColor}</Label>
                   <div className="flex flex-col sm:flex-row gap-2">
                     <Input
                       id="backgroundColor"
                       type="color"
                       value={backgroundColor}
                       onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="w-full sm:w-20 h-12"
+                      className="w-full sm:w-20 h-10 sm:h-12"
                     />
                     <Input
                       value={backgroundColor}
                       onChange={(e) => setBackgroundColor(e.target.value)}
-                      className="flex-1 h-12 px-4 py-3"
+                      className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
                   </div>
                 </div>
                 
                 {/* Landing Page Colors */}
-                <div className="border-t pt-4">
-                  <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+                <div className="border-t pt-3 sm:pt-4">
+                  <h3 className="text-sm sm:text-base font-medium mb-3 sm:mb-4">Landing Page Colors</h3>
                   
-                  <div className="space-y-4">
+                  <div className="space-y-3 sm:space-y-4">
                     <div className="space-y-2">
-                      <Label htmlFor="primaryColor" className="text-base font-medium">Primary Color</Label>
+                      <Label htmlFor="primaryColor" className="text-sm sm:text-base font-medium">Primary Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="primaryColor"
                           type="color"
                           value={primaryColor}
                           onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="w-full sm:w-20 h-12"
+                          className="w-full sm:w-20 h-10 sm:h-12"
                         />
                         <Input
                           value={primaryColor}
                           onChange={(e) => setPrimaryColor(e.target.value)}
-                          className="flex-1 h-12 px-4 py-3"
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="primaryHoverColor" className="text-base font-medium">Primary Hover Color</Label>
+                      <Label htmlFor="primaryHoverColor" className="text-sm sm:text-base font-medium">Primary Hover Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="primaryHoverColor"
                           type="color"
                           value={primaryHoverColor}
                           onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="w-full sm:w-20 h-12"
+                          className="w-full sm:w-20 h-10 sm:h-12"
                         />
                         <Input
                           value={primaryHoverColor}
                           onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                          className="flex-1 h-12 px-4 py-3"
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="accentColor" className="text-base font-medium">Accent Color</Label>
+                      <Label htmlFor="accentColor" className="text-sm sm:text-base font-medium">Accent Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="accentColor"
                           type="color"
                           value={accentColor}
                           onChange={(e) => setAccentColor(e.target.value)}
-                          className="w-full sm:w-20 h-12"
+                          className="w-full sm:w-20 h-10 sm:h-12"
                         />
                         <Input
                           value={accentColor}
                           onChange={(e) => setAccentColor(e.target.value)}
-                          className="flex-1 h-12 px-4 py-3"
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label className="text-base font-medium">Background Gradient</Label>
-                      <div className="p-3 bg-gray-50 rounded-md border">
-                        <p className="text-sm text-gray-600 mb-2">
+                      <Label className="text-sm sm:text-base font-medium">Background Gradient</Label>
+                      <div className="p-2 sm:p-3 bg-gray-50 rounded-md border">
+                        <p className="text-xs sm:text-sm text-gray-600 mb-2">
                           The background gradient is automatically generated based on your Primary and Accent colors.
                         </p>
                         <div 
-                          className="w-full h-8 rounded border"
+                          className="w-full h-6 sm:h-8 rounded border"
                           style={{ 
                             background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
                           }}
@@ -2267,31 +2222,31 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerColor" className="text-base font-medium">Loading Spinner Color</Label>
+                      <Label htmlFor="loadingSpinnerColor" className="text-sm sm:text-base font-medium">Loading Spinner Color</Label>
                       <div className="flex flex-col sm:flex-row gap-2">
                         <Input
                           id="loadingSpinnerColor"
                           type="color"
                           value={loadingSpinnerColor}
                           onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                          className="w-full sm:w-20 h-12"
+                          className="w-full sm:w-20 h-10 sm:h-12"
                         />
                         <Input
                           value={loadingSpinnerColor}
                           onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                          className="flex-1 h-12 px-4 py-3"
+                          className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                         />
                       </div>
                     </div>
                     
                     <div className="space-y-2">
-                      <Label htmlFor="loadingSpinnerBorderColor" className="text-base font-medium">Loading Spinner Border Color</Label>
+                      <Label htmlFor="loadingSpinnerBorderColor" className="text-sm sm:text-base font-medium">Loading Spinner Border Color</Label>
                       <Input
                         id="loadingSpinnerBorderColor"
                         value={loadingSpinnerBorderColor}
                         onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
                         placeholder="rgba(139, 92, 246, 0.2)"
-                        className="h-12 px-4 py-3"
+                        className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                       />
                     </div>
                   </div>
@@ -2299,16 +2254,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               </div>
             </div>
           )}
-          <div className="mt-6 flex flex-col sm:flex-row justify-end gap-2">
+          <div className="mt-4 sm:mt-6 flex flex-col sm:flex-row justify-end gap-2">
             <Button 
               type="submit" 
-              className="w-full sm:w-auto text-base py-4 h-14"
+              className="w-full sm:w-auto text-sm sm:text-base py-3 sm:py-4 h-12 sm:h-14"
               disabled={isLoading || (!canCreateMenu && !canCreateProducts && !canCreateVitrine)}
             >
               {isLoading ? translations[language].creating : translations[language].createQRCode}
             </Button>
           </div>
-          {error && <div className="text-red-500 mt-2 text-base">{error}</div>}
+          {error && <div className="text-red-500 mt-2 text-sm sm:text-base">{error}</div>}
         </form>
       </CardContent>
     </Card>
