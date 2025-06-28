@@ -145,104 +145,39 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: index * 0.05 }}
               >
-                {/* Product Images Grid */}
+                {/* Product Images - Single Image with Navigation */}
                 {validImages.length > 0 && (
-                  <div className="relative w-full overflow-hidden">
-                    {validImages.length === 1 ? (
-                      // Single image - full height
-                      <div className="h-80 w-full overflow-hidden">
-                        <img
-                          src={validImages[0]}
-                          alt={product.name}
-                          className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                          loading="lazy"
-                        />
-                        <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
-                      </div>
-                    ) : validImages.length === 2 ? (
-                      // Two images - side by side
-                      <div className="h-80 w-full flex gap-2 p-2">
-                        <div className="flex-1 overflow-hidden rounded-lg">
-                          <img
-                            src={validImages[0]}
-                            alt={`${product.name} - Image 1`}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                            loading="lazy"
-                          />
+                  <div className="relative h-80 w-full overflow-hidden">
+                    <img
+                      src={validImages[imageIndexes[productId] || 0]}
+                      alt={product.name}
+                      className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
+                      loading="lazy"
+                    />
+                    {validImages.length > 1 && (
+                      <>
+                        <button
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, -1); }}
+                          type="button"
+                        >
+                          &#8592;
+                        </button>
+                        <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, 1); }}
+                          type="button"
+                        >
+                          &#8594;
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {validImages.map((_, idx) => (
+                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[productId] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
+                          ))}
                         </div>
-                        <div className="flex-1 overflow-hidden rounded-lg">
-                          <img
-                            src={validImages[1]}
-                            alt={`${product.name} - Image 2`}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                            loading="lazy"
-                          />
-                        </div>
-                      </div>
-                    ) : validImages.length === 3 ? (
-                      // Three images - 2 on top, 1 on bottom
-                      <div className="h-80 w-full flex flex-col gap-2 p-2">
-                        <div className="flex-1 flex gap-2">
-                          <div className="flex-1 overflow-hidden rounded-lg">
-                            <img
-                              src={validImages[0]}
-                              alt={`${product.name} - Image 1`}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                          <div className="flex-1 overflow-hidden rounded-lg">
-                            <img
-                              src={validImages[1]}
-                              alt={`${product.name} - Image 2`}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex-1 overflow-hidden rounded-lg">
-                          <img
-                            src={validImages[2]}
-                            alt={`${product.name} - Image 3`}
-                            className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                            loading="lazy"
-                          />
-                        </div>
-                      </div>
-                    ) : validImages.length === 4 ? (
-                      // Four images - 2x2 grid
-                      <div className="h-80 w-full grid grid-cols-2 gap-2 p-2">
-                        {validImages.slice(0, 4).map((image, idx) => (
-                          <div key={idx} className="overflow-hidden rounded-lg">
-                            <img
-                              src={image}
-                              alt={`${product.name} - Image ${idx + 1}`}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      // More than 4 images - 2x2 grid with overlay showing count
-                      <div className="h-80 w-full grid grid-cols-2 gap-2 p-2 relative">
-                        {validImages.slice(0, 4).map((image, idx) => (
-                          <div key={idx} className="overflow-hidden rounded-lg">
-                            <img
-                              src={image}
-                              alt={`${product.name} - Image ${idx + 1}`}
-                              className="w-full h-full object-cover transition-transform duration-500 hover:scale-105"
-                              loading="lazy"
-                            />
-                          </div>
-                        ))}
-                        {validImages.length > 4 && (
-                          <div className="absolute bottom-4 right-4 bg-black/70 text-white px-3 py-1 rounded-full text-sm font-medium">
-                            +{validImages.length - 4} more
-                          </div>
-                        )}
-                      </div>
+                      </>
                     )}
+                    <div className="absolute inset-0 bg-gradient-to-b from-transparent via-transparent to-black/20"></div>
                   </div>
                 )}
 
