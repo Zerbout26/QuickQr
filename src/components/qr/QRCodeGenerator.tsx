@@ -162,7 +162,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
           onClick={() => handleDownload('png')}
         >
           <Download className="h-4 w-4 mr-2" />
-          Download PNG
+          Download QR Sticker
         </Button>
         <Button
           type="button"
@@ -170,7 +170,7 @@ const QRPreview = ({ url, color, bgColor, logoUrl }: {
           onClick={() => handleDownload('svg')}
         >
           <Download className="h-4 w-4 mr-2" />
-          Download SVG
+          Download QR Code
         </Button>
       </div>
     </div>
@@ -297,6 +297,8 @@ const translations = {
     codFormToggle: "Enable COD Form",
     qrCreated: 'QR code created successfully',
     errorCreatingQR: 'Failed to create QR code',
+    downloadQRCode: 'Download the QR Code',
+    downloadQRCodeSticker: 'Download the QR Code on Ready Sticker',
   },
   ar: {
     success: 'نجاح',
@@ -387,6 +389,8 @@ const translations = {
     codFormToggle: "تفعيل نموذج الدفع عند الاستلام",
     qrCreated: 'تم إنشاء رمز الاستجابة السريعة بنجاح',
     errorCreatingQR: 'فشل إنشاء رمز الاستجابة السريعة',
+    downloadQRCode: 'تحميل رمز الاستجابة السريعة',
+    downloadQRCodeSticker: 'تحميل رمز الاستجابة السريعة على ملصق جاهز',
   },
 };
 
