@@ -458,6 +458,17 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
     if (selectedType) setType(selectedType);
   }, [selectedType]);
 
+  // Initialize showOtherTypes from sessionStorage
+  useEffect(() => {
+    const showOtherTypesFlag = sessionStorage.getItem('showOtherTypes');
+    if (showOtherTypesFlag === 'true') {
+      setShowOtherTypes(true);
+    } else if (fromOnboarding) {
+      // If coming from onboarding, show only the selected type initially
+      setShowOtherTypes(false);
+    }
+  }, [fromOnboarding]);
+
   // Set defaults for products type (e-commerce)
   useEffect(() => {
     if (type === 'products') {
@@ -890,6 +901,10 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
         onAllowOtherTypes();
       }
       
+      // Clear showOtherTypes flag after successful creation
+      sessionStorage.removeItem('showOtherTypes');
+      setShowOtherTypes(false);
+      
       resetForm();
     } catch (error: any) {
       console.error('Error creating QR code:', error);
@@ -933,6 +948,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                     size="sm"
                     onClick={() => {
                       setShowOtherTypes(true);
+                      sessionStorage.setItem('showOtherTypes', 'true');
                       if (onAllowOtherTypes) onAllowOtherTypes();
                     }}
                     className="text-blue-600 border-blue-300 hover:bg-blue-100 mt-2 sm:mt-0 w-full sm:w-auto text-xs sm:text-sm"

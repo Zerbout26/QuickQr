@@ -994,7 +994,11 @@ const Dashboard = () => {
             <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
               <h2 className="text-xl sm:text-2xl font-semibold font-cairo text-center sm:text-left">{translations[language].myQRCodes}</h2>
               <Button 
-                onClick={() => setActiveTab('create')}
+                onClick={() => {
+                  setActiveTab('create');
+                  // Set showOtherTypes flag when coming from My QR Codes section
+                  sessionStorage.setItem('showOtherTypes', 'true');
+                }}
                 className="dz-button flex items-center gap-2 w-full sm:w-auto"
               >
                 <Plus className="w-4 h-4" /> {translations[language].createNewQR}
