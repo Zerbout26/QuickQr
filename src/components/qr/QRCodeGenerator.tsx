@@ -400,10 +400,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
   const [name, setName] = useState('');
   const getInitialType = () => {
     if (selectedType) return selectedType;
-    if (user) {
-      if (user.hasMenu && !user.hasVitrine) return 'vitrine';
-      if (user.hasVitrine && !user.hasMenu) return 'menu';
-    }
+    // Default to menu if no selectedType is provided
     return 'menu';
   };
   const [type, setType] = useState<string>(getInitialType());
@@ -468,12 +465,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
   useEffect(() => {
     if (selectedType) setType(selectedType);
   }, [selectedType]);
-
-  // Add a useEffect to update type if user changes (e.g., after refresh)
-  useEffect(() => {
-    setType(getInitialType());
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user, selectedType]);
 
   // Set defaults for products type (e-commerce)
   useEffect(() => {

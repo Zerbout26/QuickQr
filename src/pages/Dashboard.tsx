@@ -306,10 +306,11 @@ const Dashboard = () => {
   useEffect(() => {
     if (openGenerator === 'true') {
       setActiveTab('create');
-      // Clear the URL parameters after setting the tab
-      navigate('/dashboard', { replace: true });
+      // Clear the URL parameters after setting the tab, but preserve selectedType
+      const newUrl = selectedType ? `/dashboard?type=${selectedType}` : '/dashboard';
+      navigate(newUrl, { replace: true });
     }
-  }, [openGenerator, navigate]);
+  }, [openGenerator, navigate, selectedType]);
 
   const fetchQRCodes = async (page: number, search: string) => {
     if (!user) return;
