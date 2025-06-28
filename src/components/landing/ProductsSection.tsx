@@ -53,8 +53,13 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   onAddToBasket,
   onDirectOrder
 }) => {
-  const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
+  // Early return if product is not available
+  if (!product) {
+    return null;
+  }
+
   const [quantity, setQuantity] = useState(1);
+  const [selectedVariants, setSelectedVariants] = useState<SelectedVariants>({});
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
 
@@ -95,6 +100,7 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   };
 
   const getValidImages = () => {
+    if (!product) return [];
     const imgs = (product.images || []).filter(url => !url.startsWith('blob:'));
     if (imgs.length > 0) return imgs;
     if (product.imageUrl) return [product.imageUrl];
