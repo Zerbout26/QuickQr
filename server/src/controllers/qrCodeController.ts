@@ -741,6 +741,80 @@ export const updateQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
+      // Handle products
+      if (req.body.products !== undefined && type === 'products') {
+        try {
+          const parsedProducts = typeof req.body.products === 'object' ? req.body.products : JSON.parse(req.body.products);
+          
+          // Handle product images
+          if (req.files && (req.files as any)['productImages']) {
+            const productImages = (req.files as any)['productImages'];
+            for (let i = 0; i < productImages.length; i++) {
+              const imageFile = productImages[i];
+              try {
+                // Upload image to Cloudinary
+                const imageUrl = await uploadToCloudinary(imageFile);
+                
+                // Get optimized URL for the product image
+                const optimizedUrl = getOptimizedUrl(imageUrl, {
+                  width: 500,
+                  height: 500,
+                  crop: 'fill',
+                  quality: 'auto'
+                });
+                
+                // Extract product and image indices from the filename
+                const filename = imageFile.originalname;
+                const parts = filename.split('-');
+                if (parts.length >= 3) {
+                  const productIndex = parseInt(parts[1], 10);
+                  const imageIndex = parseInt(parts[2], 10);
+                  
+                  if (!isNaN(productIndex) && !isNaN(imageIndex) &&
+                      parsedProducts.products[productIndex]) {
+                    
+                    const product = parsedProducts.products[productIndex];
+                    
+                    // Initialize images array if it doesn't exist
+                    if (!product.images) {
+                      product.images = [];
+                    }
+                    
+                    // Replace the blob URL at the specific index with the Cloudinary URL
+                    if (product.images[imageIndex]) {
+                      product.images[imageIndex] = optimizedUrl;
+                    } else {
+                      // If the index doesn't exist, push to the end
+                      product.images.push(optimizedUrl);
+                    }
+                    
+                    // Also update imageUrl for backward compatibility (use the first image)
+                    if (product.images.length > 0) {
+                      product.imageUrl = product.images[0];
+                    }
+                    
+                    console.log(`Updated images array for product ${productIndex}: ${JSON.stringify(product.images)}`);
+                  } else {
+                    console.warn(`Invalid indices in filename: ${filename}`);
+                  }
+                } else {
+                  console.warn(`Invalid filename format: ${filename}`);
+                }
+              } catch (uploadError) {
+                console.error('Error uploading image to Cloudinary:', uploadError);
+                // Continue with other images even if one fails
+                continue;
+              }
+            }
+          }
+          
+          qrCode.products = parsedProducts;
+        } catch (e) {
+          console.error('Error parsing products:', e);
+          return res.status(400).json({ error: 'Invalid products format' });
+        }
+      }
+
       // Handle vitrine
       if (vitrine !== undefined && type === 'vitrine') {
         try {
