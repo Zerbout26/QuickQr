@@ -333,92 +333,34 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
               {(() => {
                 const dialogImages = getValidImages(dialogProduct.product);
                 return dialogImages.length > 0 && (
-                  <div className="mb-4">
-                    {dialogImages.length === 1 ? (
-                      // Single image
-                      <div className="w-full h-64 overflow-hidden rounded">
-                        <img
-                          src={dialogImages[0]}
-                          alt={dialogProduct.product.name}
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ) : dialogImages.length === 2 ? (
-                      // Two images side by side
-                      <div className="w-full h-64 flex gap-2">
-                        <div className="flex-1 overflow-hidden rounded">
-                          <img
-                            src={dialogImages[0]}
-                            alt={`${dialogProduct.product.name} - Image 1`}
-                            className="w-full h-full object-cover"
-                          />
+                  <div className="relative w-full h-64 mb-4">
+                    <img
+                      src={dialogImages[imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0]}
+                      alt={dialogProduct.product.name}
+                      className="w-full h-full object-cover rounded"
+                    />
+                    {dialogImages.length > 1 && (
+                      <>
+                        <button
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, -1); }}
+                          type="button"
+                        >
+                          &#8592;
+                        </button>
+                        <button
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
+                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, 1); }}
+                          type="button"
+                        >
+                          &#8594;
+                        </button>
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                          {dialogImages.map((_, idx) => (
+                            <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
+                          ))}
                         </div>
-                        <div className="flex-1 overflow-hidden rounded">
-                          <img
-                            src={dialogImages[1]}
-                            alt={`${dialogProduct.product.name} - Image 2`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-                    ) : dialogImages.length === 3 ? (
-                      // Three images - 2 on top, 1 on bottom
-                      <div className="w-full h-64 flex flex-col gap-2">
-                        <div className="flex-1 flex gap-2">
-                          <div className="flex-1 overflow-hidden rounded">
-                            <img
-                              src={dialogImages[0]}
-                              alt={`${dialogProduct.product.name} - Image 1`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                          <div className="flex-1 overflow-hidden rounded">
-                            <img
-                              src={dialogImages[1]}
-                              alt={`${dialogProduct.product.name} - Image 2`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        </div>
-                        <div className="flex-1 overflow-hidden rounded">
-                          <img
-                            src={dialogImages[2]}
-                            alt={`${dialogProduct.product.name} - Image 3`}
-                            className="w-full h-full object-cover"
-                          />
-                        </div>
-                      </div>
-                    ) : dialogImages.length === 4 ? (
-                      // Four images - 2x2 grid
-                      <div className="w-full h-64 grid grid-cols-2 gap-2">
-                        {dialogImages.slice(0, 4).map((image, idx) => (
-                          <div key={idx} className="overflow-hidden rounded">
-                            <img
-                              src={image}
-                              alt={`${dialogProduct.product.name} - Image ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                      </div>
-                    ) : (
-                      // More than 4 images - 2x2 grid with overlay
-                      <div className="w-full h-64 grid grid-cols-2 gap-2 relative">
-                        {dialogImages.slice(0, 4).map((image, idx) => (
-                          <div key={idx} className="overflow-hidden rounded">
-                            <img
-                              src={image}
-                              alt={`${dialogProduct.product.name} - Image ${idx + 1}`}
-                              className="w-full h-full object-cover"
-                            />
-                          </div>
-                        ))}
-                        {dialogImages.length > 4 && (
-                          <div className="absolute bottom-2 right-2 bg-black/70 text-white px-2 py-1 rounded-full text-xs font-medium">
-                            +{dialogImages.length - 4} more
-                          </div>
-                        )}
-                      </div>
+                      </>
                     )}
                   </div>
                 );
