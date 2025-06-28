@@ -36,8 +36,12 @@ export const createOrder = async (req: Request, res: Response) => {
       return res.status(404).json({ error: 'QR code not found' });
     }
 
-    if (!qrCode.menu?.orderable) {
-      return res.status(400).json({ error: 'This menu is not orderable' });
+    // Check if the QR code is orderable (either menu or products)
+    const isMenuOrderable = qrCode.menu?.orderable;
+    const isProductsOrderable = qrCode.products?.orderable;
+    
+    if (!isMenuOrderable && !isProductsOrderable) {
+      return res.status(400).json({ error: 'This QR code is not orderable' });
     }
 
     if (!qrCode.user?.isActive) {

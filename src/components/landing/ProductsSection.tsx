@@ -92,9 +92,11 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
   };
 
   const handleImageNav = (key: string, images: string[], dir: 1 | -1) => {
+    console.log('handleImageNav called:', { key, dir, imagesLength: images.length });
     setImageIndexes(prev => {
       const current = prev[key] || 0;
       const next = (current + dir + images.length) % images.length;
+      console.log('Image navigation:', { current, next, key });
       return { ...prev, [key]: next };
     });
   };
@@ -157,20 +159,30 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                     {validImages.length > 1 && (
                       <>
                         <button
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                          onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, -1); }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
+                          onClick={(e) => { 
+                            e.preventDefault();
+                            e.stopPropagation(); 
+                            console.log('Left arrow clicked for', productId);
+                            handleImageNav(productId, validImages, -1); 
+                          }}
                           type="button"
                         >
                           &#8592;
                         </button>
                         <button
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                          onClick={e => { e.stopPropagation(); handleImageNav(productId, validImages, 1); }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
+                          onClick={(e) => { 
+                            e.preventDefault();
+                            e.stopPropagation(); 
+                            console.log('Right arrow clicked for', productId);
+                            handleImageNav(productId, validImages, 1); 
+                          }}
                           type="button"
                         >
                           &#8594;
                         </button>
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                           {validImages.map((_, idx) => (
                             <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[productId] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
                           ))}
@@ -342,20 +354,30 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
                     {dialogImages.length > 1 && (
                       <>
                         <button
-                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, -1); }}
+                          className="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
+                          onClick={(e) => { 
+                            e.preventDefault();
+                            e.stopPropagation(); 
+                            console.log('Dialog left arrow clicked');
+                            handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, -1); 
+                          }}
                           type="button"
                         >
                           &#8592;
                         </button>
                         <button
-                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-1 shadow"
-                          onClick={e => { e.stopPropagation(); handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, 1); }}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 rounded-full p-2 shadow-lg z-10 hover:bg-white transition-all"
+                          onClick={(e) => { 
+                            e.preventDefault();
+                            e.stopPropagation(); 
+                            console.log('Dialog right arrow clicked');
+                            handleImageNav(`dialog-${dialogProduct.productIndex}`, dialogImages, 1); 
+                          }}
                           type="button"
                         >
                           &#8594;
                         </button>
-                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1">
+                        <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1 z-10">
                           {dialogImages.map((_, idx) => (
                             <span key={idx} className={`inline-block w-2 h-2 rounded-full ${idx === (imageIndexes[`dialog-${dialogProduct.productIndex}`] || 0) ? 'bg-primary' : 'bg-gray-300'}`}></span>
                           ))}
