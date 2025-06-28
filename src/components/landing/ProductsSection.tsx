@@ -197,13 +197,13 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+            <h1 className="text-3xl md:text-4xl font-bold text-gray-800 mb-2">
               {product.name}
             </h1>
             
             {/* Price */}
             <div className="flex items-center gap-3 mb-4">
-              <span className="text-3xl font-bold" style={{ color: colors.primaryColor }}>
+              <span className="text-3xl font-bold text-gray-800">
                 {finalPrice} {currency || 'DZD'}
               </span>
               {priceAdjustment > 0 && (
@@ -311,8 +311,8 @@ const ProductsSection: React.FC<ProductsSectionProps> = ({
       <div className="mt-16 border-t pt-8">
         <div className="flex border-b">
           <button 
-            className="px-4 py-2 font-medium border-b-2"
-            style={{ borderColor: colors.primaryColor, color: colors.primaryColor }}
+            className="px-4 py-2 font-medium border-b-2 text-gray-800"
+            style={{ borderColor: colors.primaryColor }}
           >
             {translations[menuLanguage].description}
           </button>
