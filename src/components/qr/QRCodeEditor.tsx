@@ -615,8 +615,18 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         }
 
         if (type === 'menu' || type === 'both') {
+            // Create a copy of menu data, preserving existing Cloudinary URLs
+            const cleanedCategories = menuCategories.map(category => ({
+                ...category,
+                items: category.items.map(item => ({
+                    ...item,
+                    // Keep existing Cloudinary URLs, only clear blob URLs
+                    images: item.images?.filter(img => !img.startsWith('blob:')) || []
+                }))
+            }));
+
             formData.append('menu', JSON.stringify({
-                categories: menuCategories,
+                categories: cleanedCategories,
                 orderable: menuOrderable,
                 codFormEnabled: codFormEnabled
             }));
