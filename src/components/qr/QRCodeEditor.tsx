@@ -16,6 +16,7 @@ import {
 } from "@/components/ui/select";
 import { Checkbox } from '@/components/ui/checkbox';
 import { Switch } from '@/components/ui/switch';
+import { useLanguage } from '@/context/LanguageContext';
 
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
@@ -115,6 +116,7 @@ const translations = {
 };
 
 const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
+  const { language } = useLanguage();
   type EditorQrType = 'url' | 'menu' | 'vitrine' | 'links' | 'both' | 'products';
   const [name, setName] = useState(qrCode.name);
   const [type, setType] = useState<EditorQrType>(
@@ -126,7 +128,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [links, setLinks] = useState<Link[]>(
     (qrCode.links || []).map(link => ({
       ...link,
-      type: allowedTypes.includes(link.type as any) ? link.type as any : 'website'
+      type: allowedTypes.includes(link.type as any) ? link.type : 'website'
     }))
   );
   const [menuCategories, setMenuCategories] = useState<MenuCategory[]>(qrCode.menu?.categories || []);
@@ -138,7 +140,6 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [logoPreview, setLogoPreview] = useState<string | null>(qrCode.logoUrl || null);
   const [isLoading, setIsLoading] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
-  const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
   
   // Landing page colors
@@ -290,8 +291,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (!file.type.startsWith('image/')) {
         toast({
             variant: "destructive",
-            title: translations[menuLanguage].invalidFileType,
-            description: translations[menuLanguage].pleaseUploadImage,
+            title: translations[language].invalidFileType,
+            description: translations[language].pleaseUploadImage,
         });
         return;
     }
@@ -300,8 +301,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (file.size > 2 * 1024 * 1024) {
         toast({
             variant: "destructive",
-            title: translations[menuLanguage].fileTooLarge,
-            description: translations[menuLanguage].imageMustBeLess,
+            title: translations[language].fileTooLarge,
+            description: translations[language].imageMustBeLess,
         });
         return;
     }
@@ -335,8 +336,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (!file.type.startsWith('image/')) {
       toast({
         variant: "destructive",
-        title: translations[menuLanguage].invalidFileType,
-        description: translations[menuLanguage].pleaseUploadImage,
+        title: translations[language].invalidFileType,
+        description: translations[language].pleaseUploadImage,
       });
       return;
     }
@@ -345,8 +346,8 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
     if (file.size > 2 * 1024 * 1024) {
       toast({
         variant: "destructive",
-        title: translations[menuLanguage].fileTooLarge,
-        description: translations[menuLanguage].imageMustBeLess,
+        title: translations[language].fileTooLarge,
+        description: translations[language].imageMustBeLess,
       });
       return;
     }
@@ -380,13 +381,13 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const updateLink = (index: number, field: keyof Link, value: string) => {
     const newLinks = [...links];
     if (field === 'type') {
-      const type = value as Link['type'];
-      const label = getPlatformLabel(type);
+      const type = value;
+      const label = getPlatformLabel(type as any);
       newLinks[index] = { 
         ...newLinks[index], 
         type,
         label,
-        url: newLinks[index].url || getDefaultUrl(type)
+        url: newLinks[index].url || getDefaultUrl(type as any)
       };
     } else if (field === 'label') {
       // Don't update the label if it's a platform type
@@ -717,15 +718,15 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
         const updatedQRCode = await response.json();
         onUpdated(updatedQRCode);
         toast({
-            title: translations[menuLanguage].success,
-            description: translations[menuLanguage].qrCodeUpdated,
+            title: translations[language].success,
+            description: translations[language].qrCodeUpdated,
         });
     } catch (error) {
         console.error('Error updating QR code:', error);
         toast({
             variant: "destructive",
-            title: translations[menuLanguage].error,
-            description: error instanceof Error ? error.message : translations[menuLanguage].updateFailed,
+            title: translations[language].error,
+            description: error instanceof Error ? error.message : translations[language].updateFailed,
         });
     } finally {
         setIsLoading(false);
@@ -818,349 +819,216 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   );
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-6">
-      <div className="space-y-4">
-        <div className="space-y-2">
-          <Label htmlFor="name">Name</Label>
-          <Input
-            id="name"
-            value={name}
-            onChange={(e) => setName(e.target.value)}
-            placeholder="My QR Code"
-          />
-        </div>
-
-        <div className="space-y-2">
-          <Label>Type</Label>
-          <div className="flex gap-2">
-            <Button
-              type="button"
-              variant={type === 'url' ? 'default' : 'outline'}
-              onClick={() => setType('url')}
-              className="flex-1"
-            >
-              URL
-            </Button>
-            <Button
-              type="button"
-              variant={type === 'menu' ? 'default' : 'outline'}
-              onClick={() => setType('menu')}
-              className="flex-1"
-            >
-              Menu
-            </Button>
-            <Button
-              type="button"
-              variant={type === 'both' ? 'default' : 'outline'}
-              onClick={() => setType('both')}
-              className="flex-1"
-            >
-              Both
-            </Button>
-            <Button
-              type="button"
-              variant={type === 'vitrine' ? 'default' : 'outline'}
-              onClick={() => setType('vitrine')}
-              className="flex-1"
-            >
-              Vitrine
-            </Button>
+    <div className="max-w-2xl mx-auto w-full p-2 sm:p-6">
+      <form onSubmit={handleSubmit} className="space-y-6">
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label htmlFor="name">Name</Label>
+            <Input
+              id="name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              placeholder="My QR Code"
+            />
           </div>
-        </div>
 
-        <Tabs defaultValue="basic" className="space-y-4">
-          <TabsList className="grid w-full grid-cols-2">
-            <TabsTrigger value="basic">{translations[menuLanguage].basic}</TabsTrigger>
-            <TabsTrigger value="advanced">{translations[menuLanguage].advanced}</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="basic" className="space-y-4">
-            <div className="space-y-2">
-              <Label>{translations[menuLanguage].qrCodeLogo}</Label>
-              <div className="flex items-center gap-4">
-                {logoPreview && (
-                  <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                >
-                  <Upload className="h-4 w-4 mr-2" />
-                  {logoPreview ? translations[menuLanguage].changeLogo : translations[menuLanguage].uploadLogo}
-                </Button>
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleLogoUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
-              </div>
+          <div className="space-y-2">
+            <Label>Type</Label>
+            <div className="flex gap-2">
+              <Button
+                type="button"
+                variant={type === 'url' ? 'default' : 'outline'}
+                onClick={() => setType('url')}
+                className="flex-1"
+              >
+                URL
+              </Button>
+              <Button
+                type="button"
+                variant={type === 'menu' ? 'default' : 'outline'}
+                onClick={() => setType('menu')}
+                className="flex-1"
+              >
+                Menu
+              </Button>
+              <Button
+                type="button"
+                variant={type === 'both' ? 'default' : 'outline'}
+                onClick={() => setType('both')}
+                className="flex-1"
+              >
+                Both
+              </Button>
+              <Button
+                type="button"
+                variant={type === 'vitrine' ? 'default' : 'outline'}
+                onClick={() => setType('vitrine')}
+                className="flex-1"
+              >
+                Vitrine
+              </Button>
             </div>
+          </div>
 
-            {(type === 'url' || type === 'both') && (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-medium">{translations[menuLanguage].links}</h3>
+          <Tabs defaultValue="basic" className="space-y-4">
+            <TabsList className="grid w-full grid-cols-2">
+              <TabsTrigger value="basic">{translations[language].basic}</TabsTrigger>
+              <TabsTrigger value="advanced">{translations[language].advanced}</TabsTrigger>
+            </TabsList>
+
+            <TabsContent value="basic" className="space-y-4">
+              <div className="space-y-2">
+                <Label>{translations[language].qrCodeLogo}</Label>
+                <div className="flex items-center gap-4">
+                  {logoPreview && (
+                    <img src={logoPreview} alt="QR Code Logo" className="w-16 h-16 object-contain border rounded" />
+                  )}
                   <Button
                     type="button"
                     variant="outline"
-                    size="sm"
-                    onClick={addLink}
-                    className="flex items-center gap-2"
+                    onClick={() => fileInputRef.current?.click()}
                   >
-                    <Plus className="h-4 w-4" />
-                    {translations[menuLanguage].addLink}
+                    <Upload className="h-4 w-4 mr-2" />
+                    {logoPreview ? translations[language].changeLogo : translations[language].uploadLogo}
                   </Button>
-                </div>
-
-                <div className="space-y-2">
-                  {links.map((link, index) => (
-                    <div key={index} className="flex gap-2">
-                      <Select
-                        value={link.type as Link['type'] || 'website'}
-                        onValueChange={(value) => updateLink(index, 'type', value as Link['type'])}
-                      >
-                        <SelectTrigger className="w-[180px]">
-                          <SelectValue placeholder={translations[menuLanguage].selectPlatform} />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="website">{translations[menuLanguage].website}</SelectItem>
-                          <SelectItem value="facebook">{translations[menuLanguage].facebook}</SelectItem>
-                          <SelectItem value="instagram">{translations[menuLanguage].instagram}</SelectItem>
-                          <SelectItem value="twitter">{translations[menuLanguage].twitter}</SelectItem>
-                          <SelectItem value="linkedin">{translations[menuLanguage].linkedin}</SelectItem>
-                          <SelectItem value="youtube">{translations[menuLanguage].youtube}</SelectItem>
-                          <SelectItem value="tiktok">{translations[menuLanguage].tiktok}</SelectItem>
-                          <SelectItem value="whatsapp">{translations[menuLanguage].whatsapp}</SelectItem>
-                          <SelectItem value="telegram">{translations[menuLanguage].telegram}</SelectItem>
-                          <SelectItem value="other">{translations[menuLanguage].other}</SelectItem>
-                        </SelectContent>
-                      </Select>
-                      <Input
-                        placeholder={translations[menuLanguage].url}
-                        type="url"
-                        value={link.url}
-                        onChange={(e) => updateLink(index, 'url', e.target.value)}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeLink(index)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
-                  ))}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
                 </div>
               </div>
-            )}
 
-            {(type === 'menu' || type === 'both') && (
-              <div className="space-y-4">
-                {/* Orderable and COD Form Toggles */}
-                <div className="space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={menuOrderable}
-                      onCheckedChange={setMenuOrderable}
-                      id="orderable-menu-toggle"
-                    />
-                    <Label htmlFor="orderable-menu-toggle">{translations[menuLanguage].orderableMenuToggle}</Label>
+              {(type === 'url' || type === 'both') && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-medium">{translations[language].links}</h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={addLink}
+                      className="flex items-center gap-2"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {translations[language].addLink}
+                    </Button>
                   </div>
-                  <div className="flex items-center gap-2">
-                    <Switch
-                      checked={codFormEnabled}
-                      onCheckedChange={setCodFormEnabled}
-                      id="cod-form-toggle"
-                    />
-                    <Label htmlFor="cod-form-toggle">{translations[menuLanguage].codFormToggle}</Label>
+
+                  <div className="space-y-2">
+                    {links.map((link, index) => (
+                      <div key={index} className="flex gap-2">
+                        <Select
+                          value={link.type}
+                          onValueChange={(value) => updateLink(index, 'type', value)}
+                        >
+                          <SelectTrigger className="w-[180px]">
+                            <SelectValue placeholder={translations[language].selectPlatform} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="website">{translations[language].website}</SelectItem>
+                            <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
+                            <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
+                            <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
+                            <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
+                            <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
+                            <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
+                            <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
+                            <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
+                            <SelectItem value="other">{translations[language].other}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          placeholder={translations[language].url}
+                          type="url"
+                          value={link.url}
+                          onChange={(e) => updateLink(index, 'url', e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeLink(index)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
                   </div>
                 </div>
-                
-                {menuCategories.map((category, categoryIndex) => (
-                  <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
-                    <div className="flex gap-2 items-center">
-                      <Input
-                        placeholder="Category Name"
-                        value={category.name}
-                        onChange={(e) => updateCategory(categoryIndex, e.target.value)}
-                      />
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="icon"
-                        onClick={() => removeCategory(categoryIndex)}
-                      >
-                        <Trash2 className="h-4 w-4" />
-                      </Button>
-                    </div>
+              )}
 
-                    <div className="space-y-2">
-                      {category.items.map((item, itemIndex) => (
-                        <div key={itemIndex} className="space-y-2 border p-2 rounded">
-                          <div className="flex items-center gap-4 mb-2">
-                            <div className="space-y-2">
-                              <Label>Images</Label>
-                              <div className="flex gap-2 flex-wrap mb-2">
-                                {(item.images || []).map((imgUrl, imgIdx) => (
-                                  <div key={imgIdx} className="relative group">
-                                    <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
-                                    <button
-                                      type="button"
-                                      className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
-                                      onClick={() => {
-                                        const newImages = [...(item.images || [])];
-                                        newImages.splice(imgIdx, 1);
-                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
-                                        
-                                        // Remove corresponding file from tempImages
-                                        const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
-                                        if (tempImages[key]) {
-                                          const newTempImages = { ...tempImages };
-                                          delete newTempImages[key];
-                                          setTempImages(newTempImages);
-                                        }
-                                      }}
-                                    >
-                                      &times;
-                                    </button>
-                                  </div>
-                                ))}
-                                <Button
-                                  type="button"
-                                  variant="outline"
-                                  size="sm"
-                                  onClick={() => {
-                                    const input = document.createElement('input');
-                                    input.type = 'file';
-                                    input.accept = 'image/*';
-                                    input.multiple = true;
-                                    input.onchange = (e) => {
-                                      const files = Array.from((e.target as HTMLInputElement).files || []);
-                                      const newImages = [...(item.images || [])];
-                                      files.forEach((file, fileIndex) => {
-                                        // Store file in tempImages for upload
-                                        const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
-                                        setTempImages(prev => ({ ...prev, [key]: file }));
-                                        // Create temporary URL for preview
-                                        const url = URL.createObjectURL(file);
-                                        newImages.push(url);
-                                      });
-                                      updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
-                                    };
-                                    input.click();
-                                  }}
-                                >
-                                  + Add Image
-                                </Button>
-                              </div>
-                            </div>
-                          </div>
-                          <Input
-                            placeholder="Item Name"
-                            value={item.name}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
-                          />
-                          <Input
-                            placeholder="Description"
-                            value={item.description || ''}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
-                          />
-                          <Input
-                            placeholder="Price"
-                            type="number"
-                            value={item.price}
-                            onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
-                          />
-                          <div className="space-y-1">
-                            <Label>Availability</Label>
-                            <div className="grid grid-cols-4 gap-2">
-                              {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
-                                <div key={day} className="flex items-center space-x-2">
-                                  <Checkbox
-                                    id={`edit-${categoryIndex}-${itemIndex}-${day}`}
-                                    checked={isAvailable}
-                                    onCheckedChange={(checked) => 
-                                      handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
-                                    }
-                                  />
-                                  <label
-                                    htmlFor={`edit-${categoryIndex}-${itemIndex}-${day}`}
-                                    className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
-                                  >
-                                    {day.charAt(0).toUpperCase() + day.slice(1)}
-                                  </label>
-                                </div>
-                              ))}
-                            </div>
-                          </div>
-                          <div className="space-y-2">
-                            <Label>Variants</Label>
-                            {(item.variants || []).map((variant, variantIdx) => (
-                              <div key={variantIdx} className="border rounded p-2 mb-2">
-                                <div className="flex items-center gap-2 mb-2">
-                                  <Input
-                                    value={variant.name}
-                                    onChange={e => {
-                                      const newVariants = [...(item.variants || [])];
-                                      newVariants[variantIdx].name = e.target.value;
-                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                    }}
-                                    placeholder="Variant name (e.g. Size, Color)"
-                                    className="flex-1"
-                                  />
-                                  <Button
-                                    type="button"
-                                    variant="destructive"
-                                    size="icon"
-                                    onClick={() => {
-                                      const newVariants = [...(item.variants || [])];
-                                      newVariants.splice(variantIdx, 1);
-                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                    }}
-                                  >
-                                    <Trash2 className="h-4 w-4" />
-                                  </Button>
-                                </div>
-                                <div className="space-y-1 ml-4">
-                                  {(variant.options || []).map((option, optionIdx) => (
-                                    <div key={optionIdx} className="flex items-center gap-2 mb-1">
-                                      <Input
-                                        value={option.name}
-                                        onChange={e => {
-                                          const newVariants = [...(item.variants || [])];
-                                          newVariants[variantIdx].options[optionIdx].name = e.target.value;
-                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                        }}
-                                        placeholder="Option (e.g. Small, Red)"
-                                        className="flex-1"
-                                      />
-                                      <Input
-                                        type="number"
-                                        value={option.price ?? ''}
-                                        onChange={e => {
-                                          const newVariants = [...(item.variants || [])];
-                                          newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
-                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
-                                        }}
-                                        placeholder="Price adj."
-                                        className="w-24"
-                                      />
-                                      <Button
+              {(type === 'menu' || type === 'both') && (
+                <div className="space-y-4">
+                  {/* Orderable and COD Form Toggles */}
+                  <div className="space-y-3">
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={menuOrderable}
+                        onCheckedChange={setMenuOrderable}
+                        id="orderable-menu-toggle"
+                      />
+                      <Label htmlFor="orderable-menu-toggle">{translations[language].orderableMenuToggle}</Label>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Switch
+                        checked={codFormEnabled}
+                        onCheckedChange={setCodFormEnabled}
+                        id="cod-form-toggle"
+                      />
+                      <Label htmlFor="cod-form-toggle">{translations[language].codFormToggle}</Label>
+                    </div>
+                  </div>
+                  
+                  {menuCategories.map((category, categoryIndex) => (
+                    <div key={categoryIndex} className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex gap-2 items-center">
+                        <Input
+                          placeholder="Category Name"
+                          value={category.name}
+                          onChange={(e) => updateCategory(categoryIndex, e.target.value)}
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeCategory(categoryIndex)}
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+
+                      <div className="space-y-2">
+                        {category.items.map((item, itemIndex) => (
+                          <div key={itemIndex} className="space-y-2 border p-2 rounded">
+                            <div className="flex items-center gap-4 mb-2">
+                              <div className="space-y-2">
+                                <Label>Images</Label>
+                                <div className="flex gap-2 flex-wrap mb-2">
+                                  {(item.images || []).map((imgUrl, imgIdx) => (
+                                    <div key={imgIdx} className="relative group">
+                                      <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
+                                      <button
                                         type="button"
-                                        variant="destructive"
-                                        size="icon"
+                                        className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
                                         onClick={() => {
-                                          const newVariants = [...(item.variants || [])];
-                                          newVariants[variantIdx].options.splice(optionIdx, 1);
-                                          updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                          const newImages = [...(item.images || [])];
+                                          newImages.splice(imgIdx, 1);
+                                          updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                          
+                                          // Remove corresponding file from tempImages
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
+                                          if (tempImages[key]) {
+                                            const newTempImages = { ...tempImages };
+                                            delete newTempImages[key];
+                                            setTempImages(newTempImages);
+                                          }
                                         }}
                                       >
-                                        <Trash2 className="h-4 w-4" />
-                                      </Button>
+                                        &times;
+                                      </button>
                                     </div>
                                   ))}
                                   <Button
@@ -1168,14 +1036,233 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                     variant="outline"
                                     size="sm"
                                     onClick={() => {
-                                      const newVariants = [...(item.variants || [])];
-                                      newVariants[variantIdx].options.push({ name: '' });
-                                      updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.multiple = true;
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || []);
+                                        const newImages = [...(item.images || [])];
+                                        files.forEach((file, fileIndex) => {
+                                          // Store file in tempImages for upload
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
+                                          setTempImages(prev => ({ ...prev, [key]: file }));
+                                          // Create temporary URL for preview
+                                          const url = URL.createObjectURL(file);
+                                          newImages.push(url);
+                                        });
+                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                      };
+                                      input.click();
                                     }}
                                   >
-                                    + Add Option
+                                    + Add Image
                                   </Button>
                                 </div>
+                              </div>
+                            </div>
+                            <Input
+                              placeholder="Item Name"
+                              value={item.name}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'name', e.target.value)}
+                            />
+                            <Input
+                              placeholder="Description"
+                              value={item.description || ''}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'description', e.target.value)}
+                            />
+                            <Input
+                              placeholder="Price"
+                              type="number"
+                              value={item.price}
+                              onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
+                            />
+                            <div className="space-y-1">
+                              <Label>Availability</Label>
+                              <div className="grid grid-cols-4 gap-2">
+                                {Object.entries(item.availability || defaultAvailability).map(([day, isAvailable]) => (
+                                  <div key={day} className="flex items-center space-x-2">
+                                    <Checkbox
+                                      id={`edit-${categoryIndex}-${itemIndex}-${day}`}
+                                      checked={isAvailable}
+                                      onCheckedChange={(checked) => 
+                                        handleItemAvailabilityChange(categoryIndex, itemIndex, day, checked === true)
+                                      }
+                                    />
+                                    <label
+                                      htmlFor={`edit-${categoryIndex}-${itemIndex}-${day}`}
+                                      className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70"
+                                    >
+                                      {day.charAt(0).toUpperCase() + day.slice(1)}
+                                    </label>
+                                  </div>
+                                ))}
+                              </div>
+                            </div>
+                            <div className="space-y-2">
+                              <Label>Variants</Label>
+                              {(item.variants || []).map((variant, variantIdx) => (
+                                <div key={variantIdx} className="border rounded p-2 mb-2">
+                                  <div className="flex items-center gap-2 mb-2">
+                                    <Input
+                                      value={variant.name}
+                                      onChange={e => {
+                                        const newVariants = [...(item.variants || [])];
+                                        newVariants[variantIdx].name = e.target.value;
+                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                      }}
+                                      placeholder="Variant name (e.g. Size, Color)"
+                                      className="flex-1"
+                                    />
+                                    <Button
+                                      type="button"
+                                      variant="destructive"
+                                      size="icon"
+                                      onClick={() => {
+                                        const newVariants = [...(item.variants || [])];
+                                        newVariants.splice(variantIdx, 1);
+                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                      }}
+                                    >
+                                      <Trash2 className="h-4 w-4" />
+                                    </Button>
+                                  </div>
+                                  <div className="space-y-1 ml-4">
+                                    {(variant.options || []).map((option, optionIdx) => (
+                                      <div key={optionIdx} className="flex items-center gap-2 mb-1">
+                                        <Input
+                                          value={option.name}
+                                          onChange={e => {
+                                            const newVariants = [...(item.variants || [])];
+                                            newVariants[variantIdx].options[optionIdx].name = e.target.value;
+                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                          }}
+                                          placeholder="Option (e.g. Small, Red)"
+                                          className="flex-1"
+                                        />
+                                        <Input
+                                          type="number"
+                                          value={option.price ?? ''}
+                                          onChange={e => {
+                                            const newVariants = [...(item.variants || [])];
+                                            newVariants[variantIdx].options[optionIdx].price = e.target.value ? parseFloat(e.target.value) : undefined;
+                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                          }}
+                                          placeholder="Price adj."
+                                          className="w-24"
+                                        />
+                                        <Button
+                                          type="button"
+                                          variant="destructive"
+                                          size="icon"
+                                          onClick={() => {
+                                            const newVariants = [...(item.variants || [])];
+                                            newVariants[variantIdx].options.splice(optionIdx, 1);
+                                            updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                          }}
+                                        >
+                                          <Trash2 className="h-4 w-4" />
+                                        </Button>
+                                      </div>
+                                    ))}
+                                    <Button
+                                      type="button"
+                                      variant="outline"
+                                      size="sm"
+                                      onClick={() => {
+                                        const newVariants = [...(item.variants || [])];
+                                        newVariants[variantIdx].options.push({ name: '' });
+                                        updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                      }}
+                                    >
+                                      + Add Option
+                                    </Button>
+                                  </div>
+                                </div>
+                              ))}
+                              <Button
+                                type="button"
+                                variant="outline"
+                                size="sm"
+                                onClick={() => {
+                                  const newVariants = [...(item.variants || [])];
+                                  newVariants.push({ name: '', options: [] });
+                                  updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                }}
+                              >
+                                + Add Variant
+                              </Button>
+                            </div>
+                            <Button
+                              type="button"
+                              variant="outline"
+                              size="sm"
+                              onClick={() => removeMenuItem(categoryIndex, itemIndex)}
+                            >
+                              <Trash2 className="h-4 w-4 mr-2" />
+                              Remove Item
+                            </Button>
+                          </div>
+                        ))}
+                        <Button
+                          type="button"
+                          variant="outline"
+                          className="w-full"
+                          onClick={() => addMenuItem(categoryIndex)}
+                        >
+                          <Plus className="h-4 w-4 mr-2" />
+                          Add Menu Item
+                        </Button>
+                      </div>
+                    </div>
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={addCategory}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add Category
+                  </Button>
+                </div>
+              )}
+
+              {type === 'products' && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">Product Showcase</h3>
+                    <p className="text-sm text-gray-600">E-commerce enabled by default</p>
+                  </div>
+                  
+                  {products.map((product, productIndex) => (
+                    <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
+                      <div className="flex items-center gap-4 mb-2">
+                        <div className="space-y-2">
+                          <Label>Images</Label>
+                          <div className="flex gap-2 flex-wrap mb-2">
+                            {(product.images || []).map((imgUrl, imgIdx) => (
+                              <div key={imgIdx} className="relative group">
+                                <img src={imgUrl} alt={product.name} className="w-16 h-16 object-cover rounded border" />
+                                <button
+                                  type="button"
+                                  className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                  onClick={() => {
+                                    const newImages = [...(product.images || [])];
+                                    newImages.splice(imgIdx, 1);
+                                    updateProduct(productIndex, 'images', newImages);
+                                    
+                                    // Remove corresponding file from tempImages
+                                    const key = `product-${productIndex}-${imgIdx}`;
+                                    if (tempImages[key]) {
+                                      const newTempImages = { ...tempImages };
+                                      delete newTempImages[key];
+                                      setTempImages(newTempImages);
+                                    }
+                                  }}
+                                >
+                                  &times;
+                                </button>
                               </div>
                             ))}
                             <Button
@@ -1183,316 +1270,232 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                               variant="outline"
                               size="sm"
                               onClick={() => {
-                                const newVariants = [...(item.variants || [])];
-                                newVariants.push({ name: '', options: [] });
-                                updateMenuItem(categoryIndex, itemIndex, 'variants', newVariants);
+                                const input = document.createElement('input');
+                                input.type = 'file';
+                                input.accept = 'image/*';
+                                input.multiple = true;
+                                input.onchange = (e) => {
+                                  const files = Array.from((e.target as HTMLInputElement).files || []);
+                                  const newImages = [...(product.images || [])];
+                                  files.forEach((file, fileIndex) => {
+                                    // Store file in tempImages for upload
+                                    const key = `product-${productIndex}-${newImages.length + fileIndex}`;
+                                    setTempImages(prev => ({ ...prev, [key]: file }));
+                                    // Create temporary URL for preview
+                                    const url = URL.createObjectURL(file);
+                                    newImages.push(url);
+                                  });
+                                  updateProduct(productIndex, 'images', newImages);
+                                };
+                                input.click();
                               }}
                             >
-                              + Add Variant
+                              + Add Image
                             </Button>
                           </div>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => removeMenuItem(categoryIndex, itemIndex)}
-                          >
-                            <Trash2 className="h-4 w-4 mr-2" />
-                            Remove Item
-                          </Button>
                         </div>
-                      ))}
+                      </div>
+                      <Input
+                        placeholder="Product Name"
+                        value={product.name}
+                        onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
+                      />
+                      <Input
+                        placeholder="Description"
+                        value={product.description || ''}
+                        onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
+                      />
+                      <Input
+                        placeholder="Price"
+                        type="number"
+                        value={product.price}
+                        onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
+                      />
                       <Button
                         type="button"
                         variant="outline"
-                        className="w-full"
-                        onClick={() => addMenuItem(categoryIndex)}
+                        size="sm"
+                        onClick={() => removeProduct(productIndex)}
                       >
-                        <Plus className="h-4 w-4 mr-2" />
-                        Add Menu Item
+                        <Trash2 className="h-4 w-4 mr-2" />
+                        Remove Product
                       </Button>
                     </div>
-                  </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={addCategory}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add Category
-                </Button>
-              </div>
-            )}
+                  ))}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    className="w-full"
+                    onClick={addProduct}
+                  >
+                    <Plus className="h-4 w-4 mr-2" />
+                    Add New Product
+                  </Button>
+                </div>
+              )}
 
-            {type === 'products' && (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Product Showcase</h3>
-                  <p className="text-sm text-gray-600">E-commerce enabled by default</p>
-                </div>
-                
-                {products.map((product, productIndex) => (
-                  <div key={productIndex} className="space-y-2 border p-4 rounded-lg">
-                    <div className="flex items-center gap-4 mb-2">
-                      <div className="space-y-2">
-                        <Label>Images</Label>
-                        <div className="flex gap-2 flex-wrap mb-2">
-                          {(product.images || []).map((imgUrl, imgIdx) => (
-                            <div key={imgIdx} className="relative group">
-                              <img src={imgUrl} alt={product.name} className="w-16 h-16 object-cover rounded border" />
-                              <button
-                                type="button"
-                                className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
-                                onClick={() => {
-                                  const newImages = [...(product.images || [])];
-                                  newImages.splice(imgIdx, 1);
-                                  updateProduct(productIndex, 'images', newImages);
-                                  
-                                  // Remove corresponding file from tempImages
-                                  const key = `product-${productIndex}-${imgIdx}`;
-                                  if (tempImages[key]) {
-                                    const newTempImages = { ...tempImages };
-                                    delete newTempImages[key];
-                                    setTempImages(newTempImages);
-                                  }
-                                }}
-                              >
-                                &times;
-                              </button>
-                            </div>
-                          ))}
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => {
-                              const input = document.createElement('input');
-                              input.type = 'file';
-                              input.accept = 'image/*';
-                              input.multiple = true;
-                              input.onchange = (e) => {
-                                const files = Array.from((e.target as HTMLInputElement).files || []);
-                                const newImages = [...(product.images || [])];
-                                files.forEach((file, fileIndex) => {
-                                  // Store file in tempImages for upload
-                                  const key = `product-${productIndex}-${newImages.length + fileIndex}`;
-                                  setTempImages(prev => ({ ...prev, [key]: file }));
-                                  // Create temporary URL for preview
-                                  const url = URL.createObjectURL(file);
-                                  newImages.push(url);
-                                });
-                                updateProduct(productIndex, 'images', newImages);
-                              };
-                              input.click();
-                            }}
-                          >
-                            + Add Image
-                          </Button>
-                        </div>
-                      </div>
-                    </div>
-                    <Input
-                      placeholder="Product Name"
-                      value={product.name}
-                      onChange={(e) => updateProduct(productIndex, 'name', e.target.value)}
-                    />
-                    <Input
-                      placeholder="Description"
-                      value={product.description || ''}
-                      onChange={(e) => updateProduct(productIndex, 'description', e.target.value)}
-                    />
-                    <Input
-                      placeholder="Price"
-                      type="number"
-                      value={product.price}
-                      onChange={(e) => updateProduct(productIndex, 'price', e.target.value)}
-                    />
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => removeProduct(productIndex)}
-                    >
-                      <Trash2 className="h-4 w-4 mr-2" />
-                      Remove Product
-                    </Button>
+              {type === 'vitrine' && (
+                <div className="space-y-4">
+                  <div className="flex justify-between items-center">
+                    <h3 className="text-lg font-semibold">Vitrine</h3>
+                    <p className="text-sm text-gray-600">E-commerce enabled by default</p>
                   </div>
-                ))}
-                <Button
-                  type="button"
-                  variant="outline"
-                  className="w-full"
-                  onClick={addProduct}
-                >
-                  <Plus className="h-4 w-4 mr-2" />
-                  Add New Product
-                </Button>
-              </div>
-            )}
+                  
+                  {/* Vitrine content */}
+                </div>
+              )}
+            </TabsContent>
 
-            {type === 'vitrine' && (
-              <div className="space-y-4">
-                <div className="flex justify-between items-center">
-                  <h3 className="text-lg font-semibold">Vitrine</h3>
-                  <p className="text-sm text-gray-600">E-commerce enabled by default</p>
-                </div>
-                
-                {/* Vitrine content */}
-              </div>
-            )}
-          </TabsContent>
-
-          <TabsContent value="advanced" className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="foregroundColor">{translations[menuLanguage].foregroundColor}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="foregroundColor"
-                  type="color"
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
-                  className="w-20"
-                />
-                <Input
-                  value={foregroundColor}
-                  onChange={(e) => setForegroundColor(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="backgroundColor">{translations[menuLanguage].backgroundColor}</Label>
-              <div className="flex gap-2">
-                <Input
-                  id="backgroundColor"
-                  type="color"
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="w-20"
-                />
-                <Input
-                  value={backgroundColor}
-                  onChange={(e) => setBackgroundColor(e.target.value)}
-                  className="flex-1"
-                />
-              </div>
-            </div>
-            
-            {/* Landing Page Colors */}
-            <div className="border-t pt-4">
-              <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
-              
-              <div className="space-y-4">
-                <div className="space-y-2">
-                  <Label htmlFor="primaryColor">Primary Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="primaryColor"
-                      type="color"
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="w-20"
-                    />
-                    <Input
-                      value={primaryColor}
-                      onChange={(e) => setPrimaryColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="primaryHoverColor"
-                      type="color"
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                      className="w-20"
-                    />
-                    <Input
-                      value={primaryHoverColor}
-                      onChange={(e) => setPrimaryHoverColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="accentColor">Accent Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="accentColor"
-                      type="color"
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="w-20"
-                    />
-                    <Input
-                      value={accentColor}
-                      onChange={(e) => setAccentColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label>Background Gradient</Label>
-                  <div className="p-3 bg-gray-50 rounded-md border">
-                    <p className="text-sm text-gray-600 mb-2">
-                      The background gradient is automatically generated based on your Primary and Accent colors.
-                    </p>
-                    <div 
-                      className="w-full h-8 rounded border"
-                      style={{ 
-                        background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
-                      }}
-                    ></div>
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
-                  <div className="flex gap-2">
-                    <Input
-                      id="loadingSpinnerColor"
-                      type="color"
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                      className="w-20"
-                    />
-                    <Input
-                      value={loadingSpinnerColor}
-                      onChange={(e) => setLoadingSpinnerColor(e.target.value)}
-                      className="flex-1"
-                    />
-                  </div>
-                </div>
-                
-                <div className="space-y-2">
-                  <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+            <TabsContent value="advanced" className="space-y-4">
+              <div className="space-y-2">
+                <Label htmlFor="foregroundColor">{translations[language].foregroundColor}</Label>
+                <div className="flex gap-2">
                   <Input
-                    id="loadingSpinnerBorderColor"
-                    value={loadingSpinnerBorderColor}
-                    onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
-                    placeholder="rgba(139, 92, 246, 0.2)"
+                    id="foregroundColor"
+                    type="color"
+                    value={foregroundColor}
+                    onChange={(e) => setForegroundColor(e.target.value)}
+                    className="w-20"
+                  />
+                  <Input
+                    value={foregroundColor}
+                    onChange={(e) => setForegroundColor(e.target.value)}
+                    className="flex-1"
                   />
                 </div>
               </div>
-            </div>
-          </TabsContent>
-        </Tabs>
-      </div>
+              <div className="space-y-2">
+                <Label htmlFor="backgroundColor">{translations[language].backgroundColor}</Label>
+                <div className="flex gap-2">
+                  <Input
+                    id="backgroundColor"
+                    type="color"
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="w-20"
+                  />
+                  <Input
+                    value={backgroundColor}
+                    onChange={(e) => setBackgroundColor(e.target.value)}
+                    className="flex-1"
+                  />
+                </div>
+              </div>
+              
+              {/* Landing Page Colors */}
+              <div className="border-t pt-4">
+                <h3 className="text-lg font-medium mb-4">Landing Page Colors</h3>
+                
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <Label htmlFor="primaryColor">Primary Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="primaryColor"
+                        type="color"
+                        value={primaryColor}
+                        onChange={(e) => setPrimaryColor(e.target.value)}
+                        className="w-20"
+                      />
+                      <Input
+                        value={primaryColor}
+                        onChange={(e) => setPrimaryColor(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="primaryHoverColor">Primary Hover Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="primaryHoverColor"
+                        type="color"
+                        value={primaryHoverColor}
+                        onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                        className="w-20"
+                      />
+                      <Input
+                        value={primaryHoverColor}
+                        onChange={(e) => setPrimaryHoverColor(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="accentColor">Accent Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="accentColor"
+                        type="color"
+                        value={accentColor}
+                        onChange={(e) => setAccentColor(e.target.value)}
+                        className="w-20"
+                      />
+                      <Input
+                        value={accentColor}
+                        onChange={(e) => setAccentColor(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label>Background Gradient</Label>
+                    <div className="p-3 bg-gray-50 rounded-md border">
+                      <p className="text-sm text-gray-600 mb-2">
+                        The background gradient is automatically generated based on your Primary and Accent colors.
+                      </p>
+                      <div 
+                        className="w-full h-8 rounded border"
+                        style={{ 
+                          background: `linear-gradient(135deg, ${primaryColor}25 0%, ${primaryColor}15 20%, white 50%, ${accentColor}15 80%, ${accentColor}25 100%)`
+                        }}
+                      ></div>
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="loadingSpinnerColor">Loading Spinner Color</Label>
+                    <div className="flex gap-2">
+                      <Input
+                        id="loadingSpinnerColor"
+                        type="color"
+                        value={loadingSpinnerColor}
+                        onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                        className="w-20"
+                      />
+                      <Input
+                        value={loadingSpinnerColor}
+                        onChange={(e) => setLoadingSpinnerColor(e.target.value)}
+                        className="flex-1"
+                      />
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2">
+                    <Label htmlFor="loadingSpinnerBorderColor">Loading Spinner Border Color</Label>
+                    <Input
+                      id="loadingSpinnerBorderColor"
+                      value={loadingSpinnerBorderColor}
+                      onChange={(e) => setLoadingSpinnerBorderColor(e.target.value)}
+                      placeholder="rgba(139, 92, 246, 0.2)"
+                    />
+                  </div>
+                </div>
+              </div>
+            </TabsContent>
+          </Tabs>
+        </div>
 
-      <div className="mt-4 flex justify-end">
-        <Button type="submit" disabled={isLoading}>
-          {isLoading ? translations[menuLanguage].saving : translations[menuLanguage].saveChanges}
-        </Button>
-      </div>
-    </form>
+        <div className="mt-4 flex justify-end">
+          <Button type="submit" disabled={isLoading}>
+            {isLoading ? translations[language].saving : translations[language].saveChanges}
+          </Button>
+        </div>
+      </form>
+    </div>
   );
 };
 
