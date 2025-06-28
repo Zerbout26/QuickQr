@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import MainLayout from '@/components/layout/MainLayout';
 import QRCodeGenerator from '@/components/qr/QRCodeGenerator';
+import QRCodeEditor from '@/components/qr/QRCodeEditor';
 import { useAuth } from '@/context/AuthContext';
 import { QRCode } from '@/types';
 import { Button } from '@/components/ui/button';
@@ -268,24 +269,24 @@ const Dashboard = () => {
   const [qrCodes, setQrCodes] = useState<QRCode[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [isCreating, setIsCreating] = useState(false);
-  const [editingQR, setEditingQR] = useState<QRCode | null>(null);
-  const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
   const [searchTerm, setSearchTerm] = useState('');
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [totalQRCodes, setTotalQRCodes] = useState(0);
   const navigate = useNavigate();
   const { language, toggleLanguage } = useLanguage();
-  const [newUrl, setNewUrl] = useState('');
-  const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
   const location = useLocation();
   const queryParams = new URLSearchParams(location.search);
   const selectedType = queryParams.get('type');
   const openGenerator = queryParams.get('openGenerator');
   const onboardingParam = queryParams.get('onboarding');
   const [activeTab, setActiveTab] = useState<'create' | 'manage'>('manage');
-  const [fromOnboarding, setFromOnboarding] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(false);
+  const [fromOnboarding, setFromOnboarding] = useState(false);
+  const [editDialogOpen, setEditDialogOpen] = useState(false);
+  const [editingQRCode, setEditingQRCode] = useState<QRCode | null>(null);
+  const [deleteConfirmQR, setDeleteConfirmQR] = useState<QRCode | null>(null);
+  const [previewQR, setPreviewQR] = useState<QRCode | null>(null);
 
   // Check if user is coming from onboarding
   useEffect(() => {
@@ -381,56 +382,18 @@ const Dashboard = () => {
   };
 
   const handleEditQR = (qr: QRCode) => {
-    setEditingQR(qr);
-    setNewUrl(qr.url);
+    setEditingQRCode(qr);
+    setEditDialogOpen(true);
   };
 
-  const handleUpdateQR = async () => {
-    if (!editingQR) return;
-    
-    try {
-      // Prepare the update data
-      const updateData: Partial<QRCode> = {
-        name: editingQR.name,
-        url: editingQR.url,
-        logoUrl: editingQR.logoUrl,
-        foregroundColor: editingQR.foregroundColor,
-        backgroundColor: editingQR.backgroundColor,
-        links: editingQR.links || [],
-        menu: editingQR.menu ? {
-          ...editingQR.menu,
-          categories: editingQR.menu.categories.map(category => ({
-            ...category,
-            items: category.items.map(item => ({
-              ...item,
-              price: typeof item.price === 'string' ? parseFloat(item.price) : item.price,
-            })),
-          })),
-        } : { restaurantName: '', categories: [] },
-        type: editingQR.type
-      };
-
-      console.log('Updating QR code with data:', updateData); // Debug log
-      
-      const updatedQR = await qrCodeApi.update(editingQR.id, updateData);
-      console.log('Update response:', updatedQR); // Debug log
-      
-      setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
-      setEditingQR(null);
-      setNewUrl('');
-      
-      toast({
-        title: "QR Code Updated",
-        description: "Your QR code has been updated successfully.",
-      });
-    } catch (error) {
-      console.error('Failed to update QR code:', error);
-      toast({
-        variant: "destructive",
-        title: "Update failed",
-        description: "There was a problem updating your QR code. Please try again.",
-      });
-    }
+  const handleQRCodeUpdated = (updatedQR: QRCode) => {
+    setQrCodes(prev => prev.map(qr => qr.id === updatedQR.id ? updatedQR : qr));
+    setEditDialogOpen(false);
+    setEditingQRCode(null);
+    toast({
+      title: "QR Code Updated",
+      description: "Your QR code has been updated successfully.",
+    });
   };
 
   const handleDeleteQR = async (qrId: string) => {
@@ -1147,7 +1110,7 @@ const Dashboard = () => {
                           <Button 
                             variant="outline" 
                             size="sm" 
-                            onClick={() => navigate(`/qrcodes/${qr.id}/edit`)}
+                            onClick={() => handleEditQR(qr)}
                             className="w-full hover:bg-gray-50 font-cairo text-xs sm:text-sm h-8 sm:h-9"
                           >
                             <Edit className="w-3 h-3 sm:w-3.5 sm:h-3.5 mr-1 sm:mr-1.5" /> {translations[language].edit}
@@ -1255,7 +1218,29 @@ const Dashboard = () => {
         </Tabs>
       </div>
 
-      {/* Preview Dialog - Mobile optimized */}
+      {/* Edit QR Code Dialog */}
+      <Dialog open={editDialogOpen} onOpenChange={setEditDialogOpen}>
+        <DialogContent className="max-w-6xl max-h-[90vh] overflow-y-auto">
+          <DialogHeader>
+            <DialogTitle className="text-xl font-bold">
+              {language === 'ar' ? 'تعديل رمز QR' : 'Edit QR Code'}
+            </DialogTitle>
+            <DialogDescription>
+              {language === 'ar' ? 'قم بتحديث محتوى ومظهر رمز QR الخاص بك' : 'Update your QR code content and appearance'}
+            </DialogDescription>
+          </DialogHeader>
+          {editingQRCode && (
+            <div className="py-4">
+              <QRCodeEditor 
+                qrCode={editingQRCode} 
+                onUpdated={handleQRCodeUpdated} 
+              />
+            </div>
+          )}
+        </DialogContent>
+      </Dialog>
+
+      {/* Preview Dialog */}
       <Dialog open={!!previewQR} onOpenChange={() => setPreviewQR(null)}>
         <DialogContent className="max-w-sm sm:max-w-2xl">
           <DialogHeader>
