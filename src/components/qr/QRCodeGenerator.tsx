@@ -1649,6 +1649,112 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                 </div>
 
+                {/* CTA Section */}
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
+                    <h3 className="text-sm sm:text-base font-semibold">Call to Action</h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setVitrine({
+                        ...vitrine,
+                        hero: {
+                          ...vitrine.hero,
+                          ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
+                        }
+                      })}
+                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      Add CTA
+                    </Button>
+                  </div>
+                  <div className="space-y-2">
+                    {vitrine.hero.ctas.map((cta, index) => (
+                      <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
+                        <div className="flex justify-between items-center">
+                          <Label className="text-xs sm:text-sm">CTA {index + 1}</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const newCtas = vitrine.hero.ctas.filter((_, i) => i !== index);
+                              setVitrine({
+                                ...vitrine,
+                                hero: { ...vitrine.hero, ctas: newCtas }
+                              });
+                            }}
+                            disabled={vitrine.hero.ctas.length === 1}
+                            className="py-1 h-8 text-xs"
+                          >
+                            <Trash2 className="h-3 w-3" />
+                          </Button>
+                        </div>
+                        <Input
+                          placeholder="CTA Text"
+                          value={cta.text}
+                          onChange={(e) => {
+                            const newCtas = [...vitrine.hero.ctas];
+                            newCtas[index] = { ...cta, text: e.target.value };
+                            setVitrine({
+                              ...vitrine,
+                              hero: { ...vitrine.hero, ctas: newCtas }
+                            });
+                          }}
+                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                          dir={language === 'ar' ? 'rtl' : 'ltr'}
+                        />
+                        <div className="flex gap-2">
+                          <Select
+                            value={cta.type}
+                            onValueChange={(value) => {
+                              const newCtas = [...vitrine.hero.ctas];
+                              newCtas[index] = { ...cta, type: value };
+                              setVitrine({
+                                ...vitrine,
+                                hero: { ...vitrine.hero, ctas: newCtas }
+                              });
+                            }}
+                          >
+                            <SelectTrigger className="w-[120px] sm:w-[140px] h-10 sm:h-12 text-xs sm:text-sm">
+                              <SelectValue placeholder="Type" />
+                            </SelectTrigger>
+                            <SelectContent>
+                              <SelectItem value="website">Website</SelectItem>
+                              <SelectItem value="facebook">Facebook</SelectItem>
+                              <SelectItem value="instagram">Instagram</SelectItem>
+                              <SelectItem value="twitter">Twitter</SelectItem>
+                              <SelectItem value="linkedin">LinkedIn</SelectItem>
+                              <SelectItem value="youtube">YouTube</SelectItem>
+                              <SelectItem value="tiktok">TikTok</SelectItem>
+                              <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                              <SelectItem value="telegram">Telegram</SelectItem>
+                              <SelectItem value="location">Location</SelectItem>
+                              <SelectItem value="other">Other</SelectItem>
+                            </SelectContent>
+                          </Select>
+                          <Input
+                            placeholder="CTA Link"
+                            value={cta.link}
+                            onChange={(e) => {
+                              const newCtas = [...vitrine.hero.ctas];
+                              newCtas[index] = { ...cta, link: e.target.value };
+                              setVitrine({
+                                ...vitrine,
+                                hero: { ...vitrine.hero, ctas: newCtas }
+                              });
+                            }}
+                            className="flex-1 h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
+                            dir={language === 'ar' ? 'rtl' : 'ltr'}
+                          />
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
                 {/* About Section */}
                 <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
                   <h3 className="text-sm sm:text-base font-semibold">{translations[language].about}</h3>

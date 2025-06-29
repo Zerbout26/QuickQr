@@ -131,7 +131,22 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
       type: allowedTypes.includes(link.type as any) ? link.type : 'website'
     }))
   );
-  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>(qrCode.menu?.categories || []);
+  const [menuCategories, setMenuCategories] = useState<MenuCategory[]>(
+    (qrCode.menu?.categories || []).map(category => ({
+      ...category,
+      items: category.items.map(item => {
+        let images = item.images;
+        if (!images || images.length === 0) {
+          if (item.imageUrl) {
+            images = [item.imageUrl];
+          } else {
+            images = [];
+          }
+        }
+        return { ...item, images };
+      })
+    }))
+  );
   const [products, setProducts] = useState<MenuItem[]>(qrCode.products?.products || []);
   const [foregroundColor, setForegroundColor] = useState(qrCode.foregroundColor || '#000000');
   const [backgroundColor, setBackgroundColor] = useState(qrCode.backgroundColor || '#FFFFFF');
@@ -175,8 +190,30 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
           description: existingVitrine.about?.description || '',
           city: existingVitrine.about?.city || ''
         },
-        services: existingVitrine.services || [],
-        gallery: existingVitrine.gallery || [],
+        services: (existingVitrine.services || []).map(service => {
+          let images = service.images;
+          const legacyImageUrl = (service as any).imageUrl;
+          if (!images || images.length === 0) {
+            if (legacyImageUrl) {
+              images = [legacyImageUrl];
+            } else {
+              images = [];
+            }
+          }
+          return { ...service, images };
+        }),
+        gallery: (existingVitrine.gallery || []).map(item => {
+          let images = item.images;
+          const legacyImageUrl = (item as any).imageUrl;
+          if (!images || images.length === 0) {
+            if (legacyImageUrl) {
+              images = [legacyImageUrl];
+            } else {
+              images = [];
+            }
+          }
+          return { ...item, images };
+        }),
         testimonials: existingVitrine.testimonials || [],
         contact: {
           phone: existingVitrine.contact?.phone || '',
@@ -313,11 +350,28 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
 
     // Create a temporary URL for preview
     const tempUrl = URL.createObjectURL(file);
-    updateVitrineItem(section, index, 'imageUrl', tempUrl);
+    
+    if (section === 'services') {
+      // For services, update the images array
+      const currentService = vitrine.services[index];
+      const updatedImages = [...(currentService.images || []), tempUrl];
+      updateVitrineItem(section, index, 'images', updatedImages);
+    } else {
+      // For gallery, update the images array
+      const currentGalleryItem = vitrine.gallery[index];
+      const updatedImages = [...(currentGalleryItem.images || []), tempUrl];
+      updateVitrineItem(section, index, 'images', updatedImages);
+    }
   };
 
   const removeVitrineImage = (section: 'services' | 'gallery', index: number) => {
-    updateVitrineItem(section, index, 'imageUrl', '');
+    if (section === 'services') {
+      // For services, clear the images array
+      updateVitrineItem(section, index, 'images', []);
+    } else {
+      // For gallery, clear the images array
+      updateVitrineItem(section, index, 'images', []);
+    }
     
     // Remove from temp images if exists
     const key = `${section}-${index}`;
@@ -381,17 +435,17 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const updateLink = (index: number, field: keyof Link, value: string) => {
     const newLinks = [...links];
     if (field === 'type') {
-      const type = value;
-      const label = getPlatformLabel(type as any);
+      const type = value as Link['type'];
+      const label = getPlatformLabel(type);
       newLinks[index] = { 
         ...newLinks[index], 
         type,
         label,
-        url: newLinks[index].url || getDefaultUrl(type as any)
+        url: newLinks[index].url || getDefaultUrl(type)
       };
     } else if (field === 'label') {
       // Don't update the label if it's a platform type
-      if (!Object.values(platformTypes).includes(newLinks[index].type)) {
+      if (!Object.values(platformTypes).includes(newLinks[index].type as any)) {
         newLinks[index] = { ...newLinks[index], [field]: value };
       }
     } else {
@@ -883,73 +937,73 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 </div>
               </div>
 
-              {type === 'menu' && (
+              {(type === 'url' || type === 'both') && (
                 <div className="space-y-4">
-                  <div className="space-y-4">
-                    <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
-                      <h3 className="text-lg font-medium">{translations[language].links}</h3>
-                      <Button
-                        type="button"
-                        variant="outline"
-                        onClick={addLink}
-                        className="w-full sm:w-auto py-3 h-12 text-base"
-                      >
-                        <Plus className="h-4 w-4" />
-                        {translations[language].addLink}
-                      </Button>
-                    </div>
-                    <div className="space-y-3">
-                      {links.map((link, index) => (
-                        <div key={index} className="flex flex-col sm:flex-row gap-2">
-                          <Select
-                            value={link.type}
-                            onValueChange={(value) => updateLink(index, 'type', value)}
-                          >
-                            <SelectTrigger className="w-full sm:w-[180px] h-12">
-                              <SelectValue placeholder={translations[language].selectPlatform} />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="website">{translations[language].website}</SelectItem>
-                              <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
-                              <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
-                              <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
-                              <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
-                              <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
-                              <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
-                              <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
-                              <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
-                              <SelectItem value="other">{translations[language].other}</SelectItem>
-                            </SelectContent>
-                          </Select>
-                          <Input
-                            placeholder={translations[language].url}
-                            type="url"
-                            value={link.url}
-                            onChange={(e) => updateLink(index, 'url', e.target.value)}
-                            className="flex-1 h-12 px-4 py-3"
-                          />
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="icon"
-                            onClick={() => removeLink(index)}
-                            className="h-12 w-12"
-                          >
-                            <Trash2 className="h-4 w-4" />
-                          </Button>
-                        </div>
-                      ))}
-                    </div>
+                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
+                    <h3 className="text-lg font-medium">{translations[language].links}</h3>
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={addLink}
+                      className="w-full sm:w-auto py-3 h-12 text-base"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {translations[language].addLink}
+                    </Button>
                   </div>
+                  <div className="space-y-3">
+                    {links.map((link, index) => (
+                      <div key={index} className="flex flex-col sm:flex-row gap-2">
+                        <Select
+                          value={link.type}
+                          onValueChange={(value) => updateLink(index, 'type', value)}
+                        >
+                          <SelectTrigger className="w-full sm:w-[180px] h-12">
+                            <SelectValue placeholder={translations[language].selectPlatform} />
+                          </SelectTrigger>
+                          <SelectContent>
+                            <SelectItem value="website">{translations[language].website}</SelectItem>
+                            <SelectItem value="facebook">{translations[language].facebook}</SelectItem>
+                            <SelectItem value="instagram">{translations[language].instagram}</SelectItem>
+                            <SelectItem value="twitter">{translations[language].twitter}</SelectItem>
+                            <SelectItem value="linkedin">{translations[language].linkedin}</SelectItem>
+                            <SelectItem value="youtube">{translations[language].youtube}</SelectItem>
+                            <SelectItem value="tiktok">{translations[language].tiktok}</SelectItem>
+                            <SelectItem value="whatsapp">{translations[language].whatsapp}</SelectItem>
+                            <SelectItem value="telegram">{translations[language].telegram}</SelectItem>
+                            <SelectItem value="other">{translations[language].other}</SelectItem>
+                          </SelectContent>
+                        </Select>
+                        <Input
+                          placeholder={translations[language].url}
+                          type="url"
+                          value={link.url}
+                          onChange={(e) => updateLink(index, 'url', e.target.value)}
+                          className="flex-1 h-12 px-4 py-3"
+                        />
+                        <Button
+                          type="button"
+                          variant="outline"
+                          size="icon"
+                          onClick={() => removeLink(index)}
+                          className="h-12 w-12"
+                        >
+                          <Trash2 className="h-4 w-4" />
+                        </Button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
 
+              {(type === 'menu' || type === 'both') && (
+                <div className="space-y-4">
                   {/* Menu Settings */}
                   <div className="space-y-3">
                     <div className="flex items-center gap-3">
                       <Switch
                         checked={menuOrderable}
-                        onCheckedChange={(checked) => {
-                          // Handle menu orderable toggle
-                        }}
+                        onCheckedChange={setMenuOrderable}
                         id="orderable-menu-toggle"
                       />
                       <Label htmlFor="orderable-menu-toggle" className="text-base">{translations[language].orderableMenuToggle}</Label>
@@ -957,9 +1011,7 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                     <div className="flex items-center gap-3">
                       <Switch
                         checked={codFormEnabled}
-                        onCheckedChange={(checked) => {
-                          // Handle COD form toggle
-                        }}
+                        onCheckedChange={setCodFormEnabled}
                         id="cod-form-toggle"
                       />
                       <Label htmlFor="cod-form-toggle" className="text-base">{translations[language].codFormToggle}</Label>
@@ -1012,6 +1064,66 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                                 onChange={(e) => updateMenuItem(categoryIndex, itemIndex, 'price', e.target.value)}
                                 className="h-12 px-4 py-3"
                               />
+                              
+                              {/* Image Upload Section */}
+                              <div className="space-y-2">
+                                <Label className="text-base font-medium">Images</Label>
+                                <div className="flex gap-2 flex-wrap mb-2">
+                                  {(item.images || []).map((imgUrl, imgIdx) => (
+                                    <div key={imgIdx} className="relative group">
+                                      <img src={imgUrl} alt={item.name} className="w-16 h-16 object-cover rounded border" />
+                                      <button
+                                        type="button"
+                                        className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                        onClick={() => {
+                                          const newImages = [...(item.images || [])];
+                                          newImages.splice(imgIdx, 1);
+                                          updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                          
+                                          // Remove corresponding file from tempImages
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${imgIdx}`;
+                                          if (tempImages[key]) {
+                                            const newTempImages = { ...tempImages };
+                                            delete newTempImages[key];
+                                            setTempImages(newTempImages);
+                                          }
+                                        }}
+                                      >
+                                        &times;
+                                      </button>
+                                    </div>
+                                  ))}
+                                  <Button
+                                    type="button"
+                                    variant="outline"
+                                    size="sm"
+                                    onClick={() => {
+                                      const input = document.createElement('input');
+                                      input.type = 'file';
+                                      input.accept = 'image/*';
+                                      input.multiple = true;
+                                      input.onchange = (e) => {
+                                        const files = Array.from((e.target as HTMLInputElement).files || []);
+                                        const newImages = [...(item.images || [])];
+                                        files.forEach((file, fileIndex) => {
+                                          // Store file in tempImages for upload
+                                          const key = `menu-${categoryIndex}-${itemIndex}-${newImages.length + fileIndex}`;
+                                          setTempImages(prev => ({ ...prev, [key]: file }));
+                                          // Create temporary URL for preview
+                                          const url = URL.createObjectURL(file);
+                                          newImages.push(url);
+                                        });
+                                        updateMenuItem(categoryIndex, itemIndex, 'images', newImages);
+                                      };
+                                      input.click();
+                                    }}
+                                    className="h-12 px-4 py-3"
+                                  >
+                                    + Add Image
+                                  </Button>
+                                </div>
+                              </div>
+                              
                               <Button
                                 type="button"
                                 variant="outline"
@@ -1166,10 +1278,422 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
                 <div className="space-y-4">
                   <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-2">
                     <h3 className="text-lg font-semibold">Vitrine</h3>
-                    <p className="text-sm text-gray-600">E-commerce enabled by default</p>
+                    <p className="text-sm text-gray-600">Business showcase page</p>
                   </div>
                   
-                  {/* Vitrine content */}
+                  {/* Hero Section */}
+                  {renderHeroSection()}
+
+                  {/* About Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <h3 className="text-lg font-medium">About Section</h3>
+                    <div className="space-y-2">
+                      <Label>Description</Label>
+                      <Input
+                        value={vitrine.about.description}
+                        onChange={(e) => updateVitrineSection('about', { ...vitrine.about, description: e.target.value })}
+                        placeholder="Enter business description"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>City</Label>
+                      <Input
+                        value={vitrine.about.city}
+                        onChange={(e) => updateVitrineSection('about', { ...vitrine.about, city: e.target.value })}
+                        placeholder="Enter city"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Services Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Services</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addVitrineItem('services', { name: '', description: '', images: [] })}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Service
+                      </Button>
+                    </div>
+                    {vitrine.services.map((service, index) => (
+                      <div key={index} className="space-y-2 border p-3 rounded">
+                        <div className="flex justify-between items-center">
+                          <Label>Service {index + 1}</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeVitrineItem('services', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          value={service.name}
+                          onChange={(e) => updateVitrineItem('services', index, 'name', e.target.value)}
+                          placeholder="Service name"
+                        />
+                        <Input
+                          value={service.description}
+                          onChange={(e) => updateVitrineItem('services', index, 'description', e.target.value)}
+                          placeholder="Service description"
+                        />
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.onchange = (e) => handleVitrineImageUpload('services', index, e as any);
+                              input.click();
+                            }}
+                          >
+                            Upload Image
+                          </Button>
+                          {service.images && service.images.length > 0 && (
+                            <img src={service.images[0]} alt={service.name} className="w-16 h-16 object-cover rounded" />
+                          )}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Gallery Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Gallery</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addVitrineItem('gallery', { title: '', description: '', images: [] })}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Gallery Item
+                      </Button>
+                    </div>
+                    {vitrine.gallery.map((galleryItem, index) => (
+                      <div key={index} className="space-y-2 border p-3 rounded">
+                        <div className="flex justify-between items-center">
+                          <Label>Gallery Item {index + 1}</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeVitrineItem('gallery', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          value={galleryItem.title}
+                          onChange={(e) => updateVitrineItem('gallery', index, 'title', e.target.value)}
+                          placeholder="Gallery item title"
+                        />
+                        <Input
+                          value={galleryItem.description}
+                          onChange={(e) => updateVitrineItem('gallery', index, 'description', e.target.value)}
+                          placeholder="Gallery item description"
+                        />
+                        <div className="flex items-center gap-2">
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              const input = document.createElement('input');
+                              input.type = 'file';
+                              input.accept = 'image/*';
+                              input.multiple = true;
+                              input.onchange = (e) => {
+                                const files = Array.from((e.target as HTMLInputElement).files || []);
+                                const newImages = [...(galleryItem.images || [])];
+                                files.forEach((file, fileIndex) => {
+                                  // Store file in tempImages for upload
+                                  const key = `gallery-${index}-${newImages.length + fileIndex}`;
+                                  setTempImages(prev => ({ ...prev, [key]: file }));
+                                  // Create temporary URL for preview
+                                  const url = URL.createObjectURL(file);
+                                  newImages.push(url);
+                                });
+                                updateVitrineItem('gallery', index, 'images', newImages);
+                              };
+                              input.click();
+                            }}
+                          >
+                            Upload Images
+                          </Button>
+                          <div className="flex gap-2 flex-wrap">
+                            {(galleryItem.images || []).map((imgUrl, imgIdx) => (
+                              <div key={imgIdx} className="relative group">
+                                <img src={imgUrl} alt={galleryItem.title} className="w-16 h-16 object-cover rounded border" />
+                                <button
+                                  type="button"
+                                  className="absolute -top-2 -right-2 bg-white border border-gray-300 rounded-full p-1 text-xs text-red-500 opacity-80 group-hover:opacity-100"
+                                  onClick={() => {
+                                    const newImages = [...(galleryItem.images || [])];
+                                    newImages.splice(imgIdx, 1);
+                                    updateVitrineItem('gallery', index, 'images', newImages);
+                                  }}
+                                >
+                                  &times;
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Contact Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <h3 className="text-lg font-medium">Contact Information</h3>
+                    <div className="space-y-2">
+                      <Label>Phone</Label>
+                      <Input
+                        value={vitrine.contact.phone}
+                        onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, phone: e.target.value })}
+                        placeholder="Enter phone number"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Email</Label>
+                      <Input
+                        value={vitrine.contact.email}
+                        onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, email: e.target.value })}
+                        placeholder="Enter email"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Address</Label>
+                      <Input
+                        value={vitrine.contact.address}
+                        onChange={(e) => updateVitrineSection('contact', { ...vitrine.contact, address: e.target.value })}
+                        placeholder="Enter address"
+                      />
+                    </div>
+                  </div>
+
+                  {/* Social Media Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <h3 className="text-lg font-medium">Social Media</h3>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div className="space-y-2">
+                        <Label>Facebook</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.facebook}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, facebook: e.target.value }
+                          })}
+                          placeholder="Facebook URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Instagram</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.instagram}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, instagram: e.target.value }
+                          })}
+                          placeholder="Instagram URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>Twitter</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.twitter}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, twitter: e.target.value }
+                          })}
+                          placeholder="Twitter URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>LinkedIn</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.linkedin}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, linkedin: e.target.value }
+                          })}
+                          placeholder="LinkedIn URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>YouTube</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.youtube}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, youtube: e.target.value }
+                          })}
+                          placeholder="YouTube URL"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <Label>TikTok</Label>
+                        <Input
+                          value={vitrine.contact.socialMedia.tiktok}
+                          onChange={(e) => updateVitrineSection('contact', { 
+                            ...vitrine.contact, 
+                            socialMedia: { ...vitrine.contact.socialMedia, tiktok: e.target.value }
+                          })}
+                          placeholder="TikTok URL"
+                        />
+                      </div>
+                    </div>
+                  </div>
+
+                  {/* Testimonials Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <div className="flex justify-between items-center">
+                      <h3 className="text-lg font-medium">Testimonials</h3>
+                      <Button
+                        type="button"
+                        variant="outline"
+                        size="sm"
+                        onClick={() => addVitrineItem('testimonials', { text: '', author: '', city: '' })}
+                      >
+                        <Plus className="h-4 w-4 mr-2" />
+                        Add Testimonial
+                      </Button>
+                    </div>
+                    {vitrine.testimonials.map((testimonial, index) => (
+                      <div key={index} className="space-y-2 border p-3 rounded">
+                        <div className="flex justify-between items-center">
+                          <Label>Testimonial {index + 1}</Label>
+                          <Button
+                            type="button"
+                            variant="outline"
+                            size="icon"
+                            onClick={() => removeVitrineItem('testimonials', index)}
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        </div>
+                        <Input
+                          value={testimonial.text}
+                          onChange={(e) => updateVitrineItem('testimonials', index, 'text', e.target.value)}
+                          placeholder="Testimonial text"
+                        />
+                        <Input
+                          value={testimonial.author}
+                          onChange={(e) => updateVitrineItem('testimonials', index, 'author', e.target.value)}
+                          placeholder="Author name"
+                        />
+                        <Input
+                          value={testimonial.city}
+                          onChange={(e) => updateVitrineItem('testimonials', index, 'city', e.target.value)}
+                          placeholder="City"
+                        />
+                      </div>
+                    ))}
+                  </div>
+
+                  {/* Footer Section */}
+                  <div className="space-y-4 border p-4 rounded-lg">
+                    <h3 className="text-lg font-medium">Footer</h3>
+                    <div className="space-y-2">
+                      <Label>Business Name</Label>
+                      <Input
+                        value={vitrine.footer.businessName}
+                        onChange={(e) => updateVitrineSection('footer', { ...vitrine.footer, businessName: e.target.value })}
+                        placeholder="Business name for footer"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Copyright</Label>
+                      <Input
+                        value={vitrine.footer.copyright}
+                        onChange={(e) => updateVitrineSection('footer', { ...vitrine.footer, copyright: e.target.value })}
+                        placeholder="Copyright text"
+                      />
+                    </div>
+                    
+                    {/* Footer Social Media */}
+                    <div className="space-y-2">
+                      <Label className="text-base font-medium">Footer Social Media</Label>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        <div className="space-y-2">
+                          <Label>Facebook</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.facebook}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, facebook: e.target.value }
+                            })}
+                            placeholder="Facebook URL"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Instagram</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.instagram}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, instagram: e.target.value }
+                            })}
+                            placeholder="Instagram URL"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>Twitter</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.twitter}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, twitter: e.target.value }
+                            })}
+                            placeholder="Twitter URL"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>LinkedIn</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.linkedin}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, linkedin: e.target.value }
+                            })}
+                            placeholder="LinkedIn URL"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>YouTube</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.youtube}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, youtube: e.target.value }
+                            })}
+                            placeholder="YouTube URL"
+                          />
+                        </div>
+                        <div className="space-y-2">
+                          <Label>TikTok</Label>
+                          <Input
+                            value={vitrine.footer.socialIcons.tiktok}
+                            onChange={(e) => updateVitrineSection('footer', { 
+                              ...vitrine.footer, 
+                              socialIcons: { ...vitrine.footer.socialIcons, tiktok: e.target.value }
+                            })}
+                            placeholder="TikTok URL"
+                          />
+                        </div>
+                      </div>
+                    </div>
+                  </div>
                 </div>
               )}
             </TabsContent>
