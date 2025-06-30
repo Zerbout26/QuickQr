@@ -1138,7 +1138,7 @@ export const incrementScanCount = async (req: Request, res: Response) => {
 
 export const getSitemap = async (req: Request, res: Response) => {
   try {
-    const baseUrl = 'https://www.qrcreator.xyz'; // Always use the public domain
+    const baseUrl = 'https://qrcreator.xyz'; // Always use the public domain
     const qrRepo = AppDataSource.getRepository(QRCode);
     const qrCodes = await qrRepo.find({ select: ['id'] });
     const urls = qrCodes.map((qr: { id: string }) =>
