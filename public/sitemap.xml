@@ -40,9 +40,4 @@
     <loc>https://www.qrcreator.xyz/links</loc>
     <priority>0.7</priority>
   </url>
-  <!-- Example dynamic QR code page, update as needed -->
-  <url>
-    <loc>https://www.qrcreator.xyz/qr/EXAMPLE_ID</loc>
-    <priority>0.6</priority>
-  </url>
 </urlset> 
