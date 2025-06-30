@@ -1,43 +1,43 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
-    <loc>https://www.qrcreator.xyz/</loc>
+    <loc>https://qrcreator.xyz/</loc>
     <priority>1.0</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/dashboard</loc>
+    <loc>https://qrcreator.xyz/dashboard</loc>
     <priority>0.9</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/signup</loc>
+    <loc>https://qrcreator.xyz/signup</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/signin</loc>
+    <loc>https://qrcreator.xyz/signin</loc>
     <priority>0.8</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/orders</loc>
+    <loc>https://qrcreator.xyz/orders</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/profile</loc>
+    <loc>https://qrcreator.xyz/profile</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/products</loc>
+    <loc>https://qrcreator.xyz/products</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/vitrine</loc>
+    <loc>https://qrcreator.xyz/vitrine</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/menu</loc>
+    <loc>https://qrcreator.xyz/menu</loc>
     <priority>0.7</priority>
   </url>
   <url>
-    <loc>https://www.qrcreator.xyz/links</loc>
+    <loc>https://qrcreator.xyz/links</loc>
     <priority>0.7</priority>
   </url>
 </urlset> 
