@@ -7,12 +7,19 @@
     <meta name="description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
     <meta name="author" content="QrCreator" />
 
+    <!-- Performance optimizations -->
+    <link rel="dns-prefetch" href="//fonts.googleapis.com" />
+    <link rel="dns-prefetch" href="//cdn.gpteng.co" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" crossorigin />
+    <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
+    
     <!-- Favicon and app icons -->
     <link rel="icon" type="image/png" href="/Logo QrCreator sur fond blanc (1).png" />
     <link rel="apple-touch-icon" href="/Logo QrCreator sur fond blanc (1).png" />
     
     <!-- Preload critical assets -->
     <link rel="preload" href="/Logo QrCreator sur fond blanc (1).png" as="image" type="image/png" />
+    <link rel="preload" href="/src/main.tsx" as="script" type="module" />
     
     <!-- Open Graph / Social Media Meta Tags -->
     <meta property="og:title" content="QrCreator - One Scan. Full Access." />
@@ -31,6 +38,10 @@
     
     <!-- Theme Color -->
     <meta name="theme-color" content="#8b5cf6" />
+    
+    <!-- Performance meta tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
     
     <!-- Prevent Flash of Unstyled Content -->
     <style>

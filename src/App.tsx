@@ -5,22 +5,33 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { AuthProvider } from "./context/AuthContext";
 import { LanguageProvider } from "./context/LanguageContext";
+import { PerformanceMonitor } from "./components/PerformanceMonitor";
+import { lazy, Suspense } from "react";
 import Index from "./pages/Index";
-import Dashboard from "./pages/Dashboard";
-import Admin from "./pages/Admin";
-import Orders from "./pages/Orders";
-import NotFound from "./pages/NotFound";
 import SignInForm from "./components/auth/SignInForm";
 import SignUpForm from "./components/auth/SignUpForm";
 import MainLayout from "./components/layout/MainLayout";
 import PaymentInstructions from "@/pages/PaymentInstructions";
 import LandingPage from '@/pages/LandingPage';
-import EditQRCodePage from '@/pages/EditQRCodePage';
 import PrivateRoute from '@/components/PrivateRoute';
-import ResetPasswordForm from '@/components/auth/ResetPasswordForm';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
-import Profile from '@/pages/Profile';
-import ChooseQRType from './pages/ChooseQRType';
+import NotFound from "./pages/NotFound";
+
+// Lazy load components for better performance
+const Dashboard = lazy(() => import("./pages/Dashboard"));
+const Admin = lazy(() => import("./pages/Admin"));
+const Orders = lazy(() => import("./pages/Orders"));
+const EditQRCodePage = lazy(() => import('@/pages/EditQRCodePage'));
+const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm'));
+const Profile = lazy(() => import('@/pages/Profile'));
+const ChooseQRType = lazy(() => import('./pages/ChooseQRType'));
+
+// Loading component for lazy-loaded routes
+const LoadingSpinner = () => (
+  <div className="flex items-center justify-center min-h-screen">
+    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
+  </div>
+);
 
 const queryClient = new QueryClient();
 
@@ -29,6 +40,7 @@ const App = () => (
     <AuthProvider>
       <LanguageProvider>
         <TooltipProvider>
+          <PerformanceMonitor />
           <Toaster />
           <Sonner />
           <BrowserRouter>
@@ -36,17 +48,23 @@ const App = () => (
               <Route path="/" element={<Index />} />
               <Route path="/dashboard" element={
                 <PrivateRoute>
-                  <Dashboard />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Dashboard />
+                  </Suspense>
                 </PrivateRoute>
               } />
               <Route path="/orders" element={
                 <PrivateRoute>
-                  <Orders />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Orders />
+                  </Suspense>
                 </PrivateRoute>
               } />
               <Route path="/admin" element={
                 <PrivateRoute>
-                  <Admin />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <Admin />
+                  </Suspense>
                 </PrivateRoute>
               } />
               <Route path="/signin" element={
@@ -71,16 +89,28 @@ const App = () => (
               <Route path="/landing/:id/:url" element={<LandingPage />} />
               <Route path="/qrcodes/:id/edit" element={
                 <PrivateRoute>
-                  <EditQRCodePage />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <EditQRCodePage />
+                  </Suspense>
                 </PrivateRoute>
               } />
               <Route path="/reset-password" element={
                 <PrivateRoute>
-                  <ResetPasswordForm />
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ResetPasswordForm />
+                  </Suspense>
                 </PrivateRoute>
               } />
-              <Route path="/profile" element={<Profile />} />
-              <Route path="/choose-qr-type" element={<ChooseQRType />} />
+              <Route path="/profile" element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <Profile />
+                </Suspense>
+              } />
+              <Route path="/choose-qr-type" element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <ChooseQRType />
+                </Suspense>
+              } />
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>

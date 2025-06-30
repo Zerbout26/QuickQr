@@ -1,5 +1,37 @@
+# Performance headers for static assets
+/assets/*  /assets/:splat  200!
+  X-Frame-Options: DENY
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+  Cache-Control: public, max-age=31536000, immutable
+
+# Performance headers for images
+*.png  /:splat  200!
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+*.jpg  /:splat  200!
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+*.jpeg  /:splat  200!
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+*.svg  /:splat  200!
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+*.ico  /:splat  200!
+  Cache-Control: public, max-age=31536000, immutable
+  X-Content-Type-Options: nosniff
+
+# Sitemap with correct content type
 /sitemap.xml  /sitemap.xml  200!
   Content-Type: application/xml
 
+# API proxy
 /api/qrcodes/sitemap.xml https://quickqr-heyg.onrender.com/api/qrcodes/sitemap.xml 200
+
+# SPA fallback
 /* /index.html 200 
