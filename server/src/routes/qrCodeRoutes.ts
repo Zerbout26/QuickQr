@@ -24,6 +24,7 @@ router.get('/public/:id', getPublicQRCode);
 router.get('/redirect/:url', redirectToUrl);
 router.post('/:id/scan', incrementScanCount);
 router.get('/:id/colors', getLandingPageColors);
+router.get('/sitemap.xml', getSitemap);
 
 // Protected routes (authentication required)
 router.use(auth); 
@@ -34,6 +35,5 @@ router.put('/:id', updateQRCode);
 router.delete('/:id', deleteQRCode);
 router.post('/upload/item-image', uploadItemImageHandler);
 router.put('/:id/colors', updateLandingPageColors);
-router.get('/sitemap.xml', getSitemap);
 
 export default router;
