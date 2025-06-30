@@ -14,11 +14,11 @@
     <link rel="preconnect" href="https://cdn.gpteng.co" crossorigin />
     
     <!-- Favicon and app icons -->
-    <link rel="icon" type="image/png" href="/Logo QrCreator sur fond blanc (1).png" />
-    <link rel="apple-touch-icon" href="/Logo QrCreator sur fond blanc (1).png" />
+    <link rel="icon" type="image/png" href="/logo-optimized.png" />
+    <link rel="apple-touch-icon" href="/logo-optimized.png" />
     
     <!-- Preload critical assets -->
-    <link rel="preload" href="/Logo QrCreator sur fond blanc (1).png" as="image" type="image/png" />
+    <link rel="preload" href="/Logo QrCreator sur fond blanc (1).webp" as="image" type="image/webp" />
     <link rel="preload" href="/src/main.tsx" as="script" type="module" />
     
     <!-- Preload critical CSS -->
@@ -28,7 +28,7 @@
     <meta property="og:title" content="QrCreator - One Scan. Full Access." />
     <meta property="og:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).png" />
+    <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
     <meta property="og:url" content="https://qrcreator.xyz" />
     <meta property="og:site_name" content="QrCreator" />
     
@@ -36,7 +36,7 @@
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="QrCreator - One Scan. Full Access." />
     <meta name="twitter:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
-    <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).png" />
+    <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
     <meta name="twitter:creator" content="@qrcreator" />
     
     <!-- Theme Color -->
@@ -75,14 +75,17 @@
 
   <body>
     <div id="root">
-      <!-- Initial loading state -->
-      <img 
-        src="/Logo QrCreator sur fond blanc (1).png" 
-        alt="QrCreator Logo" 
-        class="loading-logo"
-        width="128"
-        height="128"
-      />
+      <!-- Initial loading state with optimized image -->
+      <picture>
+        <source srcset="/Logo QrCreator sur fond blanc (1).webp" type="image/webp" />
+        <img 
+          src="/logo-optimized.png" 
+          alt="QrCreator Logo" 
+          class="loading-logo"
+          width="128"
+          height="128"
+        />
+      </picture>
     </div>
     <!-- IMPORTANT: DO NOT REMOVE THIS SCRIPT TAG OR link THIS VERY COMMENT! -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
