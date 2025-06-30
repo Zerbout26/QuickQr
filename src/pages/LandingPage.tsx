@@ -585,7 +585,7 @@ const LandingPage = () => {
 
         {/* Floating Basket Toggle Button */}
         {shouldShowBasket && (
-          <div className="fixed bottom-6 right-6 z-50">
+          <div className="fixed bottom-20 right-6 z-[60]">
             <button
               onClick={() => setIsBasketOpen(!isBasketOpen)}
               className="relative w-14 h-14 rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center"
@@ -605,7 +605,7 @@ const LandingPage = () => {
 
         {/* Side Basket */}
         {shouldShowBasket && (
-          <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-40 ${isBasketOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+          <div className={`fixed top-0 right-0 h-full w-80 bg-white shadow-2xl transform transition-transform duration-300 ease-in-out z-[55] ${isBasketOpen ? 'translate-x-0' : 'translate-x-full'}`}>
             <div className="flex flex-col h-full">
               {/* Basket Header */}
               <div className="flex items-center justify-between p-4 border-b border-gray-200">
@@ -727,7 +727,7 @@ const LandingPage = () => {
 
         {/* COD Form Modal */}
         {showCodForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full max-h-[90vh] overflow-y-auto">
               <div className="p-6">
                 <div className="flex items-center justify-between mb-6">
@@ -859,7 +859,7 @@ const LandingPage = () => {
 
         {/* Custom Confirm Order Success Dialog */}
         {showConfirmDialog && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 bg-black bg-opacity-50 z-[70] flex items-center justify-center p-4">
             <div className="bg-white rounded-lg shadow-xl max-w-md w-full">
               <div className="p-6 text-center">
                 {/* Success Icon */}
@@ -897,7 +897,7 @@ const LandingPage = () => {
         {/* Backdrop */}
         {isBasketOpen && shouldShowBasket && (
           <div
-            className="fixed inset-0 bg-black bg-opacity-50 z-30"
+            className="fixed inset-0 bg-black bg-opacity-50 z-[54]"
             onClick={() => setIsBasketOpen(false)}
           />
         )}
