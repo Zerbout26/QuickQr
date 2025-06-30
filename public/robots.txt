@@ -13,5 +13,5 @@ Allow: /
 User-agent: *
 Allow: /
 
-Sitemap: https://www.qrcreator.xyz/sitemap.xml
-Sitemap: https://www.qrcreator.xyz/api/qrcodes/sitemap.xml
+Sitemap: https://qrcreator.xyz/sitemap.xml
+Sitemap: https://qrcreator.xyz/api/qrcodes/sitemap.xml
