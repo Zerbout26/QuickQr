@@ -8,7 +8,8 @@ import {
   uploadItemImageHandler,
   getPublicQRCode,
   redirectToUrl,
-  incrementScanCount
+  incrementScanCount,
+  getSitemap
 } from '../controllers/qrCodeController';
 import {
   getLandingPageColors,
@@ -33,5 +34,6 @@ router.put('/:id', updateQRCode);
 router.delete('/:id', deleteQRCode);
 router.post('/upload/item-image', uploadItemImageHandler);
 router.put('/:id/colors', updateLandingPageColors);
+router.get('/sitemap.xml', getSitemap);
 
 export default router;

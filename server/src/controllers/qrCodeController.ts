@@ -1134,4 +1134,20 @@ export const incrementScanCount = async (req: Request, res: Response) => {
     console.error('Error incrementing scan count:', error);
     res.status(500).json({ message: 'Error incrementing scan count' });
   }
+};
+
+export const getSitemap = async (req: Request, res: Response) => {
+  try {
+    const baseUrl = req.protocol + '://' + req.get('host');
+    const qrRepo = AppDataSource.getRepository(QRCode);
+    const qrCodes = await qrRepo.find({ select: ['id'] });
+    const urls = qrCodes.map((qr: { id: string }) =>
+      `<url><loc>${baseUrl}/qr/${qr.id}</loc><priority>0.6</priority></url>`
+    ).join('');
+    const xml = `<?xml version="1.0" encoding="UTF-8"?>\n<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`;
+    res.header('Content-Type', 'application/xml');
+    res.send(xml);
+  } catch (error) {
+    res.status(500).send('Failed to generate sitemap');
+  }
 }; 

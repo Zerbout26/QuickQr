@@ -2,6 +2,7 @@ import React, { useEffect, useState, Suspense, lazy, useCallback } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { QRCode, MenuItem } from '@/types';
 import { qrCodeApi } from '@/lib/api';
+import { Helmet } from 'react-helmet';
 
 // Landing page colors interface
 interface LandingPageColors {
@@ -495,6 +496,21 @@ const LandingPage = () => {
 
   return (
     <>
+      <Helmet>
+        <title>QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders</title>
+        <meta name="description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <meta name="keywords" content="QR code, menu, vitrine, ecommerce, orders, digital menu, QR generator, QR code generator, restaurant QR, online menu, business showcase, order management, product QR, quickqr" />
+        <meta property="og:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
+        <meta property="og:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <meta property="og:type" content="website" />
+        <meta property="og:url" content="https://www.qrcreator.xyz/" />
+        <meta property="og:image" content="https://www.qrcreator.xyz/favicon.ico" />
+        <meta name="twitter:card" content="summary_large_image" />
+        <meta name="twitter:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
+        <meta name="twitter:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <meta name="twitter:image" content="https://www.qrcreator.xyz/favicon.ico" />
+        <link rel="canonical" href="https://www.qrcreator.xyz/" />
+      </Helmet>
       <CriticalCSS colors={landingPageColors} />
       <div className="landing-container pb-20">
         <div className="content-wrapper">

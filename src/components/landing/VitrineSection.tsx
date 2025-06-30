@@ -29,11 +29,11 @@ interface VitrineSectionProps {
       name: string;
       description?: string;
       title?: string;
-      imageUrl?: string;
+      images?: string[];
       imageDescription?: string;
     }>;
     gallery: Array<{
-      imageUrl: string;
+      images?: string[];
       title?: string;
       description?: string;
     }>;
@@ -313,10 +313,10 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     background: `linear-gradient(to bottom right, ${colors.primaryColor}10, ${colors.accentColor}05, transparent)`
                   }}
                 ></div>
-                {service.imageUrl && (
+                {service.images && service.images.length > 0 && (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <BlurImage
-                      src={service.imageUrl}
+                      src={service.images[0]}
                       alt={service.name}
                       className="transition-transform duration-500 group-hover:scale-110"
                     />
@@ -382,7 +382,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                 ></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                   <BlurImage
-                    src={item.imageUrl}
+                    src={item.images && item.images.length > 0 ? item.images[0] : ''}
                     alt={item.title || `Gallery image ${index + 1}`}
                     className="transition-transform duration-500 group-hover:scale-110"
                   />
