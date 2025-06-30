@@ -7,7 +7,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import { ArrowRight, Shield, Star, Globe, ChartBar, Settings } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet';
-import { OptimizedImage } from '@/components/OptimizedImage';
 
 // Translations object
 const translations = {
@@ -249,31 +248,52 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders</title>
-        <meta name="description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
-        <meta name="keywords" content="QR code, menu, vitrine, ecommerce, orders, digital menu, QR generator, QR code generator, restaurant QR, online menu, business showcase, order management, product QR, quickqr" />
-        <meta property="og:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
-        <meta property="og:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <title>Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator</title>
+        <meta name="description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète pour entreprises en Algérie et partout." />
+        <meta name="keywords" content="générateur QR code gratuit, QR code gratuit, créer QR code, QR code menu restaurant, QR code vitrine, QR code ecommerce, QR code Algérie, générateur QR code en ligne, QR code dynamique, QR code business" />
+        <meta property="og:title" content="Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator" />
+        <meta property="og:description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète pour entreprises en Algérie et partout." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://qrcreator.xyz/" />
         <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
-        <meta name="twitter:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <meta name="twitter:title" content="Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator" />
+        <meta name="twitter:description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
         <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <link rel="canonical" href="https://qrcreator.xyz/" />
         <script type="application/ld+json">{`
           {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "QuickQr",
+            "name": "QrCreator",
             "url": "https://qrcreator.xyz",
             "logo": "https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp",
-            "description": "Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution.",
+            "description": "Générateur QR code gratuit en ligne pour menus, vitrines, ecommerce et gestion de commandes.",
+            "address": {
+              "@type": "PostalAddress",
+              "addressCountry": "DZ",
+              "addressRegion": "Algérie"
+            },
             "sameAs": [
-              "https://www.facebook.com/yourpage",
-              "https://www.instagram.com/yourpage"
+              "https://www.facebook.com/qrcreator",
+              "https://www.instagram.com/qrcreator"
             ]
+          }
+        `}</script>
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            "name": "QrCreator - Générateur QR Code Gratuit",
+            "url": "https://qrcreator.xyz",
+            "description": "Générateur QR code gratuit en ligne pour créer des QR codes pour menus, vitrines, ecommerce et gestion de commandes.",
+            "applicationCategory": "BusinessApplication",
+            "operatingSystem": "Web Browser",
+            "offers": {
+              "@type": "Offer",
+              "price": "0",
+              "priceCurrency": "DZD"
+            }
           }
         `}</script>
       </Helmet>
@@ -281,10 +301,10 @@ const Index = () => {
         {/* SEO h1 and paragraph for keyword targeting */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-primary mb-2">
-            QR Code Generator for Menus, Vitrine Sites, Ecommerce & Orders
+            Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce & Commandes
           </h1>
-          <p className="text-center text-gray-700 max-w-2xl mx-auto">
-            QuickQr helps you create QR codes for digital menus, business vitrines, ecommerce product showcases, and order management. Boost your business with our all-in-one QR code platform for restaurants, shops, and service providers.
+          <p className="text-center text-gray-700 max-w-3xl mx-auto">
+            QrCreator est votre générateur QR code gratuit en ligne. Créez facilement des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite pour toutes les entreprises en Algérie et dans le monde. Aucune inscription requise, QR codes illimités.
           </p>
         </div>
         
@@ -326,41 +346,65 @@ const Index = () => {
               <div className="lg:w-1/2 w-full">
                 <div className="relative">
                   <div className="relative rounded-xl shadow-lg">
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-xl">
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm">
-                        <OptimizedImage 
+                    {/* Debug info */}
+                    <div className="text-xs text-gray-500 mb-2 p-2 bg-yellow-50 rounded">
+                      Debug: Grid should show 4 images (2x2 layout)
+                    </div>
+                    
+                    <div className="grid grid-cols-2 gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-xl" style={{minHeight: '200px'}}>
+                      {/* Image 1 */}
+                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
+                        <img 
                           src="/ChatGPT Image May 23, 2025, 12_04_53 AM.webp"
                           alt="QR Code in use" 
                           className="w-full h-full object-cover"
-                          width={200}
-                          height={200}
+                          onLoad={() => console.log('✅ Image 1 loaded successfully')}
+                          onError={(e) => {
+                            console.log('❌ Image 1 failed to load');
+                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_04_53 AM.png';
+                          }}
                         />
                       </div>
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm">
-                        <OptimizedImage 
+                      
+                      {/* Image 2 */}
+                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
+                        <img 
                           src="/Design sans titre.webp"
                           alt="Restaurant QR menu" 
                           className="w-full h-full object-cover"
-                          width={200}
-                          height={200}
+                          onLoad={() => console.log('✅ Image 2 loaded successfully')}
+                          onError={(e) => {
+                            console.log('❌ Image 2 failed to load');
+                            e.currentTarget.src = '/Design sans titre.png';
+                          }}
                         />
                       </div>
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm">
-                        <OptimizedImage 
+                      
+                      {/* Image 3 */}
+                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
+                        <img 
                           src="/ChatGPT Image May 23, 2025, 12_08_02 AM.webp"
                           alt="Retail store" 
                           className="w-full h-full object-cover"
-                          width={200}
-                          height={200}
+                          onLoad={() => console.log('✅ Image 3 loaded successfully')}
+                          onError={(e) => {
+                            console.log('❌ Image 3 failed to load');
+                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_08_02 AM.png';
+                          }}
                         />
                       </div>
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm">
-                        <OptimizedImage 
+                      
+                      {/* Image 4 */}
+                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
+                        <img 
                           src="/ChatGPT Image May 23, 2025, 12_09_50 AM.webp"
                           alt="Digital menu scanning" 
                           className="w-full h-full object-cover"
-                          width={200}
-                          height={200}
+                          onLoad={() => console.log('✅ Image 4 loaded successfully')}
+                          onError={(e) => {
+                            console.log('❌ Image 4 failed to load');
+                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_09_50 AM.png';
+                          }}
                         />
                       </div>
                     </div>
@@ -479,6 +523,112 @@ const Index = () => {
             <p className="text-sm mt-4 opacity-75">
               {translations[language].noCreditCard}
             </p>
+          </div>
+        </section>
+
+        {/* SEO Content Section */}
+        <section className="py-8 sm:py-12 lg:py-16 bg-white">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-900">
+                Générateur QR Code Gratuit - La Solution Complète pour Votre Business
+              </h2>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-primary">Pourquoi Choisir QrCreator ?</h3>
+                  <ul className="space-y-3 text-gray-700">
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">✓</span>
+                      <span>Générateur QR code <strong>100% gratuit</strong> sans limite</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">✓</span>
+                      <span>QR codes <strong>dynamiques</strong> modifiables à tout moment</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">✓</span>
+                      <span>Spécialement conçu pour les <strong>entreprises algériennes</strong></span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">✓</span>
+                      <span>Interface en <strong>français et arabe</strong></span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">✓</span>
+                      <span>Aucune inscription requise, <strong>utilisation immédiate</strong></span>
+                    </li>
+                  </ul>
+                </div>
+                
+                <div>
+                  <h3 className="text-xl font-semibold mb-4 text-primary">Utilisations Principales</h3>
+                  <ul className="space-y-3 text-gray-700">
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span><strong>Menus de restaurant</strong> - QR codes pour cartes digitales</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span><strong>Vitrines d'entreprise</strong> - Présentation interactive</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span><strong>Ecommerce</strong> - Catalogues produits dynamiques</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span><strong>Gestion de commandes</strong> - Système de commande intégré</span>
+                    </li>
+                    <li className="flex items-start">
+                      <span className="text-primary mr-2">•</span>
+                      <span><strong>Marketing</strong> - Campagnes promotionnelles interactives</span>
+                    </li>
+                  </ul>
+                </div>
+              </div>
+
+              <div className="bg-gray-50 rounded-lg p-6 mb-8">
+                <h3 className="text-xl font-semibold mb-4 text-primary">Générateur QR Code Gratuit - Fonctionnalités Avancées</h3>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  <div className="text-center">
+                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-primary font-bold">🎨</span>
+                    </div>
+                    <h4 className="font-semibold mb-2">Personnalisation</h4>
+                    <p className="text-sm text-gray-600">Couleurs, logos, styles personnalisés pour votre marque</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-primary font-bold">📊</span>
+                    </div>
+                    <h4 className="font-semibold mb-2">Analytics</h4>
+                    <p className="text-sm text-gray-600">Suivi des scans et statistiques détaillées</p>
+                  </div>
+                  <div className="text-center">
+                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
+                      <span className="text-primary font-bold">🔄</span>
+                    </div>
+                    <h4 className="font-semibold mb-2">Mise à Jour</h4>
+                    <p className="text-sm text-gray-600">Modifiez le contenu sans changer le QR code</p>
+                  </div>
+                </div>
+              </div>
+
+              <div className="text-center">
+                <h3 className="text-xl font-semibold mb-4 text-primary">Générateur QR Code Gratuit - Commencez Maintenant</h3>
+                <p className="text-gray-700 mb-6">
+                  Rejoignez des milliers d'entreprises en Algérie qui utilisent déjà QrCreator pour digitaliser leur business. 
+                  Créez votre premier QR code gratuit en moins de 2 minutes !
+                </p>
+                <Button 
+                  onClick={() => navigate('/signup')} 
+                  className="bg-primary hover:bg-primary/90 text-white text-lg py-4 px-8"
+                >
+                  Créer Mon QR Code Gratuit
+                </Button>
+              </div>
+            </div>
           </div>
         </section>
       </MainLayout>
