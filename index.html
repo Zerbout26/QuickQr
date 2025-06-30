@@ -24,30 +24,16 @@
     <!-- Preload critical CSS -->
     <link rel="preload" href="/src/index.css" as="style" />
     
-    <!-- Open Graph / Social Media Meta Tags -->
-    <meta property="og:title" content="QrCreator - One Scan. Full Access." />
-    <meta property="og:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
-    <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
-    <meta property="og:url" content="https://qrcreator.xyz" />
-    <meta property="og:site_name" content="QrCreator" />
-    
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:title" content="QrCreator - One Scan. Full Access." />
-    <meta name="twitter:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
-    <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
-    <meta name="twitter:creator" content="@qrcreator" />
-    
-    <!-- Theme Color -->
-    <meta name="theme-color" content="#8b5cf6" />
-    
-    <!-- Performance meta tags -->
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="format-detection" content="telephone=no" />
-    
-    <!-- Prevent Flash of Unstyled Content -->
+    <!-- Inline critical CSS for above-the-fold content -->
     <style>
+      html, body {
+        min-height: 100vh;
+        margin: 0;
+        padding: 0;
+        background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
+        color: #222;
+        font-family: 'Cairo', Arial, sans-serif;
+      }
       #root {
         min-height: 100vh;
         background: linear-gradient(to bottom right, rgba(139, 92, 246, 0.2), rgba(236, 72, 153, 0.2));
@@ -70,6 +56,58 @@
         }
       }
     </style>
+    <!-- End critical CSS -->
+
+    <!-- Structured Data for SEO -->
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "Organization",
+        "name": "QrCreator",
+        "url": "https://qrcreator.xyz",
+        "logo": "https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp",
+        "description": "Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use.",
+        "sameAs": [
+          "https://twitter.com/qrcreator"
+        ]
+      }
+    </script>
+    <script type="application/ld+json">
+      {
+        "@context": "https://schema.org",
+        "@type": "WebSite",
+        "url": "https://qrcreator.xyz",
+        "name": "QrCreator",
+        "potentialAction": {
+          "@type": "SearchAction",
+          "target": "https://qrcreator.xyz/search?q={search_term_string}",
+          "query-input": "required name=search_term_string"
+        }
+      }
+    </script>
+    <!-- End Structured Data -->
+
+    <!-- Open Graph / Social Media Meta Tags -->
+    <meta property="og:title" content="QrCreator - One Scan. Full Access." />
+    <meta property="og:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
+    <meta property="og:type" content="website" />
+    <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
+    <meta property="og:url" content="https://qrcreator.xyz" />
+    <meta property="og:site_name" content="QrCreator" />
+    
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="QrCreator - One Scan. Full Access." />
+    <meta name="twitter:description" content="Create beautiful QR codes with custom landing pages. Perfect for restaurants, businesses, and personal use." />
+    <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
+    <meta name="twitter:creator" content="@qrcreator" />
+    
+    <!-- Theme Color -->
+    <meta name="theme-color" content="#8b5cf6" />
+    
+    <!-- Performance meta tags -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="format-detection" content="telephone=no" />
     <meta name="google-site-verification" content="ZkupsDnS4VuMLVrF9JuN9pUVIFKl8y0_5Yqj6kp7c8c" />
   </head>
 
