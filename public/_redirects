@@ -1,2 +1,5 @@
+/sitemap.xml  /sitemap.xml  200!
+  Content-Type: application/xml
+
 /api/qrcodes/sitemap.xml https://quickqr-heyg.onrender.com/api/qrcodes/sitemap.xml 200
 /* /index.html 200 
