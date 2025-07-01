@@ -248,27 +248,27 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator</title>
-        <meta name="description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète pour entreprises en Algérie et partout." />
-        <meta name="keywords" content="générateur QR code gratuit, QR code gratuit, créer QR code, QR code menu restaurant, QR code vitrine, QR code ecommerce, QR code Algérie, générateur QR code en ligne, QR code dynamique, QR code business" />
-        <meta property="og:title" content="Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator" />
-        <meta property="og:description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète pour entreprises en Algérie et partout." />
+        <title>Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie</title>
+        <meta name="description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite, aucune inscription requise." />
+        <meta name="keywords" content="qrcreator, générateur QR code gratuit, QR code gratuit, créer QR code, QR code menu restaurant, QR code vitrine, QR code ecommerce, QR code Algérie, générateur QR code en ligne, QR code dynamique, QR code business, qr creator" />
+        <meta property="og:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie" />
+        <meta property="og:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://qrcreator.xyz/" />
         <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce | QrCreator" />
-        <meta name="twitter:description" content="Générateur QR code gratuit en ligne. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
+        <meta name="twitter:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie" />
+        <meta name="twitter:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
         <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <link rel="canonical" href="https://qrcreator.xyz/" />
         <script type="application/ld+json">{`
           {
             "@context": "https://schema.org",
             "@type": "Organization",
-            "name": "QrCreator",
+            "name": "Qrcreator",
             "url": "https://qrcreator.xyz",
             "logo": "https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp",
-            "description": "Générateur QR code gratuit en ligne pour menus, vitrines, ecommerce et gestion de commandes.",
+            "description": "Qrcreator est le générateur QR code gratuit #1 en Algérie pour menus, vitrines, ecommerce et gestion de commandes.",
             "address": {
               "@type": "PostalAddress",
               "addressCountry": "DZ",
@@ -284,9 +284,9 @@ const Index = () => {
           {
             "@context": "https://schema.org",
             "@type": "WebApplication",
-            "name": "QrCreator - Générateur QR Code Gratuit",
+            "name": "Qrcreator - Générateur QR Code Gratuit",
             "url": "https://qrcreator.xyz",
-            "description": "Générateur QR code gratuit en ligne pour créer des QR codes pour menus, vitrines, ecommerce et gestion de commandes.",
+            "description": "Qrcreator est le générateur QR code gratuit #1 en Algérie pour créer des QR codes pour menus, vitrines, ecommerce et gestion de commandes.",
             "applicationCategory": "BusinessApplication",
             "operatingSystem": "Web Browser",
             "offers": {
@@ -296,15 +296,47 @@ const Index = () => {
             }
           }
         `}</script>
+        <script type="application/ld+json">{`
+          {
+            "@context": "https://schema.org",
+            "@type": "FAQPage",
+            "mainEntity": [
+              {
+                "@type": "Question",
+                "name": "Comment créer un QR code gratuit avec Qrcreator ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Avec Qrcreator, créez un QR code gratuit en 3 étapes simples : 1) Choisissez votre type de QR code (menu, vitrine, ecommerce), 2) Personnalisez avec vos couleurs et logo, 3) Téléchargez et utilisez immédiatement. Aucune inscription requise."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Qrcreator est-il vraiment gratuit ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Oui, Qrcreator est 100% gratuit. Créez autant de QR codes que vous voulez, personnalisez-les avec vos couleurs et logo, et utilisez-les commercialement sans aucune limitation."
+                }
+              },
+              {
+                "@type": "Question",
+                "name": "Puis-je créer un QR code pour mon restaurant en Algérie ?",
+                "acceptedAnswer": {
+                  "@type": "Answer",
+                  "text": "Absolument ! Qrcreator est spécialement conçu pour les restaurants en Algérie. Créez des menus QR codes avec photos, prix, et système de commande intégré."
+                }
+              }
+            ]
+          }
+        `}</script>
       </Helmet>
       <MainLayout>
         {/* SEO h1 and paragraph for keyword targeting */}
         <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-4">
           <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-primary mb-2">
-            Générateur QR Code Gratuit - Créer QR Codes pour Menus, Vitrines, Ecommerce & Commandes
+            Qrcreator - Générateur QR Code Gratuit #1 en Algérie pour Menus, Vitrines, Ecommerce & Commandes
           </h1>
           <p className="text-center text-gray-700 max-w-3xl mx-auto">
-            QrCreator est votre générateur QR code gratuit en ligne. Créez facilement des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite pour toutes les entreprises en Algérie et dans le monde. Aucune inscription requise, QR codes illimités.
+            Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez facilement des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite, aucune inscription requise, QR codes illimités. Le meilleur générateur QR code pour les entreprises algériennes.
           </p>
         </div>
         
@@ -523,6 +555,73 @@ const Index = () => {
             <p className="text-sm mt-4 opacity-75">
               {translations[language].noCreditCard}
             </p>
+          </div>
+        </section>
+
+        {/* FAQ Section for SEO */}
+        <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
+          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+            <div className="max-w-4xl mx-auto">
+              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-900">
+                Questions Fréquentes - Générateur QR Code Gratuit
+              </h2>
+              
+              <div className="space-y-6">
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Comment créer un QR code gratuit avec Qrcreator ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Avec Qrcreator, créez un QR code gratuit en 3 étapes simples : 1) Choisissez votre type de QR code (menu, vitrine, ecommerce), 2) Personnalisez avec vos couleurs et logo, 3) Téléchargez et utilisez immédiatement. Aucune inscription requise.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Qrcreator est-il vraiment gratuit ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Oui, Qrcreator est 100% gratuit. Créez autant de QR codes que vous voulez, personnalisez-les avec vos couleurs et logo, et utilisez-les commercialement sans aucune limitation. Aucun abonnement caché.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Puis-je créer un QR code pour mon restaurant en Algérie ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Absolument ! Qrcreator est spécialement conçu pour les restaurants en Algérie. Créez des menus QR codes avec photos, prix, et système de commande intégré. Interface en français et arabe.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Quelle est la différence entre Qrcreator et les autres générateurs QR code ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Qrcreator se distingue par sa spécialisation pour le marché algérien, son interface bilingue, ses fonctionnalités avancées (menus, ecommerce, commandes), et sa gratuité totale sans limitation.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Puis-je modifier mon QR code après l'avoir créé ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Oui ! Qrcreator utilise des QR codes dynamiques. Vous pouvez modifier le contenu de votre landing page à tout moment sans avoir à créer un nouveau QR code. Parfait pour les menus qui changent souvent.
+                  </p>
+                </div>
+
+                <div className="bg-white rounded-lg p-6 shadow-sm">
+                  <h3 className="text-lg font-semibold mb-3 text-primary">
+                    Qrcreator fonctionne-t-il sur mobile ?
+                  </h3>
+                  <p className="text-gray-700">
+                    Parfaitement ! Qrcreator est optimisé pour mobile. Les QR codes générés s'ouvrent sur des pages adaptées aux smartphones, offrant une excellente expérience utilisateur sur tous les appareils.
+                  </p>
+                </div>
+              </div>
+            </div>
           </div>
         </section>
 

@@ -497,19 +497,19 @@ const LandingPage = () => {
   return (
     <>
       <Helmet>
-        <title>QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders</title>
-        <meta name="description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
-        <meta name="keywords" content="QR code, menu, vitrine, ecommerce, orders, digital menu, QR generator, QR code generator, restaurant QR, online menu, business showcase, order management, product QR, quickqr" />
-        <meta property="og:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
-        <meta property="og:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
+        <title>Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes</title>
+        <meta name="description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite." />
+        <meta name="keywords" content="qrcreator, générateur QR code gratuit, QR code gratuit, créer QR code, QR code menu restaurant, QR code vitrine, QR code ecommerce, QR code Algérie, générateur QR code en ligne, QR code dynamique, QR code business, qr creator" />
+        <meta property="og:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes" />
+        <meta property="og:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://www.qrcreator.xyz/" />
-        <meta property="og:image" content="https://www.qrcreator.xyz/favicon.ico" />
+        <meta property="og:url" content="https://qrcreator.xyz/" />
+        <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="QuickQr - QR Code Generator, Menu, Vitrine, Ecommerce & Orders" />
-        <meta name="twitter:description" content="Create QR codes for menus, vitrines, ecommerce, and order management. QuickQr is your all-in-one digital business solution." />
-        <meta name="twitter:image" content="https://www.qrcreator.xyz/favicon.ico" />
-        <link rel="canonical" href="https://www.qrcreator.xyz/" />
+        <meta name="twitter:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes" />
+        <meta name="twitter:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
+        <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
+        <link rel="canonical" href="https://qrcreator.xyz/" />
       </Helmet>
       <CriticalCSS colors={landingPageColors} />
       <div className="landing-container pb-20">
@@ -569,7 +569,7 @@ const LandingPage = () => {
           <div className="text-center py-4 text-sm">
             <p className="mb-1">Powered by</p>
             <a 
-              href="https://www.qrcreator.xyz" 
+              href="https://qrcreator.xyz" 
               target="_blank" 
               rel="noopener noreferrer"
               style={{ 
@@ -578,7 +578,7 @@ const LandingPage = () => {
               } as React.CSSProperties}
               className="hover:opacity-80 transition-opacity font-medium"
             >
-              www.qrcreator.xyz
+              qrcreator.xyz
             </a>
           </div>
         </div>
