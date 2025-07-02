@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Image as ImageIcon } from 'lucide-react';
 import { useState } from 'react';
 
 interface LandingPageColors {
@@ -30,10 +30,12 @@ interface VitrineSectionProps {
       description?: string;
       title?: string;
       images?: string[];
+      imageUrl?: string;
       imageDescription?: string;
     }>;
     gallery: Array<{
       images?: string[];
+      imageUrl?: string;
       title?: string;
       description?: string;
     }>;
@@ -192,6 +194,35 @@ const BlurImage = ({ src, alt, className }: { src: string; alt: string; classNam
 };
 
 const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) => {
+  // Debug: Log vitrine data to see what images are available
+  console.log('=== VITRINE DEBUG ===');
+  console.log('Full vitrine data:', vitrine);
+  if (vitrine?.services) {
+    console.log('Services:', vitrine.services);
+    vitrine.services.forEach((service, index) => {
+      console.log(`Service ${index}:`, {
+        name: service.name,
+        images: service.images,
+        imageUrl: service.imageUrl,
+        imageCount: service.images?.length || 0,
+        hasImageUrl: !!service.imageUrl
+      });
+    });
+  }
+  if (vitrine?.gallery) {
+    console.log('Gallery:', vitrine.gallery);
+    vitrine.gallery.forEach((item, index) => {
+      console.log(`Gallery ${index}:`, {
+        title: item.title,
+        images: item.images,
+        imageUrl: item.imageUrl,
+        imageCount: item.images?.length || 0,
+        hasImageUrl: !!item.imageUrl
+      });
+    });
+  }
+  console.log('=== END DEBUG ===');
+
   if (!vitrine) return null;
 
   return (
@@ -313,13 +344,20 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     background: `linear-gradient(to bottom right, ${colors.primaryColor}10, ${colors.accentColor}05, transparent)`
                   }}
                 ></div>
-                {service.images && service.images.length > 0 && (
+                {(service.images && service.images.length > 0) || service.imageUrl ? (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden">
                     <BlurImage
-                      src={service.images[0]}
+                      src={service.imageUrl || (service.images && service.images[0]) || ''}
                       alt={service.name}
                       className="transition-transform duration-500 group-hover:scale-110"
                     />
+                  </div>
+                ) : (
+                  <div className="aspect-w-16 aspect-h-9 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                    <div className="text-center">
+                      <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                      <p className="text-sm text-gray-500">{service.name}</p>
+                    </div>
                   </div>
                 )}
                 <div 
@@ -381,11 +419,20 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                   }}
                 ></div>
                 <div className="aspect-w-16 aspect-h-9 overflow-hidden">
-                  <BlurImage
-                    src={item.images && item.images.length > 0 ? item.images[0] : ''}
-                    alt={item.title || `Gallery image ${index + 1}`}
-                    className="transition-transform duration-500 group-hover:scale-110"
-                  />
+                  {(item.images && item.images.length > 0) || item.imageUrl ? (
+                    <BlurImage
+                      src={item.imageUrl || (item.images && item.images[0]) || ''}
+                      alt={item.title || `Gallery image ${index + 1}`}
+                      className="transition-transform duration-500 group-hover:scale-110"
+                    />
+                  ) : (
+                    <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
+                      <div className="text-center">
+                        <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
+                        <p className="text-sm text-gray-500">{item.title || `Gallery ${index + 1}`}</p>
+                      </div>
+                    </div>
+                  )}
                 </div>
                 <div 
                   className="p-6"
