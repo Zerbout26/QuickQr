@@ -276,10 +276,10 @@ const LandingPage = () => {
           return;
         }
 
-        // Set timeout for initial loading state
+        // Set timeout for initial loading state - reduced for better UX
         const timeout = setTimeout(() => {
           if (isMounted) setLoading(false);
-        }, 500);
+        }, 200);
 
         // First fetch the QR code data
         const data = await qrCodeApi.getPublicQRCode(id);
@@ -484,7 +484,60 @@ const LandingPage = () => {
     }
   };
 
-  if (loading) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center"><div className="loading-spinner" /></div></>;
+  if (loading) return (
+    <>
+      <CriticalCSS colors={landingPageColors} />
+      <div className="landing-container pb-20">
+        <div className="content-wrapper">
+          {/* Skeleton loading state */}
+          <div className="animate-pulse">
+            {/* Header skeleton */}
+            <div className="text-center py-12 mb-8">
+              <div className="w-32 h-8 bg-gray-200 rounded mx-auto mb-4"></div>
+              <div className="w-48 h-4 bg-gray-200 rounded mx-auto mb-6"></div>
+              <div className="w-24 h-10 bg-gray-200 rounded mx-auto"></div>
+            </div>
+            
+            {/* Content skeleton */}
+            <div className="space-y-8">
+              <div className="bg-white rounded-lg p-6 shadow-sm">
+                <div className="w-24 h-6 bg-gray-200 rounded mb-4"></div>
+                <div className="space-y-3">
+                  {[1, 2, 3].map(i => (
+                    <div key={i} className="flex items-center space-x-4">
+                      <div className="w-16 h-16 bg-gray-200 rounded"></div>
+                      <div className="flex-1 space-y-2">
+                        <div className="w-3/4 h-4 bg-gray-200 rounded"></div>
+                        <div className="w-1/2 h-3 bg-gray-200 rounded"></div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </div>
+          
+          {/* Loading indicator */}
+          <div className="text-center py-8">
+            <div className="relative mb-4">
+              <div className="w-8 h-8 border-2 border-gray-200 rounded-full mx-auto">
+                <div 
+                  className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+                  style={{ 
+                    borderTopColor: landingPageColors.loadingSpinnerColor,
+                    animationDuration: '1.2s'
+                  }}
+                ></div>
+              </div>
+            </div>
+            <p className="text-gray-500 text-sm">
+              {menuLanguage === 'ar' ? 'جاري تحميل المحتوى...' : 'Loading content...'}
+            </p>
+          </div>
+        </div>
+      </div>
+    </>
+  );
   if (error) return <><CriticalCSS colors={landingPageColors} /><div className="landing-container flex items-center justify-center text-red-500">{error}</div></>;
   if (!qrCode) return null;
 
@@ -512,7 +565,7 @@ const LandingPage = () => {
         <link rel="canonical" href="https://qrcreator.xyz/" />
       </Helmet>
       <CriticalCSS colors={landingPageColors} />
-      <div className="landing-container pb-20">
+      <div className="landing-container pb-20 content-fade-in" style={{ opacity: 0, animation: 'fadeInUp 0.6s ease-out forwards' }}>
         <div className="content-wrapper">
           {/* QR Header - Always show for menu and URL types */}
           {(qrCode.type === 'menu' || qrCode.type === 'url' || qrCode.type === 'both') && (
