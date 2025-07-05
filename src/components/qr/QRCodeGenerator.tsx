@@ -857,8 +857,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       borderRightColor: '#6b728040',
                       borderBottomColor: '#6b728020',
                       borderLeftColor: '#6b728010',
-                      animationDuration: '1.5s',
-                      animationTimingFunction: 'ease-in-out'
+                      animationDuration: '0.8s',
+                      animationTimingFunction: 'linear'
                     }}
                   ></div>
                 </div>
@@ -874,9 +874,9 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               }
             </p>
             <div className="flex space-x-1.5 justify-center mt-3">
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '0ms', animationDuration: '2s' }}></div>
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '300ms', animationDuration: '2s' }}></div>
-              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '600ms', animationDuration: '2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '0ms', animationDuration: '1.2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '200ms', animationDuration: '1.2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '400ms', animationDuration: '1.2s' }}></div>
             </div>
           </div>
         </div>
@@ -2245,8 +2245,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             borderRightColor: '#ffffff40',
                             borderBottomColor: '#ffffff20',
                             borderLeftColor: '#ffffff10',
-                            animationDuration: '1.5s',
-                            animationTimingFunction: 'ease-in-out'
+                            animationDuration: '0.8s',
+                            animationTimingFunction: 'linear'
                           }}
                         ></div>
                       </div>
