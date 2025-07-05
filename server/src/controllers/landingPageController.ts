@@ -21,7 +21,7 @@ const generateDynamicBackground = (primaryColor: string, accentColor: string): s
 
   if (!primaryRgb || !accentRgb) {
     // Fallback to default gradient if color parsing fails
-    return 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)';
+    return 'linear-gradient(135deg, #3b82f615 0%, #3b82f608 25%, white 50%, #64748b08 75%, #64748b15 100%)';
   }
 
   // Check if primary and accent colors are the same
@@ -137,8 +137,8 @@ export const getLandingPageColors = async (req: Request, res: Response) => {
     }
 
     // Get the primary and accent colors
-    const primaryColor = qrCode.primaryColor || '#8b5cf6';
-    const accentColor = qrCode.accentColor || '#ec4899';
+    const primaryColor = qrCode.primaryColor || '#3b82f6';
+    const accentColor = qrCode.accentColor || '#64748b';
     
     // Generate dynamic background based on user colors
     const dynamicBackground = generateDynamicBackground(primaryColor, accentColor);
@@ -146,11 +146,11 @@ export const getLandingPageColors = async (req: Request, res: Response) => {
     // Return the landing page colors with dynamic background
     const landingPageColors = {
       primaryColor: primaryColor,
-      primaryHoverColor: qrCode.primaryHoverColor || '#7c3aed',
+      primaryHoverColor: qrCode.primaryHoverColor || '#2563eb',
       accentColor: accentColor,
       backgroundGradient: qrCode.backgroundGradient || dynamicBackground,
       loadingSpinnerColor: qrCode.loadingSpinnerColor || primaryColor,
-      loadingSpinnerBorderColor: qrCode.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)'
+      loadingSpinnerBorderColor: qrCode.loadingSpinnerBorderColor || 'rgba(59, 130, 246, 0.2)'
     };
 
     res.json(landingPageColors);
@@ -198,16 +198,16 @@ export const updateLandingPageColors = async (req: Request, res: Response) => {
       qrCode.backgroundGradient = backgroundGradient;
     } else if (primaryColor !== undefined || accentColor !== undefined) {
       // Generate new background gradient based on updated colors
-      const newPrimaryColor = primaryColor || qrCode.primaryColor || '#8b5cf6';
-      const newAccentColor = accentColor || qrCode.accentColor || '#ec4899';
+      const newPrimaryColor = primaryColor || qrCode.primaryColor || '#3b82f6';
+      const newAccentColor = accentColor || qrCode.accentColor || '#64748b';
       qrCode.backgroundGradient = generateDynamicBackground(newPrimaryColor, newAccentColor);
     }
 
     await qrCodeRepository.save(qrCode);
 
     // Get the updated primary and accent colors
-    const updatedPrimaryColor = qrCode.primaryColor || '#8b5cf6';
-    const updatedAccentColor = qrCode.accentColor || '#ec4899';
+    const updatedPrimaryColor = qrCode.primaryColor || '#3b82f6';
+    const updatedAccentColor = qrCode.accentColor || '#64748b';
     
     // Generate dynamic background based on updated colors (for response)
     const dynamicBackground = generateDynamicBackground(updatedPrimaryColor, updatedAccentColor);
@@ -215,11 +215,11 @@ export const updateLandingPageColors = async (req: Request, res: Response) => {
     // Return the updated colors with dynamic background
     const updatedColors = {
       primaryColor: updatedPrimaryColor,
-      primaryHoverColor: qrCode.primaryHoverColor || '#7c3aed',
+      primaryHoverColor: qrCode.primaryHoverColor || '#2563eb',
       accentColor: updatedAccentColor,
       backgroundGradient: qrCode.backgroundGradient || dynamicBackground,
       loadingSpinnerColor: qrCode.loadingSpinnerColor || updatedPrimaryColor,
-      loadingSpinnerBorderColor: qrCode.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)'
+      loadingSpinnerBorderColor: qrCode.loadingSpinnerBorderColor || 'rgba(59, 130, 246, 0.2)'
     };
 
     res.json({ 

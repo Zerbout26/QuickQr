@@ -31,7 +31,7 @@ const generateDynamicBackground = (primaryColor: string, accentColor: string): s
 
   if (!primaryRgb || !accentRgb) {
     // Fallback to default gradient if color parsing fails
-    return 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)';
+    return 'linear-gradient(135deg, #3b82f615 0%, #3b82f608 25%, white 50%, #64748b08 75%, #64748b15 100%)';
   }
 
   // Check if primary and accent colors are the same
@@ -209,12 +209,12 @@ const LandingPage = () => {
   const [menuLanguage, setMenuLanguage] = useState<'en' | 'ar'>('en');
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null);
   const [landingPageColors, setLandingPageColors] = useState<LandingPageColors>({
-    primaryColor: '#8b5cf6',
-    primaryHoverColor: '#7c3aed',
-    accentColor: '#ec4899',
-    backgroundGradient: 'linear-gradient(135deg, #8b5cf615 0%, #8b5cf608 25%, white 50%, #ec489908 75%, #ec489915 100%)',
-    loadingSpinnerColor: '#8b5cf6',
-    loadingSpinnerBorderColor: 'rgba(139, 92, 246, 0.2)'
+    primaryColor: '#3b82f6',
+    primaryHoverColor: '#2563eb',
+    accentColor: '#64748b',
+    backgroundGradient: 'linear-gradient(135deg, #3b82f615 0%, #3b82f608 25%, white 50%, #64748b08 75%, #64748b15 100%)',
+    loadingSpinnerColor: '#3b82f6',
+    loadingSpinnerBorderColor: 'rgba(59, 130, 246, 0.2)'
   });
   const [basket, setBasket] = useState<Array<{
     key: string;

@@ -158,12 +158,12 @@ const QRCodeEditor: React.FC<QRCodeEditorProps> = ({ qrCode, onUpdated }) => {
   const [tempImages, setTempImages] = useState<{ [key: string]: File }>({});
   
   // Landing page colors
-  const [primaryColor, setPrimaryColor] = useState(qrCode.primaryColor || '#8b5cf6');
-  const [primaryHoverColor, setPrimaryHoverColor] = useState(qrCode.primaryHoverColor || '#7c3aed');
-  const [accentColor, setAccentColor] = useState(qrCode.accentColor || '#ec4899');
-  const [backgroundGradient, setBackgroundGradient] = useState(qrCode.backgroundGradient || 'linear-gradient(to bottom right, #8b5cf620, white, #ec489920)');
-  const [loadingSpinnerColor, setLoadingSpinnerColor] = useState(qrCode.loadingSpinnerColor || '#8b5cf6');
-  const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState(qrCode.loadingSpinnerBorderColor || 'rgba(139, 92, 246, 0.2)');
+  const [primaryColor, setPrimaryColor] = useState(qrCode.primaryColor || '#3b82f6');
+  const [primaryHoverColor, setPrimaryHoverColor] = useState(qrCode.primaryHoverColor || '#2563eb');
+  const [accentColor, setAccentColor] = useState(qrCode.accentColor || '#64748b');
+  const [backgroundGradient, setBackgroundGradient] = useState(qrCode.backgroundGradient || 'linear-gradient(to bottom right, #3b82f620, white, #64748b20)');
+  const [loadingSpinnerColor, setLoadingSpinnerColor] = useState(qrCode.loadingSpinnerColor || '#3b82f6');
+  const [loadingSpinnerBorderColor, setLoadingSpinnerBorderColor] = useState(qrCode.loadingSpinnerBorderColor || 'rgba(59, 130, 246, 0.2)');
 
   // Vitrine state
   const [vitrine, setVitrine] = useState(() => {
