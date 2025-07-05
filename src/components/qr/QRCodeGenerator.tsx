@@ -656,36 +656,16 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
         }
         formData.append('url', directUrl);
       } else if (type === 'url' || type === 'both') {
-        if (!links || links.length === 0) {
-          throw new Error('At least one link is required');
-        }
-        // Validate each link has required fields
-        for (const link of links) {
-          if (!link.label || !link.url) {
-            throw new Error('All links must have both label and URL');
-          }
-        }
-        formData.append('links', JSON.stringify(links));
+        // Allow empty links array - user can add links later
+        formData.append('links', JSON.stringify(links || []));
       }
       
       if (type === 'menu' || type === 'both') {
-        // Validate menu has at least one category with items
-        if (!menuCategories || menuCategories.length === 0) {
-          throw new Error('At least one menu category is required');
-        }
-        
-        // Check if at least one category has items
-        const hasItems = menuCategories.some(category => 
-          category.items && category.items.length > 0
-        );
-        if (!hasItems) {
-          throw new Error('At least one menu item is required');
-        }
-        
+        // Allow empty menu - user can add categories and items later
         const menuData = {
           restaurantName: name || 'My Restaurant',
           description: '',
-          categories: menuCategories,
+          categories: menuCategories || [],
           orderable: menuOrderable,
           codFormEnabled: codFormEnabled
         };
@@ -702,22 +682,11 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       }
 
       if (type === 'products') {
-        // Validate products has at least one product
-        if (!products || products.length === 0) {
-          throw new Error('At least one product is required');
-        }
-        
-        // Validate each product has required fields
-        for (const product of products) {
-          if (!product.name || !product.price) {
-            throw new Error('All products must have name and price');
-          }
-        }
-        
+        // Allow empty products - user can add products later
         const productsData = {
           storeName: name || 'My Product Store',
           description: '',
-          products: products,
+          products: products || [],
           orderable: menuOrderable,
           codFormEnabled: codFormEnabled
         };
@@ -734,19 +703,12 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       }
 
       if (type === 'vitrine') {
-        // Validate vitrine data
+        // Only require business name for vitrine - everything else is optional
         if (!vitrine.hero.businessName) {
           throw new Error('Business name is required');
         }
-        if (!vitrine.about.description) {
-          throw new Error('About description is required');
-        }
-        if (!vitrine.contact.email) {
-          throw new Error('Contact email is required');
-        }
-        // Footer business name is automatically set from hero business name, so no validation needed
 
-        // Ensure all required fields are present
+        // Ensure all fields are present with defaults
         const validatedVitrine = {
           hero: {
             businessName: vitrine.hero.businessName,
@@ -759,7 +721,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             }))
           },
           about: {
-            description: vitrine.about.description,
+            description: vitrine.about.description || '',
             city: vitrine.about.city || ''
           },
           services: vitrine.services.map(service => ({
@@ -782,7 +744,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           contact: {
             address: vitrine.contact.address || '',
             phone: vitrine.contact.phone || '',
-            email: vitrine.contact.email,
+            email: vitrine.contact.email || '',
           },
           footer: {
             copyright: vitrine.footer.copyright || `© ${new Date().getFullYear()}`,

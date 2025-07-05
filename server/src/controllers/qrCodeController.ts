@@ -375,39 +375,49 @@ export const createQRCode = async (req: AuthRequest, res: Response) => {
         }
       }
 
-      // Handle vitrine images
-      if (req.files && 'vitrineImages' in req.files) {
-        const vitrineImages = req.files['vitrineImages'] as Express.Multer.File[];
-        const vitrine = JSON.parse(req.body.vitrine);
+      // Handle vitrine data
+      if (type === 'vitrine' && vitrine) {
+        let parsedVitrine;
+        try {
+          parsedVitrine = JSON.parse(vitrine);
+        } catch (e) {
+          console.error('Error parsing vitrine:', e);
+          return res.status(400).json({ error: 'Invalid vitrine format' });
+        }
 
-        // Upload images to Cloudinary and update URLs
-        for (const file of vitrineImages) {
-          try {
-            const imageUrl = await uploadToCloudinary(file);
-            if (imageUrl) {
-              const optimizedUrl = getOptimizedUrl(imageUrl, {
-                width: 800,
-                height: 600,
-                crop: 'fill',
-                quality: 'auto'
-              });
-              
-              // Extract section and index from filename (format: section-index-timestamp-filename)
-              const [section, index] = file.originalname.split('-');
-              
-              if (section === 'service' && vitrine.services[parseInt(index)]) {
-                vitrine.services[parseInt(index)].imageUrl = optimizedUrl;
-              } else if (section === 'gallery' && vitrine.gallery[parseInt(index)]) {
-                vitrine.gallery[parseInt(index)].imageUrl = optimizedUrl;
+        // Handle vitrine images if present
+        if (req.files && 'vitrineImages' in req.files) {
+          const vitrineImages = req.files['vitrineImages'] as Express.Multer.File[];
+
+          // Upload images to Cloudinary and update URLs
+          for (const file of vitrineImages) {
+            try {
+              const imageUrl = await uploadToCloudinary(file);
+              if (imageUrl) {
+                const optimizedUrl = getOptimizedUrl(imageUrl, {
+                  width: 800,
+                  height: 600,
+                  crop: 'fill',
+                  quality: 'auto'
+                });
+                
+                // Extract section and index from filename (format: section-index-timestamp-filename)
+                const [section, index] = file.originalname.split('-');
+                
+                if (section === 'service' && parsedVitrine.services[parseInt(index)]) {
+                  parsedVitrine.services[parseInt(index)].imageUrl = optimizedUrl;
+                } else if (section === 'gallery' && parsedVitrine.gallery[parseInt(index)]) {
+                  parsedVitrine.gallery[parseInt(index)].imageUrl = optimizedUrl;
+                }
               }
+            } catch (error) {
+              console.error('Error uploading vitrine image to Cloudinary:', error);
             }
-          } catch (error) {
-            console.error('Error uploading vitrine image to Cloudinary:', error);
           }
         }
 
-        // Update the vitrine data with the new image URLs
-        qrCodeData.vitrine = vitrine;
+        // Set the vitrine data (with or without images)
+        qrCodeData.vitrine = parsedVitrine;
       }
 
       const qrCode = new QRCode();
