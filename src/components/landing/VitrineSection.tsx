@@ -62,7 +62,6 @@ interface VitrineSectionProps {
   };
   menuLanguage: 'en' | 'ar';
   colors: LandingPageColors;
-  globalLogoUrl?: string;
 }
 
 const getPlatformInfo = (type: string) => {
@@ -206,7 +205,7 @@ const BlurImage = ({ src, alt, className }: { src: string; alt: string; classNam
   );
 };
 
-const VitrineSection = ({ vitrine, menuLanguage, colors, globalLogoUrl }: VitrineSectionProps) => {
+const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) => {
   // Debug: Log vitrine data to see what images are available
   console.log('=== VITRINE DEBUG ===');
   console.log('Full vitrine data:', vitrine);
@@ -249,25 +248,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors, globalLogoUrl }: Vitrin
           }}
         ></div>
         
-        {/* Global Logo */}
-        {globalLogoUrl && (
-          <motion.div 
-            className="flex justify-center mb-6 sm:mb-8"
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-          >
-            <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden border-4 shadow-lg"
-                 style={{ borderColor: colors.primaryColor }}>
-              <img
-                src={globalLogoUrl}
-                alt={vitrine.hero.businessName}
-                className="w-full h-full object-cover"
-                loading="lazy"
-              />
-            </div>
-          </motion.div>
-        )}
+
         
         <motion.h2 
           className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-800 px-2"

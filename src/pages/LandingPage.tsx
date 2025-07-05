@@ -612,7 +612,6 @@ const LandingPage = () => {
                 vitrine={qrCode.vitrine} 
                 menuLanguage={menuLanguage} 
                 colors={landingPageColors}
-                globalLogoUrl={qrCode.logoUrl}
               />
             </Suspense>
           )}
