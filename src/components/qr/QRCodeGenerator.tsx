@@ -651,12 +651,37 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       formData.append('loadingSpinnerBorderColor', loadingSpinnerBorderColor);
       
       if (type === 'direct') {
+        if (!directUrl || directUrl.trim() === '') {
+          throw new Error('Direct URL is required');
+        }
         formData.append('url', directUrl);
       } else if (type === 'url' || type === 'both') {
+        if (!links || links.length === 0) {
+          throw new Error('At least one link is required');
+        }
+        // Validate each link has required fields
+        for (const link of links) {
+          if (!link.label || !link.url) {
+            throw new Error('All links must have both label and URL');
+          }
+        }
         formData.append('links', JSON.stringify(links));
       }
       
       if (type === 'menu' || type === 'both') {
+        // Validate menu has at least one category with items
+        if (!menuCategories || menuCategories.length === 0) {
+          throw new Error('At least one menu category is required');
+        }
+        
+        // Check if at least one category has items
+        const hasItems = menuCategories.some(category => 
+          category.items && category.items.length > 0
+        );
+        if (!hasItems) {
+          throw new Error('At least one menu item is required');
+        }
+        
         const menuData = {
           restaurantName: name || 'My Restaurant',
           description: '',
@@ -677,6 +702,18 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       }
 
       if (type === 'products') {
+        // Validate products has at least one product
+        if (!products || products.length === 0) {
+          throw new Error('At least one product is required');
+        }
+        
+        // Validate each product has required fields
+        for (const product of products) {
+          if (!product.name || !product.price) {
+            throw new Error('All products must have name and price');
+          }
+        }
+        
         const productsData = {
           storeName: name || 'My Product Store',
           description: '',
@@ -707,9 +744,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
         if (!vitrine.contact.email) {
           throw new Error('Contact email is required');
         }
-        if (!vitrine.footer.businessName) {
-          throw new Error('Footer business name is required');
-        }
+        // Footer business name is automatically set from hero business name, so no validation needed
 
         // Ensure all required fields are present
         const validatedVitrine = {
@@ -751,7 +786,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
           },
           footer: {
             copyright: vitrine.footer.copyright || `© ${new Date().getFullYear()}`,
-            businessName: vitrine.footer.businessName,
+            businessName: vitrine.hero.businessName,
           }
         };
 
@@ -1673,8 +1708,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   <div className="space-y-2">
                     {vitrine.hero.ctas.map((cta, index) => (
                       <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
-                        <div className="flex justify-between items-center">
-                          <Label className="text-xs sm:text-sm">CTA {index + 1}</Label>
+                        <div className="flex justify-end">
                           <Button
                             type="button"
                             variant="outline"
@@ -1692,20 +1726,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             <Trash2 className="h-3 w-3" />
                           </Button>
                         </div>
-                        <Input
-                          placeholder="CTA Text"
-                          value={cta.text}
-                          onChange={(e) => {
-                            const newCtas = [...vitrine.hero.ctas];
-                            newCtas[index] = { ...cta, text: e.target.value };
-                            setVitrine({
-                              ...vitrine,
-                              hero: { ...vitrine.hero, ctas: newCtas }
-                            });
-                          }}
-                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
                         <div className="flex gap-2">
                           <Select
                             value={cta.type}
@@ -1731,6 +1751,8 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                               <SelectItem value="tiktok">TikTok</SelectItem>
                               <SelectItem value="whatsapp">WhatsApp</SelectItem>
                               <SelectItem value="telegram">Telegram</SelectItem>
+                              <SelectItem value="phone">Phone Call</SelectItem>
+                              <SelectItem value="viber">Viber</SelectItem>
                               <SelectItem value="location">Location</SelectItem>
                               <SelectItem value="other">Other</SelectItem>
                             </SelectContent>
@@ -1769,16 +1791,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                       className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                     />
-                    <Input
-                      placeholder={translations[language].enterCity}
-                      value={vitrine.about.city}
-                      onChange={(e) => setVitrine({
-                        ...vitrine,
-                        about: { ...vitrine.about, city: e.target.value }
-                      })}
-                      dir={language === 'ar' ? 'rtl' : 'ltr'}
-                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                    />
                   </div>
                 </div>
 
@@ -1812,28 +1824,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             setVitrine({ ...vitrine, services: newServices });
                           }}
                           className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                        <Input
-                          placeholder={translations[language].enterServiceTitle}
-                          value={service.title}
-                          onChange={(e) => {
-                            const newServices = [...vitrine.services];
-                            newServices[index] = { ...service, title: e.target.value };
-                            setVitrine({ ...vitrine, services: newServices });
-                          }}
-                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                        <Textarea
-                          placeholder={translations[language].enterImageDescription}
-                          value={service.imageDescription}
-                          onChange={(e) => {
-                            const newServices = [...vitrine.services];
-                            newServices[index] = { ...service, imageDescription: e.target.value };
-                            setVitrine({ ...vitrine, services: newServices });
-                          }}
-                          className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -1922,17 +1912,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                             setVitrine({ ...vitrine, gallery: newGallery });
                           }}
                           className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                        <Textarea
-                          placeholder={translations[language].enterImageDescription}
-                          value={item.description}
-                          onChange={(e) => {
-                            const newGallery = [...vitrine.gallery];
-                            newGallery[index] = { ...item, description: e.target.value };
-                            setVitrine({ ...vitrine, gallery: newGallery });
-                          }}
-                          className="min-h-[60px] sm:min-h-[80px] px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
                         <div className="flex items-center gap-2 sm:gap-3">
@@ -2027,17 +2006,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                           className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                           dir={language === 'ar' ? 'rtl' : 'ltr'}
                         />
-                        <Input
-                          placeholder={translations[language].enterCity}
-                          value={testimonial.city}
-                          onChange={(e) => {
-                            const newTestimonials = [...vitrine.testimonials];
-                            newTestimonials[index] = { ...testimonial, city: e.target.value };
-                            setVitrine({ ...vitrine, testimonials: newTestimonials });
-                          }}
-                          className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
                         <Button
                           type="button"
                           variant="outline"
@@ -2094,22 +2062,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                   </div>
                 </div>
 
-                {/* Footer Section */}
-                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
-                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].footer}</h3>
-                  <div className="space-y-2">
-                    <Input
-                      placeholder={translations[language].enterBusinessName}
-                      value={vitrine.footer.businessName}
-                      onChange={(e) => setVitrine({
-                        ...vitrine,
-                        footer: { ...vitrine.footer, businessName: e.target.value }
-                      })}
-                      className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
-                      dir={language === 'ar' ? 'rtl' : 'ltr'}
-                    />
-                  </div>
-                </div>
+
               </div>
             )}
             <div className="mt-3 sm:mt-4">

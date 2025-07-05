@@ -1,5 +1,5 @@
 import { motion, AnimatePresence } from 'framer-motion';
-import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Image as ImageIcon } from 'lucide-react';
+import { Facebook, Instagram, Twitter, Linkedin, Youtube, Music, MessageCircle, Send, Globe, ExternalLink, MapPin, Image as ImageIcon, Phone, MessageSquare } from 'lucide-react';
 import { useState } from 'react';
 
 interface LandingPageColors {
@@ -113,6 +113,18 @@ const getPlatformInfo = (type: string) => {
       icon: Send,
       bgColor: '#0088CC',
       hoverBgColor: '#006699',
+    },
+    phone: {
+      label: 'Call',
+      icon: Phone,
+      bgColor: '#10B981',
+      hoverBgColor: '#059669',
+    },
+    viber: {
+      label: 'Viber',
+      icon: MessageSquare,
+      bgColor: '#7360F2',
+      hoverBgColor: '#5B4BC4',
     },
     tiktok: {
       label: 'TikTok',
@@ -256,12 +268,56 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
         <div className="flex flex-wrap justify-center gap-4 mt-8">
           {vitrine.hero.ctas.map((cta, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
+            
+            // Handle different CTA types
+            const getCtaProps = () => {
+              switch (cta.type) {
+                case 'phone':
+                  return {
+                    href: `tel:${cta.link}`,
+                    target: undefined,
+                    rel: undefined,
+                    onClick: (e: React.MouseEvent) => {
+                      e.preventDefault();
+                      window.location.href = `tel:${cta.link}`;
+                    }
+                  };
+                case 'whatsapp':
+                  return {
+                    href: `https://wa.me/${cta.link.replace(/\D/g, '')}`,
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                  };
+                case 'viber':
+                  return {
+                    href: `viber://chat?number=${cta.link.replace(/\D/g, '')}`,
+                    target: '_blank',
+                    rel: 'noopener noreferrer',
+                    onClick: (e: React.MouseEvent) => {
+                      e.preventDefault();
+                      // Try Viber app first, fallback to web
+                      window.location.href = `viber://chat?number=${cta.link.replace(/\D/g, '')}`;
+                      // Fallback after a short delay
+                      setTimeout(() => {
+                        window.open(`https://viber.com/contact/${cta.link.replace(/\D/g, '')}`, '_blank');
+                      }, 1000);
+                    }
+                  };
+                default:
+                  return {
+                    href: cta.link,
+                    target: '_blank',
+                    rel: 'noopener noreferrer'
+                  };
+              }
+            };
+
+            const ctaProps = getCtaProps();
+
             return (
               <motion.a
                 key={index}
-                href={cta.link}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...ctaProps}
                 className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap"
                 style={{ 
                   background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
