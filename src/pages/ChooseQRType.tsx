@@ -25,7 +25,7 @@ const translations = {
     businessPlan: "Business Plan",
     daysLeft: "days left",
     unlimitedAccess: "Unlimited Access",
-    vitrine: "Business Showcase",
+    vitrine: "Business Showcase (Vitrine)",
     vitrineDesc: "Create a professional business showcase with services, gallery, and contact information",
     menu: "Digital Menu",
     menuDesc: "Create a digital menu with categories, items, and online ordering",
@@ -51,7 +51,7 @@ const translations = {
     businessPlan: "خطة تجارية",
     daysLeft: "أيام متبقية",
     unlimitedAccess: "وصول غير محدود",
-    vitrine: "عرض الأعمال",
+    vitrine: "عرض الأعمال (فيترين)",
     vitrineDesc: "إنشاء عرض أعمال احترافي مع الخدمات والمعرض ومعلومات الاتصال",
     menu: "قائمة رقمية",
     menuDesc: "إنشاء قائمة رقمية مع الفئات والعناصر والطلب عبر الإنترنت",
@@ -76,8 +76,8 @@ const businessTypes = [
   {
     id: 'vitrine',
     name: {
-      en: 'Business Showcase',
-      ar: 'عرض الأعمال'
+      en: 'Business Showcase (Vitrine)',
+      ar: '(فيترين)عرض الأعمال'
     },
     description: {
       en: 'Create a professional business showcase with services, gallery, and contact information',
