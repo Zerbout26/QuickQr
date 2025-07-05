@@ -238,17 +238,17 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
   if (!vitrine) return null;
 
   return (
-    <div className="space-y-16 mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="space-y-8 sm:space-y-16 mt-8 sm:mt-12" dir={menuLanguage === 'ar' ? 'rtl' : 'ltr'}>
       {/* Hero Section */}
-      <div className="text-center mb-12 relative">
+      <div className="text-center mb-8 sm:mb-12 relative px-4">
         <div 
-          className="absolute inset-0 -z-10 rounded-3xl"
+          className="absolute inset-0 -z-10 rounded-2xl sm:rounded-3xl"
           style={{
             background: `linear-gradient(to bottom right, ${colors.primaryColor}20, white, ${colors.accentColor}20)`
           }}
         ></div>
         <motion.h2 
-          className="text-4xl sm:text-5xl font-bold tracking-tight mb-6 text-gray-800"
+          className="text-3xl sm:text-4xl lg:text-5xl font-bold tracking-tight mb-4 sm:mb-6 text-gray-800 px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
@@ -257,7 +257,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
         </motion.h2>
         {vitrine.hero.tagline && (
           <motion.p 
-            className="text-gray-600 mt-4 text-lg sm:text-xl max-w-3xl mx-auto px-4 leading-relaxed"
+            className="text-gray-600 mt-3 sm:mt-4 text-base sm:text-lg lg:text-xl max-w-3xl mx-auto px-4 leading-relaxed"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5, delay: 0.2 }}
@@ -265,7 +265,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.hero.tagline}
           </motion.p>
         )}
-        <div className="flex flex-wrap justify-center gap-4 mt-8">
+        <div className="flex flex-col sm:flex-row flex-wrap justify-center gap-3 sm:gap-4 mt-6 sm:mt-8 px-2">
           {vitrine.hero.ctas.map((cta, index) => {
             const { label, icon: Icon, bgColor, hoverBgColor } = getPlatformInfo(cta.type);
             
@@ -318,7 +318,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
               <motion.a
                 key={index}
                 {...ctaProps}
-                className="flex items-center justify-center gap-3 px-6 sm:px-8 py-3 text-base sm:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap"
+                className="flex items-center justify-center gap-2 sm:gap-3 px-4 sm:px-6 lg:px-8 py-3 sm:py-3 text-sm sm:text-base lg:text-lg font-medium rounded-full text-white transition-all duration-300 hover:scale-[1.02] hover:shadow-lg active:scale-[0.98] whitespace-nowrap w-full sm:w-auto min-h-[44px] sm:min-h-[48px]"
                 style={{ 
                   background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                   boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
@@ -329,8 +329,8 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.3, delay: index * 0.1 }}
               >
-                <Icon className="w-6 h-6" />
-                <span className="text-base sm:text-lg">{label}</span>
+                <Icon className="w-5 h-5 sm:w-6 sm:h-6" />
+                <span className="text-sm sm:text-base lg:text-lg">{label}</span>
               </motion.a>
             );
           })}
@@ -346,22 +346,22 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
           transition={{ duration: 0.5 }}
         >
           <div 
-            className="absolute inset-0 -z-10 rounded-3xl"
+            className="absolute inset-0 -z-10 rounded-2xl sm:rounded-3xl"
             style={{
               background: `linear-gradient(to bottom right, ${colors.primaryColor}20, white, ${colors.accentColor}20)`
             }}
           ></div>
           <h3 
-            className="text-3xl sm:text-4xl font-bold mb-6 text-gray-800"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-4 sm:mb-6 text-gray-800 px-2"
           >
             {menuLanguage === 'ar' ? 'من نحن' : 'About Us'}
           </h3>
-          <p className="text-gray-600 text-lg sm:text-xl leading-relaxed">
+          <p className="text-gray-600 text-base sm:text-lg lg:text-xl leading-relaxed px-2">
             {vitrine.about.description}
           </p>
           {vitrine.about.city && (
             <p 
-              className="mt-4 text-lg font-medium text-gray-700"
+              className="mt-3 sm:mt-4 text-base sm:text-lg font-medium text-gray-700 px-2"
             >
               {vitrine.about.city}
             </p>
@@ -371,16 +371,16 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
 
       {/* Services Section */}
       {vitrine.services.length > 0 && (
-        <div className="space-y-10 px-4">
+        <div className="space-y-8 sm:space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800 px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             {menuLanguage === 'ar' ? 'خدماتنا' : 'Our Services'}
           </motion.h3>
-          <div className={`grid gap-8 ${
+          <div className={`grid gap-6 sm:gap-8 ${
             vitrine.services.length === 1 
               ? 'grid-cols-1 max-w-2xl mx-auto' 
               : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -388,7 +388,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.services.map((service, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -411,30 +411,30 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                 ) : (
                   <div className="aspect-w-16 aspect-h-9 overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                     <div className="text-center">
-                      <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                      <p className="text-sm text-gray-500">{service.name}</p>
+                      <ImageIcon className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-400" />
+                      <p className="text-xs sm:text-sm text-gray-500">{service.name}</p>
                     </div>
                   </div>
                 )}
                 <div 
-                  className="p-6"
+                  className="p-4 sm:p-6"
                   style={{
                     background: `linear-gradient(to bottom right, white, ${colors.primaryColor}05)`
                   }}
                 >
                   <h4 
-                    className="text-2xl font-bold mb-3 text-gray-800"
+                    className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3 text-gray-800"
                   >{service.name}</h4>
                   {service.description && (
-                    <p className="text-gray-600 mb-4 text-base leading-relaxed">{service.description}</p>
+                    <p className="text-gray-600 mb-3 sm:mb-4 text-sm sm:text-base leading-relaxed">{service.description}</p>
                   )}
                   {service.title && (
                     <p 
-                      className="font-medium text-gray-700"
+                      className="font-medium text-gray-700 text-sm sm:text-base"
                     >{service.title}</p>
                   )}
                   {service.imageDescription && (
-                    <p className="text-gray-500 mt-2 text-sm">{service.imageDescription}</p>
+                    <p className="text-gray-500 mt-2 text-xs sm:text-sm">{service.imageDescription}</p>
                   )}
                 </div>
               </motion.div>
@@ -445,16 +445,16 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
 
       {/* Gallery Section */}
       {vitrine.gallery.length > 0 && (
-        <div className="space-y-10 px-4">
+        <div className="space-y-8 sm:space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800 px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             {menuLanguage === 'ar' ? 'معرض الصور' : 'Gallery'}
           </motion.h3>
-          <div className={`grid gap-8 ${
+          <div className={`grid gap-6 sm:gap-8 ${
             vitrine.gallery.length === 1 
               ? 'grid-cols-1 max-w-2xl mx-auto' 
               : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'
@@ -462,7 +462,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.gallery.map((item, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden group relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
@@ -484,26 +484,26 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                   ) : (
                     <div className="w-full h-full bg-gradient-to-br from-gray-100 to-gray-200 flex items-center justify-center">
                       <div className="text-center">
-                        <ImageIcon className="w-12 h-12 mx-auto mb-2 text-gray-400" />
-                        <p className="text-sm text-gray-500">{item.title || `Gallery ${index + 1}`}</p>
+                        <ImageIcon className="w-8 h-8 sm:w-12 sm:h-12 mx-auto mb-2 text-gray-400" />
+                        <p className="text-xs sm:text-sm text-gray-500">{item.title || `Gallery ${index + 1}`}</p>
                       </div>
                     </div>
                   )}
                 </div>
                 <div 
-                  className="p-6"
+                  className="p-4 sm:p-6"
                   style={{
                     background: `linear-gradient(to bottom right, white, ${colors.primaryColor}05)`
                   }}
                 >
                   {item.title && (
                     <h4 
-                      className="text-2xl font-bold mb-3"
+                      className="text-xl sm:text-2xl font-bold mb-2 sm:mb-3"
                       style={{ color: colors.primaryColor }}
                     >{item.title}</h4>
                   )}
                   {item.description && (
-                    <p className="text-gray-600 text-base leading-relaxed">{item.description}</p>
+                    <p className="text-gray-600 text-sm sm:text-base leading-relaxed">{item.description}</p>
                   )}
                 </div>
               </motion.div>
@@ -514,43 +514,43 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
 
       {/* Testimonials Section */}
       {vitrine.testimonials.length > 0 && (
-        <div className="space-y-10 px-4">
+        <div className="space-y-8 sm:space-y-10 px-4">
           <motion.h3 
-            className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
+            className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800 px-2"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
             {menuLanguage === 'ar' ? 'آراء العملاء' : 'Testimonials'}
           </motion.h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-8">
             {vitrine.testimonials.map((testimonial, index) => (
               <motion.div
                 key={index}
-                className="bg-white rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-8 relative"
+                className="bg-white rounded-xl sm:rounded-2xl shadow-lg hover:shadow-xl transition-all duration-300 p-6 sm:p-8 relative"
                 whileHover={{ y: -4 }}
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5, delay: index * 0.1 }}
               >
                 <div 
-                  className="absolute inset-0 rounded-2xl -z-10"
+                  className="absolute inset-0 rounded-xl sm:rounded-2xl -z-10"
                   style={{
                     background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
                   }}
                 ></div>
                 <div 
-                  className="absolute top-4 left-4 text-6xl font-serif"
+                  className="absolute top-3 sm:top-4 left-3 sm:left-4 text-4xl sm:text-6xl font-serif"
                   style={{ color: `${colors.primaryColor}10` }}
                 >"</div>
-                <p className="text-gray-600 text-lg leading-relaxed mb-6 mt-4">"{testimonial.text}"</p>
-                <div className="flex items-center justify-between">
+                <p className="text-gray-600 text-base sm:text-lg leading-relaxed mb-4 sm:mb-6 mt-3 sm:mt-4">"{testimonial.text}"</p>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 sm:gap-0">
                   <span 
-                    className="font-bold text-lg text-gray-800"
+                    className="font-bold text-base sm:text-lg text-gray-800"
                   >{testimonial.author}</span>
                   {testimonial.city && (
                     <span 
-                      className="text-base text-gray-700"
+                      className="text-sm sm:text-base text-gray-700"
                     >{testimonial.city}</span>
                   )}
                 </div>
@@ -561,24 +561,24 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
       )}
 
       {/* Contact Section */}
-      <div className="space-y-10 px-4">
+      <div className="space-y-8 sm:space-y-10 px-4">
         <motion.h3 
-          className="text-3xl sm:text-4xl font-bold text-center mb-8 text-gray-800"
+          className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center mb-6 sm:mb-8 text-gray-800 px-2"
           initial={{ opacity: 0, y: 20 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
           {menuLanguage === 'ar' ? 'اتصل بنا' : 'Contact Us'}
         </motion.h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-10 max-w-4xl mx-auto">
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 sm:gap-10 max-w-4xl mx-auto">
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
+            className="space-y-4 sm:space-y-6 bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-lg relative"
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
             <div 
-              className="absolute inset-0 rounded-2xl -z-10"
+              className="absolute inset-0 rounded-xl sm:rounded-2xl -z-10"
               style={{
                 background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
               }}
@@ -586,52 +586,52 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
             {vitrine.contact.address && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2 text-gray-800"
+                  className="font-bold text-base sm:text-lg mb-1 sm:mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'العنوان' : 'Address'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.address}</p>
+                <p className="text-gray-600 text-sm sm:text-base">{vitrine.contact.address}</p>
               </div>
             )}
             {vitrine.contact.phone && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2 text-gray-800"
+                  className="font-bold text-base sm:text-lg mb-1 sm:mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'الهاتف' : 'Phone'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.phone}</p>
+                <p className="text-gray-600 text-sm sm:text-base">{vitrine.contact.phone}</p>
               </div>
             )}
             {vitrine.contact.email && (
               <div>
                 <h4 
-                  className="font-bold text-lg mb-2 text-gray-800"
+                  className="font-bold text-base sm:text-lg mb-1 sm:mb-2 text-gray-800"
                 >
                   {menuLanguage === 'ar' ? 'البريد الإلكتروني' : 'Email'}
                 </h4>
-                <p className="text-gray-600 text-base">{vitrine.contact.email}</p>
+                <p className="text-gray-600 text-sm sm:text-base">{vitrine.contact.email}</p>
               </div>
             )}
           </motion.div>
           <motion.div 
-            className="space-y-6 bg-white rounded-2xl p-8 shadow-lg relative"
+            className="space-y-4 sm:space-y-6 bg-white rounded-xl sm:rounded-2xl p-6 sm:p-8 shadow-lg relative"
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             transition={{ duration: 0.5 }}
           >
             <div 
-              className="absolute inset-0 rounded-2xl -z-10"
+              className="absolute inset-0 rounded-xl sm:rounded-2xl -z-10"
               style={{
                 background: `linear-gradient(to bottom right, ${colors.primaryColor}20, ${colors.accentColor}10, transparent)`
               }}
             ></div>
             <h4 
-              className="font-bold text-lg mb-4 text-gray-800"
+              className="font-bold text-base sm:text-lg mb-3 sm:mb-4 text-gray-800"
             >
               {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
             </h4>
-            <div className="flex flex-wrap justify-center gap-4">
+            <div className="flex flex-wrap justify-center gap-3 sm:gap-4">
               {/* Social Media Links */}
               {vitrine.contact.socialMedia && Object.entries(vitrine.contact.socialMedia).map(([platform, url]) => {
                 if (!url) return null;
@@ -642,7 +642,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     href={url}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                    className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 min-h-[44px] sm:min-h-[40px]"
                     style={{ 
                       background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                       boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
@@ -650,8 +650,8 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     whileHover={{ y: -2, scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="text-sm font-medium">{label}</span>
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="text-xs sm:text-sm font-medium">{label}</span>
                   </motion.a>
                 );
               })}
@@ -664,7 +664,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     href={cta.link}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110"
+                    className="flex items-center justify-center gap-1 sm:gap-2 px-3 sm:px-4 py-2 rounded-full text-white font-medium shadow-md hover:shadow-lg transition-all duration-300 hover:scale-110 min-h-[44px] sm:min-h-[40px]"
                     style={{ 
                       background: `linear-gradient(135deg, ${bgColor} 0%, ${hoverBgColor} 100%)`,
                       boxShadow: '0 4px 14px rgba(0, 0, 0, 0.1)',
@@ -672,8 +672,8 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                     whileHover={{ y: -2, scale: 1.02 }}
                     whileTap={{ scale: 0.95 }}
                   >
-                    <Icon className="h-5 w-5" />
-                    <span className="text-sm font-medium">{label}</span>
+                    <Icon className="h-4 w-4 sm:h-5 sm:w-5" />
+                    <span className="text-xs sm:text-sm font-medium">{label}</span>
                   </motion.a>
                 );
               })}
@@ -684,29 +684,29 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
 
       {/* Footer Section */}
       <motion.div 
-        className="border-t border-gray-200 pt-12 mt-16 px-4"
+        className="border-t border-gray-200 pt-8 sm:pt-12 mt-12 sm:mt-16 px-4"
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.5 }}
       >
         <div className="text-center">
-          <div className="flex flex-wrap justify-between items-center gap-8">
+          <div className="flex flex-col sm:flex-row flex-wrap justify-between items-center gap-6 sm:gap-8">
             <div className="flex-1 min-w-[200px]">
-              <p className="text-gray-400">&copy; {vitrine.footer.copyright} {vitrine.footer.businessName}</p>
+              <p className="text-gray-400 text-sm sm:text-base">&copy; {vitrine.footer.copyright} {vitrine.footer.businessName}</p>
             </div>
             {vitrine.footer.quickLinks && vitrine.footer.quickLinks.length > 0 && (
               <div className="flex-1 min-w-[200px]">
                 <h4 
-                  className="font-semibold mb-3 text-gray-800"
+                  className="font-semibold mb-2 sm:mb-3 text-gray-800 text-sm sm:text-base"
                 >
                   {menuLanguage === 'ar' ? 'روابط سريعة' : 'Quick Links'}
                 </h4>
-                <ul className="space-y-2">
+                <ul className="space-y-1 sm:space-y-2">
                   {vitrine.footer.quickLinks.map((link, index) => (
                     <li key={index}>
                       <a 
                         href={link.url} 
-                        className="text-gray-600 hover:text-gray-800 transition-colors"
+                        className="text-gray-600 hover:text-gray-800 transition-colors text-sm sm:text-base"
                       >
                         {link.label}
                       </a>
@@ -716,13 +716,13 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
               </div>
             )}
             {vitrine.footer.socialIcons && Object.keys(vitrine.footer.socialIcons).length > 0 && (
-              <div className="flex-1 min-w-[200px] text-center md:text-right">
+              <div className="flex-1 min-w-[200px] text-center sm:text-right">
                 <h4 
-                  className="font-semibold mb-3 text-gray-800"
+                  className="font-semibold mb-2 sm:mb-3 text-gray-800 text-sm sm:text-base"
                 >
                   {menuLanguage === 'ar' ? 'تابعنا' : 'Follow Us'}
                 </h4>
-                <div className="flex justify-center md:justify-end gap-4">
+                <div className="flex justify-center sm:justify-end gap-3 sm:gap-4">
                   {Object.entries(vitrine.footer.socialIcons).map(([platform, link]) => {
                     if (!link) return null;
                     const { icon: Icon, bgColor } = getPlatformInfo(platform);
@@ -734,7 +734,7 @@ const VitrineSection = ({ vitrine, menuLanguage, colors }: VitrineSectionProps) 
                         rel="noopener noreferrer"
                         className="text-gray-600 hover:text-gray-800 transition-colors"
                       >
-                        <Icon className="h-6 w-6" />
+                        <Icon className="h-5 w-5 sm:h-6 sm:w-6" />
                       </motion.a>
                     );
                   })}
