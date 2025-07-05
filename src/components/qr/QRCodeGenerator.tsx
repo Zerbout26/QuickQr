@@ -309,11 +309,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
       businessName: '',
       logo: '',
       tagline: '',
-      ctas: [{
-        text: 'Contact Us',
-        link: '',
-        type: 'website'
-      }]
+      ctas: []
     },
     about: {
       description: '',
@@ -416,6 +412,30 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
     setLinks([]);
     setMenuCategories([]);
     setProducts([]);
+    setVitrine({
+      hero: {
+        businessName: '',
+        logo: '',
+        tagline: '',
+        ctas: []
+      },
+      about: {
+        description: '',
+        city: ''
+      },
+      services: [],
+      gallery: [],
+      testimonials: [],
+      contact: {
+        address: '',
+        phone: '',
+        email: '',
+      },
+      footer: {
+        copyright: `© ${new Date().getFullYear()}`,
+        businessName: '',
+      }
+    });
     setForegroundColor('#6366F1');
     setBackgroundColor('#FFFFFF');
     setLogoFile(null);
@@ -714,11 +734,13 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             businessName: vitrine.hero.businessName,
             logo: vitrine.hero.logo || '',
             tagline: vitrine.hero.tagline || '',
-            ctas: vitrine.hero.ctas.map(cta => ({
-              text: cta.text || 'Contact Us',
-              link: cta.link || '',
-              type: cta.type || 'website'
-            }))
+            ctas: vitrine.hero.ctas && vitrine.hero.ctas.length > 0 
+              ? vitrine.hero.ctas.map(cta => ({
+                  text: cta.text || 'Contact Us',
+                  link: cta.link || '',
+                  type: cta.type || 'website'
+                }))
+              : []
           },
           about: {
             description: vitrine.about.description || '',
@@ -1648,25 +1670,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
 
                 {/* CTA Section */}
                 <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold">Call to Action</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setVitrine({
-                        ...vitrine,
-                        hero: {
-                          ...vitrine.hero,
-                          ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
-                        }
-                      })}
-                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
-                    >
-                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      Add CTA
-                    </Button>
-                  </div>
+                  <h3 className="text-sm sm:text-base font-semibold">Call to Action</h3>
                   <div className="space-y-2">
                     {vitrine.hero.ctas.map((cta, index) => (
                       <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
@@ -1736,6 +1740,22 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         </div>
                       </div>
                     ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setVitrine({
+                        ...vitrine,
+                        hero: {
+                          ...vitrine.hero,
+                          ctas: [...vitrine.hero.ctas, { text: '', link: '', type: 'website' }]
+                        }
+                      })}
+                      className="w-full py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      Add CTA
+                    </Button>
                   </div>
                 </div>
 
@@ -1758,22 +1778,7 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
 
                 {/* Services Section */}
                 <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].services}</h3>
-                    <Button
-                      type="button"
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setVitrine({
-                        ...vitrine,
-                        services: [...vitrine.services, { name: '', title: '', imageDescription: '', images: [] }]
-                      })}
-                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
-                    >
-                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      {translations[language].addService}
-                    </Button>
-                  </div>
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].services}</h3>
                   <div className="space-y-2">
                     {vitrine.services.map((service, index) => (
                       <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
@@ -1841,27 +1846,25 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         </Button>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                {/* Gallery Section */}
-                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].gallery}</h3>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => setVitrine({
                         ...vitrine,
-                        gallery: [...vitrine.gallery, { images: [], title: '', description: '' }]
+                        services: [...vitrine.services, { name: '', title: '', imageDescription: '', images: [] }]
                       })}
-                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                      className="w-full py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      {translations[language].addImage}
+                      {translations[language].addService}
                     </Button>
                   </div>
+                </div>
+
+                {/* Gallery Section */}
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].gallery}</h3>
                   <div className="space-y-2">
                     {vitrine.gallery.map((item, index) => (
                       <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
@@ -1922,27 +1925,25 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         </Button>
                       </div>
                     ))}
-                  </div>
-                </div>
-
-                {/* Testimonials Section */}
-                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
-                  <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-1 sm:gap-2">
-                    <h3 className="text-sm sm:text-base font-semibold">{translations[language].testimonials}</h3>
                     <Button
                       type="button"
                       variant="outline"
                       size="sm"
                       onClick={() => setVitrine({
                         ...vitrine,
-                        testimonials: [...vitrine.testimonials, { text: '', author: '', city: '' }]
+                        gallery: [...vitrine.gallery, { images: [], title: '', description: '' }]
                       })}
-                      className="w-full sm:w-auto py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                      className="w-full py-2 h-10 sm:h-12 text-xs sm:text-sm"
                     >
                       <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                      {translations[language].addTestimonial}
+                      {translations[language].addImage}
                     </Button>
                   </div>
+                </div>
+
+                {/* Testimonials Section */}
+                <div className="space-y-2 border p-2 sm:p-3 rounded-lg">
+                  <h3 className="text-sm sm:text-base font-semibold">{translations[language].testimonials}</h3>
                   <div className="space-y-2">
                     {vitrine.testimonials.map((testimonial, index) => (
                       <div key={index} className="space-y-2 border p-2 sm:p-3 rounded">
@@ -1983,6 +1984,19 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                         </Button>
                       </div>
                     ))}
+                    <Button
+                      type="button"
+                      variant="outline"
+                      size="sm"
+                      onClick={() => setVitrine({
+                        ...vitrine,
+                        testimonials: [...vitrine.testimonials, { text: '', author: '', city: '' }]
+                      })}
+                      className="w-full py-2 h-10 sm:h-12 text-xs sm:text-sm"
+                    >
+                      <Plus className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                      {translations[language].addTestimonial}
+                    </Button>
                   </div>
                 </div>
 
