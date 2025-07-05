@@ -906,36 +906,38 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
               />
             </div>
             
-            {/* Logo Upload */}
-            <div className="space-y-2">
-              <Label className="text-sm sm:text-base font-medium">{translations[language].logo}</Label>
-              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
-                {logoPreview && (
-                  <img src={logoPreview} alt="QR Code Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain border rounded" />
-                )}
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={() => fileInputRef.current?.click()}
-                  className="w-full sm:w-auto py-2 sm:py-3 h-10 sm:h-12 text-xs sm:text-sm"
-                >
-                  <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                  {logoPreview ? 'Change Logo' : 'Upload Logo'}
-                </Button>
-                {logoPreview && (
-                  <Button type="button" variant="destructive" size="icon" onClick={removeLogo} className="h-10 w-10 sm:h-12 sm:w-12">
-                    <X className="h-3 w-3 sm:h-4 sm:w-4" />
+            {/* Logo Upload - Hidden for vitrine type since it has its own logo in hero section */}
+            {type !== 'vitrine' && selectedType !== 'vitrine' && (
+              <div className="space-y-2">
+                <Label className="text-sm sm:text-base font-medium">{translations[language].logo}</Label>
+                <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
+                  {logoPreview && (
+                    <img src={logoPreview} alt="QR Code Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain border rounded" />
+                  )}
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="w-full sm:w-auto py-2 sm:py-3 h-10 sm:h-12 text-xs sm:text-sm"
+                  >
+                    <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
+                    {logoPreview ? 'Change Logo' : 'Upload Logo'}
                   </Button>
-                )}
-                <input
-                  type="file"
-                  ref={fileInputRef}
-                  onChange={handleLogoUpload}
-                  accept="image/*"
-                  className="hidden"
-                />
+                  {logoPreview && (
+                    <Button type="button" variant="destructive" size="icon" onClick={removeLogo} className="h-10 w-10 sm:h-12 sm:w-12">
+                      <X className="h-3 w-3 sm:h-4 sm:w-4" />
+                    </Button>
+                  )}
+                  <input
+                    type="file"
+                    ref={fileInputRef}
+                    onChange={handleLogoUpload}
+                    accept="image/*"
+                    className="hidden"
+                  />
+                </div>
               </div>
-            </div>
+            )}
             
             {/* QR Type Selector as Buttons */}
             {(!selectedType && user) ? (
