@@ -1605,37 +1605,6 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
                       dir={language === 'ar' ? 'rtl' : 'ltr'}
                       className="h-10 sm:h-12 px-3 py-2 text-xs sm:text-sm"
                     />
-                    <div className="flex items-center gap-2 sm:gap-3">
-                      {vitrine.hero.logo && (
-                        <img src={vitrine.hero.logo} alt="Business Logo" className="w-12 h-12 sm:w-16 sm:h-16 object-contain border rounded" />
-                      )}
-                      <Button
-                        type="button"
-                        variant="outline"
-                        size="sm"
-                        onClick={() => {
-                          const input = document.createElement('input');
-                          input.type = 'file';
-                          input.accept = 'image/*';
-                          input.onchange = (e) => {
-                            const file = (e.target as HTMLInputElement).files?.[0];
-                            if (file) {
-                              setTempImages(prev => ({ ...prev, 'hero-logo': file }));
-                              const tempUrl = URL.createObjectURL(file);
-                              setVitrine({
-                                ...vitrine,
-                                hero: { ...vitrine.hero, logo: tempUrl }
-                              });
-                            }
-                          };
-                          input.click();
-                        }}
-                        className="py-2 h-10 sm:h-12 text-xs sm:text-sm"
-                      >
-                        <Upload className="h-3 w-3 sm:h-4 sm:w-4 mr-1 sm:mr-2" />
-                        {vitrine.hero.logo ? translations[language].changeLogo : translations[language].addLogo}
-                      </Button>
-                    </div>
                   </div>
                 </div>
 
