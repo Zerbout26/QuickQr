@@ -16,6 +16,7 @@ import LandingPage from '@/pages/LandingPage';
 import PrivateRoute from '@/components/PrivateRoute';
 import ForgotPasswordForm from '@/components/auth/ForgotPasswordForm';
 import NotFound from "./pages/NotFound";
+import { LoadingSpinner } from "@/components/ui/loading";
 
 // Lazy load components for better performance
 const Dashboard = lazy(() => import("./pages/Dashboard"));
@@ -25,13 +26,6 @@ const EditQRCodePage = lazy(() => import('@/pages/EditQRCodePage'));
 const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm'));
 const Profile = lazy(() => import('@/pages/Profile'));
 const ChooseQRType = lazy(() => import('./pages/ChooseQRType'));
-
-// Loading component for lazy-loaded routes
-const LoadingSpinner = () => (
-  <div className="flex items-center justify-center min-h-screen">
-    <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-purple-600"></div>
-  </div>
-);
 
 const queryClient = new QueryClient();
 
@@ -107,9 +101,11 @@ const App = () => (
                 </Suspense>
               } />
               <Route path="/choose-qr-type" element={
-                <Suspense fallback={<LoadingSpinner />}>
-                  <ChooseQRType />
-                </Suspense>
+                <PrivateRoute>
+                  <Suspense fallback={<LoadingSpinner />}>
+                    <ChooseQRType />
+                  </Suspense>
+                </PrivateRoute>
               } />
               <Route path="*" element={<NotFound />} />
             </Routes>
