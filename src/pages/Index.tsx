@@ -4,221 +4,120 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowRight, Shield, Star, Globe, ChartBar, Settings } from 'lucide-react';
+import { ArrowRight, Shield, Star, Globe, ChartBar, Settings, CheckCircle } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet';
 
-// Translations object
+// Clean translations object
 const translations = {
   en: {
-    welcome: "Welcome",
-    digitalSolutions: "Digital Solutions for Your Business",
-    createEngaging: "Create Engaging QR Landing Pages For Your Business",
-    description: "Generate beautiful QR codes that lead to custom landing pages with your links, menus, and business information - perfect for any type of business in Algeria and beyond.",
-    startFreeTrial: "Start Free Trial",
-    signIn: "Sign In",
-    features: "Features That Deliver Results",
-    allInOne: "All-in-One QR Solution for Your Business",
-    featuresDescription: "Create custom landing pages with links and menus that engage your audience and drive results",
-    simpleProcess: "Simple Process",
-    createInMinutes: "Create Your QR Landing Page in Minutes",
-    threeSteps: "Three simple steps to get your QR landing page online",
-    step1: {
-      title: "Create Your QR Code",
-      description: "Design your QR code with your brand colors and logo to match your business identity"
+    hero: {
+      title: "Professional QR Code Solutions",
+      subtitle: "Create engaging digital experiences for your business",
+      description: "Transform your business with custom QR landing pages. Perfect for restaurants, retail stores, and professional services.",
+      startFreeTrial: "Start Free Trial",
+      signIn: "Sign In",
+      noCreditCard: "14-day free trial. No credit card required."
     },
-    step2: {
-      title: "Add Links & Menus",
-      description: "Customize your landing page with links, restaurant menus and promotional content"
+    features: {
+      title: "Everything You Need",
+      subtitle: "Professional QR solutions for modern businesses",
+      customBranding: "Custom Branding",
+      customBrandingDesc: "Match your brand colors and logo perfectly",
+      menuBuilder: "Menu Builder",
+      menuBuilderDesc: "Create beautiful digital menus for restaurants",
+      multipleLinks: "Multiple Links",
+      multipleLinksDesc: "Add unlimited links and content to your QR",
+      realTimeUpdates: "Real-time Updates",
+      realTimeUpdatesDesc: "Update content anytime without new QR codes"
     },
-    step3: {
-      title: "Share & Update",
-      description: "Download your QR code and update your landing page anytime without creating new codes"
-    },
-    pricing: "Pricing",
-    simplePricing: "Simple, Transparent Pricing",
-    pricingDescription: "Everything you need to create professional QR landing pages",
-    businessPlan: "Business Plan",
-    perMonth: "DZD/month",
-    everythingYouNeed: "Everything you need for your business",
-    readyToTransform: "Ready to Transform Your Business with Smart QR Solutions?",
-    joinBusinesses: "Join businesses across Algeria that are elevating their customer experience with our easy-to-use QR landing page platform.",
-    businessTypes: {
-      restaurants: {
-        name: "Restaurants",
-        description: "Digital menus, specials, and online ordering"
+    howItWorks: {
+      title: "Simple Process",
+      subtitle: "Get your QR landing page online in minutes",
+      step1: {
+        title: "Create QR Code",
+        description: "Design with your brand colors and logo"
       },
-      retail: {
-        name: "Retail Stores",
-        description: "Product catalogs, promotions, and loyalty programs"
+      step2: {
+        title: "Add Content",
+        description: "Customize with links, menus, and information"
       },
-      services: {
-        name: "Professional Services",
-        description: "Appointment booking, testimonials, and service lists"
-      },
-      tourism: {
-        name: "Tourism & Hospitality",
-        description: "Virtual tours, booking links, and local attractions"
-      },
-      events: {
-        name: "Event Planners",
-        description: "Event schedules, maps, and registration links"
-      },
-      education: {
-        name: "Education",
-        description: "Course materials, schedules, and campus information"
+      step3: {
+        title: "Share & Update",
+        description: "Download and update anytime"
       }
     },
-    solutionsForAllIndustries: "Solutions For All Industries",
-    qrCodesForEveryBusiness: "QR Codes For Every Type of Business",
-    discoverHow: "Discover how our QR solutions can help your specific industry connect with customers",
-    findYourSolution: "Find Your Solution",
-    trustedByBusinesses: "Trusted by Businesses",
-    whatCustomersSay: "What Our Customers Say",
-    hearFromBusinesses: "Hear from businesses that have transformed their customer engagement",
-    startCreatingNow: "Start Creating Now",
-    noCreditCard: "No credit card required to start your trial",
-    unlimitedQrCodes: "Unlimited QR codes",
-    customBranding: "Custom branding and colors",
-    restaurantMenuBuilder: "Restaurant menu builder",
-    multipleLinks: "Multiple links per QR code",
-    realTimeUpdates: "Real-time landing page updates",
-    analytics: "Analytics and scan tracking",
-    customerTools: "Direct customer interaction tools",
-    prioritySupport: "Priority support"
+    cta: {
+      title: "Ready to Transform Your Business?",
+      subtitle: "Join businesses using our QR platform to enhance customer experience",
+      button: "Start Creating Now"
+    }
   },
   ar: {
-    welcome: "مرحباً",
-    digitalSolutions: "حلول رقمية لعملك",
-    createEngaging: "أنشئ صفحات QR جذابة لعملك",
-    description: "قم بإنشاء رموز QR جميلة تؤدي إلى صفحات هبوط مخصصة مع روابطك وقوائم الطعام ومعلومات عملك - مثالية لأي نوع من الأعمال في الجزائر وما بعدها.",
-    startFreeTrial: "ابدأ التجربة المجانية",
-    signIn: "تسجيل الدخول",
-    features: "ميزات تحقق النتائج",
-    allInOne: "حل QR متكامل لعملك",
-    featuresDescription: "أنشئ صفحات هبوط مخصصة مع روابط وقوائم طعام تجذب جمهورك وتحقق النتائج",
-    simpleProcess: "عملية بسيطة",
-    createInMinutes: "أنشئ صفحة QR في دقائق",
-    threeSteps: "ثلاث خطوات بسيطة للحصول على صفحة QR الخاصة بك",
-    step1: {
-      title: "أنشئ رمز QR الخاص بك",
-      description: "صمم رمز QR بألوان علامتك التجارية وشعارك ليتناسب مع هوية عملك"
+    hero: {
+      title: "حلول QR احترافية",
+      subtitle: "أنشئ تجارب رقمية جذابة لعملك",
+      description: "حول عملك بصفحات QR مخصصة. مثالية للمطاعم والمتاجر والخدمات المهنية.",
+      startFreeTrial: "ابدأ التجربة المجانية",
+      signIn: "تسجيل الدخول",
+      noCreditCard: "تجربة مجانية 14 يوم. لا حاجة لبطاقة ائتمان."
     },
-    step2: {
-      title: "أضف الروابط والقوائم",
-      description: "خصص صفحة الهبوط الخاصة بك بالروابط وقوائم المطاعم والمحتوى الترويجي"
+    features: {
+      title: "كل ما تحتاجه",
+      subtitle: "حلول QR احترافية للشركات الحديثة",
+      customBranding: "تخصيص العلامة التجارية",
+      customBrandingDesc: "طابق ألوان علامتك التجارية وشعارك تماماً",
+      menuBuilder: "منشئ القوائم",
+      menuBuilderDesc: "أنشئ قوائم طعام رقمية جميلة للمطاعم",
+      multipleLinks: "روابط متعددة",
+      multipleLinksDesc: "أضف روابط ومحتوى غير محدود لرمز QR",
+      realTimeUpdates: "تحديثات فورية",
+      realTimeUpdatesDesc: "حدث المحتوى في أي وقت دون رموز QR جديدة"
     },
-    step3: {
-      title: "شارك وحدث",
-      description: "قم بتنزيل رمز QR الخاص بك وتحديث صفحة الهبوط في أي وقت دون إنشاء رموز جديدة"
-    },
-    pricing: "التسعير",
-    simplePricing: "تسعير بسيط وشفاف",
-    pricingDescription: "كل ما تحتاجه لإنشاء صفحات QR احترافية",
-    businessPlan: "الخطة التجارية",
-    perMonth: "دج/شهرياً",
-    everythingYouNeed: "كل ما تحتاجه لعملك",
-    readyToTransform: "هل أنت مستعد لتحويل عملك بحلول QR الذكية؟",
-    joinBusinesses: "انضم إلى الشركات في جميع أنحاء الجزائر التي تعزز تجربة عملائها من خلال منصة صفحات QR سهلة الاستخدام.",
-    businessTypes: {
-      restaurants: {
-        name: "المطاعم",
-        description: "قوائم طعام رقمية، عروض خاصة، وطلب عبر الإنترنت"
+    howItWorks: {
+      title: "عملية بسيطة",
+      subtitle: "احصل على صفحة QR في دقائق",
+      step1: {
+        title: "أنشئ رمز QR",
+        description: "صمم بألوان علامتك التجارية وشعارك"
       },
-      retail: {
-        name: "متاجر التجزئة",
-        description: "كتالوجات المنتجات، العروض الترويجية، وبرامج الولاء"
+      step2: {
+        title: "أضف المحتوى",
+        description: "خصص بالروابط والقوائم والمعلومات"
       },
-      services: {
-        name: "الخدمات المهنية",
-        description: "حجز المواعيد، الشهادات، وقوائم الخدمات"
-      },
-      tourism: {
-        name: "السياحة والضيافة",
-        description: "جولات افتراضية، روابط الحجز، والمعالم المحلية"
-      },
-      events: {
-        name: "منظمي الفعاليات",
-        description: "جداول الفعاليات، الخرائط، وروابط التسجيل"
-      },
-      education: {
-        name: "التعليم",
-        description: "المواد التعليمية، الجداول الزمنية، ومعلومات الحرم الجامعي"
+      step3: {
+        title: "شارك وحدث",
+        description: "حمل وحدث في أي وقت"
       }
     },
-    solutionsForAllIndustries: "حلول لجميع الصناعات",
-    qrCodesForEveryBusiness: "رموز QR لكل نوع من الأعمال",
-    discoverHow: "اكتشف كيف يمكن لحلول QR الخاصة بنا مساعدة صناعتك المحددة في التواصل مع العملاء",
-    findYourSolution: "ابحث عن حلك",
-    trustedByBusinesses: "موثوق به من قبل الشركات",
-    whatCustomersSay: "ماذا يقول عملاؤنا",
-    hearFromBusinesses: "استمع إلى الشركات التي حولت تجربة عملائها",
-    startCreatingNow: "ابدأ الإنشاء الآن",
-    noCreditCard: "لا حاجة لبطاقة ائتمان لبدء تجربتك",
-    unlimitedQrCodes: "رموز QR غير محدودة",
-    customBranding: "تخصيص العلامة التجارية والألوان",
-    restaurantMenuBuilder: "منشئ قوائم المطاعم",
-    multipleLinks: "روابط متعددة لكل رمز QR",
-    realTimeUpdates: "تحديثات صفحة الهبوط في الوقت الفعلي",
-    analytics: "تحليلات وتتبع المسح",
-    customerTools: "أدوات التفاعل المباشر مع العملاء",
-    prioritySupport: "دعم ذو أولوية"
+    cta: {
+      title: "هل أنت مستعد لتحويل عملك؟",
+      subtitle: "انضم للشركات التي تستخدم منصتنا لتعزيز تجربة العملاء",
+      button: "ابدأ الإنشاء الآن"
+    }
   }
 };
 
 const features = [
   {
-    title: (lang: 'en' | 'ar') => translations[lang].features,
-    description: (lang: 'en' | 'ar') => translations[lang].featuresDescription,
-    icon: <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
+    title: (lang: 'en' | 'ar') => translations[lang].features.customBranding,
+    description: (lang: 'en' | 'ar') => translations[lang].features.customBrandingDesc,
+    icon: <Star className="w-6 h-6 text-primary" />,
   },
   {
-    title: (lang: 'en' | 'ar') => translations[lang].customBranding,
-    description: (lang: 'en' | 'ar') => translations[lang].customBranding,
-    icon: <Star className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
+    title: (lang: 'en' | 'ar') => translations[lang].features.menuBuilder,
+    description: (lang: 'en' | 'ar') => translations[lang].features.menuBuilderDesc,
+    icon: <ChartBar className="w-6 h-6 text-primary" />,
   },
   {
-    title: (lang: 'en' | 'ar') => translations[lang].restaurantMenuBuilder,
-    description: (lang: 'en' | 'ar') => translations[lang].restaurantMenuBuilder,
-    icon: <ChartBar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
+    title: (lang: 'en' | 'ar') => translations[lang].features.multipleLinks,
+    description: (lang: 'en' | 'ar') => translations[lang].features.multipleLinksDesc,
+    icon: <Globe className="w-6 h-6 text-primary" />,
   },
   {
-    title: (lang: 'en' | 'ar') => translations[lang].multipleLinks,
-    description: (lang: 'en' | 'ar') => translations[lang].multipleLinks,
-    icon: <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-];
-
-const businessTypes = [
-  {
-    name: translations.en.businessTypes.restaurants.name,
-    description: translations.en.businessTypes.restaurants.description,
-    icon: <ChartBar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-  {
-    name: translations.en.businessTypes.retail.name,
-    description: translations.en.businessTypes.retail.description,
-    icon: <Star className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-  {
-    name: translations.en.businessTypes.services.name,
-    description: translations.en.businessTypes.services.description,
-    icon: <Globe className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-  {
-    name: translations.en.businessTypes.tourism.name,
-    description: translations.en.businessTypes.tourism.description,
-    icon: <Settings className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-  {
-    name: translations.en.businessTypes.events.name,
-    description: translations.en.businessTypes.events.description,
-    icon: <ChartBar className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
-  },
-  {
-    name: translations.en.businessTypes.education.name,
-    description: translations.en.businessTypes.education.description,
-    icon: <Star className="w-6 h-6 sm:w-8 sm:h-8 text-primary" />,
+    title: (lang: 'en' | 'ar') => translations[lang].features.realTimeUpdates,
+    description: (lang: 'en' | 'ar') => translations[lang].features.realTimeUpdatesDesc,
+    icon: <Settings className="w-6 h-6 text-primary" />,
   },
 ];
 
@@ -248,202 +147,110 @@ const Index = () => {
   return (
     <>
       <Helmet>
-        <title>Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie</title>
-        <meta name="description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite, aucune inscription requise." />
-        <meta name="keywords" content="qrcreator, générateur QR code gratuit, QR code gratuit, créer QR code, QR code menu restaurant, QR code vitrine, QR code ecommerce, QR code Algérie, générateur QR code en ligne, QR code dynamique, QR code business, qr creator" />
-        <meta property="og:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie" />
-        <meta property="og:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
+        <title>QRCreator - Professional QR Code Solutions</title>
+        <meta name="description" content="Create engaging digital experiences for your business with custom QR landing pages. Perfect for restaurants, retail stores, and professional services." />
+        <meta name="keywords" content="qr creator, qr code generator, digital menu, business qr codes, landing pages" />
+        <meta property="og:title" content="QRCreator - Professional QR Code Solutions" />
+        <meta property="og:description" content="Create engaging digital experiences for your business with custom QR landing pages." />
         <meta property="og:type" content="website" />
         <meta property="og:url" content="https://qrcreator.xyz/" />
         <meta property="og:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
-        <meta name="twitter:card" content="summary_large_image" />
-        <meta name="twitter:title" content="Qrcreator - Générateur QR Code Gratuit pour Menus, Vitrines, Ecommerce & Commandes | Algérie" />
-        <meta name="twitter:description" content="Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes." />
-        <meta name="twitter:image" content="https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp" />
         <link rel="canonical" href="https://qrcreator.xyz/" />
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "Organization",
-            "name": "Qrcreator",
-            "url": "https://qrcreator.xyz",
-            "logo": "https://qrcreator.xyz/Logo QrCreator sur fond blanc (1).webp",
-            "description": "Qrcreator est le générateur QR code gratuit #1 en Algérie pour menus, vitrines, ecommerce et gestion de commandes.",
-            "address": {
-              "@type": "PostalAddress",
-              "addressCountry": "DZ",
-              "addressRegion": "Algérie"
-            },
-            "sameAs": [
-              "https://www.facebook.com/qrcreator",
-              "https://www.instagram.com/qrcreator"
-            ]
-          }
-        `}</script>
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "WebApplication",
-            "name": "Qrcreator - Générateur QR Code Gratuit",
-            "url": "https://qrcreator.xyz",
-            "description": "Qrcreator est le générateur QR code gratuit #1 en Algérie pour créer des QR codes pour menus, vitrines, ecommerce et gestion de commandes.",
-            "applicationCategory": "BusinessApplication",
-            "operatingSystem": "Web Browser",
-            "offers": {
-              "@type": "Offer",
-              "price": "0",
-              "priceCurrency": "DZD"
-            }
-          }
-        `}</script>
-        <script type="application/ld+json">{`
-          {
-            "@context": "https://schema.org",
-            "@type": "FAQPage",
-            "mainEntity": [
-              {
-                "@type": "Question",
-                "name": "Comment créer un QR code gratuit avec Qrcreator ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Avec Qrcreator, créez un QR code gratuit en 3 étapes simples : 1) Choisissez votre type de QR code (menu, vitrine, ecommerce), 2) Personnalisez avec vos couleurs et logo, 3) Téléchargez et utilisez immédiatement. Aucune inscription requise."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Qrcreator est-il vraiment gratuit ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Oui, Qrcreator est 100% gratuit. Créez autant de QR codes que vous voulez, personnalisez-les avec vos couleurs et logo, et utilisez-les commercialement sans aucune limitation."
-                }
-              },
-              {
-                "@type": "Question",
-                "name": "Puis-je créer un QR code pour mon restaurant en Algérie ?",
-                "acceptedAnswer": {
-                  "@type": "Answer",
-                  "text": "Absolument ! Qrcreator est spécialement conçu pour les restaurants en Algérie. Créez des menus QR codes avec photos, prix, et système de commande intégré."
-                }
-              }
-            ]
-          }
-        `}</script>
       </Helmet>
+      
       <MainLayout>
-        {/* SEO h1 and paragraph for keyword targeting */}
-        <div className="container mx-auto px-4 sm:px-6 lg:px-8 mt-8 mb-4">
-          <h1 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-center text-primary mb-2">
-            Qrcreator - Générateur QR Code Gratuit #1 en Algérie pour Menus, Vitrines, Ecommerce & Commandes
-          </h1>
-          <p className="text-center text-gray-700 max-w-3xl mx-auto">
-            Qrcreator est le générateur QR code gratuit #1 en Algérie. Créez facilement des QR codes pour menus de restaurant, vitrines d'entreprise, ecommerce et gestion de commandes. Solution complète et gratuite, aucune inscription requise, QR codes illimités. Le meilleur générateur QR code pour les entreprises algériennes.
-          </p>
-        </div>
-        
-        {/* Hero Section - Mobile optimized */}
-        <section className="relative overflow-hidden py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-white to-gray-50">
+        {/* Hero Section */}
+        <section className="relative overflow-hidden py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-white to-gray-50">
           <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-secondary/5 -z-10"></div>
           
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="flex flex-col lg:flex-row items-center gap-6 lg:gap-12">
-              <div className="lg:w-1/2 mb-6 lg:mb-0 text-center lg:text-left">
-                <div className="mb-4">
-                  <span className="inline-block py-1 px-3 sm:px-4 rounded-full bg-primary/10 text-primary font-medium text-xs sm:text-sm mb-4">
-                    <span className="arabic mx-1">{translations[language].welcome}</span> | {translations[language].digitalSolutions}
-                  </span>
-                  <h1 className="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-bold text-gray-900 mb-4 leading-tight" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    {translations[language].createEngaging}
+            <div className="flex flex-col lg:flex-row items-center gap-8 lg:gap-12">
+              <div className="lg:w-1/2 text-center lg:text-left">
+                <div className="mb-6">
+                  <h1 className="text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-gray-900 mb-6 leading-tight" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    {translations[language].hero.title}
                   </h1>
-                  <p className="text-base sm:text-lg text-gray-600 mb-6 leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                    {translations[language].description}
+                  <p className="text-lg sm:text-xl text-gray-600 mb-4 leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    {translations[language].hero.subtitle}
+                  </p>
+                  <p className="text-base sm:text-lg text-gray-600 mb-8 leading-relaxed" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    {translations[language].hero.description}
                   </p>
                 </div>
                 
-                <div className="flex flex-col sm:flex-row space-y-3 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
-                  <Button onClick={() => navigate('/signup')} className="business-cta-btn text-base py-3 sm:py-4 px-6 flex items-center justify-center gap-2 group w-full sm:w-auto">
-                    {translations[language].startFreeTrial}
-                    <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
+                  <Button 
+                    onClick={() => navigate('/signup')} 
+                    className="text-lg py-4 px-8 flex items-center justify-center gap-2 group w-full sm:w-auto"
+                  >
+                    {translations[language].hero.startFreeTrial}
+                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
                   </Button>
-                  <Button onClick={() => navigate('/signin')} variant="outline" className="text-base py-3 sm:py-4 px-6 border-2 hover:bg-gray-50 w-full sm:w-auto">
-                    {translations[language].signIn}
+                  <Button 
+                    onClick={() => navigate('/signin')} 
+                    variant="outline" 
+                    className="text-lg py-4 px-8 border-2 hover:bg-gray-50 w-full sm:w-auto"
+                  >
+                    {translations[language].hero.signIn}
                   </Button>
                 </div>
                 
-                <div className="mt-4 sm:mt-6 flex items-center justify-center lg:justify-start text-gray-500">
+                <div className="mt-6 flex items-center justify-center lg:justify-start text-gray-500">
                   <Shield className="w-4 h-4 mr-2" />
-                  <span className="text-xs sm:text-sm">14-day free trial. No credit card required.</span>
+                  <span className="text-sm">{translations[language].hero.noCreditCard}</span>
                 </div>
               </div>
               
               <div className="lg:w-1/2 w-full">
                 <div className="relative">
-                  <div className="relative rounded-xl shadow-lg">
-                    {/* Debug info */}
-                    <div className="text-xs text-gray-500 mb-2 p-2 bg-yellow-50 rounded">
-                      Debug: Grid should show 4 images (2x2 layout)
+                  <div className="grid grid-cols-2 gap-4 p-4 bg-white rounded-2xl shadow-xl">
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_04_53 AM.webp"
+                        alt="QR Code in use" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_04_53 AM.png';
+                        }}
+                      />
                     </div>
                     
-                    <div className="grid grid-cols-2 gap-2 sm:gap-3 p-2 sm:p-3 bg-white rounded-xl" style={{minHeight: '200px'}}>
-                      {/* Image 1 */}
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
-                        <img 
-                          src="/ChatGPT Image May 23, 2025, 12_04_53 AM.webp"
-                          alt="QR Code in use" 
-                          className="w-full h-full object-cover"
-                          onLoad={() => console.log('✅ Image 1 loaded successfully')}
-                          onError={(e) => {
-                            console.log('❌ Image 1 failed to load');
-                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_04_53 AM.png';
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Image 2 */}
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
-                        <img 
-                          src="/Design sans titre.webp"
-                          alt="Restaurant QR menu" 
-                          className="w-full h-full object-cover"
-                          onLoad={() => console.log('✅ Image 2 loaded successfully')}
-                          onError={(e) => {
-                            console.log('❌ Image 2 failed to load');
-                            e.currentTarget.src = '/Design sans titre.png';
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Image 3 */}
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
-                        <img 
-                          src="/ChatGPT Image May 23, 2025, 12_08_02 AM.webp"
-                          alt="Retail store" 
-                          className="w-full h-full object-cover"
-                          onLoad={() => console.log('✅ Image 3 loaded successfully')}
-                          onError={(e) => {
-                            console.log('❌ Image 3 failed to load');
-                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_08_02 AM.png';
-                          }}
-                        />
-                      </div>
-                      
-                      {/* Image 4 */}
-                      <div className="aspect-square rounded-lg overflow-hidden shadow-sm bg-gray-100 border border-gray-200">
-                        <img 
-                          src="/ChatGPT Image May 23, 2025, 12_09_50 AM.webp"
-                          alt="Digital menu scanning" 
-                          className="w-full h-full object-cover"
-                          onLoad={() => console.log('✅ Image 4 loaded successfully')}
-                          onError={(e) => {
-                            console.log('❌ Image 4 failed to load');
-                            e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_09_50 AM.png';
-                          }}
-                        />
-                      </div>
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
+                      <img 
+                        src="/Design sans titre.webp"
+                        alt="Restaurant QR menu" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/Design sans titre.png';
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_08_02 AM.webp"
+                        alt="Retail store" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_08_02 AM.png';
+                        }}
+                      />
+                    </div>
+                    
+                    <div className="aspect-square rounded-xl overflow-hidden shadow-lg">
+                      <img 
+                        src="/ChatGPT Image May 23, 2025, 12_09_50 AM.webp"
+                        alt="Digital menu scanning" 
+                        className="w-full h-full object-cover"
+                        onError={(e) => {
+                          e.currentTarget.src = '/ChatGPT Image May 23, 2025, 12_09_50 AM.png';
+                        }}
+                      />
                     </div>
                   </div>
-                  <div className="absolute -top-2 -right-2 sm:-top-4 sm:-right-4 w-12 h-12 sm:w-16 sm:h-16 bg-white rounded-lg shadow-md flex items-center justify-center p-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" className="w-full h-full" viewBox="0 0 24 24">
-                      <path fill="currentColor" className="text-primary" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
+                  <div className="absolute -top-4 -right-4 w-16 h-16 bg-white rounded-xl shadow-lg flex items-center justify-center">
+                    <svg xmlns="http://www.w3.org/2000/svg" className="w-10 h-10 text-primary" viewBox="0 0 24 24">
+                      <path fill="currentColor" d="M3 3h6v6H3V3zm2 2v2h2V5H5zm8-2h6v6h-6V3zm2 2v2h2V5h-2zM3 11h6v6H3v-6zm2 2v2h2v-2H5zm13-2h1v1h-1v-1zm-5 2h1v1h-1v-1zm2 0h1v1h-1v-1zm2 0h1v1h-1v-1zm0 2h1v1h-1v-1zm-4-2h1v3h-1v-3zm4 2h1v3h-1v-3zm-2 1h1v1h-1v-1zm-4 1h1v1h-1v-1zm2 0h1v1h-1v-1z"/>
                     </svg>
                   </div>
                 </div>
@@ -452,282 +259,104 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Features Section - Mobile optimized */}
-        <section className="py-8 sm:py-12 lg:py-16 bg-white">
+        {/* Features Section */}
+        <section className="py-16 sm:py-20 lg:py-24 bg-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-              <span className="inline-block py-1 px-3 rounded-full bg-primary/10 text-primary font-medium text-xs sm:text-sm mb-4">
-                {translations[language].features}
-              </span>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
-                {translations[language].allInOne}
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                {translations[language].features.title}
               </h2>
-              <p className="text-base sm:text-lg text-gray-600">
-                {translations[language].featuresDescription}
+              <p className="text-lg sm:text-xl text-gray-600">
+                {translations[language].features.subtitle}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 sm:gap-8">
               {features.map((feature, index) => (
                 <div 
                   key={index}
-                  className="bg-white rounded-lg p-4 sm:p-6 shadow-sm hover:shadow-md transition-shadow border-l-4 border-l-primary/80 flex flex-col h-full"
+                  className="bg-white rounded-xl p-6 shadow-lg hover:shadow-xl transition-shadow border border-gray-100"
                 >
-                  <div className="bg-primary/5 p-2 rounded-lg inline-flex mb-3 sm:mb-4">{feature.icon}</div>
-                  <h3 className="text-base sm:text-lg font-semibold mb-2 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>{feature.title(language)}</h3>
-                  <p className="text-gray-600 flex-grow text-sm" dir={language === 'ar' ? 'rtl' : 'ltr'}>{feature.description(language)}</p>
+                  <div className="bg-primary/10 p-3 rounded-lg inline-flex mb-4">{feature.icon}</div>
+                  <h3 className="text-lg font-semibold mb-3 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    {feature.title(language)}
+                  </h3>
+                  <p className="text-gray-600 text-sm" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                    {feature.description(language)}
+                  </p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* How It Works Section - Mobile optimized */}
-        <section className="py-8 sm:py-12 lg:py-16 bg-gradient-to-br from-white to-gray-50">
+        {/* How It Works Section */}
+        <section className="py-16 sm:py-20 lg:py-24 bg-gradient-to-br from-gray-50 to-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="text-center max-w-3xl mx-auto mb-8 sm:mb-12">
-              <span className="inline-block py-1 px-3 rounded-full bg-accent/10 text-accent font-medium text-xs sm:text-sm mb-4">
-                {translations[language].simpleProcess}
-              </span>
-              <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold text-gray-900 mb-4">
-                {translations[language].createInMinutes}
+            <div className="text-center max-w-3xl mx-auto mb-12 sm:mb-16">
+              <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold text-gray-900 mb-4">
+                {translations[language].howItWorks.title}
               </h2>
-              <p className="text-base sm:text-lg text-gray-600">
-                {translations[language].threeSteps}
+              <p className="text-lg sm:text-xl text-gray-600">
+                {translations[language].howItWorks.subtitle}
               </p>
             </div>
             
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6 sm:gap-8">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-8 sm:gap-12">
               <div className="text-center">
-                <div className="bg-primary/10 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-lg sm:text-xl">1</span>
+                <div className="bg-primary/10 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-primary font-bold text-xl sm:text-2xl">1</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step1.title}
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step1.title}
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step1.description}
+                <p className="text-gray-600 text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step1.description}
                 </p>
               </div>
               
               <div className="text-center">
-                <div className="bg-primary/10 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-lg sm:text-xl">2</span>
+                <div className="bg-primary/10 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-primary font-bold text-xl sm:text-2xl">2</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step2.title}
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step2.title}
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step2.description}
+                <p className="text-gray-600 text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step2.description}
                 </p>
               </div>
               
               <div className="text-center">
-                <div className="bg-primary/10 w-12 h-12 sm:w-16 sm:h-16 rounded-full flex items-center justify-center mx-auto mb-4">
-                  <span className="text-primary font-bold text-lg sm:text-xl">3</span>
+                <div className="bg-primary/10 w-16 h-16 sm:w-20 sm:h-20 rounded-full flex items-center justify-center mx-auto mb-6">
+                  <span className="text-primary font-bold text-xl sm:text-2xl">3</span>
                 </div>
-                <h3 className="text-lg sm:text-xl font-semibold mb-2 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step3.title}
+                <h3 className="text-xl sm:text-2xl font-semibold mb-4 text-gray-900" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step3.title}
                 </h3>
-                <p className="text-gray-600 text-sm sm:text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                  {translations[language].step3.description}
+                <p className="text-gray-600 text-base" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+                  {translations[language].howItWorks.step3.description}
                 </p>
               </div>
             </div>
           </div>
         </section>
 
-        {/* CTA Section - Mobile optimized */}
-        <section className="py-8 sm:py-12 lg:py-16 bg-primary text-white">
+        {/* CTA Section */}
+        <section className="py-16 sm:py-20 lg:py-24 bg-primary text-white">
           <div className="container mx-auto px-4 sm:px-6 lg:px-8 text-center">
-            <h2 className="text-xl sm:text-2xl lg:text-3xl font-bold mb-4">
-              {translations[language].readyToTransform}
+            <h2 className="text-2xl sm:text-3xl lg:text-4xl font-bold mb-6">
+              {translations[language].cta.title}
             </h2>
-            <p className="text-base sm:text-lg mb-6 max-w-2xl mx-auto opacity-90">
-              {translations[language].joinBusinesses}
+            <p className="text-lg sm:text-xl mb-8 max-w-2xl mx-auto opacity-90">
+              {translations[language].cta.subtitle}
             </p>
             <Button 
               onClick={() => navigate('/signup')} 
-              className="bg-white text-primary hover:bg-gray-100 text-base py-3 sm:py-4 px-8"
+              className="bg-white text-primary hover:bg-gray-100 text-lg py-4 px-8 text-lg"
             >
-              {translations[language].startCreatingNow}
+              {translations[language].cta.button}
             </Button>
-            <p className="text-sm mt-4 opacity-75">
-              {translations[language].noCreditCard}
-            </p>
-          </div>
-        </section>
-
-        {/* FAQ Section for SEO */}
-        <section className="py-8 sm:py-12 lg:py-16 bg-gray-50">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-900">
-                Questions Fréquentes - Générateur QR Code Gratuit
-              </h2>
-              
-              <div className="space-y-6">
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Comment créer un QR code gratuit avec Qrcreator ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Avec Qrcreator, créez un QR code gratuit en 3 étapes simples : 1) Choisissez votre type de QR code (menu, vitrine, ecommerce), 2) Personnalisez avec vos couleurs et logo, 3) Téléchargez et utilisez immédiatement. Aucune inscription requise.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Qrcreator est-il vraiment gratuit ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Oui, Qrcreator est 100% gratuit. Créez autant de QR codes que vous voulez, personnalisez-les avec vos couleurs et logo, et utilisez-les commercialement sans aucune limitation. Aucun abonnement caché.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Puis-je créer un QR code pour mon restaurant en Algérie ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Absolument ! Qrcreator est spécialement conçu pour les restaurants en Algérie. Créez des menus QR codes avec photos, prix, et système de commande intégré. Interface en français et arabe.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Quelle est la différence entre Qrcreator et les autres générateurs QR code ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Qrcreator se distingue par sa spécialisation pour le marché algérien, son interface bilingue, ses fonctionnalités avancées (menus, ecommerce, commandes), et sa gratuité totale sans limitation.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Puis-je modifier mon QR code après l'avoir créé ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Oui ! Qrcreator utilise des QR codes dynamiques. Vous pouvez modifier le contenu de votre landing page à tout moment sans avoir à créer un nouveau QR code. Parfait pour les menus qui changent souvent.
-                  </p>
-                </div>
-
-                <div className="bg-white rounded-lg p-6 shadow-sm">
-                  <h3 className="text-lg font-semibold mb-3 text-primary">
-                    Qrcreator fonctionne-t-il sur mobile ?
-                  </h3>
-                  <p className="text-gray-700">
-                    Parfaitement ! Qrcreator est optimisé pour mobile. Les QR codes générés s'ouvrent sur des pages adaptées aux smartphones, offrant une excellente expérience utilisateur sur tous les appareils.
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* SEO Content Section */}
-        <section className="py-8 sm:py-12 lg:py-16 bg-white">
-          <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-            <div className="max-w-4xl mx-auto">
-              <h2 className="text-2xl sm:text-3xl font-bold text-center mb-8 text-gray-900">
-                Générateur QR Code Gratuit - La Solution Complète pour Votre Business
-              </h2>
-              
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-12">
-                <div>
-                  <h3 className="text-xl font-semibold mb-4 text-primary">Pourquoi Choisir QrCreator ?</h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">✓</span>
-                      <span>Générateur QR code <strong>100% gratuit</strong> sans limite</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">✓</span>
-                      <span>QR codes <strong>dynamiques</strong> modifiables à tout moment</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">✓</span>
-                      <span>Spécialement conçu pour les <strong>entreprises algériennes</strong></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">✓</span>
-                      <span>Interface en <strong>français et arabe</strong></span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">✓</span>
-                      <span>Aucune inscription requise, <strong>utilisation immédiate</strong></span>
-                    </li>
-                  </ul>
-                </div>
-                
-                <div>
-                  <h3 className="text-xl font-semibold mb-4 text-primary">Utilisations Principales</h3>
-                  <ul className="space-y-3 text-gray-700">
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span><strong>Menus de restaurant</strong> - QR codes pour cartes digitales</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span><strong>Vitrines d'entreprise</strong> - Présentation interactive</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span><strong>Ecommerce</strong> - Catalogues produits dynamiques</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span><strong>Gestion de commandes</strong> - Système de commande intégré</span>
-                    </li>
-                    <li className="flex items-start">
-                      <span className="text-primary mr-2">•</span>
-                      <span><strong>Marketing</strong> - Campagnes promotionnelles interactives</span>
-                    </li>
-                  </ul>
-                </div>
-              </div>
-
-              <div className="bg-gray-50 rounded-lg p-6 mb-8">
-                <h3 className="text-xl font-semibold mb-4 text-primary">Générateur QR Code Gratuit - Fonctionnalités Avancées</h3>
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                  <div className="text-center">
-                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-primary font-bold">🎨</span>
-                    </div>
-                    <h4 className="font-semibold mb-2">Personnalisation</h4>
-                    <p className="text-sm text-gray-600">Couleurs, logos, styles personnalisés pour votre marque</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-primary font-bold">📊</span>
-                    </div>
-                    <h4 className="font-semibold mb-2">Analytics</h4>
-                    <p className="text-sm text-gray-600">Suivi des scans et statistiques détaillées</p>
-                  </div>
-                  <div className="text-center">
-                    <div className="bg-primary/10 w-12 h-12 rounded-full flex items-center justify-center mx-auto mb-3">
-                      <span className="text-primary font-bold">🔄</span>
-                    </div>
-                    <h4 className="font-semibold mb-2">Mise à Jour</h4>
-                    <p className="text-sm text-gray-600">Modifiez le contenu sans changer le QR code</p>
-                  </div>
-                </div>
-              </div>
-
-              <div className="text-center">
-                <h3 className="text-xl font-semibold mb-4 text-primary">Générateur QR Code Gratuit - Commencez Maintenant</h3>
-                <p className="text-gray-700 mb-6">
-                  Rejoignez des milliers d'entreprises en Algérie qui utilisent déjà QrCreator pour digitaliser leur business. 
-                  Créez votre premier QR code gratuit en moins de 2 minutes !
-                </p>
-                <Button 
-                  onClick={() => navigate('/signup')} 
-                  className="bg-primary hover:bg-primary/90 text-white text-lg py-4 px-8"
-                >
-                  Créer Mon QR Code Gratuit
-                </Button>
-              </div>
-            </div>
           </div>
         </section>
       </MainLayout>
