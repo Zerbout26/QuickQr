@@ -567,16 +567,14 @@ const LandingPage = () => {
       <CriticalCSS colors={landingPageColors} />
       <div className="landing-container pb-20 content-fade-in" style={{ opacity: 0, animation: 'fadeInUp 0.6s ease-out forwards' }}>
         <div className="content-wrapper">
-          {/* QR Header - Always show for menu and URL types */}
-          {(qrCode.type === 'menu' || qrCode.type === 'url' || qrCode.type === 'both') && (
-            <Suspense fallback={null}>
-              <QRHeader 
-                qrCode={qrCode}
-                menuLanguage={menuLanguage} 
-                colors={landingPageColors}
-              />
-            </Suspense>
-          )}
+          {/* QR Header - Always show for all types */}
+          <Suspense fallback={null}>
+            <QRHeader 
+              qrCode={qrCode}
+              menuLanguage={menuLanguage} 
+              colors={landingPageColors}
+            />
+          </Suspense>
 
           {/* Menu Section */}
           {hasMenu && (
