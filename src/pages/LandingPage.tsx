@@ -213,8 +213,8 @@ const LandingPage = () => {
     primaryHoverColor: '#2563eb',
     accentColor: '#64748b',
     backgroundGradient: 'linear-gradient(135deg, #3b82f615 0%, #3b82f608 25%, white 50%, #64748b08 75%, #64748b15 100%)',
-    loadingSpinnerColor: '#3b82f6',
-    loadingSpinnerBorderColor: 'rgba(59, 130, 246, 0.2)'
+    loadingSpinnerColor: '#6b7280',
+    loadingSpinnerBorderColor: 'rgba(107, 114, 128, 0.2)'
   });
   const [basket, setBasket] = useState<Array<{
     key: string;
@@ -520,19 +520,30 @@ const LandingPage = () => {
           {/* Loading indicator */}
           <div className="text-center py-8">
             <div className="relative mb-4">
-              <div className="w-8 h-8 border-2 border-gray-200 rounded-full mx-auto">
-                <div 
-                  className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
-                  style={{ 
-                    borderTopColor: landingPageColors.loadingSpinnerColor,
-                    animationDuration: '1.2s'
-                  }}
-                ></div>
+              <div className="w-8 h-8 bg-gray-100 rounded-full mx-auto flex items-center justify-center">
+                <div className="w-8 h-8 border-2 border-gray-200 rounded-full relative">
+                  <div 
+                    className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+                    style={{ 
+                      borderTopColor: landingPageColors.loadingSpinnerColor,
+                      borderRightColor: `${landingPageColors.loadingSpinnerColor}40`,
+                      borderBottomColor: `${landingPageColors.loadingSpinnerColor}20`,
+                      borderLeftColor: `${landingPageColors.loadingSpinnerColor}10`,
+                      animationDuration: '1.5s',
+                      animationTimingFunction: 'ease-in-out'
+                    }}
+                  ></div>
+                </div>
               </div>
             </div>
-            <p className="text-gray-500 text-sm">
+            <p className="text-gray-500 text-sm font-normal mb-2">
               {menuLanguage === 'ar' ? 'جاري تحميل المحتوى...' : 'Loading content...'}
             </p>
+            <div className="flex space-x-1.5 justify-center">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '0ms', animationDuration: '2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '300ms', animationDuration: '2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '600ms', animationDuration: '2s' }}></div>
+            </div>
           </div>
         </div>
       </div>

@@ -10,7 +10,7 @@ interface LoadingProps {
 export const Loading: React.FC<LoadingProps> = ({ 
   size = 'md', 
   text = 'Loading...', 
-  color = '#8b5cf6',
+  color = '#6b7280',
   className = ''
 }) => {
   const sizeClasses = {
@@ -28,47 +28,50 @@ export const Loading: React.FC<LoadingProps> = ({
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <div className="relative mb-3">
-        <div className={`${sizeClasses[size]} border-2 border-gray-200 rounded-full`}>
-          <div 
-            className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
-            style={{ 
-              borderTopColor: color,
-              animationDuration: '1.2s'
-            }}
-          ></div>
+        {/* Soft background circle */}
+        <div className={`${sizeClasses[size]} bg-gray-100 rounded-full flex items-center justify-center`}>
+          {/* Main spinner with softer colors */}
+          <div className={`${sizeClasses[size]} border-2 border-gray-200 rounded-full relative`}>
+            <div 
+              className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+              style={{ 
+                borderTopColor: color,
+                borderRightColor: `${color}40`,
+                borderBottomColor: `${color}20`,
+                borderLeftColor: `${color}10`,
+                animationDuration: '1.5s',
+                animationTimingFunction: 'ease-in-out'
+              }}
+            ></div>
+          </div>
         </div>
       </div>
       {text && (
-        <p className={`text-gray-600 font-medium ${textSizes[size]} mb-2`}>
+        <p className={`text-gray-500 font-normal ${textSizes[size]} mb-2`}>
           {text}
         </p>
       )}
-      <div className="flex space-x-1 justify-center">
+      {/* Softer pulsing dots */}
+      <div className="flex space-x-1.5 justify-center">
         <div 
-          className="w-1 h-1 rounded-full animate-pulse" 
+          className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" 
           style={{ 
-            backgroundColor: color,
-            opacity: 0.4,
             animationDelay: '0ms', 
-            animationDuration: '1.5s' 
+            animationDuration: '2s' 
           }}
         ></div>
         <div 
-          className="w-1 h-1 rounded-full animate-pulse" 
+          className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" 
           style={{ 
-            backgroundColor: color,
-            opacity: 0.4,
-            animationDelay: '200ms', 
-            animationDuration: '1.5s' 
+            animationDelay: '300ms', 
+            animationDuration: '2s' 
           }}
         ></div>
         <div 
-          className="w-1 h-1 rounded-full animate-pulse" 
+          className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" 
           style={{ 
-            backgroundColor: color,
-            opacity: 0.4,
-            animationDelay: '400ms', 
-            animationDuration: '1.5s' 
+            animationDelay: '600ms', 
+            animationDuration: '2s' 
           }}
         ></div>
       </div>
@@ -77,7 +80,7 @@ export const Loading: React.FC<LoadingProps> = ({
 };
 
 export const LoadingSpinner: React.FC<LoadingProps> = (props) => (
-  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50 to-white">
+  <div className="flex items-center justify-center min-h-screen bg-gradient-to-br from-gray-50/80 to-white/90 backdrop-blur-sm">
     <Loading {...props} />
   </div>
 );

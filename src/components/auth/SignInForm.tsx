@@ -62,14 +62,17 @@ const SignInForm = () => {
 
     try {
       const user = await signIn(email, password);
-      // Redirect based on original location or user role
-      if (user.role === 'admin' && from === '/dashboard') {
-        navigate('/admin');
-      } else if (user.hasVitrine && user.hasMenu) {
-        navigate('/dashboard');
-      } else {
-        navigate('/choose-qr-type');
-      }
+      // Add a small delay to ensure state is properly updated
+      setTimeout(() => {
+        // Redirect based on original location or user role
+        if (user.role === 'admin' && from === '/dashboard') {
+          navigate('/admin');
+        } else if (user.hasVitrine && user.hasMenu) {
+          navigate('/dashboard');
+        } else {
+          navigate('/choose-qr-type');
+        }
+      }, 100);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to sign in');
     } finally {

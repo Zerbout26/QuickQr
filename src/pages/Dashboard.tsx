@@ -350,6 +350,39 @@ const Dashboard = () => {
     }
   }, [user, authLoading, navigate]);
 
+  // Wait for authentication to complete before proceeding
+  if (authLoading) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-gray-50/80 to-white/90 backdrop-blur-sm">
+        <div className="text-center">
+          <div className="relative mb-4">
+            <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 border-2 border-gray-200 rounded-full relative">
+                <div 
+                  className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+                  style={{ 
+                    borderTopColor: '#6b7280',
+                    borderRightColor: '#6b728040',
+                    borderBottomColor: '#6b728020',
+                    borderLeftColor: '#6b728010',
+                    animationDuration: '1.5s',
+                    animationTimingFunction: 'ease-in-out'
+                  }}
+                ></div>
+              </div>
+            </div>
+          </div>
+          <p className="text-gray-500 font-normal text-sm mb-2">Loading your dashboard...</p>
+          <div className="flex space-x-1.5 justify-center">
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '0ms', animationDuration: '2s' }}></div>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '300ms', animationDuration: '2s' }}></div>
+            <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '600ms', animationDuration: '2s' }}></div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   // Check if user has any QR codes and redirect to onboarding if not
   useEffect(() => {
     if (user && !isLoading && qrCodes.length === 0 && totalQRCodes === 0) {

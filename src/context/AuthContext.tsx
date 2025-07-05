@@ -84,20 +84,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { user, token } = await authApi.login({ email, password });
       localStorage.setItem('qr-generator-token', token);
       setUser(user);
+      // Ensure loading is set to false after user state is updated
+      setLoading(false);
       toast({
         title: "Signed in successfully",
         description: `Welcome back${user.name ? `, ${user.name}` : ''}!`,
       });
       return user;
     } catch (error: any) {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Sign in failed",
         description: error?.response?.data?.error || "Unknown error occurred",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 
@@ -107,20 +108,21 @@ export const AuthProvider: React.FC<{ children: React.ReactNode }> = ({ children
       const { user, token } = await authApi.register({ email, phone, password });
       localStorage.setItem('qr-generator-token', token);
       setUser(user);
+      // Ensure loading is set to false after user state is updated
+      setLoading(false);
       toast({
         title: "Account created",
         description: `Welcome to QR Code Generator! Your 14-day free trial has started.`,
       });
       return user;
     } catch (error: any) {
+      setLoading(false);
       toast({
         variant: "destructive",
         title: "Sign up failed",
         description: error?.response?.data?.error || "Unknown error occurred",
       });
       throw error;
-    } finally {
-      setLoading(false);
     }
   };
 

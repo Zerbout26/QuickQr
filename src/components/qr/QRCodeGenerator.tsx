@@ -843,7 +843,44 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
   };
 
   return (
-    <Card className="w-full p-1 sm:p-4">
+    <Card className="w-full p-1 sm:p-4 relative">
+      {isLoading && (
+        <div className="absolute inset-0 bg-white/80 backdrop-blur-sm z-10 flex items-center justify-center rounded-lg">
+          <div className="text-center">
+            <div className="relative mb-4">
+              <div className="w-12 h-12 bg-gray-100 rounded-full flex items-center justify-center mx-auto">
+                <div className="w-12 h-12 border-2 border-gray-200 rounded-full relative">
+                  <div 
+                    className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+                    style={{ 
+                      borderTopColor: '#6b7280',
+                      borderRightColor: '#6b728040',
+                      borderBottomColor: '#6b728020',
+                      borderLeftColor: '#6b728010',
+                      animationDuration: '1.5s',
+                      animationTimingFunction: 'ease-in-out'
+                    }}
+                  ></div>
+                </div>
+              </div>
+            </div>
+            <p className="text-gray-600 font-medium text-sm mb-2">
+              {translations[language].creating}
+            </p>
+            <p className="text-gray-500 text-xs">
+              {translations[language].creating === 'Creating...' 
+                ? 'Please wait while we create your QR code...' 
+                : 'يرجى الانتظار بينما نقوم بإنشاء رمز QR الخاص بك...'
+              }
+            </p>
+            <div className="flex space-x-1.5 justify-center mt-3">
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '0ms', animationDuration: '2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '300ms', animationDuration: '2s' }}></div>
+              <div className="w-1.5 h-1.5 rounded-full animate-pulse bg-gray-300" style={{ animationDelay: '600ms', animationDuration: '2s' }}></div>
+            </div>
+          </div>
+        </div>
+      )}
       <CardContent className="pt-2 sm:pt-4">
         <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
           {fromOnboarding && (
@@ -2193,10 +2230,33 @@ const QRCodeGenerator: React.FC<QRCodeFormProps> = ({ onCreated, selectedType, f
             <Button 
               type="submit"
               variant="default"
-              className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium"
+              className="w-full py-3 h-12 sm:h-14 text-sm sm:text-base bg-gradient-to-r from-blue-500 to-blue-600 hover:from-blue-600 hover:to-blue-700 text-white shadow-lg hover:shadow-xl transition-all duration-300 border-0 font-medium relative overflow-hidden"
               disabled={isLoading || (!canCreateMenu && !canCreateProducts && !canCreateVitrine)}
             >
-              {isLoading ? translations[language].creating : translations[language].createQRCode}
+              {isLoading ? (
+                <div className="flex items-center justify-center gap-2">
+                  <div className="relative">
+                    <div className="w-4 h-4 bg-gray-100 rounded-full flex items-center justify-center">
+                      <div className="w-4 h-4 border-2 border-gray-200 rounded-full relative">
+                        <div 
+                          className="w-full h-full border-2 border-transparent rounded-full animate-spin" 
+                          style={{ 
+                            borderTopColor: '#ffffff',
+                            borderRightColor: '#ffffff40',
+                            borderBottomColor: '#ffffff20',
+                            borderLeftColor: '#ffffff10',
+                            animationDuration: '1.5s',
+                            animationTimingFunction: 'ease-in-out'
+                          }}
+                        ></div>
+                      </div>
+                    </div>
+                  </div>
+                  <span>{translations[language].creating}</span>
+                </div>
+              ) : (
+                translations[language].createQRCode
+              )}
             </Button>
           </div>
           {error && <div className="text-red-500 mt-2 text-sm sm:text-base">{error}</div>}

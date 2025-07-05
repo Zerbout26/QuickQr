@@ -80,7 +80,10 @@ const SignUpForm = () => {
 
     try {
       await signUp(email, phone, password);
-      navigate('/choose-qr-type');
+      // Add a small delay to ensure state is properly updated
+      setTimeout(() => {
+        navigate('/choose-qr-type');
+      }, 100);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to create account');
     } finally {
