@@ -141,8 +141,47 @@ export const getOrders = async (req: AuthRequest, res: Response) => {
       where.qrCodeOwnerId = req.user.id;
       where.orderType = 'qr_order';
     } else {
-      // Default: get both types for the user
-      where.qrCodeOwnerId = req.user.id;
+      // Default: get both types - QR orders for the user and all card orders
+      // We need to use OR condition for this case
+      const qrOrdersWhere = { qrCodeOwnerId: req.user.id, orderType: 'qr_order' };
+      const cardOrdersWhere = { orderType: 'card_order' };
+      
+      // Use TypeORM's OR condition
+      const [qrOrders, qrTotal] = await orderRepository.findAndCount({
+        where: qrOrdersWhere,
+        relations: ['qrCode'],
+        order: { createdAt: 'DESC' },
+        take: limit,
+        skip,
+      });
+      
+      const [cardOrders, cardTotal] = await orderRepository.findAndCount({
+        where: cardOrdersWhere,
+        relations: ['qrCode'],
+        order: { createdAt: 'DESC' },
+        take: limit,
+        skip,
+      });
+      
+      // Combine and sort by creation date
+      const allOrders = [...qrOrders, ...cardOrders].sort((a, b) => 
+        new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+      );
+      
+      // Apply pagination to combined results
+      const startIndex = skip;
+      const endIndex = skip + limit;
+      const paginatedOrders = allOrders.slice(startIndex, endIndex);
+      
+      res.json({
+        data: paginatedOrders,
+        total: qrTotal + cardTotal,
+        page,
+        limit,
+        totalPages: Math.ceil((qrTotal + cardTotal) / limit),
+      });
+      
+      return;
     }
 
     if (status) {
@@ -185,7 +224,10 @@ export const getOrder = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     const order = await orderRepository.findOne({
-      where: { id, qrCodeOwnerId: req.user.id },
+      where: [
+        { id, qrCodeOwnerId: req.user.id },
+        { id, orderType: 'card_order' }
+      ],
       relations: ['qrCode']
     });
 
@@ -216,7 +258,10 @@ export const updateOrderStatus = async (req: AuthRequest, res: Response) => {
     }
 
     const order = await orderRepository.findOne({
-      where: { id, qrCodeOwnerId: req.user.id }
+      where: [
+        { id, qrCodeOwnerId: req.user.id },
+        { id, orderType: 'card_order' }
+      ]
     });
 
     if (!order) {
@@ -267,7 +312,10 @@ export const updateOrderNotes = async (req: AuthRequest, res: Response) => {
     const { adminNotes } = req.body;
 
     const order = await orderRepository.findOne({
-      where: { id, qrCodeOwnerId: req.user.id }
+      where: [
+        { id, qrCodeOwnerId: req.user.id },
+        { id, orderType: 'card_order' }
+      ]
     });
 
     if (!order) {
@@ -299,7 +347,10 @@ export const deleteOrder = async (req: AuthRequest, res: Response) => {
     const { id } = req.params;
 
     const order = await orderRepository.findOne({
-      where: { id, qrCodeOwnerId: req.user.id }
+      where: [
+        { id, qrCodeOwnerId: req.user.id },
+        { id, orderType: 'card_order' }
+      ]
     });
 
     if (!order) {
