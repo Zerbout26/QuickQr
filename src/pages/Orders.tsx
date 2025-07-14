@@ -45,7 +45,10 @@ interface Order {
   confirmedAt?: string;
   cancelledAt?: string;
   deliveredAt?: string;
-  qrCode: {
+  orderType?: string;
+  cardType?: string;
+  cardQuantity?: number;
+  qrCode?: {
     id: string;
     name: string;
   };
@@ -104,6 +107,9 @@ const translations = {
     to: 'to',
     results: 'results',
     clearFilters: 'Clear Filters',
+    orderType: 'Order Type',
+    qrOrders: 'QR Orders',
+    cardOrders: 'Card Orders',
   },
   ar: {
     orders: 'الطلبات',
@@ -157,6 +163,9 @@ const translations = {
     to: 'إلى',
     results: 'نتيجة',
     clearFilters: 'مسح المرشحات',
+    orderType: 'نوع الطلب',
+    qrOrders: 'طلبات QR',
+    cardOrders: 'طلبات البطاقات',
   }
 };
 
@@ -169,6 +178,7 @@ const Orders = () => {
   const [totalPages, setTotalPages] = useState(1);
   const [totalOrders, setTotalOrders] = useState(0);
   const [statusFilter, setStatusFilter] = useState<string>('all');
+  const [orderTypeFilter, setOrderTypeFilter] = useState<string>('all');
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [editingStatus, setEditingStatus] = useState<string>('');
@@ -189,7 +199,7 @@ const Orders = () => {
       fetchOrderStats();
     }, 10000); // 10 seconds
     return () => clearInterval(interval);
-  }, [page, statusFilter, searchTerm]);
+  }, [page, statusFilter, orderTypeFilter, searchTerm]);
 
   const fetchOrders = async () => {
     try {
@@ -198,6 +208,7 @@ const Orders = () => {
         page: page.toString(),
         limit: ordersPerPage.toString(),
         ...(statusFilter !== 'all' && { status: statusFilter }),
+        ...(orderTypeFilter !== 'all' && { orderType: orderTypeFilter }),
         ...(searchTerm && { searchTerm })
       });
 
@@ -363,6 +374,7 @@ const Orders = () => {
 
   const clearFilters = () => {
     setStatusFilter('all');
+    setOrderTypeFilter('all');
     setSearchTerm('');
     setPage(1);
   };
@@ -423,7 +435,7 @@ const Orders = () => {
 
         {/* Filters */}
         <div className="bg-white rounded-lg shadow p-4 mb-6">
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
             {/* Search */}
             <div>
               <label className="block text-sm font-medium mb-2">{t.search}</label>
@@ -451,6 +463,21 @@ const Orders = () => {
                   <SelectItem value="confirmed">{t.confirmed}</SelectItem>
                   <SelectItem value="cancelled">{t.cancelled}</SelectItem>
                   <SelectItem value="delivered">{t.delivered}</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            {/* Order Type Filter */}
+            <div>
+              <label className="block text-sm font-medium mb-2">{t.orderType}</label>
+              <Select value={orderTypeFilter} onValueChange={setOrderTypeFilter}>
+                <SelectTrigger>
+                  <SelectValue />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">{t.allOrders}</SelectItem>
+                  <SelectItem value="qr_order">{t.qrOrders}</SelectItem>
+                  <SelectItem value="card_order">{t.cardOrders}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
@@ -541,16 +568,29 @@ const Orders = () => {
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
                           <div className="space-y-1">
-                            {order.items.map((item, idx) => (
-                              <div key={idx}>
-                                <span className="font-medium">{item.itemName}</span>
-                                {item.selectedVariants && (
-                                  <span className="block text-xs text-gray-500">
-                                    {Object.entries(item.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
-                                  </span>
-                                )}
+                            {order.orderType === 'card_order' ? (
+                              <div>
+                                <span className="font-medium">
+                                  {order.cardType === 'business' ? 'Business Cards' : 
+                                   order.cardType === 'nfc' ? 'NFC Cards' :
+                                   order.cardType === 'tags' ? 'QR Tags' : 'QR Stickers'}
+                                </span>
+                                <span className="block text-xs text-gray-500">
+                                  Quantity: {order.cardQuantity}
+                                </span>
                               </div>
-                            ))}
+                            ) : (
+                              order.items.map((item, idx) => (
+                                <div key={idx}>
+                                  <span className="font-medium">{item.itemName}</span>
+                                  {item.selectedVariants && (
+                                    <span className="block text-xs text-gray-500">
+                                      {Object.entries(item.selectedVariants).map(([variant, option]) => `${variant}: ${option}`).join(', ')}
+                                    </span>
+                                  )}
+                                </div>
+                              ))
+                            )}
                           </div>
                         </td>
                         <td className={`px-6 py-4 whitespace-nowrap text-sm ${language === 'ar' ? 'text-right' : 'text-left'}`}>
@@ -642,27 +682,52 @@ const Orders = () => {
 
                                     {/* Order Items */}
                                     <div>
-                                      <h4 className="font-semibold mb-2">{t.orderItems}</h4>
+                                      <h4 className="font-semibold mb-2">
+                                        {selectedOrder.orderType === 'card_order' ? 'Card Order Details' : t.orderItems}
+                                      </h4>
                                       <div className="space-y-2">
-                                        {selectedOrder.items.map((item, index) => (
-                                          <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
-                                            <div>
-                                              <p className="font-medium">{item.itemName}</p>
-                                              <p className="text-sm text-gray-600">{item.categoryName}</p>
-                                              {item.selectedVariants && (
-                                                <ul className="text-xs text-gray-500 mt-1 space-y-0.5">
-                                                  {Object.entries(item.selectedVariants).map(([variant, option]) => (
-                                                    <li key={variant}>{variant}: {option}</li>
-                                                  ))}
-                                                </ul>
-                                              )}
-                                            </div>
-                                            <div className="text-right">
-                                              <p>{item.quantity} x {item.price} DZD</p>
-                                              <p className="font-semibold">{item.quantity * item.price} DZD</p>
+                                        {selectedOrder.orderType === 'card_order' ? (
+                                          <div className="p-4 bg-gray-50 rounded">
+                                            <div className="flex justify-between items-center">
+                                              <div>
+                                                <p className="font-medium">
+                                                  {selectedOrder.cardType === 'business' ? 'Business Cards' : 
+                                                   selectedOrder.cardType === 'nfc' ? 'NFC Cards' :
+                                                   selectedOrder.cardType === 'tags' ? 'QR Tags' : 'QR Stickers'}
+                                                </p>
+                                                <p className="text-sm text-gray-600">
+                                                  Professional {selectedOrder.cardType === 'business' ? 'business cards' : 
+                                                              selectedOrder.cardType === 'nfc' ? 'NFC visitor cards' :
+                                                              selectedOrder.cardType === 'tags' ? 'QR code tags' : 'QR code stickers'}
+                                                </p>
+                                              </div>
+                                              <div className="text-right">
+                                                <p>{selectedOrder.cardQuantity} cards</p>
+                                                <p className="font-semibold">{selectedOrder.totalAmount} DZD</p>
+                                              </div>
                                             </div>
                                           </div>
-                                        ))}
+                                        ) : (
+                                          selectedOrder.items.map((item, index) => (
+                                            <div key={index} className="flex justify-between items-center p-2 bg-gray-50 rounded">
+                                              <div>
+                                                <p className="font-medium">{item.itemName}</p>
+                                                <p className="text-sm text-gray-600">{item.categoryName}</p>
+                                                {item.selectedVariants && (
+                                                  <ul className="text-xs text-gray-500 mt-1 space-y-0.5">
+                                                    {Object.entries(item.selectedVariants).map(([variant, option]) => (
+                                                      <li key={variant}>{variant}: {option}</li>
+                                                    ))}
+                                                  </ul>
+                                                )}
+                                              </div>
+                                              <div className="text-right">
+                                                <p>{item.quantity} x {item.price} DZD</p>
+                                                <p className="font-semibold">{item.quantity * item.price} DZD</p>
+                                              </div>
+                                            </div>
+                                          ))
+                                        )}
                                       </div>
                                       <div className="mt-4 pt-4 border-t">
                                         <div className="flex justify-between font-bold">

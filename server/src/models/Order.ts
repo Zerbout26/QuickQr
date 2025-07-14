@@ -52,17 +52,26 @@ export class Order {
   @Column({ nullable: true })
   adminNotes?: string;
 
-  @ManyToOne(() => QRCode, { onDelete: 'CASCADE' })
-  qrCode!: QRCode;
+  @ManyToOne(() => QRCode, { onDelete: 'CASCADE', nullable: true })
+  qrCode?: QRCode;
 
-  @Column()
-  qrCodeId!: string;
+  @Column({ nullable: true })
+  qrCodeId?: string;
 
-  @ManyToOne(() => User, { onDelete: 'CASCADE' })
-  qrCodeOwner!: User;
+  @ManyToOne(() => User, { onDelete: 'CASCADE', nullable: true })
+  qrCodeOwner?: User;
 
-  @Column()
-  qrCodeOwnerId!: string;
+  @Column({ nullable: true })
+  qrCodeOwnerId?: string;
+
+  @Column({ default: 'qr_order' })
+  orderType!: string;
+
+  @Column({ nullable: true })
+  cardType?: string;
+
+  @Column({ nullable: true })
+  cardQuantity?: number;
 
   @CreateDateColumn()
   createdAt!: Date;

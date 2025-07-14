@@ -4,9 +4,11 @@ import MainLayout from '@/components/layout/MainLayout';
 import { Button } from '@/components/ui/button';
 import { useAuth } from '@/context/AuthContext';
 import { useLanguage } from '@/context/LanguageContext';
-import { ArrowRight, Shield, Star, Globe, ChartBar, Settings, CheckCircle, Facebook, Instagram } from 'lucide-react';
+import { ArrowRight, Shield, Star, Globe, ChartBar, Settings, CheckCircle, Facebook, Instagram, CreditCard, Smartphone } from 'lucide-react';
 import { useState } from 'react';
 import { Helmet } from 'react-helmet';
+import CardOrderSection from '@/components/landing/CardOrderSection';
+
 
 // Clean translations object
 const translations = {
@@ -147,12 +149,73 @@ const Index = () => {
     return () => window.removeEventListener('resize', checkMobile);
   }, []);
 
-  // If user is already logged in, redirect to dashboard
-  useEffect(() => {
-    if (user) {
-      navigate('/dashboard');
+  // If user is already logged in, don't redirect - let them access the card order section
+  // The card order section should be accessible to everyone
+
+  const handleOrderSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (isSubmitting) return;
+    
+    setIsSubmitting(true);
+    
+    try {
+      const orderData = {
+        type: 'card_order',
+        cardType: selectedProductType,
+        quantity: quantity,
+        customerInfo: formData,
+        totalAmount: selectedProductType === 'business' ? quantity * 0.5 : 
+                   selectedProductType === 'nfc' ? quantity * 2 :
+                   selectedProductType === 'tags' ? quantity * 0.3 :
+                   quantity * 0.2 // stickers
+      };
+
+      console.log('Sending order data:', orderData);
+
+      const response = await fetch('https://quickqr-heyg.onrender.com/api/orders', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(orderData)
+      });
+
+      console.log('Response status:', response.status);
+      const responseText = await response.text();
+      console.log('Response text:', responseText);
+
+      if (!response.ok) {
+        let errorMessage = 'Failed to create order';
+        try {
+          const errorData = JSON.parse(responseText);
+          errorMessage = errorData.error || errorMessage;
+        } catch (e) {
+          errorMessage = responseText || errorMessage;
+        }
+        throw new Error(errorMessage);
+      }
+
+      const result = JSON.parse(responseText);
+
+      // Reset form and show success
+      setFormData({ name: '', phone: '', address: '', notes: '' });
+      setShowOrderForm(false);
+      setShowSuccess(true);
+      
+      // Hide success message after 5 seconds
+      setTimeout(() => setShowSuccess(false), 5000);
+      
+    } catch (error) {
+      console.error('Error creating order:', error);
+      alert(language === 'ar' ? 
+        'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' : 
+        'Error submitting order. Please try again.'
+      );
+    } finally {
+      setIsSubmitting(false);
     }
-  }, [user, navigate]);
+  };
 
   return (
     <>
@@ -189,20 +252,48 @@ const Index = () => {
                 </div>
                 
                 <div className="flex flex-col sm:flex-row space-y-4 sm:space-y-0 sm:space-x-4 justify-center lg:justify-start">
-                  <Button 
-                    onClick={() => navigate('/signup')} 
-                    className="text-lg py-4 px-8 flex items-center justify-center gap-2 group w-full sm:w-auto"
-                  >
-                    {translations[language].hero.startFreeTrial}
-                    <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-                  </Button>
-                  <Button 
-                    onClick={() => navigate('/signin')} 
-                    variant="outline" 
-                    className="text-lg py-4 px-8 border-2 hover:bg-gray-50 w-full sm:w-auto"
-                  >
-                    {translations[language].hero.signIn}
-                  </Button>
+                  {user ? (
+                    <Button 
+                      onClick={() => navigate('/dashboard')} 
+                      className="text-lg py-4 px-8 flex items-center justify-center gap-2 group w-full sm:w-auto"
+                    >
+                      Go to Dashboard
+                      <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                    </Button>
+                  ) : (
+                    <>
+                      <Button 
+                        onClick={() => navigate('/signup')} 
+                        className="text-lg py-4 px-8 flex items-center justify-center gap-2 group w-full sm:w-auto"
+                      >
+                        {translations[language].hero.startFreeTrial}
+                        <ArrowRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
+                      </Button>
+                      <Button 
+                        onClick={() => navigate('/signin')} 
+                        variant="outline" 
+                        className="text-lg py-4 px-8 border-2 hover:bg-gray-50 w-full sm:w-auto"
+                      >
+                        {translations[language].hero.signIn}
+                      </Button>
+                    </>
+                  )}
+                </div>
+                
+                {/* Card Order Quick Access */}
+                <div className="mt-6">
+                  <p className="text-sm text-gray-500 mb-3 text-center lg:text-left">
+                    {language === 'ar' ? 'أو اطلب البطاقات والملصقات مباشرة:' : 'Or order cards, tags & stickers directly:'}
+                  </p>
+                  <div className="flex justify-center lg:justify-start">
+                    <Button 
+                      onClick={() => navigate('/order')}
+                      className="text-base py-3 px-6 bg-blue-600 hover:bg-blue-700 text-white w-full sm:w-auto flex items-center gap-2"
+                    >
+                      <CreditCard className="w-4 h-4" />
+                      {language === 'ar' ? 'طلب NFC، بطاقات عمل، علامات وملصقات' : 'Order NFC, Business Cards, Tags & Stickers'}
+                    </Button>
+                  </div>
                 </div>
                 
                 <div className="mt-6 flex items-center justify-center lg:justify-start text-gray-500">
@@ -268,6 +359,14 @@ const Index = () => {
             </div>
           </div>
         </section>
+
+        {/* Card Order Section - Prominent Position */}
+        <CardOrderSection 
+          colors={{
+            primaryColor: '#3b82f6',
+            primaryHoverColor: '#2563eb'
+          }}
+        />
 
         {/* Features Section */}
         <section className="py-16 sm:py-20 lg:py-24 bg-white">
@@ -425,14 +524,37 @@ const Index = () => {
               {translations[language].cta.subtitle}
             </p>
             <Button 
-              onClick={() => navigate('/signup')} 
+              onClick={() => user ? navigate('/dashboard') : navigate('/signup')} 
               className="bg-white text-primary hover:bg-gray-100 text-lg py-4 px-8 text-lg"
             >
-              {translations[language].cta.button}
+              {user ? 'Go to Dashboard' : translations[language].cta.button}
             </Button>
           </div>
         </section>
       </MainLayout>
+
+      {/* Success Dialog */}
+      {showSuccess && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
+          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
+            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+              <CheckCircle className="w-8 h-8 text-green-600" />
+            </div>
+            <h3 className="text-xl font-bold text-gray-900 mb-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              {language === 'ar' ? 'تم إرسال الطلب بنجاح' : 'Order Submitted Successfully'}
+            </h3>
+            <p className="text-gray-600 mb-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
+              {language === 'ar' ? 'سنتواصل معك قريباً لتأكيد طلبك' : 'We will contact you soon to confirm your order'}
+            </p>
+            <DialogButton
+              onClick={() => setShowSuccess(false)}
+              className="w-full"
+            >
+              OK
+            </DialogButton>
+          </div>
+        </div>
+      )}
     </>
   );
 };

@@ -22,6 +22,7 @@ import { LoadingSpinner } from "@/components/ui/loading";
 const Dashboard = lazy(() => import("./pages/Dashboard"));
 const Admin = lazy(() => import("./pages/Admin"));
 const Orders = lazy(() => import("./pages/Orders"));
+const OrderPage = lazy(() => import("./pages/OrderPage"));
 const EditQRCodePage = lazy(() => import('@/pages/EditQRCodePage'));
 const ResetPasswordForm = lazy(() => import('@/components/auth/ResetPasswordForm'));
 const Profile = lazy(() => import('@/pages/Profile'));
@@ -81,6 +82,11 @@ const App = () => (
               <Route path="/payment-instructions" element={<PaymentInstructions />} />
               <Route path="/landing/:id" element={<LandingPage />} />
               <Route path="/landing/:id/:url" element={<LandingPage />} />
+              <Route path="/order" element={
+                <Suspense fallback={<LoadingSpinner />}>
+                  <OrderPage />
+                </Suspense>
+              } />
               <Route path="/qrcodes/:id/edit" element={
                 <PrivateRoute>
                   <Suspense fallback={<LoadingSpinner />}>

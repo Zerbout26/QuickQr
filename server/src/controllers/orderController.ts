@@ -20,8 +20,44 @@ const generateOrderNumber = (): string => {
 // Create new order (public endpoint)
 export const createOrder = async (req: Request, res: Response) => {
   try {
-    const { qrCodeId, items, customerInfo } = req.body;
+    console.log('Received order request:', req.body);
+    const { qrCodeId, items, customerInfo, type, cardType, quantity, totalAmount } = req.body;
 
+    // Handle card orders
+    if (type === 'card_order') {
+      console.log('Processing card order:', { customerInfo, cardType, quantity, totalAmount });
+      if (!customerInfo || !cardType || !quantity || !totalAmount) {
+        console.log('Missing fields:', { 
+          hasCustomerInfo: !!customerInfo, 
+          hasCardType: !!cardType, 
+          hasQuantity: !!quantity, 
+          hasTotalAmount: !!totalAmount 
+        });
+        return res.status(400).json({ error: 'Missing required fields for card order' });
+      }
+
+      // Create card order
+      const order = new Order();
+      order.orderNumber = generateOrderNumber();
+      order.orderType = 'card_order';
+      order.cardType = cardType;
+      order.cardQuantity = quantity;
+      order.customerInfo = customerInfo;
+      order.totalAmount = totalAmount;
+      order.status = 'pending';
+      order.items = []; // Empty items for card orders
+
+      const savedOrder = await orderRepository.save(order);
+
+      res.status(201).json({
+        success: true,
+        message: 'Card order created successfully',
+        order: savedOrder
+      });
+      return;
+    }
+
+    // Handle QR code orders (existing logic)
     if (!qrCodeId || !items || !customerInfo) {
       return res.status(400).json({ error: 'Missing required fields' });
     }
@@ -49,14 +85,15 @@ export const createOrder = async (req: Request, res: Response) => {
     }
 
     // Calculate total amount
-    const totalAmount = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
+    const calculatedTotalAmount = items.reduce((sum: number, item: any) => sum + (item.price * item.quantity), 0);
 
     // Create order
     const order = new Order();
     order.orderNumber = generateOrderNumber();
+    order.orderType = 'qr_order';
     order.items = items;
     order.customerInfo = customerInfo;
-    order.totalAmount = totalAmount;
+    order.totalAmount = calculatedTotalAmount;
     order.qrCodeId = qrCodeId;
     order.qrCodeOwnerId = qrCode.user.id;
     order.status = 'pending';
@@ -94,7 +131,19 @@ export const getOrders = async (req: AuthRequest, res: Response) => {
     const searchTerm = req.query.searchTerm as string;
     const skip = (page - 1) * limit;
 
-    const where: any = { qrCodeOwnerId: req.user.id };
+    // For card orders, we need to get all card orders (no owner restriction)
+    // For QR orders, we get orders for the specific user
+    const where: any = {};
+    
+    if (req.query.orderType === 'card_order') {
+      where.orderType = 'card_order';
+    } else if (req.query.orderType === 'qr_order') {
+      where.qrCodeOwnerId = req.user.id;
+      where.orderType = 'qr_order';
+    } else {
+      // Default: get both types for the user
+      where.qrCodeOwnerId = req.user.id;
+    }
 
     if (status) {
       where.status = status;
