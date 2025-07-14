@@ -295,13 +295,7 @@ const Index = () => {
           </div>
         </section>
 
-        {/* Card Order Section - Prominent Position */}
-        <CardOrderSection 
-          colors={{
-            primaryColor: '#3b82f6',
-            primaryHoverColor: '#2563eb'
-          }}
-        />
+
 
         {/* Features Section */}
         <section className="py-16 sm:py-20 lg:py-24 bg-white">
