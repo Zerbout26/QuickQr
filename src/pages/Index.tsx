@@ -152,71 +152,6 @@ const Index = () => {
   // If user is already logged in, don't redirect - let them access the card order section
   // The card order section should be accessible to everyone
 
-  const handleOrderSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-      const orderData = {
-        type: 'card_order',
-        cardType: selectedProductType,
-        quantity: quantity,
-        customerInfo: formData,
-        totalAmount: selectedProductType === 'business' ? quantity * 0.5 : 
-                   selectedProductType === 'nfc' ? quantity * 2 :
-                   selectedProductType === 'tags' ? quantity * 0.3 :
-                   quantity * 0.2 // stickers
-      };
-
-      console.log('Sending order data:', orderData);
-
-      const response = await fetch('https://quickqr-heyg.onrender.com/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to create order';
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const result = JSON.parse(responseText);
-
-      // Reset form and show success
-      setFormData({ name: '', phone: '', address: '', notes: '' });
-      setShowOrderForm(false);
-      setShowSuccess(true);
-      
-      // Hide success message after 5 seconds
-      setTimeout(() => setShowSuccess(false), 5000);
-      
-    } catch (error) {
-      console.error('Error creating order:', error);
-      alert(language === 'ar' ? 
-        'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' : 
-        'Error submitting order. Please try again.'
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
   return (
     <>
       <Helmet>
@@ -532,29 +467,6 @@ const Index = () => {
           </div>
         </section>
       </MainLayout>
-
-      {/* Success Dialog */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-              {language === 'ar' ? 'تم إرسال الطلب بنجاح' : 'Order Submitted Successfully'}
-            </h3>
-            <p className="text-gray-600 mb-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-              {language === 'ar' ? 'سنتواصل معك قريباً لتأكيد طلبك' : 'We will contact you soon to confirm your order'}
-            </p>
-            <DialogButton
-              onClick={() => setShowSuccess(false)}
-              className="w-full"
-            >
-              OK
-            </DialogButton>
-          </div>
-        </div>
-      )}
     </>
   );
 };

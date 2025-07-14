@@ -1,8 +1,5 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { useLanguage } from '@/context/LanguageContext';
@@ -77,85 +74,8 @@ const translations = {
 const CardOrderSection: React.FC<CardOrderSectionProps> = ({ colors }) => {
   const { language } = useLanguage();
   const t = translations[language];
-  
-  const [showOrderForm, setShowOrderForm] = useState(false);
-  const [selectedCardType, setSelectedCardType] = useState<'business' | 'nfc' | 'tags' | 'stickers'>('business');
-  const [quantity, setQuantity] = useState(100);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
-  
-  const [formData, setFormData] = useState({
-    name: '',
-    phone: '',
-    address: '',
-    notes: ''
-  });
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    
-    if (isSubmitting) return;
-    
-    setIsSubmitting(true);
-    
-    try {
-      const orderData = {
-        type: 'card_order',
-        cardType: selectedCardType,
-        quantity: quantity,
-        customerInfo: formData,
-        totalAmount: selectedCardType === 'business' ? quantity * 0.5 : 
-                   selectedCardType === 'nfc' ? quantity * 2 :
-                   selectedCardType === 'tags' ? quantity * 0.3 :
-                   quantity * 0.2 // stickers
-      };
 
-      console.log('Sending order data:', orderData);
-
-      // Send order to backend
-      const response = await fetch('https://quickqr-heyg.onrender.com/api/orders', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(orderData)
-      });
-
-      console.log('Response status:', response.status);
-      const responseText = await response.text();
-      console.log('Response text:', responseText);
-
-      if (!response.ok) {
-        let errorMessage = 'Failed to create order';
-        try {
-          const errorData = JSON.parse(responseText);
-          errorMessage = errorData.error || errorMessage;
-        } catch (e) {
-          errorMessage = responseText || errorMessage;
-        }
-        throw new Error(errorMessage);
-      }
-
-      const result = JSON.parse(responseText);
-
-      // Reset form and show success
-      setFormData({ name: '', phone: '', address: '', notes: '' });
-      setShowOrderForm(false);
-      setShowSuccess(true);
-      
-      // Hide success message after 5 seconds
-      setTimeout(() => setShowSuccess(false), 5000);
-      
-    } catch (error) {
-      console.error('Error creating order:', error);
-      alert(language === 'ar' ? 
-        'حدث خطأ أثناء إرسال الطلب. يرجى المحاولة مرة أخرى.' : 
-        'Error submitting order. Please try again.'
-      );
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
 
   const cardTypes = [
     {
@@ -280,204 +200,22 @@ const CardOrderSection: React.FC<CardOrderSectionProps> = ({ colors }) => {
                   ))}
                 </ul>
                 
-                <Dialog>
-                  <DialogTrigger asChild>
-                    <Button 
-                      className="w-full"
-                      style={{ 
-                        backgroundColor: colors.primaryColor,
-                        '--tw-ring-color': colors.primaryColor
-                      } as React.CSSProperties}
-                      onClick={() => setSelectedCardType(cardType.type)}
-                      data-order-form-trigger={cardType.type === 'business' ? 'true' : undefined}
-                    >
-                      {t.orderNow}
-                    </Button>
-                  </DialogTrigger>
-                  
-                  <DialogContent className="max-w-md">
-                    <DialogHeader>
-                      <DialogTitle className="text-xl font-bold" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                        {t.deliveryInfo}
-                      </DialogTitle>
-                    </DialogHeader>
-                    
-                    <form onSubmit={handleSubmit} className="space-y-4">
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          {t.fullName} *
-                        </label>
-                        <Input
-                          type="text"
-                          required
-                          value={formData.name}
-                          onChange={(e) => setFormData(prev => ({ ...prev, name: e.target.value }))}
-                          placeholder={t.enterName}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          {t.phoneNumber} *
-                        </label>
-                        <Input
-                          type="tel"
-                          required
-                          value={formData.phone}
-                          onChange={(e) => setFormData(prev => ({ ...prev, phone: e.target.value }))}
-                          placeholder={t.enterPhone}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          {t.address} *
-                        </label>
-                        <Textarea
-                          required
-                          value={formData.address}
-                          onChange={(e) => setFormData(prev => ({ ...prev, address: e.target.value }))}
-                          placeholder={t.enterAddress}
-                          rows={3}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          {t.quantity}
-                        </label>
-                        <div className="flex items-center gap-2">
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setQuantity(Math.max(50, quantity - 50))}
-                          >
-                            -
-                          </Button>
-                          <span className="px-4 py-2 bg-gray-50 rounded-md min-w-[80px] text-center">
-                            {quantity}
-                          </span>
-                          <Button
-                            type="button"
-                            variant="outline"
-                            size="sm"
-                            onClick={() => setQuantity(quantity + 50)}
-                          >
-                            +
-                          </Button>
-                        </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-sm font-medium text-gray-700 mb-1" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                          {t.notes}
-                        </label>
-                        <Textarea
-                          value={formData.notes}
-                          onChange={(e) => setFormData(prev => ({ ...prev, notes: e.target.value }))}
-                          placeholder={t.enterNotes}
-                          rows={2}
-                          dir={language === 'ar' ? 'rtl' : 'ltr'}
-                        />
-                      </div>
-
-                      <div className="bg-gray-50 p-4 rounded-lg">
-                        <div className="flex justify-between items-center mb-2">
-                          <span className="font-medium" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                            {t.cardType}:
-                          </span>
-                          <span className="text-sm text-gray-600" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                            {selectedCardType === 'business' ? t.businessCard : 
-                             selectedCardType === 'nfc' ? t.nfcCard :
-                             selectedCardType === 'tags' ? 'QR Tags' : 'QR Stickers'}
-                          </span>
-                        </div>
-                        <div className="flex justify-between items-center">
-                          <span className="font-medium" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                            {t.quantity}:
-                          </span>
-                          <span className="text-sm text-gray-600">{quantity}</span>
-                        </div>
-                        <div className="flex justify-between items-center pt-2 border-t">
-                          <span className="font-bold" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-                            Total:
-                          </span>
-                          <span className="font-bold">
-                            {selectedCardType === 'business' ? quantity * 0.5 : 
-                             selectedCardType === 'nfc' ? quantity * 2 :
-                             selectedCardType === 'tags' ? quantity * 0.3 :
-                             quantity * 0.2} DZD
-                          </span>
-                        </div>
-                      </div>
-
-                      <div className="flex gap-3 pt-4">
-                        <Button
-                          type="button"
-                          variant="outline"
-                          className="flex-1"
-                          onClick={() => setShowOrderForm(false)}
-                        >
-                          {t.cancel}
-                        </Button>
-                        <Button
-                          type="submit"
-                          className="flex-1"
-                          disabled={isSubmitting}
-                          style={{ 
-                            backgroundColor: colors.primaryColor,
-                            '--tw-ring-color': colors.primaryColor
-                          } as React.CSSProperties}
-                        >
-                          {isSubmitting ? (
-                            <div className="flex items-center gap-2">
-                              <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
-                              {t.loading}
-                            </div>
-                          ) : (
-                            t.submitOrder
-                          )}
-                        </Button>
-                      </div>
-                    </form>
-                  </DialogContent>
-                </Dialog>
+                                <Button 
+                  className="w-full"
+                  style={{ 
+                    backgroundColor: colors.primaryColor,
+                    '--tw-ring-color': colors.primaryColor
+                  } as React.CSSProperties}
+                  onClick={() => window.open('/order', '_blank')}
+                >
+                  {t.orderNow}
+                </Button>
               </CardContent>
             </Card>
           ))}
         </div>
       </div>
 
-      {/* Success Dialog */}
-      {showSuccess && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg shadow-xl max-w-md w-full p-6 text-center">
-            <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
-              <CheckCircle className="w-8 h-8 text-green-600" />
-            </div>
-            <h3 className="text-xl font-bold text-gray-900 mb-2" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-              {t.orderSubmitted}
-            </h3>
-            <p className="text-gray-600 mb-6" dir={language === 'ar' ? 'rtl' : 'ltr'}>
-              {t.orderSubmittedDesc}
-            </p>
-            <Button
-              onClick={() => setShowSuccess(false)}
-              className="w-full"
-              style={{ 
-                backgroundColor: colors.primaryColor,
-                '--tw-ring-color': colors.primaryColor
-              } as React.CSSProperties}
-            >
-              OK
-            </Button>
-          </div>
-        </div>
-      )}
     </section>
   );
 };
