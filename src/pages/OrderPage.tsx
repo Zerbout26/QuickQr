@@ -143,19 +143,20 @@ const OrderPage = () => {
     setLoading(true);
 
     try {
-      const response = await fetch(`${API_BASE_URL}/orders/card`, {
+      const response = await fetch(`${API_BASE_URL}/orders`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
+          type: 'card_order',
+          cardType: formData.productType,
+          cardQuantity: formData.quantity,
           customerInfo: {
             name: formData.name,
             phone: formData.phone,
             address: formData.address
           },
-          cardType: formData.productType,
-          cardQuantity: formData.quantity,
           notes: formData.notes,
           totalAmount: totalPrice
         })
