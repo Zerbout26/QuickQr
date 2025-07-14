@@ -151,7 +151,7 @@ const OrderPage = () => {
         body: JSON.stringify({
           type: 'card_order',
           cardType: formData.productType,
-          cardQuantity: formData.quantity,
+          quantity: formData.quantity,
           customerInfo: {
             name: formData.name,
             phone: formData.phone,
