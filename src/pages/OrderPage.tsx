@@ -11,6 +11,14 @@ import { Badge } from '@/components/ui/badge';
 import { toast } from '@/components/ui/use-toast';
 import { CheckCircle, CreditCard, Truck, Shield, ArrowRight, Home, Star, Globe, ChartBar, Settings } from 'lucide-react';
 
+declare global {
+  interface Window {
+    ttq?: {
+      track: (event: string, data?: Record<string, any>) => void;
+    };
+  }
+}
+
 const API_BASE_URL = 'https://quickqr-heyg.onrender.com/api';
 
 const translations = {
@@ -160,6 +168,11 @@ const OrderPage = () => {
         title: t.orderSuccess,
         description: `Order #${result.order.orderNumber} has been placed successfully!`
       });
+
+      // TikTok Pixel custom event for order
+      if (window.ttq && typeof window.ttq.track === 'function') {
+        window.ttq.track('PlaceAnOrder', { value: totalPrice, currency: 'DZD' });
+      }
 
       // Reset form
       setFormData({
