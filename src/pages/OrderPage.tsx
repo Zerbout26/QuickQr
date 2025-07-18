@@ -100,28 +100,16 @@ const OrderPage = () => {
 
   const productTypes = [
     {
-      value: 'business',
-      label: t.businessCards,
-      description: t.businessCardsDesc,
-      price: t.pricing.business
+      value: 'nfc_standard',
+      label: language === 'ar' ? 'بطاقة NFC عادية' : 'NFC Card Standard',
+      description: language === 'ar' ? 'بطاقة NFC عادية بجودة عالية' : 'High quality standard NFC card',
+      price: 1900
     },
     {
-      value: 'nfc',
-      label: t.nfcCards,
-      description: t.nfcCardsDesc,
-      price: t.pricing.nfc
-    },
-    {
-      value: 'tags',
-      label: t.qrTags,
-      description: t.qrTagsDesc,
-      price: t.pricing.tags
-    },
-    {
-      value: 'stickers',
-      label: t.qrStickers,
-      description: t.qrStickersDesc,
-      price: t.pricing.stickers
+      value: 'nfc_custom',
+      label: language === 'ar' ? 'بطاقة NFC مخصصة' : 'NFC Card Custom',
+      description: language === 'ar' ? 'بطاقة NFC بتصميم مخصص' : 'Custom design NFC card',
+      price: 2900
     }
   ];
 
